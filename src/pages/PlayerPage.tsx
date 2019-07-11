@@ -20,13 +20,21 @@ import {UserCursor} from "../components/whiteboard/UserCursor";
 import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
+import videojs from "video.js";
+import Draggable from "react-draggable";
+import VideoPlaceholder from "../components/whiteboard/VideoPlaceholder";
+import {isMobile} from "react-device-detect";
+
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type PlayerPageProps = RouteComponentProps<{
     uuid: string;
-    roomToken: string;
     userId: string;
+    time: string;
+    duration: string;
+    mediaSource?: string;
 }> & {room: Room};
+
 
 export type PlayerPageStates = {
     player: Player | null;
@@ -44,6 +52,7 @@ export type PlayerPageStates = {
 export default class PlayerPage extends React.Component<PlayerPageProps, PlayerPageStates> {
     private scheduleTime: number = 0;
     private readonly cursor: any;
+
     public constructor(props: PlayerPageProps) {
         super(props);
         this.cursor = new UserCursor();
@@ -60,6 +69,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             seenMessagesLength: 0,
         };
     }
+
     private getRoomToken = async (uuid: string): Promise<string | null> => {
         const res = await netlessWhiteboardApi.room.joinRoomApi(uuid);
         if (res.code === 200) {
@@ -71,10 +81,24 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
 
     public async componentDidMount(): Promise<void> {
         const uuid = this.props.match.params.uuid;
-        const roomToken = this.props.match.params.roomToken;
         const whiteWebSdk = new WhiteWebSdk();
+        const roomToken = await this.getRoomToken(uuid);
         if (uuid && roomToken) {
-            const player = await whiteWebSdk.replayRoom({room: uuid, roomToken: roomToken, cursorAdapter: this.cursor}, {
+            const {time, duration} = this.props.match.params;
+
+            let {mediaSource} = this.props.match.params;
+
+            mediaSource = mediaSource === undefined ? undefined : `https://netless-media.oss-cn-hangzhou.aliyuncs.com/${mediaSource}`;
+
+            const player = await whiteWebSdk.replayRoom(
+                {
+                    beginTimestamp: time ? parseInt(time) : undefined,
+                    duration: duration ? parseInt(duration) : undefined,
+                    room: uuid,
+                    audioUrl: mediaSource,
+                    roomToken: roomToken,
+                    cursorAdapter: this.cursor,
+                }, {
                 onPhaseChanged: phase => {
                     this.setState({phase: phase});
                 },
@@ -90,7 +114,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                     }
                 },
                 onStoppedWithError: error => {
-                  message.error("Playback error");
+                    message.error("Playback error");
                 },
                 onScheduleTimeChanged: scheduleTime => {
                     this.setState({currentTime: scheduleTime});
@@ -200,6 +224,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                     <div className="player-mid-box-time">
                         {displayWatch(Math.floor(this.state.player.scheduleTime / 1000))} / {displayWatch(Math.floor(this.state.player.timeDuration / 1000))}
                     </div>
+                    {isMobile ||
                     <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isVisible ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                         <Popover
                             overlayClassName="whiteboard-chat"
@@ -220,6 +245,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                             </div>
                         </Popover>
                     </Badge>
+                    }
                 </div>
             );
         } else {
@@ -228,67 +254,67 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
     }
 
     public render(): React.ReactNode {
-        if (!this.state.player) {
-            return <div className="white-board-loading">
-                <img src={loading}/>
-            </div>;
-        } else if (this.state.phase === PlayerPhase.WaitingFirstFrame) {
-            return <div className="white-board-loading">
-                <img src={loading}/>
-            </div>;
-        } else {
-            return (
-                <div className="player-out-box">
-                    <div
-                        style={{display: "flex"}}
-                        className="player-nav-box">
-                        <div className="player-nav-left-box">
-                            <div className="player-nav-left">
-                                <div
-                                    onClick={() => push(this.props.history, `/`)}
-                                    className="player-nav-icon-box-left">
-                                    <img src={home}/>
-                                </div>
-                                <div
-                                    onClick={() => push(this.props.history, `/whiteboard/${this.props.match.params.uuid}/${this.props.match.params.userId}/`)}
-                                    className="player-nav-icon-box-right">
-                                    <img src={board}/>
-                                </div>
+        return (
+            <div className="player-out-box">
+                <div
+                    style={{display: "flex"}}
+                    className="player-nav-box">
+                    <div className="player-nav-left-box">
+                        <div className="player-nav-left">
+                            <div
+                                onClick={() => push(this.props.history, `/`)}
+                                className="player-nav-icon-box-left">
+                                <img src={home}/>
+                            </div>
+                            <div
+                                onClick={() => push(this.props.history, `/whiteboard/${this.props.match.params.uuid}/${this.props.match.params.userId}/`)}
+                                className="player-nav-icon-box-right">
+                                <img src={board}/>
                             </div>
                         </div>
-                        <div className="player-nav-right">
-                            <Identicon
-                                size={36}
-                                string={netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${parseInt(this.props.match.params.userId)}`)}/>
-                        </div>
                     </div>
-                    {this.renderScheduleView()}
-                    {this.state.isHandClap && <div className="whiteboard-box-gift-box">
-                        <TweenOne
-                            animation={[
-                                {
-                                    scale: 1,
-                                    duration: 360,
-                                    ease: "easeInOutQuart",
-                                },
-                                {
-                                    opacity: 0,
-                                    scale: 2,
-                                    ease: "easeInOutQuart",
-                                    duration: 400,
-                                },
-                            ]}
-                            style={{
-                                transform: "scale(0)",
-                                borderTopLeftRadius: 4,
-                            }}className="whiteboard-box-gift-inner-box"
-                        >
-                            <img src={like}/>
-                        </TweenOne>
-                    </div>}
-                    <PlayerWhiteboard className="player-box" player={this.state.player}/>
+                    <div className="player-nav-right">
+                        <Identicon
+                            size={36}
+                            string={netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${parseInt(this.props.match.params.userId)}`)}/>
+                    </div>
                 </div>
-            );
-        }
+                {this.renderScheduleView()}
+                {this.state.isHandClap && <div className="whiteboard-box-gift-box">
+                    <TweenOne
+                        animation={[
+                            {
+                                scale: 1,
+                                duration: 360,
+                                ease: "easeInOutQuart",
+                            },
+                            {
+                                opacity: 0,
+                                scale: 2,
+                                ease: "easeInOutQuart",
+                                duration: 400,
+                            },
+                        ]}
+                        style={{
+                            transform: "scale(0)",
+                            borderTopLeftRadius: 4,
+                        }}className="whiteboard-box-gift-inner-box"
+                    >
+                        <img src={like}/>
+                    </TweenOne>
+                </div>}
+                {this.props.match.params.mediaSource &&
+                    <Draggable>
+                        <div className={isMobile ? "player-video-out-mb" : "player-video-out"}>
+                            <VideoPlaceholder
+                                controls={false}
+                                className="player-video"
+                            />
+                        </div>
+                    </Draggable>
+                }
+                {this.state.player && <PlayerWhiteboard className="player-box" player={this.state.player}/>}
+            </div>
+        );
     }
 }

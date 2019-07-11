@@ -41,8 +41,6 @@ const basic = {
                     {
                         loader: 'ui-component-loader',
                         options: {
-                            onlyCompileBundledFiles: true,
-                            transpileOnly: true,
                             'lib': 'antd',
                             'libDir': 'es',
                             'style': false,
@@ -74,7 +72,7 @@ const basic = {
                 }
             }, {
                 test: /\.(png|jpg)$/,
-                loader: 'url-loader?limit=8192&name=images/[hash:8].[name].[ext]'
+                loader: 'url-loader?limit=8192&name=icons/[hash:8].[name].[ext]'
             }]
     },
     plugins: [
@@ -92,6 +90,13 @@ const development = {
     devServer: {
         port: 3000,
         historyApiFallback: true,
+        // proxy: {
+        //   "/api": {
+        //     pathRewrite: {'^/api': '/'},
+        //     target: "http://bad006a941144606a2cf5b693c5dddea-cn-hangzhou.alicloudapi.com/",
+        //     changeOrigin: true
+        //   },
+        // },
     },
 };
 

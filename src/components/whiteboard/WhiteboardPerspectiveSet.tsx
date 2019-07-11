@@ -26,10 +26,10 @@ class WhiteboardPerspectiveSet extends React.Component<WhiteboardPerspectiveSetP
                         <div className="whiteboard-perspective-user-head">
                             <Identicon
                                 size={24}
-                                string={perspectiveState.broadcasterInformation && perspectiveState.broadcasterInformation.avatar}/>
+                                string={perspectiveState.broadcasterInformation && perspectiveState.broadcasterInformation.payload.avatar}/>
                         </div>
                         <div className="whiteboard-perspective-user-name">
-                            {perspectiveState.broadcasterInformation && perspectiveState.broadcasterInformation.nickName.substring(0, 6)}
+                            {perspectiveState.broadcasterInformation && perspectiveState.broadcasterInformation.payload.nickName.substring(0, 6)}
                         </div>
                     </div>
                 </div>
@@ -61,7 +61,7 @@ class WhiteboardPerspectiveSet extends React.Component<WhiteboardPerspectiveSetP
                             onChange={checked => {
                                 if (checked) {
                                     room.setViewMode(ViewMode.Broadcaster);
-                                    message.info(this.props.intl.formatMessage({id: "go-to-lecture"}));
+                                    message.info("进入演讲模式，他人会跟随您的视角");
                                 } else {
                                     room.setViewMode(ViewMode.Freedom);
                                 }

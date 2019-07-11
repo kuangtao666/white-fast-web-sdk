@@ -1,12 +1,11 @@
 import * as React from "react";
 import "./MenuPPTDoc.less";
-import PPTDatas from "./PPTDatas";
-import {SceneDefinition, Room} from "white-react-sdk";
+import PPTDatas, {PPTDataType, PPTType} from "./PPTDatas";
+import {Room} from "white-react-sdk";
 
 export type MenuPPTDocProps = {
     room: Room;
 };
-export type PPTDataType = {active: boolean, cover: string, id: number, data: ReadonlyArray<SceneDefinition>};
 export type MenuPPTDocStates = {
     docs: PPTDataType[];
     activeDocData?: PPTDataType;
@@ -21,16 +20,37 @@ class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
         };
     }
     public componentDidMount(): void {
-       const docs = PPTDatas.map((PPTData: {active: boolean, id: number, data: string}) => {
+        const docs: PPTDataType[] = PPTDatas.map((PPTData: PPTDataType) => {
             const dataObj = JSON.parse(PPTData.data);
-            return {
-                active: PPTData.active,
-                cover: dataObj[0].ppt.src,
-                id: PPTData.id,
-                data: dataObj,
-            };
+            if (PPTData.pptType === PPTType.static) {
+                const newDataObj = dataObj.map((data: any) => {
+                    data.ppt.width = 1200;
+                    data.ppt.height = 675;
+                    return data;
+                });
+                return {
+                    active: PPTData.active,
+                    static_cover: dataObj[0].ppt.src,
+                    id: PPTData.id,
+                    data: newDataObj,
+                    pptType: PPTData.pptType,
+                };
+            } else {
+                const newDataObj = dataObj.map((data: any) => {
+                    data.ppt.width = 1200;
+                    data.ppt.height = 675;
+                    return data;
+                });
+                return {
+                    active: PPTData.active,
+                    dynamic_cover: PPTData.dynamic_cover,
+                    id: PPTData.id,
+                    data: newDataObj,
+                    pptType: PPTData.pptType,
+                };
+            }
         });
-       this.setState({docs: docs});
+        this.setState({docs: docs});
     }
 
     private selectDoc = (id: number) => {
@@ -49,28 +69,54 @@ class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
             }
         });
         this.setState({docs: docsArray});
+        const proportion = window.innerWidth / window.innerHeight;
+        if (proportion > 1) {
+            const zoomNumber = window.innerHeight / 675;
+            room.moveCamera({scale: zoomNumber});
+        } else {
+            const zoomNumber = window.innerWidth / 1200;
+            room.moveCamera({scale: zoomNumber});
+        }
     }
 
     public render(): React.ReactNode {
         let docCells: React.ReactNode;
         if (this.state.docs.length > 0) {
             docCells = this.state.docs.map(data => {
-                return <div
-                    key={`${data.id}`}
-                    onClick={() => this.selectDoc(data.id)}
-                    className="menu-ppt-inner-cell">
-                    <div
-                        style={{backgroundColor: data.active ? "#A2A7AD" : "#525252"}}
-                        className="menu-ppt-image-box">
-                        <svg key="" width={144} height={104}>
-                            <image
-                                width="100%"
-                                height="100%"
-                                xlinkHref={data.cover + "?x-oss-process=style/ppt_preview"}
-                            />
-                        </svg>
-                    </div>
-                </div>;
+                if (data.pptType === PPTType.static) {
+                    return <div
+                        key={`${data.id}`}
+                        onClick={() => this.selectDoc(data.id)}
+                        className="menu-ppt-inner-cell">
+                        <div
+                            style={{backgroundColor: data.active ? "#A2A7AD" : "#525252"}}
+                            className="menu-ppt-image-box">
+                            <svg key="" width={144} height={104}>
+                                <image
+                                    width="100%"
+                                    height="100%"
+                                    xlinkHref={data.static_cover + "?x-oss-process=style/ppt_preview"}
+                                />
+                            </svg>
+                        </div>
+                    </div>;
+                } else {
+                    return <div
+                        key={`${data.id}`}
+                        onClick={() => this.selectDoc(data.id)}
+                        className="menu-ppt-inner-cell">
+                        <div
+                            style={{backgroundColor: data.active ? "#A2A7AD" : "#525252"}}
+                            className="menu-ppt-image-box">
+                            <div className="menu-ppt-image-box-inner">
+                                <img src={data.dynamic_cover}/>
+                                <div>
+                                    动态 PPT
+                                </div>
+                            </div>
+                        </div>
+                    </div>;
+                }
             });
         }
 
