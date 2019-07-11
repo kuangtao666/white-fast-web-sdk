@@ -1,4 +1,4 @@
-# netless-react-whiteboard
+# netless-agora-react-whiteboard
 
 ## 一、前言
 
@@ -15,10 +15,11 @@
 
     - 互动白板
     - 云存储
+    - 音视频
 
-    该 demo 使用的是 netless 自研的互动白板，阿里云的云存储作为基础选型。
+    该 demo 使用的是 netless 自研的互动白板，阿里云的云存储，声网的音视频通讯服务作为基础选型。
 
-2. 填写 `appToken.ts` 文件  
+2. 填写 `appTokenConfig.ts` 文件  
 
     ``` typescript
     export const netlessToken = "xxx";
@@ -32,6 +33,7 @@
         prefix: "https://xxx.oss-cn-xxx.aliyuncs.com/",
     };
     
+    export const rtcAppId = "xxx";
     ```
 
 ### 2. 白板 Token
@@ -68,8 +70,20 @@
     };
     ```
 
+
+### 4. 音视频 Token
+
+1. 用途：音视频实时通信。
+2. 获取方式：
+   - 地址：https://dashboard.agora.io/
+    ![1558250731260](https://ohuuyffq2.qnssl.com/1558250731260.png)
+3. 填写参数
+  
+    ```
+    export const rtcAppId = "xxx";
+    ```
     
-### 4. 注意事项
+### 5. 注意事项
 
 **以上 token 都是用户的核心资产，本项目只是为了方便演示才直接放在项目当中，客户正式商用的时候请妥善保管。**
     
@@ -112,6 +126,7 @@ export const ossConfigObj = {
     prefix: "",
 };
 
+export const agoraAppId = "";
 ```
 
 ### 5. 启动

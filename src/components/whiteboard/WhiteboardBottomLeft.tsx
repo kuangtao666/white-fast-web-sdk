@@ -7,20 +7,29 @@ import * as like_icon from "../../assets/image/like_icon.svg";
 import {Tooltip} from "antd";
 import {withRouter} from "react-router-dom";
 import {RouteComponentProps} from "react-router";
-import {InjectedIntlProps, injectIntl} from "react-intl";
 import {push} from "@netless/i18n-react-router";
+import {netlessWhiteboardApi} from "../../apiMiddleware";
+import {isMobile} from "react-device-detect";
+import {InputProps} from "antd/lib/input/Input";
 
 export type WhiteboardBottomLeftInnerProps = {
     room: Room;
     roomState: RoomState;
     uuid: string;
     userId: string;
-    roomToken: string;
+    startTime?: number;
+    stopTime?: number;
+    mediaSource?: string;
 };
 
-export type WhiteboardBottomLeftProps = RouteComponentProps<{}> & WhiteboardBottomLeftInnerProps & InjectedIntlProps;
+export type WhiteboardBottomLeftProps = RouteComponentProps<{}> & WhiteboardBottomLeftInnerProps;
 
 class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
+
+    public constructor(props: WhiteboardBottomLeftProps) {
+        super(props);
+    }
+
 
     private zoomChange = (scale: number): void => {
         const {room} = this.props;
@@ -28,30 +37,65 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
     }
 
     public render(): React.ReactNode {
-        const {roomState} = this.props;
-        return (
-            <div className="whiteboard-box-bottom-left">
-                <ScaleController zoomScale={roomState.zoomScale} zoomChange={this.zoomChange}/>
-                <Tooltip placement="top" title={this.props.intl.formatMessage({id: "playback"})}>
-                    <div
-                        onClick={async () => {
-                            await this.props.room.disconnect();
-                            push(this.props.history, `/replay/${this.props.roomToken}/${this.props.uuid}/${this.props.userId}/`);
-                        }}
-                        className="whiteboard-box-bottom-left-player">
-                        <img src={player}/>
-                    </div>
-                </Tooltip>
+        const {roomState, startTime, stopTime, mediaSource} = this.props;
+        if (isMobile) {
+            return (
                 <div
                     onClick={async () => {
-                        this.props.room.dispatchMagixEvent("handclap", "handclap");
+                        await this.props.room.disconnect();
+                        if (startTime && stopTime) {
+                            const duration = (stopTime - startTime);
+                            if (mediaSource) {
+                                push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/${startTime}/${duration}/${mediaSource}`);
+                            } else {
+                                push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/${startTime}/${duration}`);
+                            }
+                        } else if (startTime) {
+                            push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/${startTime}/`);
+                        } else {
+                            push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/`);
+                        }
                     }}
-                    className="whiteboard-box-bottom-left-cell">
-                    <img style={{width: 15}} src={like_icon}/>
+                    className="whiteboard-box-bottom-left-player-mb">
+                    <img src={player}/>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            return (
+                <div className="whiteboard-box-bottom-left">
+                    <ScaleController zoomScale={roomState.zoomScale} zoomChange={this.zoomChange}/>
+                    <Tooltip placement="top" title={"回放"}>
+                        <div
+                            onClick={async () => {
+                                await this.props.room.disconnect();
+                                if (startTime && stopTime) {
+                                    const duration = (stopTime - startTime);
+                                    if (mediaSource) {
+                                        push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/${startTime}/${duration}/${mediaSource}`);
+                                    } else {
+                                        push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/${startTime}/${duration}`);
+                                    }
+                                } else if (startTime) {
+                                    push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/${startTime}/`);
+                                } else {
+                                    push(this.props.history, `/replay/${this.props.uuid}/${this.props.userId}/`);
+                                }
+                            }}
+                            className="whiteboard-box-bottom-left-player">
+                            <img src={player}/>
+                        </div>
+                    </Tooltip>
+                    <div
+                        onClick={async () => {
+                            this.props.room.dispatchMagixEvent("handclap", "handclap");
+                        }}
+                        className="whiteboard-box-bottom-left-cell">
+                        <img style={{width: 15}} src={like_icon}/>
+                    </div>
+                </div>
+            );
+        }
     }
 }
 
-export default withRouter(injectIntl(WhiteboardBottomLeft));
+export default withRouter(WhiteboardBottomLeft);

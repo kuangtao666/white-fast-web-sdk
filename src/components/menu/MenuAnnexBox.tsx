@@ -3,6 +3,7 @@ import close from "../../assets/image/close.svg";
 import add_icon from "../../assets/image/add_icon.svg";
 import TweenOne from "rc-tween-one";
 import {Room, RoomState, Scene} from "white-react-sdk";
+import html2canvas from "html2canvas";
 import "./MenuAnnexBox.less";
 
 export type MenuAnnexBoxState = {
@@ -33,12 +34,10 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     private arrowControllerHotKey(evt: KeyboardEvent): void {
     }
 
-    private removeScene(index: number): void {
+    private removeScene(): void {
         const {room} = this.props;
-        const scenes = room.state.sceneState.scenes;
         const scenePath = room.state.sceneState.scenePath;
-        const pathName = this.pathName(scenePath);
-        room.removeScenes(`/${pathName}/${scenes[index].name}`);
+        room.removeScenes(`${scenePath}`);
     }
     private setScenePath = (newActiveIndex: number) => {
         const {room} = this.props;
@@ -58,6 +57,29 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
         document.body.removeEventListener("keydown", this.arrowControllerHotKey);
     }
 
+    private renderClose = (index: number, isActive: boolean): React.ReactNode => {
+        if (index === this.state.hoverCellIndex || isActive) {
+            return (
+                <TweenOne
+                    animation={[
+                        {
+                            scale: 1,
+                            duration: 200,
+                            ease: "easeInOutQuart",
+                        },
+                    ]}
+                    style={{
+                        transform: "scale(0)",
+                    }}
+                    className="page-box-inner-index-delete" onClick={() => this.removeScene()}>
+                    <img className="menu-title-close-icon" src={close}/>
+                </TweenOne>
+            );
+        } else {
+            return null;
+        }
+    }
+
     public render(): React.ReactNode {
         const {roomState} = this.props;
         const scenes = roomState.sceneState.scenes;
@@ -66,7 +88,6 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
         const activeIndex = roomState.sceneState.index;
         const renderPages = scenes.map((scene: Scene, index: number): React.ReactNode => {
             const isActive = index === activeIndex;
-
             return (
                     <div
                         key={`${scene.name}${index}`}
@@ -86,21 +107,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                             </div>
                         </div>
                         <div className="page-box-inner-index-delete-box">
-                            {this.state.hoverCellIndex === index &&
-                            <TweenOne
-                                animation={[
-                                    {
-                                        scale: 1,
-                                        duration: 200,
-                                        ease: "easeInOutQuart",
-                                    },
-                                ]}
-                                style={{
-                                    transform: "scale(0)",
-                                }}
-                                className="page-box-inner-index-delete" onClick={() => this.removeScene(index)}>
-                                <img className="menu-title-close-icon" src={close}/>
-                            </TweenOne>}
+                            {this.renderClose(index, isActive)}
                         </div>
                     </div>
 
@@ -149,6 +156,7 @@ export type PageImageProps = { scene: Scene, path: string, room: Room, isMenuOpe
 class PageImage extends React.Component<PageImageProps, {}> {
 
     private ref?: HTMLDivElement | null;
+    private clock: any;
 
     public constructor(props: any) {
         super(props);
@@ -162,6 +170,9 @@ class PageImage extends React.Component<PageImageProps, {}> {
     private setupDivRef = (ref: HTMLDivElement | null) => {
         if (ref) {
             this.ref = ref;
+            // html2canvas(ref).then(canvas => {
+            //     console.log(canvas);
+            // });
             this.props.room.scenePreview(this.props.path, ref, 192, 112.5);
         }
     }

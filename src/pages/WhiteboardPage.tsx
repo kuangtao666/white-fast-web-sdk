@@ -3,11 +3,13 @@ import TopLoadingBar from "@netless/react-loading-bar";
 import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
 import * as OSS from "ali-oss";
 import ToolBox from "@netless/react-tool-box";
+import ToolBoxMobile from "@netless/react-mb-tool-box";
 import {message} from "antd";
 import * as uuidv4 from "uuid/v4";
 import {RouteComponentProps} from "react-router";
 import TweenOne from "rc-tween-one";
 import Dropzone from "react-dropzone";
+import {isMobile} from "react-device-detect";
 import {
     WhiteWebSdk,
     RoomWhiteboard,
@@ -17,6 +19,7 @@ import {
     PptConverter,
     MemberState,
     ViewMode,
+    DeviceType,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
 import "./WhiteboardPage.less";
@@ -36,7 +39,7 @@ import {UserCursor} from "../components/whiteboard/UserCursor";
 import MenuPPTDoc from "../components/menu/MenuPPTDoc";
 import UploadBtn from "../tools/UploadBtn";
 import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
-import {push} from "@netless/i18n-react-router";
+import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum MenuInnerType {
@@ -47,10 +50,9 @@ export enum MenuInnerType {
 }
 
 export type WhiteboardPageProps = RouteComponentProps<{
-    roomToken: string;
     uuid: string;
-    version: string;
-    readOnly?: string;
+    userId: string;
+    readOnly: string;
 }>;
 
 export type WhiteboardPageState = {
@@ -65,6 +67,10 @@ export type WhiteboardPageState = {
     converterPercent: number;
     userId: string;
     isMenuOpen: boolean;
+    mediaSource?: string;
+    isMediaRun?: boolean;
+    startRecordTime?: number;
+    stopRecordTime?: number;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
@@ -95,13 +101,24 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
        this.cursor = new UserCursor();
     }
 
+    private getRoomToken = async (uuid: string): Promise<string | null> => {
+        const res = await netlessWhiteboardApi.room.joinRoomApi(uuid);
+        if (res.code === 200) {
+            return res.msg.roomToken;
+        } else {
+            return null;
+        }
+    }
+
+    private setMediaState = (state: boolean): void => {
+        this.setState({isMediaRun: state});
+    }
 
     private startJoinRoom = async (): Promise<void> => {
         const uuid = this.props.match.params.uuid;
-        const roomToken = this.props.match.params.roomToken;
-        const isReadOnly = this.props.match.params.readOnly;
-        const userId = `${Math.floor(Math.random() * 100000)}`;
+        const userId = this.props.match.params.userId;
         this.setState({userId: userId});
+        const roomToken = await this.getRoomToken(uuid);
         if (netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`) === `Netless uuid ${userId}`) {
             const userUuid = uuidv4();
             netlessWhiteboardApi.user.updateUserInf(userUuid, userUuid, userId);
@@ -109,7 +126,13 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         const userUuid = netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`);
         const name = netlessWhiteboardApi.user.getUserInf(UserInfType.name, `${userId}`);
         if (roomToken && uuid) {
-            const whiteWebSdk = new WhiteWebSdk();
+            let whiteWebSdk;
+            if (isMobile) {
+                whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Touch});
+            } else {
+                whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktop});
+            }
+
             const pptConverter = whiteWebSdk.pptConverter(netlessToken.sdkToken);
             this.setState({pptConverter: pptConverter});
             const room = await whiteWebSdk.joinRoom({
@@ -144,8 +167,13 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                 await timeout(800);
                 this.setState({isHandClap: false});
             });
-            if (isReadOnly && isReadOnly === "read_only") {
-                room.disableOperations = true;
+            const proportion = window.innerWidth / window.innerHeight;
+            if (proportion > 1) {
+                const zoomNumber = window.innerHeight / 675;
+                room.moveCamera({scale: zoomNumber});
+            } else {
+                const zoomNumber = window.innerWidth / 1200;
+                room.moveCamera({scale: zoomNumber});
             }
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
@@ -200,10 +228,14 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
     private renderWhiteboard(): React.ReactNode {
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100vh"}}/>;
+                                   style={{width: "100%", height: "100vh", backgroundColor: "#F1F3F4"}}/>;
         } else {
             return null;
         }
+    }
+
+    private setMediaSource = (source: string): void => {
+        this.setState({mediaSource: source});
     }
 
     private handleHotKeyMenuState = (): void => {
@@ -320,6 +352,13 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         }
     }
 
+    private setStartTime = (time: number): void => {
+        this.setState({startRecordTime: time});
+    }
+    private setStopTime = (time: number): void => {
+        this.setState({stopRecordTime: time});
+    }
+
     private setMenuState = (state: boolean) => {
         this.setState({isMenuOpen: state});
     }
@@ -366,34 +405,53 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                                 {this.renderClipView()}
                                 <WhiteboardTopLeft room={this.state.room}/>
                                 <WhiteboardTopRight
+                                    oss={ossConfigObj}
+                                    onProgress={this.progress}
+                                    whiteboardRef={this.state.whiteboardLayerDownRef}
                                     roomState={this.state.roomState}
-                                    uuid={this.props.match.params.uuid} room={this.state.room} number={this.state.userId}/>
+                                    uuid={this.props.match.params.uuid}
+                                    room={this.state.room}
+                                    number={this.state.userId}/>
                                 <WhiteboardBottomLeft
                                     uuid={this.props.match.params.uuid}
-                                    roomToken={this.props.match.params.roomToken}
                                     roomState={this.state.roomState}
                                     room={this.state.room}
-                                    userId={this.state.userId}/>
+                                    userId={this.state.userId}
+                                    mediaSource={this.state.mediaSource}
+                                    stopTime={this.state.stopRecordTime}
+                                    startTime={this.state.startRecordTime}/>
+                                <WhiteboardRecord
+                                    setMediaSource={this.setMediaSource}
+                                    channelName={this.props.match.params.uuid}
+                                    isMediaRun={this.state.isMediaRun}
+                                    setStopTime={this.setStopTime}
+                                    setStartTime={this.setStartTime}/>
                                 <WhiteboardBottomRight
                                     userId={this.state.userId}
                                     roomState={this.state.roomState}
                                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                     handleHotKeyMenuState={this.handleHotKeyMenuState}
                                     room={this.state.room}/>
-                                <div className={this.state.roomState.broadcastState.mode === ViewMode.Follower ? "whiteboard-tool-box-disable" : "whiteboard-tool-box"}>
-                                    <ToolBox
-                                        setMemberState={this.setMemberState}
-                                        customerComponent={[
-                                            <UploadBtn
-                                                oss={ossConfigObj}
-                                                room={this.state.room}
-                                                roomToken={this.state.roomToken}
-                                                onProgress={this.progress}
-                                                whiteboardRef={this.state.whiteboardLayerDownRef}
-                                            />,
-                                        ]}
-                                        memberState={this.state.room.state.memberState}/>
-                                </div>
+                                    {isMobile ?
+                                        <ToolBoxMobile
+                                            style={{justifyContent: "left", marginLeft: 8, bottom: 40}}
+                                            setMemberState={this.setMemberState}
+                                            memberState={this.state.room.state.memberState}
+                                        /> :
+                                        <div className="whiteboard-tool-box">
+                                            <ToolBox
+                                                setMemberState={this.setMemberState}
+                                                customerComponent={[
+                                                    <UploadBtn
+                                                        oss={ossConfigObj}
+                                                        room={this.state.room}
+                                                        roomToken={this.state.roomToken}
+                                                        onProgress={this.progress}
+                                                        whiteboardRef={this.state.whiteboardLayerDownRef}
+                                                    />,
+                                                ]}
+                                                memberState={this.state.room.state.memberState}/>
+                                        </div>}
                                 <div onClick={this.handlePPtBoxMenuState}
                                      className={(this.state.menuInnerState === MenuInnerType.PPTBox && this.state.isMenuVisible) ? "slide-box-active" : "slide-box"}>
                                     <img src={arrow}/>

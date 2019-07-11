@@ -2,9 +2,14 @@ import * as React from "react";
 import {AppRouter, HistoryType} from "@netless/i18n-react-router";
 import {language} from "../locale";
 import {message} from "antd";
+import WhiteboardCreatorPage from "./WhiteboardCreatorPage";
 import WhiteboardPage from "./WhiteboardPage";
 import PlayerPage from "./PlayerPage";
-import PageInput from "./PageInput";
+import PageNameInput from "./Homepage";
+message.config({
+    top: (window.innerHeight / 2 - 64),
+    maxCount: 1,
+});
 export class AppRoutes extends React.Component<{}, {}> {
 
     public constructor(props: {}) {
@@ -18,10 +23,12 @@ export class AppRoutes extends React.Component<{}, {}> {
     public render(): React.ReactNode {
         return (
             <AppRouter historyType={HistoryType.HashRouter} language={language} routes={[
-                {path: "/", component: PageInput},
-                {path: "/whiteboard/:roomToken/:uuid/:version?/:readOnly?/", component: WhiteboardPage},
-                {path: "/replay/:roomToken/:uuid/:userId/:version?/", component: PlayerPage},
+                {path: "/replay/:uuid/:userId/:time?/:duration?/:mediaSource?/", component: PlayerPage},
+                {path: "/", component: PageNameInput},
+                {path: "/whiteboard/:uuid?/", component: WhiteboardCreatorPage},
+                {path: "/whiteboard/:uuid/:userId/:readOnly?/", component: WhiteboardPage},
             ]}/>
         );
     }
 }
+

@@ -5,7 +5,7 @@
   height: 100vh;
   display: flex;
   flex-direction: row;
-  background-color: @white_nearly;
+  background-color: white;
   img {
     cursor: pointer;
     position: absolute;
@@ -19,7 +19,9 @@
 }
 
 .name-button {
-  width: 300px;
+  width: 240px;
+  margin-top: 24px;
+  font-size: 14px;
 }
 
 .name-title {
@@ -29,7 +31,32 @@
 }
 
 .page-input-left-mid-box {
+  width: 360px;
+  height: 280px;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-right: 20px;
+  padding-left: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 16px #E7EAEE;
+}
+
+.page-input-left-mid-box-tab {
   width: 300px;
+  margin-top: 12px;
+}
+.page-input {
+  width: 240px;
+  font-size: 14px;
+}
+.page-input-left-inner-box {
+  height: 180px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .page-input-left-box {
@@ -46,4 +73,15 @@
   justify-content: center;
   flex-direction: column;
   background: url("../assets/image/name_bg.jpg") no-repeat scroll center center;
+}
+@media screen and (max-width: 840px) {
+  .page-input-left-box {
+    width: 100%;
+  }
+  .page-input-right-box {
+    display: none;
+  }
+  .page-input-left-mid-box {
+    width: 300px;
+  }
 }
