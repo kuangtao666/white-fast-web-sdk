@@ -2,8 +2,6 @@ import * as React from "react";
 import "./WhiteboardRecord.less";
 import {message} from "antd";
 import {isMobile} from "react-device-detect";
-import {netlessWhiteboardApi} from "../../apiMiddleware";
-import {ossConfigObj} from "../../appToken";
 
 export type WhiteboardRecordState = {
     isRecord: boolean,

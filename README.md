@@ -1,8 +1,8 @@
-# netless-agora-react-whiteboard
+# netless-demo-whiteboard
 
 ## 一、前言
 
-1. `netless-react-whiteboard` 是 netless 提供的 web 实践项目，目的是为了让用户更加具象化的了解 netless 白板的功能和场景。
+1. `netless-demo-whiteboard` 是 netless 提供的 web 实践项目，目的是为了让用户更加具象化的了解 netless 白板的功能和场景。
 2. 我们采用 react 前端框架，Typescript 作为编程语言的技术选型编写这个项目，目的是让项目更加容易维护和迭代。
 3. 我们将项目很多可复用的组件都抽象成了 react 的控件托管在 [netless-io](https://github.com/netless-io) 这个仓库，用户可以参考相关代码或者直接使用组件。我们也非常欢迎指正错误提交 PR.
 4. 如有疑问可以发邮件到： rick@herewhite.com
@@ -15,7 +15,6 @@
 
     - 互动白板
     - 云存储
-    - 音视频
 
     该 demo 使用的是 netless 自研的互动白板，阿里云的云存储，声网的音视频通讯服务作为基础选型。
 
@@ -33,7 +32,6 @@
         prefix: "https://xxx.oss-cn-xxx.aliyuncs.com/",
     };
     
-    export const rtcAppId = "xxx";
     ```
 
 ### 2. 白板 Token
@@ -69,21 +67,8 @@
         prefix: "https://xxx.oss-cn-xxx.aliyuncs.com/",
     };
     ```
-
-
-### 4. 音视频 Token
-
-1. 用途：音视频实时通信。
-2. 获取方式：
-   - 地址：https://dashboard.agora.io/
-    ![1558250731260](https://ohuuyffq2.qnssl.com/1558250731260.png)
-3. 填写参数
-  
-    ```
-    export const rtcAppId = "xxx";
-    ```
     
-### 5. 注意事项
+### 4. 注意事项
 
 **以上 token 都是用户的核心资产，本项目只是为了方便演示才直接放在项目当中，客户正式商用的时候请妥善保管。**
     
@@ -126,7 +111,6 @@ export const ossConfigObj = {
     prefix: "",
 };
 
-export const agoraAppId = "";
 ```
 
 ### 5. 启动
