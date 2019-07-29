@@ -1,5 +1,5 @@
 {
-  "name": "netless-rtc-react-whiteboard",
+  "name": "netless-demo-whiteboard",
   "version": "2.0.0",
   "main": "src/index.ts",
   "author": "Wushuang",
@@ -39,7 +39,7 @@
     "react-dropzone": "4.2.10",
     "react-identicons": "^1.1.7",
     "uuid": "^3.3.2",
-    "white-react-sdk": "^2.2.4"
+    "white-react-sdk": "^2.2.8"
   },
   "devDependencies": {
     "@livechat/ui-kit": "^0.4.0-1",
