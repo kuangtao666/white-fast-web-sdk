@@ -5,10 +5,10 @@ import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
 import "./UploadBtn.less";
 import {PptKind, Room, WhiteWebSdk} from "white-react-sdk";
-import * as image from "../assets/image/image.svg";
-import * as doc_to_image from "../assets/image/doc_to_image.svg";
-import * as doc_to_web from "../assets/image/doc_to_web.svg";
-import * as upload from "../assets/image/upload.svg";
+import * as image from "../../assets/image/image.svg";
+import * as doc_to_image from "../../assets/image/doc_to_image.svg";
+import * as doc_to_web from "../../assets/image/doc_to_web.svg";
+import * as upload from "../../assets/image/upload.svg";
 
 export type ToolBoxUploadBoxState = {
     toolBoxColor: string,

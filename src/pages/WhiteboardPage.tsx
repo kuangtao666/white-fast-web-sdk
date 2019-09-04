@@ -2,7 +2,7 @@ import * as React from "react";
 import TopLoadingBar from "@netless/react-loading-bar";
 import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
 import * as OSS from "ali-oss";
-import ToolBox from "@netless/react-tool-box";
+import ToolBox from "../tools/toolBox";
 import ToolBoxMobile from "@netless/react-mb-tool-box";
 import {message} from "antd";
 import * as uuidv4 from "uuid/v4";
@@ -37,9 +37,8 @@ import MenuAnnexBox from "../components/menu/MenuAnnexBox";
 import {netlessToken, ossConfigObj} from "../appToken";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import MenuPPTDoc from "../components/menu/MenuPPTDoc";
-import UploadBtn from "../tools/UploadBtn";
+import UploadBtn from "../tools/upload/UploadBtn";
 import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
-import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum MenuInnerType {
@@ -68,7 +67,6 @@ export type WhiteboardPageState = {
     userId: string;
     isMenuOpen: boolean;
     mediaSource?: string;
-    isMediaRun?: boolean;
     startRecordTime?: number;
     stopRecordTime?: number;
     room?: Room;
@@ -109,11 +107,6 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
             return null;
         }
     }
-
-    private setMediaState = (state: boolean): void => {
-        this.setState({isMediaRun: state});
-    }
-
     private startJoinRoom = async (): Promise<void> => {
         const uuid = this.props.match.params.uuid;
         const userId = this.props.match.params.userId;
@@ -234,10 +227,6 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         }
     }
 
-    private setMediaSource = (source: string): void => {
-        this.setState({mediaSource: source});
-    }
-
     private handleHotKeyMenuState = (): void => {
         this.setState({
             isMenuVisible: !this.state.isMenuVisible,
@@ -351,14 +340,6 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
             }
         }
     }
-
-    private setStartTime = (time: number): void => {
-        this.setState({startRecordTime: time});
-    }
-    private setStopTime = (time: number): void => {
-        this.setState({stopRecordTime: time});
-    }
-
     private setMenuState = (state: boolean) => {
         this.setState({isMenuOpen: state});
     }
@@ -403,7 +384,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                             <div className="whiteboard-out-box">
                                 {this.renderClipView()}
-                                <WhiteboardTopLeft room={this.state.room}/>
+                                <WhiteboardTopLeft/>
                                 <WhiteboardTopRight
                                     oss={ossConfigObj}
                                     onProgress={this.progress}
@@ -420,12 +401,6 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                                     mediaSource={this.state.mediaSource}
                                     stopTime={this.state.stopRecordTime}
                                     startTime={this.state.startRecordTime}/>
-                                <WhiteboardRecord
-                                    setMediaSource={this.setMediaSource}
-                                    channelName={this.props.match.params.uuid}
-                                    isMediaRun={this.state.isMediaRun}
-                                    setStopTime={this.setStopTime}
-                                    setStartTime={this.setStartTime}/>
                                 <WhiteboardBottomRight
                                     userId={this.state.userId}
                                     roomState={this.state.roomState}
