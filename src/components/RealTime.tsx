@@ -284,6 +284,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.onColorArrayChange,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
+                    room: this.state.room,
                 }}>
                     <div id="outer-container">
                         <MenuBox
@@ -354,7 +355,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     private renderWhiteboard(): React.ReactNode {
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100vh", backgroundColor: "#F1F3F4"}}/>;
+                                   style={{width: "100%", height: "100vh", backgroundColor: "white"}}/>;
         } else {
             return null;
         }

@@ -1,4 +1,5 @@
 import * as React from "react";
+import {Room} from "white-react-sdk";
 export type RoomContext = {
     // readonly remoteMediaStreams: any[];
     // readonly userId: number;
@@ -7,6 +8,7 @@ export type RoomContext = {
     // setSliderExtending: () => void;
     // setSliderHiding: () => void;
     whiteboardLayerDownRef: HTMLDivElement;
+    room: Room;
     onColorArrayChange?: (colorArray: string[]) => void;
     // joinRoomTime: number;
 };
