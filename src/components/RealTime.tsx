@@ -33,6 +33,7 @@ import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
 import UploadBtn from "../tools/upload/UploadBtn";
 import ExtendTool from "../tools/extendTool/ExtendTool";
+import {RoomContextProvider} from "./RoomContext";
 
 export enum MenuInnerType {
     HotKey = "HotKey",
@@ -45,7 +46,6 @@ export type RealTimeStates = {
     phase: RoomPhase;
     connectedFail: boolean;
     didSlaveConnected: boolean;
-    isHandClap: boolean;
     menuInnerState: MenuInnerType;
     isMenuVisible: boolean;
     roomToken: string | null;
@@ -65,6 +65,8 @@ export type RealTimeStates = {
 export type RealTimeProps = {
     uuid: string;
     userId: string;
+    colorConfig?: string[];
+    onColorArrayChange?: (colorArray: string[]) => void;
 };
 
 
@@ -77,7 +79,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             phase: RoomPhase.Connecting,
             connectedFail: false,
             didSlaveConnected: false,
-            isHandClap: false,
             menuInnerState: MenuInnerType.HotKey,
             isMenuVisible: false,
             roomToken: null,
@@ -280,96 +281,72 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             </div>;
         } else {
             return (
-                <div id="outer-container">
-                    <MenuBox
-                        setMenuState={this.setMenuState}
-                        resetMenu={this.resetMenu}
-                        pageWrapId={"page-wrap" }
-                        outerContainerId={ "outer-container" }
-                        isLeft={this.state.isMenuLeft}
-                        isVisible={this.state.isMenuVisible}
-                        menuInnerState={this.state.menuInnerState}>
-                        {this.renderMenuInner()}
-                    </MenuBox>
-                    <div style={{backgroundColor: "white"}} id="page-wrap">
-                        <Dropzone
-                            accept={"image/*"}
-                            disableClick={true}
-                            onDrop={this.onDropFiles}
-                            className="whiteboard-drop-upload-box">
-                            <TopLoadingBar loadingPercent={this.state.ossPercent}/>
-                            <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
-                            <div className="whiteboard-out-box">
-                                <WhiteboardTopRight
-                                    oss={ossConfigObj}
-                                    onProgress={this.progress}
-                                    whiteboardRef={this.state.whiteboardLayerDownRef}
-                                    roomState={this.state.roomState}
-                                    uuid={"uuid"}
-                                    room={this.state.room}
-                                    number={this.state.userId}/>
-                                <WhiteboardBottomLeft
-                                    uuid={"uuid"}
-                                    roomState={this.state.roomState}
-                                    room={this.state.room}
-                                    userId={this.state.userId}/>
-                                <WhiteboardBottomRight
-                                    userId={this.state.userId}
-                                    roomState={this.state.roomState}
-                                    handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
-                                    handleHotKeyMenuState={this.handleHotKeyMenuState}
-                                    room={this.state.room}/>
-                                <div className="whiteboard-tool-box">
-                                    <ToolBox
-                                        colorConfig={[
-                                            {
-                                                color: [236, 52, 85],
-                                            },
-                                            {
-                                                color: [0, 91, 246],
-                                            },
-                                            {
-                                                color: [245, 173, 70],
-                                            },
-                                            {
-                                                color: [104, 171, 93],
-                                            },
-                                            {
-                                                color: [158, 81, 182],
-                                            },
-                                            {
-                                                color: [30, 32, 35],
-                                            },
-                                            {
-                                                color: [104, 171, 93],
-                                            },
-                                            {
-                                                color: [158, 81, 182],
-                                            },
-                                            {
-                                                color: [30, 32, 35],
-                                            },
-                                        ]}
-                                        setMemberState={this.setMemberState}
-                                        customerComponent={[
-                                            <UploadBtn
-                                                oss={ossConfigObj}
-                                                room={this.state.room}
-                                                roomToken={this.state.roomToken}
-                                                onProgress={this.progress}
-                                                whiteboardRef={this.state.whiteboardLayerDownRef}
-                                            />,
-                                            <ExtendTool/>,
-                                        ]} customerComponentPosition={CustomerComponentPositionType.end}
-                                        memberState={this.state.room.state.memberState}/>
+                <RoomContextProvider value={{
+                    onColorArrayChange: this.props.onColorArrayChange,
+                }}>
+                    <div id="outer-container">
+                        <MenuBox
+                            setMenuState={this.setMenuState}
+                            resetMenu={this.resetMenu}
+                            pageWrapId={"page-wrap" }
+                            outerContainerId={ "outer-container" }
+                            isLeft={this.state.isMenuLeft}
+                            isVisible={this.state.isMenuVisible}
+                            menuInnerState={this.state.menuInnerState}>
+                            {this.renderMenuInner()}
+                        </MenuBox>
+                        <div style={{backgroundColor: "white"}} id="page-wrap">
+                            <Dropzone
+                                accept={"image/*"}
+                                disableClick={true}
+                                onDrop={this.onDropFiles}
+                                className="whiteboard-drop-upload-box">
+                                <TopLoadingBar loadingPercent={this.state.ossPercent}/>
+                                <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
+                                <div className="whiteboard-out-box">
+                                    <WhiteboardTopRight
+                                        oss={ossConfigObj}
+                                        onProgress={this.progress}
+                                        whiteboardRef={this.state.whiteboardLayerDownRef}
+                                        roomState={this.state.roomState}
+                                        uuid={"uuid"}
+                                        room={this.state.room}
+                                        number={this.state.userId}/>
+                                    <WhiteboardBottomLeft
+                                        uuid={"uuid"}
+                                        roomState={this.state.roomState}
+                                        room={this.state.room}
+                                        userId={this.state.userId}/>
+                                    <WhiteboardBottomRight
+                                        userId={this.state.userId}
+                                        roomState={this.state.roomState}
+                                        handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
+                                        handleHotKeyMenuState={this.handleHotKeyMenuState}
+                                        room={this.state.room}/>
+                                    <div className="whiteboard-tool-box">
+                                        <ToolBox
+                                            colorConfig={this.props.colorConfig}
+                                            setMemberState={this.setMemberState}
+                                            customerComponent={[
+                                                <UploadBtn
+                                                    oss={ossConfigObj}
+                                                    room={this.state.room}
+                                                    roomToken={this.state.roomToken}
+                                                    onProgress={this.progress}
+                                                    whiteboardRef={this.state.whiteboardLayerDownRef}
+                                                />,
+                                                <ExtendTool/>,
+                                            ]} customerComponentPosition={CustomerComponentPositionType.end}
+                                            memberState={this.state.room.state.memberState}/>
+                                    </div>
+                                    <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
+                                        {this.renderWhiteboard()}
+                                    </div>
                                 </div>
-                                <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
-                                    {this.renderWhiteboard()}
-                                </div>
-                            </div>
-                        </Dropzone>
+                            </Dropzone>
+                        </div>
                     </div>
-                </div>
+                </RoomContextProvider>
             );
         }
     }

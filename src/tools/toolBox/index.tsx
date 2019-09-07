@@ -33,7 +33,7 @@ export type MemberState = {
 export type ToolBoxProps = {
     memberState: Readonly<MemberState>;
     setMemberState: (modifyState: Partial<MemberState>) => void;
-    colorConfig?: ReadonlyArray<any>;
+    colorConfig?: string[];
     customerComponent?: React.ReactNode[];
     customerComponentPosition?: CustomerComponentPositionType;
 };

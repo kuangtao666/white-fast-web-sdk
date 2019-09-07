@@ -4,18 +4,27 @@ import toolPaletteConfig from "./ToolPaletteConfig";
 import  "./ToolBoxPaletteBox.less";
 import isColor from "is-color";
 import {message} from "antd";
+import ToolBoxAddColor from "./ToolBoxAddColor";
+import {RoomContextConsumer} from "../../components/RoomContext";
 export type ToolBoxPaletteBoxProps = {
     displayStroke: boolean;
     setMemberState: (modifyState: Partial<any>) => void;
     memberState: Readonly<any>;
-    colorConfig?: ReadonlyArray<any>;
+    colorConfig?: string[];
 };
 
-export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, {}> {
+export type ToolBoxPaletteBoxStates = {
+    colorConfig: string[];
+};
+
+export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBoxProps, ToolBoxPaletteBoxStates> {
 
     public constructor(props: ToolBoxPaletteBoxProps) {
         super(props);
-        this.state = {};
+        const {colorConfig} = this.props;
+        this.state = {
+            colorConfig: colorConfig ? colorConfig : toolPaletteConfig,
+        };
     }
 
     private setStrokeWidth(event: Event): void {
@@ -37,12 +46,12 @@ export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBox
 
         hex = hex.substr(1);
 
-        if (hex.length === 3) { // 处理 "#abc" 成 "#aabbcc"
+        if (hex.length === 3) {
             hex = hex.replace(/(.)/g, "$1$1");
         }
 
         hex.replace(/../g, (color: any): any => {
-            rgb.push(parseInt(color, 0x10)); // 按16进制将字符串转换为数字
+            rgb.push(parseInt(color, 0x10));
         });
 
         return rgb;
@@ -57,60 +66,40 @@ export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBox
         }
     }
 
+    private appendNewColor = (color: string): void => {
+        const colorArray = this.state.colorConfig;
+        colorArray.push(color);
+        this.setState({colorConfig: colorArray});
+        const newColor = this.hexToRgb(color);
+        this.props.setMemberState({strokeColor: newColor});
+    }
+
     private renderColorCellArray = (): React.ReactNode => {
-        const {colorConfig} = this.props;
-        if (colorConfig) {
-            return colorConfig.map((cell, index) => {
-                if (this.isEffectiveColor(cell.color)) {
-                    if (typeof cell.color === "string") {
-                        const color = this.hexToRgb(cell.color);
-                        const className = this.isMatchColor(color) ? "palette-color-inner-box-active"
-                            : "palette-color-inner-box";
-                        const [r, g, b] = color;
-
-                        return (
-                            <div className={className}
-                                 key={`${index}`}
-                                 onClick={() => this.props.setMemberState({strokeColor: color})}>
-                                <div className="palette-color"
-                                     style={{backgroundColor: `rgb(${r},${g},${b})`}}/>
-                            </div>
-                        );
-                    } else {
-                        const className = this.isMatchColor(cell.color) ? "palette-color-inner-box-active"
-                            : "palette-color-inner-box";
-                        const [r, g, b] = cell.color;
-
-                        return (
-                            <div className={className}
-                                 key={`${index}`}
-                                 onClick={() => this.props.setMemberState({strokeColor: cell.color})}>
-                                <div className="palette-color"
-                                     style={{backgroundColor: `rgb(${r},${g},${b})`}}/>
-                            </div>
-                        );
-                    }
-                } else {
-                    message.error(`${cell.color}是非法颜色，无法被渲染。`);
-                    return null;
-                }
-            });
-        } else {
-            return toolPaletteConfig.map((cell, index) => {
-                const className = this.isMatchColor(cell.color) ? "palette-color-inner-box-active"
+        const {colorConfig} = this.state;
+        const nodes = colorConfig.map((color, index) => {
+            if (this.isEffectiveColor(color)) {
+                const newColor = this.hexToRgb(color);
+                const className = this.isMatchColor(newColor) ? "palette-color-inner-box-active"
                     : "palette-color-inner-box";
-                const [r, g, b] = cell.color;
+                const [r, g, b] = newColor;
 
                 return (
                     <div className={className}
                          key={`${index}`}
-                         onClick={() => this.props.setMemberState({strokeColor: cell.color})}>
+                         onClick={() => this.props.setMemberState({strokeColor: newColor})}>
                         <div className="palette-color"
                              style={{backgroundColor: `rgb(${r},${g},${b})`}}/>
                     </div>
                 );
-            });
-        }
+            } else {
+                message.error(`${color}是非法颜色，无法被渲染。`);
+                return null;
+            }
+        });
+        nodes.push(<RoomContextConsumer key={"add"} children={context => (
+            <ToolBoxAddColor newColor={this.appendNewColor} newColorArray={context.onColorArrayChange}/>
+        )}/>);
+        return nodes;
     }
     private renderColorSelector = (): React.ReactNode => {
         return [

@@ -1,25 +1,10 @@
-const toolPaletteConfig = [
-    {
-        color: [236, 52, 85],
-    },
-    {
-        color: [0, 91, 246],
-    },
-    {
-        color: [245, 173, 70],
-    },
-    {
-        color: [104, 171, 93],
-    },
-    {
-        color: [158, 81, 182],
-    },
-    {
-        color: [30, 32, 35],
-    },
-    {
-        color: [153, 204, 238],
-    },
+const toolPaletteConfig: string[] = [
+    "#EC3455",
+    "#005BF6",
+    "#F5AD46",
+    "#68AB5D",
+    "#9E51B6",
+    "#1E2023",
 ];
 
 
