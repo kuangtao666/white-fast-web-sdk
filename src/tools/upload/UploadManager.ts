@@ -124,6 +124,17 @@ export class UploadManager {
     const newAcceptedFiles = await Promise.all(newAcceptedFilePromises);
     await this.uploadImageFilesArray(newAcceptedFiles, onProgress);
   }
+
+    public async addToolImage(url: string, coordinateX: number, coordinateY: number, onProgress?: PPTProgressListener): Promise<void> {
+        const {x, y} = this.room.convertToPointInWorld({x: coordinateX, y: coordinateY});
+        this.room.insertImage({
+            uuid: uuidv4(),
+            centerX: x,
+            centerY: y,
+            width: 180,
+            height: 180,
+        });
+    }
   private fetchWhiteImageFileWith(file: File, x: number, y: number): Promise<NetlessImageFile> {
     return new Promise(resolve => {
       const image = new Image();

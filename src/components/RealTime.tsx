@@ -283,6 +283,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.onColorArrayChange,
+                    whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                 }}>
                     <div id="outer-container">
                         <MenuBox

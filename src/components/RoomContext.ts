@@ -6,6 +6,7 @@ export type RoomContext = {
     // setSliderFloating: () => void;
     // setSliderExtending: () => void;
     // setSliderHiding: () => void;
+    whiteboardLayerDownRef: HTMLDivElement;
     onColorArrayChange?: (colorArray: string[]) => void;
     // joinRoomTime: number;
 };
