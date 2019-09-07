@@ -153,7 +153,7 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
 
     public render(): React.ReactNode {
         return (
-            <Popover content={this.renderPopoverContent()}>
+            <Popover placement="bottom"  content={this.renderPopoverContent()}>
                 <div
                     onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                     onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

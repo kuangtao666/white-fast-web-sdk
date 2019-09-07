@@ -18,7 +18,7 @@ type ApplianceDescription = {
     readonly hasStroke: boolean;
 };
 
-export enum customerComponentPositionType {
+export enum CustomerComponentPositionType {
     middle = "middle",
     end = "end",
     head = "head",
@@ -33,8 +33,9 @@ export type MemberState = {
 export type ToolBoxProps = {
     memberState: Readonly<MemberState>;
     setMemberState: (modifyState: Partial<MemberState>) => void;
+    colorConfig?: ReadonlyArray<any>;
     customerComponent?: React.ReactNode[];
-    customerComponentPosition?: customerComponentPositionType;
+    customerComponentPosition?: CustomerComponentPositionType;
 };
 
 export type ToolBoxStates = {
@@ -129,10 +130,10 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 return <div key={`tool-customer-${index}`}>{data}</div>;
             });
             if (position) {
-                if (position === customerComponentPositionType.head) {
+                if (position === CustomerComponentPositionType.head) {
                     nodes.splice(0, 0, [...customerNodes]);
                     return nodes;
-                } else if (position === customerComponentPositionType.end) {
+                } else if (position === CustomerComponentPositionType.end) {
                     nodes.splice(nodes.length, 0, [...customerNodes]);
                     return nodes;
                 }
@@ -208,7 +209,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
 
     private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
         if (isSelected && this.state.extendsPanel) {
-            return <ToolBoxPaletteBox
+            return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
                 memberState={this.props.memberState}
                 setMemberState={this.props.setMemberState}
                 displayStroke={description.hasStroke}/>;

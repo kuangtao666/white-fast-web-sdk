@@ -8,6 +8,7 @@ import netless_black from "../assets/image/netless_black.svg";
 import {Link} from "@netless/i18n-react-router";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import {FormComponentProps} from "antd/lib/form";
+import {NetlessRoomType} from "./WhiteboardCreatorPage";
 
 const { TabPane } = Tabs;
 
@@ -31,7 +32,7 @@ class Homepage extends React.Component<HomepageProps, HomepageStates> {
         } else {
             netlessWhiteboardApi.user.updateUserInf("Netless user", uuidv4(), "1");
         }
-        this.props.history.push("/whiteboard/");
+        this.props.history.push(`/whiteboard/${NetlessRoomType.teacher_interactive}`);
     }
 
     private getActiveSelectedKey = (url: string): string => {
@@ -55,10 +56,10 @@ class Homepage extends React.Component<HomepageProps, HomepageStates> {
         if (this.state.url) {
             if (isUrl) {
                 const uuid = this.getActiveSelectedKey(this.state.url);
-                this.props.history.push(`/whiteboard/${uuid}/`);
+                this.props.history.push(`/whiteboard/${NetlessRoomType.teacher_interactive}/${uuid}/`);
             } else {
                 if (this.state.url.length === 32) {
-                    this.props.history.push(`/whiteboard/${this.state.url}/`);
+                    this.props.history.push(`/whiteboard/${NetlessRoomType.teacher_interactive}/${this.state.url}/`);
                 }
             }
         }

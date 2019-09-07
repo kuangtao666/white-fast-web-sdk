@@ -1,6 +1,6 @@
 import * as React from "react";
 import {slide as Menu, reveal as MenuLeft} from "react-burger-menu";
-import {MenuInnerType} from "../../pages/WhiteboardPage";
+import {MenuInnerType} from "../RealTime";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 

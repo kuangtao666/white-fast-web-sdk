@@ -5,13 +5,20 @@ import PageError from "./PageError";
 import {netlessWhiteboardApi, RoomType} from "../apiMiddleware";
 import {message} from "antd";
 import {RouteComponentProps} from "react-router";
+export enum NetlessRoomType {
+    live = "live",
+    interactive = "interactive",
+    teacher_interactive = "teacher_interactive",
+}
 
 export type WhiteboardCreatorPageState = {
     uuid?: string;
     userId?: string;
     foundError: boolean;
 };
+
 export type WhiteboardCreatorPageProps = InjectedIntlProps & RouteComponentProps<{
+    netlessRoomType: NetlessRoomType;
     uuid?: string;
 }>;
 
@@ -55,10 +62,11 @@ class WhiteboardCreatorPage extends React.Component<WhiteboardCreatorPageProps, 
     }
 
     public render(): React.ReactNode {
+        const netlessRoomType = this.props.match.params.netlessRoomType;
         if (this.state.foundError) {
             return <PageError/>;
         } else if (this.state.uuid && this.state.userId) {
-            return <Redirect to={`/whiteboard/${this.state.uuid}/${this.state.userId}/`}/>;
+            return <Redirect to={`/whiteboard/${netlessRoomType}/${this.state.uuid}/${this.state.userId}/`}/>;
         }
         return null;
     }

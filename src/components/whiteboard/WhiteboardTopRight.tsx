@@ -26,7 +26,7 @@ export type WhiteboardTopRightState = {
     isInviteVisible: boolean;
 };
 
-export type WhiteboardTopRightProps = RouteComponentProps<{}> & InjectedIntlProps & {
+export type WhiteboardTopRightProps = {
     room: Room,
     number: string,
     uuid: string,
@@ -65,13 +65,13 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
             if (!isBroadcaster) {
                 if (hasBroadcaster) {
                     if (perspectiveState.mode === ViewMode.Follower) {
-                        message.info(this.props.intl.formatMessage({id: "current-speaker"}) + " " + perspectiveState.broadcasterInformation!.payload.nickName + "," + this.props.intl.formatMessage({id: "follow-perspective"}));
+                        message.info("当前演讲者为：" + " " + perspectiveState.broadcasterInformation!.payload.nickName + "," + "您将跟随其视角");
                     } else {
-                        message.info(this.props.intl.formatMessage({id: "freedom-perspective"}));
+                        message.info("目前为自由视角");
                     }
                 } else {
                     if (!isBeforeBroadcaster) {
-                        message.info(this.props.intl.formatMessage({id: "freedom-perspective"}));
+                        message.info("目前为自由视角");
                     }
                 }
             }
@@ -86,11 +86,11 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
         const hasBroadcaster = perspectiveState.broadcasterId !== undefined;
         if (isBroadcaster) {
             return (
-                <Tooltip placement="bottom" title={this.props.intl.formatMessage({id: "in-lecture"})}>
+                <Tooltip placement="bottom" title={"您正在演讲中..."}>
                     <div
                         onClick={ () => {
                             room.setViewMode(ViewMode.Freedom);
-                            message.info(this.props.intl.formatMessage({id: "out-lecture"}));
+                            message.info("退出演讲模式，他人不再跟随您的视角");
                         }}
                         className="whiteboard-top-bar-btn-mb">
                         <img src={board_black}/>
@@ -112,11 +112,11 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
                 );
             } else {
                 return (
-                    <Tooltip placement="bottom" title={this.props.intl.formatMessage({id: "to-be-broadcaster"})}>
+                    <Tooltip placement="bottom" title={"成为演讲者"}>
                         <div
                             onClick={ () => {
                                 room.setViewMode(ViewMode.Broadcaster);
-                                message.info(this.props.intl.formatMessage({id: "go-to-lecture"}));
+                                message.info("进入演讲模式，他人会跟随您的视角");
                             }}
                             className="whiteboard-top-bar-btn-mb">
                             <img src={board}/>
@@ -137,7 +137,7 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
                 <div
                     onClick={ () => {
                         room.setViewMode(ViewMode.Freedom);
-                        message.info(this.props.intl.formatMessage({id: "out-lecture"}));
+                        message.info("退出演讲模式，他人不再跟随您的视角");
                     }}
                     className="whiteboard-top-bar-btn-mb">
                     <img src={board_black}/>
@@ -161,7 +161,7 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
                     <div
                         onClick={ () => {
                             room.setViewMode(ViewMode.Broadcaster);
-                            message.info(this.props.intl.formatMessage({id: "go-to-lecture"}));
+                            message.info("进入演讲模式，他人会跟随您的视角");
                         }}
                         className="whiteboard-top-bar-btn-mb">
                         <img src={board}/>
@@ -271,4 +271,4 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
     }
 }
 
-export default withRouter(injectIntl(WhiteboardTopRight));
+export default WhiteboardTopRight;
