@@ -6,9 +6,9 @@ English | 中文 | 日本語
 
 ⚡ Open source ultra fast white borad web SDK.
 
-## Installation
+## 🎉 Installation
 
-## Example code
+## 📋 Example code
 
 ```javascript
 WhiteFastSDK("app-root",{
@@ -18,11 +18,11 @@ WhiteFastSDK("app-root",{
 });
 ```
 
-## Development
+## 🚀 Development
 
 1. yarn dev
 2. open facade/index.html
 
-## Documentation
+## 📖 Documentation
 
-## Contributing
+## 👏 Contributing
