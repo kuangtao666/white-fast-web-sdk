@@ -9,5 +9,5 @@ const BorderFacade = function (element: string, config: any): void {
     );
 };
 
-(window as any).BorderFacade = BorderFacade;
+(window as any).WhiteFastSDK = BorderFacade;
 
