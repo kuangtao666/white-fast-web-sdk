@@ -2,7 +2,7 @@ const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = {
-    entry: path.resolve(__dirname, 'src'),
+    entry: path.resolve(__dirname, 'src/facade/index.tsx'),
 
     output: {
         filename: 'bundle.js',
@@ -45,6 +45,10 @@ module.exports = {
                     },
                     {
                         loader: 'less-loader', // compiles Less to CSS
+                        options: {
+                            modifyVars: require("./theme").antd,
+                            javascriptEnabled: true,
+                        }
                     },
                 ],
             },],
