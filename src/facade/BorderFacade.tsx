@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { AppRoutes } from "../pages/AppRoutes";
+import WhiteboardPage from "../pages/WhiteboardPage";
 
 const BorderFacade = function (element: string, config: any): void {
     ReactDOM.render(
-        <AppRoutes />,
+        <WhiteboardPage {...config}/>,
         document.getElementById(element),
     );
 };

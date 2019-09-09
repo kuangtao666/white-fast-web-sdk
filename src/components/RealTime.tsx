@@ -1,39 +1,28 @@
-import * as React from "react";
+import { PPTProgressPhase, UploadManager } from "@netless/oss-upload-manager";
 import TopLoadingBar from "@netless/react-loading-bar";
-import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
 import * as OSS from "ali-oss";
-import {message} from "antd";
-import * as uuidv4 from "uuid/v4";
+import { message } from "antd";
+import * as React from "react";
 import Dropzone from "react-dropzone";
-import {
-    WhiteWebSdk,
-    RoomWhiteboard,
-    Room,
-    RoomState,
-    RoomPhase,
-    PptConverter,
-    MemberState,
-    ViewMode,
-    DeviceType,
-} from "white-react-sdk";
+import * as uuidv4 from "uuid/v4";
+import { DeviceType, MemberState, PptConverter, Room, RoomPhase, RoomState, RoomWhiteboard, WhiteWebSdk } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
-import "./RealTime.less";
+import { netlessWhiteboardApi, UserInfType } from "../apiMiddleware";
+import { netlessToken, ossConfigObj } from "../appToken";
+import * as loading from "../assets/image/loading.svg";
 import PageError from "../pages/PageError";
-import WhiteboardTopRight from "./whiteboard/WhiteboardTopRight";
+import ExtendTool from "../tools/extendTool/ExtendTool";
+import ToolBox, { CustomerComponentPositionType } from "../tools/toolBox";
+import UploadBtn from "../tools/upload/UploadBtn";
+import MenuAnnexBox from "./menu/MenuAnnexBox";
+import MenuBox from "./menu/MenuBox";
+import MenuPPTDoc from "./menu/MenuPPTDoc";
+import "./RealTime.less";
+import { RoomContextProvider } from "./RoomContext";
+import { UserCursor } from "./whiteboard/UserCursor";
 import WhiteboardBottomLeft from "./whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "./whiteboard/WhiteboardBottomRight";
-import * as loading from "../assets/image/loading.svg";
-import MenuHotKey from "./menu/MenuHotKey";
-import MenuBox from "./menu/MenuBox";
-import MenuAnnexBox from "./menu/MenuAnnexBox";
-import {netlessToken, ossConfigObj} from "../appToken";
-import {UserCursor} from "./whiteboard/UserCursor";
-import MenuPPTDoc from "./menu/MenuPPTDoc";
-import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
-import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
-import UploadBtn from "../tools/upload/UploadBtn";
-import ExtendTool from "../tools/extendTool/ExtendTool";
-import {RoomContextProvider} from "./RoomContext";
+import WhiteboardTopRight from "./whiteboard/WhiteboardTopRight";
 
 export enum MenuInnerType {
     HotKey = "HotKey",
@@ -170,7 +159,8 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     private renderMenuInner = (): React.ReactNode => {
         switch (this.state.menuInnerState) {
             case MenuInnerType.HotKey:
-                return <MenuHotKey handleHotKeyMenuState={this.handleHotKeyMenuState}/>;
+                return null;
+                // return <MenuHotKey handleHotKeyMenuState={this.handleHotKeyMenuState}/>;
             case MenuInnerType.AnnexBox:
                 return <MenuAnnexBox
                     isMenuOpen={this.state.isMenuOpen}
