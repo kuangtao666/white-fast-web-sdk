@@ -1,4 +1,4 @@
-# Netless Fast SDK
+# White Fast Web SDK
 
 ![GitHub](https://img.shields.io/github/license/netless-io/whiteboard-designer)
 
