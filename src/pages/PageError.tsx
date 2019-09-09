@@ -3,12 +3,10 @@ import "./PageError.less";
 import * as page404 from "../assets/image/page404.svg";
 import * as room_not_find from "../assets/image/room_not_find.svg";
 import {WhiteUIButton} from "../whiteUIKit/WhiteUIButton";
-import {withRouter} from "react-router-dom";
-import {RouteComponentProps} from "react-router";
-import {FormattedMessage} from "react-intl";
+// import {FormattedMessage} from "react-intl";
 
-class PageError extends React.Component<RouteComponentProps<{}>, {}> {
-    public constructor(props: RouteComponentProps<{}>) {
+class PageError extends React.Component<{}, {}> {
+    public constructor(props: {}) {
         super(props);
     }
     public render(): React.ReactNode {
@@ -17,19 +15,19 @@ class PageError extends React.Component<RouteComponentProps<{}>, {}> {
                 <div className="page404-image-box">
                     <img className="page404-image-inner" src={room_not_find}/>
                     <div className="page404-inner">
-                        <FormattedMessage
+                        {/* <FormattedMessage
                             id="error-page.title-room-not-exist"
-                        />
+                        /> */}
                     </div>
                     <WhiteUIButton
                         type="primary"
                         size="large"
                         className="page404-btn"
-                        onClick={() => this.props.history.goBack()}
+                        onClick={() => console.warn("TODO")}
                     >
-                        <FormattedMessage
+                        {/* <FormattedMessage
                             id="error-page.btn"
-                        />
+                        /> */}
                     </WhiteUIButton>
                 </div>
             </div>
@@ -37,4 +35,4 @@ class PageError extends React.Component<RouteComponentProps<{}>, {}> {
     }
 }
 
-export default withRouter(PageError);
+export default PageError;

@@ -4,8 +4,8 @@ import "./WhiteboardBottomLeft.less";
 import ScaleController from "@netless/react-scale-controller";
 import * as player from "../../assets/image/player.svg";
 import {Tooltip} from "antd";
-import {withRouter} from "react-router-dom";
-import {RouteComponentProps} from "react-router";
+// import {withRouter} from "react-router-dom";
+// import {RouteComponentProps} from "react-router";
 
 export type WhiteboardBottomLeftInnerProps = {
     room: Room;
@@ -14,7 +14,7 @@ export type WhiteboardBottomLeftInnerProps = {
     userId: string;
 };
 
-export type WhiteboardBottomLeftProps = RouteComponentProps<{}> & WhiteboardBottomLeftInnerProps;
+export type WhiteboardBottomLeftProps = WhiteboardBottomLeftInnerProps;
 
 class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
 
@@ -43,4 +43,4 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
     }
 }
 
-export default withRouter(WhiteboardBottomLeft);
+export default WhiteboardBottomLeft;
