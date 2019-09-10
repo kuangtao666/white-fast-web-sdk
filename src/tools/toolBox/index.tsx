@@ -11,6 +11,7 @@ import {
     ToolBoxText,
 } from "./ToolIconComponent";
 import "./ToolBox.less";
+import {ToolBarPositionEnum} from "../../components/RealTime";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -33,6 +34,7 @@ export type MemberState = {
 export type ToolBoxProps = {
     memberState: Readonly<MemberState>;
     setMemberState: (modifyState: Partial<MemberState>) => void;
+    toolBarPosition?: ToolBarPositionEnum;
     colorConfig?: string[];
     customerComponent?: React.ReactNode[];
     customerComponentPosition?: CustomerComponentPositionType;
@@ -146,22 +148,58 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     public render(): React.ReactNode {
+        const {toolBarPosition} = this.props;
         const nodes: React.ReactNode[] = [];
         for (const applianceName in ToolBox.descriptions) {
             const description = ToolBox.descriptions[applianceName];
             const node = this.renderApplianceButton(applianceName, description);
             nodes.push(node);
         }
-        return (
-            <div className="tool-box">
-                <div className="tool-mid-box">
-                    {this.addCustomerComponent(nodes)}
-                </div>
-            </div>
-        );
+        switch (toolBarPosition) {
+            case ToolBarPositionEnum.top: {
+                return (
+                    <div className="whiteboard-tool-box">
+                        <div className="tool-mid-box">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            case ToolBarPositionEnum.bottom: {
+                return (
+                    <div className="whiteboard-tool-box-bottom">
+                        <div className="tool-mid-box">
+                                {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            case ToolBarPositionEnum.left: {
+                return (
+                    <div className="whiteboard-tool-box-left">
+                        <div className="tool-mid-box-left">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            case ToolBarPositionEnum.right: {
+                return null;
+            }
+            default: {
+                return (
+                    <div className="whiteboard-tool-box">
+                        <div className="tool-mid-box">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+        }
     }
 
     private renderApplianceButton(applianceName: string, description: ApplianceDescription): React.ReactNode {
+        const {} = this.props
         const ToolIcon = description.iconView;
         const state = this.props.memberState;
         const isExtendable = description.hasStroke || description.hasColor;
@@ -169,7 +207,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         const buttonColor = this.buttonColor(isSelected);
 
         const cellBox: React.ReactNode = (
-            <div className="tool-box-cell-box" key={applianceName}>
+            <div className={"tool-box-cell-box"} key={applianceName}>
                 <div className="tool-box-cell"
                      onClick={() => this.clickAppliance(event, applianceName)}>
                     <ToolIcon color={buttonColor}/>
@@ -208,12 +246,9 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
-        if (isSelected && this.state.extendsPanel) {
-            return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
-                memberState={this.props.memberState}
-                setMemberState={this.props.setMemberState}
-                displayStroke={description.hasStroke}/>;
-        }
-        return null;
+        return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
+                                  memberState={this.props.memberState}
+                                  setMemberState={this.props.setMemberState}
+                                  displayStroke={description.hasStroke}/>;
     }
 }

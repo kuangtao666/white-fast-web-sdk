@@ -9,6 +9,7 @@ import * as image from "../../assets/image/image.svg";
 import * as doc_to_image from "../../assets/image/doc_to_image.svg";
 import * as doc_to_web from "../../assets/image/doc_to_web.svg";
 import * as upload from "../../assets/image/upload.svg";
+import {ToolBarPositionEnum} from "../../components/RealTime";
 
 export type ToolBoxUploadBoxState = {
     toolBoxColor: string,
@@ -33,6 +34,7 @@ export type UploadBtnProps = {
     roomToken: string | null,
     whiteboardRef?: HTMLDivElement,
     onProgress?: PPTProgressListener,
+    toolBarPosition?: ToolBarPositionEnum;
 };
 
 export type UploadBtnMobileProps = {

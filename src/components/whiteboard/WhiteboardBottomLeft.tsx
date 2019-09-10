@@ -33,11 +33,6 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         return (
             <div className="whiteboard-box-bottom-left">
                 <ScaleController zoomScale={roomState.zoomScale} zoomChange={this.zoomChange}/>
-                <Tooltip placement="top" title={"回放"}>
-                    <div className="whiteboard-box-bottom-left-player">
-                        <img src={player}/>
-                    </div>
-                </Tooltip>
             </div>
         );
     }

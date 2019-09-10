@@ -1,15 +1,20 @@
 import * as React from "react";
-import {Popover, Upload} from "antd";
+import {Popover} from "antd";
 import "./ExtendTool.less";
 import {ExtendToolIcon} from "./ExtendToolIcon";
-import ExtendToolInner, {ExtendToolInnerProps} from "./ExtendToolInner";
+import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../components/RoomContext";
+import {ToolBarPositionEnum} from "../../components/RealTime";
 
 export type ExtendToolStates = {
     toolBoxColor: string;
 };
 
-export default class ExtendTool extends React.Component<{}, ExtendToolStates> {
+export type ExtendToolProps = {
+    toolBarPosition?: ToolBarPositionEnum;
+};
+
+export default class ExtendTool extends React.Component<ExtendToolProps, ExtendToolStates> {
     public constructor(props: {}) {
         super(props);
         this.state = {

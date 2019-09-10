@@ -1,14 +1,24 @@
-.tool-box {
-}
+
 
 .tool-mid-box {
   height: 32px;
   display: flex;
   border-radius: 4px;
-  background-color: white;
+  background-color: red;
   justify-content: space-between;
   padding-left: 6px;
   padding-right: 6px;
+}
+
+.tool-mid-box-left {
+  width: 32px;
+  display: flex;
+  border-radius: 4px;
+  background-color: red;
+  justify-content: space-between;
+  flex-direction: column;
+  padding-bottom: 6px;
+  padding-top: 6px;
 }
 
 .tool-box-cell {
@@ -25,6 +35,16 @@
   height: 32px;
   margin-left: 4px;
   margin-right: 4px;
+  user-select: none;
+  cursor: pointer;
+  background-color: white;
+}
+
+.tool-box-cell-box-left {
+  width: 32px;
+  height: 32px;
+  margin-top: 4px;
+  margin-bottom: 4px;
   user-select: none;
   cursor: pointer;
   background-color: white;

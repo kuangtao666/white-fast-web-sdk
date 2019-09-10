@@ -23,7 +23,6 @@ import WhiteboardTopRight from "./whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "./whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "./whiteboard/WhiteboardBottomRight";
 import * as loading from "../assets/image/loading.svg";
-import MenuHotKey from "./menu/MenuHotKey";
 import MenuBox from "./menu/MenuBox";
 import MenuAnnexBox from "./menu/MenuAnnexBox";
 import {netlessToken, ossConfigObj} from "../appToken";
@@ -37,10 +36,26 @@ import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "./whiteboard/WhiteboardTopLeft";
 
 export enum MenuInnerType {
-    HotKey = "HotKey",
     AnnexBox = "AnnexBox",
     PPTBox = "PPTBox",
-    DocSet = "DocSet",
+}
+
+export type RealTimeProps = {
+    uuid: string;
+    userId: string;
+    roomToken: string;
+    toolBarPosition?: ToolBarPositionEnum;
+    boardBackgroundColor?: string;
+    defaultColorArray?: string[];
+    onColorArrayChange?: (colorArray: string[]) => void;
+    logoUrl?: string | boolean;
+};
+
+export enum ToolBarPositionEnum {
+    top = "top",
+    bottom = "bottom",
+    left = "left",
+    right = "right",
 }
 
 export type RealTimeStates = {
@@ -63,15 +78,6 @@ export type RealTimeStates = {
     whiteboardLayerDownRef?: HTMLDivElement;
 };
 
-export type RealTimeProps = {
-    uuid: string;
-    userId: string;
-    colorConfig?: string[];
-    onColorArrayChange?: (colorArray: string[]) => void;
-    logoUrl?: string;
-};
-
-
 export default class RealTime extends React.Component<RealTimeProps, RealTimeStates> {
     private didLeavePage: boolean = false;
     private readonly cursor: UserCursor;
@@ -81,7 +87,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             phase: RoomPhase.Connecting,
             connectedFail: false,
             didSlaveConnected: false,
-            menuInnerState: MenuInnerType.HotKey,
+            menuInnerState: MenuInnerType.AnnexBox,
             isMenuVisible: false,
             roomToken: null,
             ossPercent: 0,
@@ -92,18 +98,9 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         this.cursor = new UserCursor();
     }
 
-    private getRoomToken = async (uuid: string): Promise<string | null> => {
-        const res = await netlessWhiteboardApi.room.joinRoomApi(uuid);
-        if (res.code === 200) {
-            return res.msg.roomToken;
-        } else {
-            return null;
-        }
-    }
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, userId} = this.props;
+        const {uuid, userId, roomToken} = this.props;
         this.setState({userId: userId});
-        const roomToken = await this.getRoomToken(uuid);
         if (netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`) === `Netless uuid ${userId}`) {
             const userUuid = uuidv4();
             netlessWhiteboardApi.user.updateUserInf(userUuid, userUuid, userId);
@@ -171,8 +168,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     }
     private renderMenuInner = (): React.ReactNode => {
         switch (this.state.menuInnerState) {
-            case MenuInnerType.HotKey:
-                return <MenuHotKey handleHotKeyMenuState={this.handleHotKeyMenuState}/>;
             case MenuInnerType.AnnexBox:
                 return <MenuAnnexBox
                     isMenuOpen={this.state.isMenuOpen}
@@ -195,7 +190,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     private handleHotKeyMenuState = (): void => {
         this.setState({
             isMenuVisible: !this.state.isMenuVisible,
-            menuInnerState: MenuInnerType.HotKey,
             isMenuLeft: false,
         });
     }
@@ -328,22 +322,22 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                         handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                         handleHotKeyMenuState={this.handleHotKeyMenuState}
                                         room={this.state.room}/>
-                                    <div className="whiteboard-tool-box">
                                         <ToolBox
-                                            colorConfig={this.props.colorConfig}
+                                            toolBarPosition={this.props.toolBarPosition}
+                                            colorConfig={this.props.defaultColorArray}
                                             setMemberState={this.setMemberState}
                                             customerComponent={[
                                                 <UploadBtn
+                                                    toolBarPosition={this.props.toolBarPosition}
                                                     oss={ossConfigObj}
                                                     room={this.state.room}
                                                     roomToken={this.state.roomToken}
                                                     onProgress={this.progress}
                                                     whiteboardRef={this.state.whiteboardLayerDownRef}
                                                 />,
-                                                <ExtendTool/>,
+                                                <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
                                             ]} customerComponentPosition={CustomerComponentPositionType.end}
                                             memberState={this.state.room.state.memberState}/>
-                                    </div>
                                     <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                         {this.renderWhiteboard()}
                                     </div>
@@ -356,9 +350,10 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         }
     }
     private renderWhiteboard(): React.ReactNode {
+        const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100vh", backgroundColor: "white"}}/>;
+                                   style={{width: "100%", height: "100vh", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "white"}}/>;
         } else {
             return null;
         }

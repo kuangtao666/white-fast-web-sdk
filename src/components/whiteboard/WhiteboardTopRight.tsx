@@ -1,13 +1,8 @@
-import { Button, Input, message, Modal, Popover, Tooltip } from "antd";
-import QRCode from "qrcode.react";
+import { message, Popover, Tooltip } from "antd";
 import * as React from "react";
-import Clipboard from "react-clipboard.js";
-import { isMobile } from "react-device-detect";
 import { Room, RoomState, ViewMode } from "white-react-sdk";
-import * as add from "../../assets/image/add.svg";
 import * as board from "../../assets/image/board.svg";
 import * as board_black from "../../assets/image/board_black.svg";
-import { UploadBtnMobile } from "../../tools/upload/UploadBtn";
 import { PPTProgressListener } from "../../tools/upload/UploadManager";
 import WhiteboardPerspectiveSet from "./WhiteboardPerspectiveSet";
 import "./WhiteboardTopRight.less";
@@ -120,147 +115,17 @@ class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, Whiteb
         }
     }
 
-    private renderBroadControllerMbile = (): React.ReactNode => {
-        const {room, roomState} = this.props;
-        const perspectiveState = roomState.broadcastState;
-        const isBroadcaster = perspectiveState.mode === ViewMode.Broadcaster;
-        const hasBroadcaster = perspectiveState.broadcasterId !== undefined;
-        if (isBroadcaster) {
-            return (
-                <div
-                    onClick={ () => {
-                        room.setViewMode(ViewMode.Freedom);
-                        message.info("退出演讲模式，他人不再跟随您的视角");
-                    }}
-                    className="whiteboard-top-bar-btn-mb">
-                    <img src={board_black}/>
-                </div>
-            );
-        } else {
-            if (hasBroadcaster) {
-                return (
-                    <Popover
-                        overlayClassName="whiteboard-perspective"
-                        content={<WhiteboardPerspectiveSet roomState={roomState} room={room}/>}
-                        placement="bottom">
-                        <div
-                            className="whiteboard-top-bar-btn-mb">
-                            <img src={board}/>
-                        </div>
-                    </Popover>
-                );
-            } else {
-                return (
-                    <div
-                        onClick={ () => {
-                            room.setViewMode(ViewMode.Broadcaster);
-                            message.info("进入演讲模式，他人会跟随您的视角");
-                        }}
-                        className="whiteboard-top-bar-btn-mb">
-                        <img src={board}/>
-                    </div>
-                );
-            }
-        }
-    }
-
-    private handleInvite = (): void => {
-        this.setState({isInviteVisible: true});
-    }
-
-    private handleUrl = (url: string): string => {
-        const regex = /[\w]+\/$/gm;
-        const match = regex.exec(url);
-        if (match) {
-            return url.substring(0, match.index);
-        } else {
-            return url;
-        }
-
-    }
 
     public render(): React.ReactNode {
-        if (isMobile) {
-            return (
-                <div className="whiteboard-box-top-right-mb">
-                    <div
-                        className="whiteboard-box-top-right-mid-mb">
-                        <UploadBtnMobile
-                            room={this.props.room}
-                            oss={this.props.oss}
-                            onProgress={this.props.onProgress}
-                            whiteboardRef={this.props.whiteboardRef} />
-                        {isMobile ? this.renderBroadControllerMbile() : this.renderBroadController()}
-                        <div
-                            className="whiteboard-top-bar-btn-mb" onClick={this.handleInvite}>
-                            <img src={add}/>
-                        </div>
-                    </div>
-                    <Modal
-                        visible={this.state.isInviteVisible}
-                        footer={null}
-                        title="Invite"
-                        onCancel={() => this.setState({isInviteVisible: false})}
-                    >
-                        <div className="whiteboard-share-box">
-                            <QRCode value={`${this.handleUrl(location.href)}`} />
-                            <div className="whiteboard-share-text-box">
-                                <Input readOnly className="whiteboard-share-text" size="large" value={`${this.handleUrl(location.href)}`}/>
-                                <Clipboard
-                                    data-clipboard-text={`${this.handleUrl(location.href)}`}
-                                    component="div"
-                                    onSuccess={() => {
-                                        message.success("Copy already copied address to clipboard");
-                                        this.setState({isInviteVisible: false});
-                                    }}
-                                >
-                                    <Button size="large" className="white-btn-size" type="primary">复制链接</Button>
-                                </Clipboard>
-                            </div>
-                        </div>
-                    </Modal>
+        return (
+            <div className="whiteboard-box-top-right">
+                <div
+                    className="whiteboard-box-top-right-mid">
+                    {this.renderBroadController()}
                 </div>
-            );
-        } else {
-            return (
-                <div className="whiteboard-box-top-right">
-                    <div
-                        className="whiteboard-box-top-right-mid">
-                        {this.renderBroadController()}
-                        <Tooltip placement="bottomLeft" title={"invite your friend"}>
-                            <div
-                                style={{marginRight: 12}}
-                                className="whiteboard-top-bar-btn" onClick={this.handleInvite}>
-                                <img src={add}/>
-                            </div>
-                        </Tooltip>
-                    </div>
-                    <Modal
-                        visible={this.state.isInviteVisible}
-                        footer={null}
-                        title="Invite"
-                        onCancel={() => this.setState({isInviteVisible: false})}
-                    >
-                        <div className="whiteboard-share-box">
-                            <QRCode value={`${this.handleUrl(location.href)}`} />
-                            <div className="whiteboard-share-text-box">
-                                <Input readOnly className="whiteboard-share-text" size="large" value={`${this.handleUrl(location.href)}`}/>
-                                <Clipboard
-                                    data-clipboard-text={`${this.handleUrl(location.href)}`}
-                                    component="div"
-                                    onSuccess={() => {
-                                        message.success("Copy already copied address to clipboard");
-                                        this.setState({isInviteVisible: false});
-                                    }}
-                                >
-                                    <Button size="large" className="white-btn-size" type="primary">复制链接</Button>
-                                </Clipboard>
-                            </div>
-                        </div>
-                    </Modal>
-                </div>
-            );
-        }
+            </div>
+        );
+
     }
 }
 

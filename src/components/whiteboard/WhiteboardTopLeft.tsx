@@ -4,7 +4,7 @@ import * as netless_black from "../../assets/image/netless_black.svg";
 
 
 export type WhiteboardTopLeftProps = {
-    logoUrl?: string;
+    logoUrl?: string | boolean;
 };
 
 
@@ -16,11 +16,21 @@ class WhiteboardTopLeft extends React.Component<WhiteboardTopLeftProps, {}> {
 
     public render(): React.ReactNode {
         const {logoUrl} = this.props;
-        return (
-            <div className="whiteboard-box-top-left">
-                <img src={logoUrl ? logoUrl : netless_black}/>
-            </div>
-        );
+        if (logoUrl === false) {
+            return null;
+        } else if (logoUrl === true) {
+            return (
+                <div className="whiteboard-box-top-left">
+                    <img src={netless_black}/>
+                </div>
+            );
+        } else {
+            return (
+                <div className="whiteboard-box-top-left">
+                    <img src={logoUrl ? logoUrl : netless_black}/>
+                </div>
+            );
+        }
     }
 }
 

@@ -29,6 +29,9 @@ export default class ToolBoxAddColor extends React.Component<ToolBoxAddColorProp
 
     private handleChangeComplete = (color: ColorResult): void => {
         this.setState({ activeColor: color.hex });
+        if (this.state.activeColor !== "#5B908E") {
+            this.setState({isAddColor: true});
+        }
     }
 
     private updateColorArray = (): void => {
@@ -47,8 +50,7 @@ export default class ToolBoxAddColor extends React.Component<ToolBoxAddColorProp
     }
     private handleVisibleChange = (visible: boolean): void => {
         this.setState({isVisible: visible});
-        if (!visible && !this.state.isAddColor) {
-            this.setState({isAddColor: true});
+        if (!visible && this.state.isAddColor) {
             const {newColor} = this.props;
             if (newColor && this.state.activeColor) {
                 newColor(this.state.activeColor);
@@ -60,7 +62,7 @@ export default class ToolBoxAddColor extends React.Component<ToolBoxAddColorProp
     public componentWillUnmount(): void {
         this.updateColorArray();
         const {newColor} = this.props;
-        if (newColor && !this.state.isAddColor) {
+        if (newColor && this.state.isAddColor) {
             newColor(this.state.activeColor);
         }
     }
