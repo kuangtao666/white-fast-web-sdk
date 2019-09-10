@@ -1,23 +1,16 @@
+import { Button, Input, message, Modal, Popover, Tooltip } from "antd";
+import QRCode from "qrcode.react";
 import * as React from "react";
-import {Button, Input, message, Modal, Popover, Tooltip} from "antd";
-import {Room, RoomState} from "white-react-sdk";
-import {ViewMode} from "white-react-sdk";
-import Identicon from "react-identicons";
-import {InjectedIntlProps, injectIntl} from "react-intl";
 import Clipboard from "react-clipboard.js";
+import { isMobile } from "react-device-detect";
+import { Room, RoomState, ViewMode } from "white-react-sdk";
 import * as add from "../../assets/image/add.svg";
 import * as board from "../../assets/image/board.svg";
 import * as board_black from "../../assets/image/board_black.svg";
+import { UploadBtnMobile } from "../../tools/upload/UploadBtn";
+import { PPTProgressListener } from "../../tools/upload/UploadManager";
 import WhiteboardPerspectiveSet from "./WhiteboardPerspectiveSet";
 import "./WhiteboardTopRight.less";
-import {withRouter} from "react-router-dom";
-import {RouteComponentProps} from "react-router";
-import {netlessWhiteboardApi} from "../../apiMiddleware";
-import {UserInfType} from "../../apiMiddleware";
-import QRCode from "qrcode.react";
-import {isMobile} from "react-device-detect";
-import {UploadBtnMobile} from "../../tools/upload/UploadBtn";
-import {PPTProgressListener} from "../../tools/upload/UploadManager";
 
 export type WhiteboardTopRightState = {
     scaleAnimation: boolean;
