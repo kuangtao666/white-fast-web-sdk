@@ -154,12 +154,14 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
     }
 
     public render(): React.ReactNode {
+        const {toolBarPosition} = this.props
         return (
             <Popover placement="bottom"  content={this.renderPopoverContent()}>
                 <div
                     onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                     onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}
-                    className="tool-box-cell-box">
+                    className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right) ?
+                        "tool-box-cell-box-left" : "tool-box-cell-box"}>
                     <div className="tool-box-cell">
                         <ToolBoxUpload color={this.state.toolBoxColor}/>
                     </div>

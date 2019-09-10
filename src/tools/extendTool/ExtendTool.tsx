@@ -23,13 +23,14 @@ export default class ExtendTool extends React.Component<ExtendToolProps, ExtendT
     }
 
     public render(): React.ReactNode {
+        const {toolBarPosition} = this.props;
         return (
             <RoomContextConsumer key={"add"} children={context => (
                 <Popover placement="bottom" content={<ExtendToolInner room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
                     <div
                         onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                         onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}
-                        className="extend-tool-cell-box">
+                        className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right) ? "extend-tool-cell-box-left" : "extend-tool-cell-box"}>
                         <div className="extend-tool-cell">
                             <ExtendToolIcon color={this.state.toolBoxColor}/>
                         </div>

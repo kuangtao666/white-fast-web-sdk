@@ -199,7 +199,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     private renderApplianceButton(applianceName: string, description: ApplianceDescription): React.ReactNode {
-        const {} = this.props
+        const {toolBarPosition} = this.props;
         const ToolIcon = description.iconView;
         const state = this.props.memberState;
         const isExtendable = description.hasStroke || description.hasColor;
@@ -207,7 +207,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         const buttonColor = this.buttonColor(isSelected);
 
         const cellBox: React.ReactNode = (
-            <div className={"tool-box-cell-box"} key={applianceName}>
+            <div className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right) ? "tool-box-cell-box-left" : "tool-box-cell-box"} key={applianceName}>
                 <div className="tool-box-cell"
                      onClick={() => this.clickAppliance(event, applianceName)}>
                     <ToolIcon color={buttonColor}/>
