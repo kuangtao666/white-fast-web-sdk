@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./WhiteboardTopLeft.less";
-import * as homeIcon from "../../assets/image/home.svg";
+import * as netless_black from "../../assets/image/netless_black.svg";
 
 
 export type WhiteboardTopLeftProps = {
@@ -15,10 +15,10 @@ class WhiteboardTopLeft extends React.Component<WhiteboardTopLeftProps, {}> {
     }
 
     public render(): React.ReactNode {
-
+        const {logoUrl} = this.props;
         return (
             <div className="whiteboard-box-top-left">
-                <img src={homeIcon}/>
+                <img src={logoUrl ? logoUrl : netless_black}/>
             </div>
         );
     }

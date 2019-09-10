@@ -34,6 +34,7 @@ import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
 import UploadBtn from "../tools/upload/UploadBtn";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import {RoomContextProvider} from "./RoomContext";
+import WhiteboardTopLeft from "./whiteboard/WhiteboardTopLeft";
 
 export enum MenuInnerType {
     HotKey = "HotKey",
@@ -67,6 +68,7 @@ export type RealTimeProps = {
     userId: string;
     colorConfig?: string[];
     onColorArrayChange?: (colorArray: string[]) => void;
+    logoUrl?: string;
 };
 
 
@@ -306,6 +308,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 <TopLoadingBar loadingPercent={this.state.ossPercent}/>
                                 <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                                 <div className="whiteboard-out-box">
+                                    <WhiteboardTopLeft logoUrl={this.props.logoUrl}/>
                                     <WhiteboardTopRight
                                         oss={ossConfigObj}
                                         onProgress={this.progress}
