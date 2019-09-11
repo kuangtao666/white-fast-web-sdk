@@ -10,6 +10,7 @@ import * as doc_to_image from "../../assets/image/doc_to_image.svg";
 import * as doc_to_web from "../../assets/image/doc_to_web.svg";
 import * as upload from "../../assets/image/upload.svg";
 import {ToolBarPositionEnum} from "../../components/RealTime";
+import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ToolBoxUploadBoxState = {
     toolBoxColor: string,
@@ -153,10 +154,28 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
         </div>;
     }
 
+    private handlePlacement = (): TooltipPlacement => {
+        const {toolBarPosition} = this.props;
+        switch (toolBarPosition) {
+            case ToolBarPositionEnum.left: {
+                return "left";
+            }
+            case ToolBarPositionEnum.bottom: {
+                return "bottom";
+            }
+            case ToolBarPositionEnum.right: {
+                return "right";
+            }
+            default: {
+                return "bottom";
+            }
+        }
+    }
+
     public render(): React.ReactNode {
-        const {toolBarPosition} = this.props
+        const {toolBarPosition} = this.props;
         return (
-            <Popover placement="bottom"  content={this.renderPopoverContent()}>
+            <Popover placement={this.handlePlacement()} content={this.renderPopoverContent()}>
                 <div
                     onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                     onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

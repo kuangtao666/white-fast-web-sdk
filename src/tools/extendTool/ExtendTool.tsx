@@ -5,6 +5,7 @@ import {ExtendToolIcon} from "./ExtendToolIcon";
 import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../components/RoomContext";
 import {ToolBarPositionEnum} from "../../components/RealTime";
+import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ExtendToolStates = {
     toolBoxColor: string;
@@ -21,12 +22,30 @@ export default class ExtendTool extends React.Component<ExtendToolProps, ExtendT
             toolBoxColor: "#A2A7AD",
         };
     }
+    private handlePlacement = (): TooltipPlacement => {
+        const {toolBarPosition} = this.props;
+        switch (toolBarPosition) {
+            case ToolBarPositionEnum.left: {
+                return "left";
+            }
+            case ToolBarPositionEnum.bottom: {
+                return "bottom";
+            }
+            case ToolBarPositionEnum.right: {
+                return "right";
+            }
+            default: {
+                return "bottom";
+            }
+        }
+    }
+
 
     public render(): React.ReactNode {
         const {toolBarPosition} = this.props;
         return (
             <RoomContextConsumer key={"add"} children={context => (
-                <Popover placement="bottom" content={<ExtendToolInner room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
+                <Popover placement={this.handlePlacement()} content={<ExtendToolInner room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
                     <div
                         onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                         onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

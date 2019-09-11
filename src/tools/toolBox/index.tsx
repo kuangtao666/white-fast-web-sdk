@@ -12,6 +12,7 @@ import {
 } from "./ToolIconComponent";
 import "./ToolBox.less";
 import {ToolBarPositionEnum} from "../../components/RealTime";
+import {TooltipPlacement} from "antd/lib/tooltip";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -184,7 +185,13 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 );
             }
             case ToolBarPositionEnum.right: {
-                return null;
+                return (
+                    <div className="whiteboard-tool-box-right">
+                        <div className="tool-mid-box-left">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
             }
             default: {
                 return (
@@ -234,7 +241,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 <Popover key={applianceName}
                          visible={this.state.extendsPanel}
                          trigger="click"
-                         placement="bottom"
+                         placement={this.handlePlacement()}
                          onVisibleChange={this.onVisibleChange}
                          content={this.renderToolBoxPaletteBox(isSelected, description)}>
                     {cellBox}
@@ -242,6 +249,24 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             );
         } else {
             return cellBox;
+        }
+    }
+
+    private handlePlacement = (): TooltipPlacement => {
+        const {toolBarPosition} = this.props;
+        switch (toolBarPosition) {
+            case ToolBarPositionEnum.left: {
+                return "left";
+            }
+            case ToolBarPositionEnum.bottom: {
+                return "bottom";
+            }
+            case ToolBarPositionEnum.right: {
+                return "right";
+            }
+            default: {
+                return "bottom";
+            }
         }
     }
 
