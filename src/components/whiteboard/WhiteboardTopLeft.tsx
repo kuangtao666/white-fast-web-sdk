@@ -28,6 +28,8 @@ class WhiteboardTopLeft extends React.Component<WhiteboardTopLeftProps, {}> {
             return (
                 <div className="whiteboard-box-top-left">
                     <img src={logoUrl ? logoUrl : netless_black}/>
+                    {/*<img/>*/}
+                    {/*<div className="whiteboard-box-top-left-name">伍双的教室</div>*/}
                 </div>
             );
         }

@@ -274,6 +274,8 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                     room: this.state.room,
                 }}>
                     <div id="outer-container">
+                        {/*<div style={{width: 300, height: "100vh", backgroundColor: "yellow"}}>*/}
+                        {/*</div>*/}
                         <MenuBox
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setMenuState}
@@ -295,9 +297,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 <div className="whiteboard-out-box">
                                     <WhiteboardTopLeft
                                         logoUrl={this.props.logoUrl}/>
-                                    <WhiteboardTopRight
-                                        roomState={this.state.roomState}
-                                        room={this.state.room}/>
+                                    {/*<WhiteboardTopRight/>*/}
                                     <WhiteboardBottomLeft
                                         roomState={this.state.roomState}
                                         room={this.state.room}/>

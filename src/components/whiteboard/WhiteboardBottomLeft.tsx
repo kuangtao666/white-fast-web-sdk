@@ -2,6 +2,7 @@ import * as React from "react";
 import {Room, RoomState} from "white-react-sdk";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
+import * as chat from "../../assets/image/chat.svg";
 
 export type WhiteboardBottomLeftInnerProps = {
     room: Room;
@@ -26,6 +27,9 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         const {roomState} = this.props;
         return (
             <div className="whiteboard-box-bottom-left">
+                <div className="whiteboard-box-bottom-left-chart">
+                    <img src={chat}/>
+                </div>
                 <ScaleController zoomScale={roomState.zoomScale} zoomChange={this.zoomChange}/>
             </div>
         );
