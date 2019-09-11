@@ -3,7 +3,6 @@ import TopLoadingBar from "@netless/react-loading-bar";
 import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
 import * as OSS from "ali-oss";
 import {message} from "antd";
-import * as uuidv4 from "uuid/v4";
 import Dropzone from "react-dropzone";
 import {
     WhiteWebSdk,
@@ -28,7 +27,6 @@ import MenuAnnexBox from "./menu/MenuAnnexBox";
 import {netlessToken, ossConfigObj} from "../appToken";
 import {UserCursor} from "./whiteboard/UserCursor";
 import MenuPPTDoc from "./menu/MenuPPTDoc";
-import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
 import UploadBtn from "../tools/upload/UploadBtn";
 import ExtendTool from "../tools/extendTool/ExtendTool";
@@ -104,22 +102,15 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     private startJoinRoom = async (): Promise<void> => {
         const {uuid, userInf, roomToken} = this.props;
         const userId = userInf.id;
-        if (netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`) === `Netless uuid ${userId}`) {
-            const userUuid = uuidv4();
-            netlessWhiteboardApi.user.updateUserInf(userUuid, userUuid, userId);
-        }
-        const userUuid = netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`);
-        const name = netlessWhiteboardApi.user.getUserInf(UserInfType.name, `${userId}`);
         if (roomToken && uuid) {
             const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktop});
-
             const pptConverter = whiteWebSdk.pptConverter(netlessToken.sdkToken);
             this.setState({pptConverter: pptConverter});
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {id: userId, userId: userUuid, nickName: name, avatar: userUuid}},
+                    userPayload: {id: userId, nickName: userInf.name, avatar: userInf.avatar ? userInf.avatar : userId}},
                 {
                     onPhaseChanged: phase => {
                         if (!this.didLeavePage) {
@@ -190,12 +181,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
     }
 
-    private handleHotKeyMenuState = (): void => {
-        this.setState({
-            isMenuVisible: !this.state.isMenuVisible,
-            isMenuLeft: false,
-        });
-    }
     private handleAnnexBoxMenuState = (): void => {
         this.setState({
             isMenuVisible: !this.state.isMenuVisible,
