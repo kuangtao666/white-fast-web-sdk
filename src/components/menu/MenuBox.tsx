@@ -1,6 +1,6 @@
 import * as React from "react";
 import {slide as Menu, reveal as MenuLeft} from "react-burger-menu";
-import {MenuInnerType} from "../RealTime";
+import {MenuInnerType, PagePreviewPositionEnum} from "../RealTime";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
@@ -36,9 +36,9 @@ export type MenuBoxProps = {
     menuInnerState: MenuInnerType;
     pageWrapId: string;
     outerContainerId: string;
-    isLeft?: boolean;
     resetMenu: () => void;
     setMenuState: (state: boolean) => void;
+    pagePreviewPosition?: PagePreviewPositionEnum;
 };
 
 
@@ -65,47 +65,28 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
         }
     }
     public render(): React.ReactNode {
-        if (this.props.isLeft) {
-            return (
-                <MenuLeft
-                    pageWrapId="page-wrap"
-                    outerContainerId="outer-container"
-                    width={360}
-                    styles={styles3}
-                    isOpen={this.props.isVisible}
-                    onStateChange={async menuState => {
-                        if (!menuState.isOpen) {
-                            await timeout(500);
-                            this.props.resetMenu();
-                        }
-                    }}
-                >
-                    {this.props.children}
-                </MenuLeft>
-            );
-        } else {
-            return (
-                <Menu
-                    pageWrapId="page-wrap"
-                    outerContainerId="outer-container"
-                    noOverlay
-                    styles={this.state.menuStyles}
-                    width={280}
-                    right={true}
-                    isOpen={this.props.isVisible}
-                    onStateChange={async menuState => {
-                        if (!menuState.isOpen) {
-                            await timeout(500);
-                            this.props.setMenuState(false);
-                        }
-                        else {
-                            this.props.setMenuState(true);
-                        }
-                        await this.getMenuStyle();
-                    }}>
-                    {this.props.children}
-                </Menu>
-            );
-        }
+        const isRight = this.props.pagePreviewPosition === PagePreviewPositionEnum.right;
+        return (
+            <Menu
+                pageWrapId="page-wrap"
+                outerContainerId="outer-container"
+                noOverlay
+                styles={this.state.menuStyles}
+                width={280}
+                right={isRight}
+                isOpen={this.props.isVisible}
+                onStateChange={async menuState => {
+                    if (!menuState.isOpen) {
+                        await timeout(500);
+                        this.props.setMenuState(false);
+                    }
+                    else {
+                        this.props.setMenuState(true);
+                    }
+                    await this.getMenuStyle();
+                }}>
+                {this.props.children}
+            </Menu>
+        );
     }
 }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Room, RoomState} from "white-react-sdk";
 import "./WhiteboardBottomLeft.less";
-import ScaleController from "@netless/react-scale-controller";
+import ScaleController from "../../tools/scaleController";
 
 export type WhiteboardBottomLeftInnerProps = {
     room: Room;

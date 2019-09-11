@@ -24,7 +24,7 @@ import WhiteboardBottomRight from "./whiteboard/WhiteboardBottomRight";
 import * as loading from "../assets/image/loading.svg";
 import MenuBox from "./menu/MenuBox";
 import MenuAnnexBox from "./menu/MenuAnnexBox";
-import {netlessToken, ossConfigObj} from "../appToken";
+import {ossConfigObj} from "../appToken";
 import {UserCursor} from "./whiteboard/UserCursor";
 import MenuPPTDoc from "./menu/MenuPPTDoc";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
@@ -48,15 +48,21 @@ export type RealTimeProps = {
     roomToken: string;
     isReadOnly?: boolean;
     toolBarPosition?: ToolBarPositionEnum;
+    pagePreviewPosition?: PagePreviewPositionEnum;
     boardBackgroundColor?: string;
     defaultColorArray?: string[];
-    onColorArrayChange?: (colorArray: string[]) => void;
+    colorArrayStateCallback?: (colorArray: string[]) => void;
     logoUrl?: string | boolean;
 };
 
 export enum ToolBarPositionEnum {
     top = "top",
     bottom = "bottom",
+    left = "left",
+    right = "right",
+}
+
+export enum PagePreviewPositionEnum {
     left = "left",
     right = "right",
 }
@@ -74,7 +80,6 @@ export type RealTimeStates = {
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
-    isMenuLeft?: boolean;
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
@@ -104,7 +109,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         const userId = userInf.id;
         if (roomToken && uuid) {
             const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktop});
-            const pptConverter = whiteWebSdk.pptConverter(netlessToken.sdkToken);
+            const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
@@ -185,14 +190,12 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         this.setState({
             isMenuVisible: !this.state.isMenuVisible,
             menuInnerState: MenuInnerType.AnnexBox,
-            isMenuLeft: false,
         });
     }
 
     private resetMenu = () => {
         this.setState({
             isMenuVisible: false,
-            isMenuLeft: false,
         });
     }
 
@@ -266,17 +269,17 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         } else {
             return (
                 <RoomContextProvider value={{
-                    onColorArrayChange: this.props.onColorArrayChange,
+                    onColorArrayChange: this.props.colorArrayStateCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: this.state.room,
                 }}>
                     <div id="outer-container">
                         <MenuBox
+                            pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setMenuState}
                             resetMenu={this.resetMenu}
                             pageWrapId={"page-wrap" }
                             outerContainerId={ "outer-container" }
-                            isLeft={this.state.isMenuLeft}
                             isVisible={this.state.isMenuVisible}
                             menuInnerState={this.state.menuInnerState}>
                             {this.renderMenuInner()}
