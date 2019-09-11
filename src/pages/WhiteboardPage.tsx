@@ -1,9 +1,10 @@
 import * as React from "react";
-import RealTime, {ToolBarPositionEnum} from "../components/RealTime";
+import RealTime, {ToolBarPositionEnum, UserType} from "../components/RealTime";
 export type WhiteboardPageProps = {
     uuid: string;
     userId: string;
     roomToken: string;
+    userInf: UserType;
     toolBarPosition?: ToolBarPositionEnum;
     boardBackgroundColor?: string;
     isReadOnly?: boolean;
@@ -28,20 +29,22 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
     public render(): React.ReactNode {
         const {
             uuid,
-            userId,
+            userInf,
             defaultColorArray,
             logoUrl,
             roomToken,
             boardBackgroundColor,
             toolBarPosition,
+            isReadOnly,
         } = this.props;
         return (
             <div>
                 <RealTime
                     uuid={uuid}
-                    userId={userId}
+                    userInf={userInf}
                     roomToken={roomToken}
                     logoUrl={logoUrl}
+                    isReadOnly={isReadOnly}
                     toolBarPosition={toolBarPosition}
                     defaultColorArray={defaultColorArray}
                     boardBackgroundColor={boardBackgroundColor}

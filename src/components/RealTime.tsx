@@ -39,11 +39,16 @@ export enum MenuInnerType {
     AnnexBox = "AnnexBox",
     PPTBox = "PPTBox",
 }
-
+export type UserType = {
+    name: string;
+    id: string;
+    avatar: string;
+};
 export type RealTimeProps = {
     uuid: string;
-    userId: string;
+    userInf: UserType;
     roomToken: string;
+    isReadOnly?: boolean;
     toolBarPosition?: ToolBarPositionEnum;
     boardBackgroundColor?: string;
     defaultColorArray?: string[];
@@ -67,7 +72,6 @@ export type RealTimeStates = {
     roomToken: string | null;
     ossPercent: number;
     converterPercent: number;
-    userId: string;
     isMenuOpen: boolean;
     room?: Room;
     roomState?: RoomState;
@@ -92,15 +96,14 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             roomToken: null,
             ossPercent: 0,
             converterPercent: 0,
-            userId: "",
             isMenuOpen: false,
         };
         this.cursor = new UserCursor();
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, userId, roomToken} = this.props;
-        this.setState({userId: userId});
+        const {uuid, userInf, roomToken} = this.props;
+        const userId = userInf.id;
         if (netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`) === `Netless uuid ${userId}`) {
             const userUuid = uuidv4();
             netlessWhiteboardApi.user.updateUserInf(userUuid, userUuid, userId);
@@ -302,42 +305,35 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 <TopLoadingBar loadingPercent={this.state.ossPercent}/>
                                 <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                                 <div className="whiteboard-out-box">
-                                    <WhiteboardTopLeft logoUrl={this.props.logoUrl}/>
+                                    <WhiteboardTopLeft
+                                        logoUrl={this.props.logoUrl}/>
                                     <WhiteboardTopRight
-                                        oss={ossConfigObj}
-                                        onProgress={this.progress}
-                                        whiteboardRef={this.state.whiteboardLayerDownRef}
                                         roomState={this.state.roomState}
-                                        uuid={"uuid"}
-                                        room={this.state.room}
-                                        number={this.state.userId}/>
+                                        room={this.state.room}/>
                                     <WhiteboardBottomLeft
-                                        uuid={"uuid"}
                                         roomState={this.state.roomState}
-                                        room={this.state.room}
-                                        userId={this.state.userId}/>
+                                        room={this.state.room}/>
                                     <WhiteboardBottomRight
-                                        userId={this.state.userId}
                                         roomState={this.state.roomState}
                                         handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
-                                        handleHotKeyMenuState={this.handleHotKeyMenuState}
                                         room={this.state.room}/>
-                                        <ToolBox
-                                            toolBarPosition={this.props.toolBarPosition}
-                                            colorConfig={this.props.defaultColorArray}
-                                            setMemberState={this.setMemberState}
-                                            customerComponent={[
-                                                <UploadBtn
-                                                    toolBarPosition={this.props.toolBarPosition}
-                                                    oss={ossConfigObj}
-                                                    room={this.state.room}
-                                                    roomToken={this.state.roomToken}
-                                                    onProgress={this.progress}
-                                                    whiteboardRef={this.state.whiteboardLayerDownRef}
-                                                />,
-                                                <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
-                                            ]} customerComponentPosition={CustomerComponentPositionType.end}
-                                            memberState={this.state.room.state.memberState}/>
+                                    <ToolBox
+                                        isReadOnly={this.props.isReadOnly}
+                                        toolBarPosition={this.props.toolBarPosition}
+                                        colorConfig={this.props.defaultColorArray}
+                                        setMemberState={this.setMemberState}
+                                        customerComponent={[
+                                            <UploadBtn
+                                                toolBarPosition={this.props.toolBarPosition}
+                                                oss={ossConfigObj}
+                                                room={this.state.room}
+                                                roomToken={this.state.roomToken}
+                                                onProgress={this.progress}
+                                                whiteboardRef={this.state.whiteboardLayerDownRef}
+                                            />,
+                                            <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
+                                        ]} customerComponentPosition={CustomerComponentPositionType.end}
+                                        memberState={this.state.room.state.memberState}/>
                                     <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                         {this.renderWhiteboard()}
                                     </div>

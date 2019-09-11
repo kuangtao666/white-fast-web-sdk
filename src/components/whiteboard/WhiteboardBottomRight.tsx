@@ -28,9 +28,7 @@ export type hotkeyTooltipState = {
 
 export type WhiteboardBottomRightProps = {
     room: Room;
-    userId: string;
     roomState: RoomState;
-    handleHotKeyMenuState: () => void;
     handleAnnexBoxMenuState: () => void;
 };
 

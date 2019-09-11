@@ -3,7 +3,6 @@ import * as React from "react";
 import { Room, RoomState, ViewMode } from "white-react-sdk";
 import * as board from "../../assets/image/board.svg";
 import * as board_black from "../../assets/image/board_black.svg";
-import { PPTProgressListener } from "../../tools/upload/UploadManager";
 import WhiteboardPerspectiveSet from "./WhiteboardPerspectiveSet";
 import "./WhiteboardTopRight.less";
 
@@ -16,19 +15,7 @@ export type WhiteboardTopRightState = {
 
 export type WhiteboardTopRightProps = {
     room: Room,
-    number: string,
-    uuid: string,
     roomState: RoomState,
-    oss: {
-        accessKeyId: string,
-        accessKeySecret: string,
-        region: string,
-        bucket: string,
-        folder: string,
-        prefix: string,
-    },
-    whiteboardRef?: HTMLDivElement,
-    onProgress?: PPTProgressListener,
 };
 
 class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightState> {
