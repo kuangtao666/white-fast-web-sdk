@@ -32,6 +32,7 @@ import UploadBtn from "../tools/upload/UploadBtn";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "./whiteboard/WhiteboardTopLeft";
+import WhiteboardChat from "./whiteboard/WhiteboardChat";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -53,6 +54,7 @@ export type RealTimeProps = {
     defaultColorArray?: string[];
     colorArrayStateCallback?: (colorArray: string[]) => void;
     logoUrl?: string | boolean;
+    isChatOpen?: boolean;
 };
 
 export enum ToolBarPositionEnum {
@@ -77,6 +79,7 @@ export type RealTimeStates = {
     ossPercent: number;
     converterPercent: number;
     isMenuOpen: boolean;
+    isChatOpen?: boolean;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
@@ -100,6 +103,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             ossPercent: 0,
             converterPercent: 0,
             isMenuOpen: false,
+            isChatOpen: this.props.isChatOpen,
         };
         this.cursor = new UserCursor();
     }
@@ -248,6 +252,14 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     private setMemberState = (modifyState: Partial<MemberState>) => {
         this.state.room!.setMemberState(modifyState);
     }
+
+    private handleChatState = (): void => {
+        if (this.state.isChatOpen === undefined) {
+            this.setState({isChatOpen: true});
+        } else {
+            this.setState({isChatOpen: !this.state.isChatOpen});
+        }
+    }
     public render(): React.ReactNode {
 
         if (this.state.connectedFail) {
@@ -273,64 +285,63 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: this.state.room,
                 }}>
-                    <div id="outer-container">
-                        {/*<div style={{width: 300, height: "100vh", backgroundColor: "yellow"}}>*/}
-                        {/*</div>*/}
+                    <div className="realtime-box">
                         <MenuBox
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setMenuState}
                             resetMenu={this.resetMenu}
-                            pageWrapId={"page-wrap" }
-                            outerContainerId={ "outer-container" }
                             isVisible={this.state.isMenuVisible}
                             menuInnerState={this.state.menuInnerState}>
                             {this.renderMenuInner()}
                         </MenuBox>
-                        <div style={{backgroundColor: "white"}} id="page-wrap">
-                            <Dropzone
-                                accept={"image/*"}
-                                disableClick={true}
-                                onDrop={this.onDropFiles}
-                                className="whiteboard-drop-upload-box">
-                                <TopLoadingBar loadingPercent={this.state.ossPercent}/>
-                                <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
-                                <div className="whiteboard-out-box">
-                                    <WhiteboardTopLeft
-                                        logoUrl={this.props.logoUrl}/>
-                                    <WhiteboardTopRight
-                                        name={this.props.userInf.name}
-                                        id={this.props.userInf.id}
-                                        avatar={this.props.userInf.avatar}/>
-                                    <WhiteboardBottomLeft
-                                        roomState={this.state.roomState}
-                                        room={this.state.room}/>
-                                    <WhiteboardBottomRight
-                                        roomState={this.state.roomState}
-                                        handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
-                                        room={this.state.room}/>
-                                    <ToolBox
-                                        isReadOnly={this.props.isReadOnly}
+                        <WhiteboardChat
+                            isChatOpen={this.state.isChatOpen}
+                            handleChatState={this.handleChatState}
+                            room={this.state.room}
+                            userInf={this.props.userInf}/>
+                        <Dropzone
+                            accept={"image/*"}
+                            disableClick={true}
+                            className="whiteboard-out-box"
+                            onDrop={this.onDropFiles}>
+                            <TopLoadingBar loadingPercent={this.state.ossPercent}/>
+                            <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
+                            <WhiteboardTopLeft
+                                logoUrl={this.props.logoUrl}/>
+                            <WhiteboardTopRight
+                                name={this.props.userInf.name}
+                                id={this.props.userInf.id}
+                                avatar={this.props.userInf.avatar}/>
+                            <WhiteboardBottomLeft
+                                roomState={this.state.roomState}
+                                chatState={this.state.isChatOpen}
+                                handleChatState={this.handleChatState}
+                                room={this.state.room}/>
+                            <WhiteboardBottomRight
+                                roomState={this.state.roomState}
+                                handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
+                                room={this.state.room}/>
+                            <ToolBox
+                                isReadOnly={this.props.isReadOnly}
+                                toolBarPosition={this.props.toolBarPosition}
+                                colorConfig={this.props.defaultColorArray}
+                                setMemberState={this.setMemberState}
+                                customerComponent={[
+                                    <UploadBtn
                                         toolBarPosition={this.props.toolBarPosition}
-                                        colorConfig={this.props.defaultColorArray}
-                                        setMemberState={this.setMemberState}
-                                        customerComponent={[
-                                            <UploadBtn
-                                                toolBarPosition={this.props.toolBarPosition}
-                                                oss={ossConfigObj}
-                                                room={this.state.room}
-                                                roomToken={this.state.roomToken}
-                                                onProgress={this.progress}
-                                                whiteboardRef={this.state.whiteboardLayerDownRef}
-                                            />,
-                                            <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
-                                        ]} customerComponentPosition={CustomerComponentPositionType.end}
-                                        memberState={this.state.room.state.memberState}/>
-                                    <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
-                                        {this.renderWhiteboard()}
-                                    </div>
-                                </div>
-                            </Dropzone>
-                        </div>
+                                        oss={ossConfigObj}
+                                        room={this.state.room}
+                                        roomToken={this.state.roomToken}
+                                        onProgress={this.progress}
+                                        whiteboardRef={this.state.whiteboardLayerDownRef}
+                                    />,
+                                    <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
+                                ]} customerComponentPosition={CustomerComponentPositionType.end}
+                                memberState={this.state.room.state.memberState}/>
+                            <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
+                                {this.renderWhiteboard()}
+                            </div>
+                        </Dropzone>
                     </div>
                 </RoomContextProvider>
             );
@@ -340,7 +351,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100vh", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "white"}}/>;
+                                   style={{width: "100%", height: "100%", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "white"}}/>;
         } else {
             return null;
         }

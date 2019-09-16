@@ -13,13 +13,17 @@ import {
 } from "@livechat/ui-kit";
 import {Room} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
+import {UserType} from "../RealTime";
+import * as empty from "../../assets/image/empty.svg";
+import * as close from "../../assets/image/close.svg";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardChatProps = {
     room: Room;
-    messages: MessageType[];
-    userId: string;
+    userInf: UserType;
+    isChatOpen?: boolean;
+    handleChatState: () => void;
 };
 
 export type WhiteboardChatStates = {
@@ -28,7 +32,7 @@ export type WhiteboardChatStates = {
 };
 
 
-class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChatStates> {
+export default class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChatStates> {
 
     private messagesEnd: HTMLDivElement | null = null;
 
@@ -46,6 +50,10 @@ class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChat
     }
 
     public async componentDidMount(): Promise<void> {
+        const {room} = this.props;
+        room.addMagixEventListener("message",  event => {
+            this.setState({messages: [...this.state.messages, event.payload]});
+        });
         await timeout(0);
         this.scrollToBottom();
         const canvasArray: any = document.getElementsByClassName("identicon").item(0);
@@ -59,7 +67,7 @@ class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChat
     }
 
     public render(): React.ReactNode {
-        const messages: MessageType[] = this.props.messages; // 有很多内容
+        const messages: MessageType[] = this.state.messages; // 有很多内容
         if (messages.length > 0) {
             let previousName = messages[0].name;
             let previousId = messages[0].id;
@@ -82,7 +90,7 @@ class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChat
                 const messageTextNode = data.messageInner.map((inner: string, index: number) => {
                     return (
                         <Message key={`${index}`}
-                                 // isOwn={netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, this.props.userId) === data.id} authorName={data.name}
+                                 isOwn={this.props.userInf.id === data.id} authorName={data.name}
                         >
                             <MessageText>{inner}</MessageText>
                         </Message>
@@ -92,7 +100,7 @@ class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChat
                     <MessageGroup
                         key={`${index}`}
                         avatar={data.avatar}
-                        // isOwn={netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, this.props.userId) === data.id}
+                        isOwn={this.props.userInf.id === data.id}
                         onlyFirstWithMeta
                     >
                         {messageTextNode}
@@ -100,68 +108,82 @@ class WhiteboardChat extends React.Component<WhiteboardChatProps, WhiteboardChat
                 );
             });
         }
-        return (
-            <div className="chat-box">
-                <ThemeProvider
-                    theme={{
-                        vars: {
-                            "avatar-border-color": "#005BF6",
-                        },
-                        FixedWrapperMaximized: {
-                            css: {
-                                boxShadow: "0 0 1em rgba(0, 0, 0, 0.1)",
+        if (this.props.isChatOpen) {
+            return (
+                <div className="chat-box">
+                    <ThemeProvider
+                        theme={{
+                            vars: {
+                                "avatar-border-color": "#005BF6",
                             },
-                        },
-                        Message: {},
-                        MessageText: {
-                            css: {
-                                backgroundColor: "#F8F8F8",
-                                borderRadius: 8,
+                            FixedWrapperMaximized: {
+                                css: {
+                                    boxShadow: "0 0 1em rgba(0, 0, 0, 0.1)",
+                                },
                             },
-                        },
-                        Avatar: {
-                            size: "32px", // special Avatar's property, supported by this component
-                            css: { // css object with any CSS properties
-                                borderColor: "blue",
+                            Message: {},
+                            MessageText: {
+                                css: {
+                                    backgroundColor: "#F8F8F8",
+                                    borderRadius: 8,
+                                },
                             },
-                        },
-                        TextComposer: {
-                            css: {
-                                "color": "#000",
+                            Avatar: {
+                                size: "32px", // special Avatar's property, supported by this component
+                                css: { // css object with any CSS properties
+                                    borderColor: "blue",
+                                },
                             },
-                        },
-                    }}
-                >
-                    <div>
-                        <div className="chat-box-message">
-                            {messageNodes !== null && <MessageList>
-                                {messageNodes}
-                            </MessageList>}
-                            <div className="under-cell" ref={ref => this.messagesEnd = ref}/>
+                            TextComposer: {
+                                css: {
+                                    "color": "#000",
+                                },
+                            },
+                        }}
+                    >
+                        <div className="chat-inner-box">
+                            <div className="chat-box-title">
+                                <div className="chat-box-name">
+                                    <span>聊天室</span>
+                                </div>
+                                <div onClick={this.props.handleChatState} className="chat-box-close">
+                                    <img src={close}/>
+                                </div>
+                            </div>
+                            <div className="chat-box-message">
+                                {messageNodes !== null ? <MessageList>
+                                    {messageNodes}
+                                </MessageList> : <div className="chat-box-message-empty">
+                                    <img src={empty}/>
+                                    <div>
+                                        暂无聊天记录~
+                                    </div>
+                                </div>}
+                                <div className="under-cell" ref={ref => this.messagesEnd = ref}/>
+                            </div>
+                            <div className="chat-box-input">
+                                <TextComposer
+                                    onSend={(event: any) => {
+                                        this.props.room.dispatchMagixEvent("message", {
+                                            name: this.props.userInf.name,
+                                            avatar: this.props.userInf.avatar,
+                                            id: this.props.userInf.id,
+                                            messageInner: [event],
+                                        });
+                                    }}
+                                >
+                                    <Row align="center">
+                                        <TextInput placeholder={"输入聊天内容~"} fill="true"/>
+                                        <SendButton fit />
+                                    </Row>
+                                </TextComposer>
+                            </div>
                         </div>
-                        <div className="chat-box-input">
-                            <TextComposer
-                                onSend={(event: any) => {
-                                    this.props.room.dispatchMagixEvent("message", {
-                                        // name: netlessWhiteboardApi.user.getUserInf(UserInfType.name, this.props.userId).substring(0, 6),
-                                        avatar: this.state.url,
-                                        // id: netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, this.props.userId),
-                                        messageInner: [event],
-                                    });
-                                }}
-                            >
-                                <Row align="center">
-                                    <TextInput fill="true"/>
-                                    <SendButton fit />
-                                </Row>
-                            </TextComposer>
-                        </div>
-                    </div>
-                </ThemeProvider>
-            </div>
-        );
+                    </ThemeProvider>
+                </div>
+            );
+        } else {
+            return null;
+        }
     }
 }
-
-
-export default WhiteboardChat;

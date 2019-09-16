@@ -2,10 +2,8 @@ import * as React from "react";
 import * as annex_box from "../../assets/image/annex_box.svg";
 import * as left_arrow from "../../assets/image/left_arrow.svg";
 import * as right_arrow from "../../assets/image/right_arrow.svg";
-import * as chat from "../../assets/image/chat.svg";
 import "./WhiteboardBottomRight.less";
-import WhiteboardChat from "./WhiteboardChat";
-import {Badge, Popover, Tooltip} from "antd";
+import {Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
 
 export type MessageType = {
@@ -32,7 +30,7 @@ export type WhiteboardBottomRightProps = {
     handleAnnexBoxMenuState: () => void;
 };
 
-class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
+export default class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
 
     public constructor(props: WhiteboardBottomRightProps) {
         super(props);
@@ -125,6 +123,3 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         );
     }
 }
-
-export default WhiteboardBottomRight;
-

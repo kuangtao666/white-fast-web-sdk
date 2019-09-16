@@ -1,5 +1,5 @@
 import * as React from "react";
-import {slide as Menu, reveal as MenuLeft} from "react-burger-menu";
+import {slide as Menu} from "react-burger-menu";
 import {MenuInnerType, PagePreviewPositionEnum} from "../RealTime";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
@@ -34,8 +34,6 @@ const styles3: any = {
 export type MenuBoxProps = {
     isVisible: boolean;
     menuInnerState: MenuInnerType;
-    pageWrapId: string;
-    outerContainerId: string;
     resetMenu: () => void;
     setMenuState: (state: boolean) => void;
     pagePreviewPosition?: PagePreviewPositionEnum;
