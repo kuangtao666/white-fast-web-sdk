@@ -297,7 +297,10 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 <div className="whiteboard-out-box">
                                     <WhiteboardTopLeft
                                         logoUrl={this.props.logoUrl}/>
-                                    {/*<WhiteboardTopRight/>*/}
+                                    <WhiteboardTopRight
+                                        name={this.props.userInf.name}
+                                        id={this.props.userInf.id}
+                                        avatar={this.props.userInf.avatar}/>
                                     <WhiteboardBottomLeft
                                         roomState={this.state.roomState}
                                         room={this.state.room}/>

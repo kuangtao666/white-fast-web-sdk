@@ -1,3 +1,62 @@
 .whiteboard-top-right-box {
+  display: flex;
+  top: 8px;
+  right: 8px;
+  position: absolute;
+  height: 32px;
+  background-color: white;
+  cursor: pointer;
+  z-index: 1001;
+  user-select: none;
+  border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
 
+.whiteboard-top-user-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.whiteboard-top-right-cell {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+  padding-right: 4px;
+  img {
+    width: 22px;
+  }
+}
+
+.whiteboard-top-right-user {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-right: 2px;
+  img {
+    width: 22px;
+    border-radius: 11px;
+  }
+}
+
+.whiteboard-top-right-name {
+  margin-right: 12px;
+}
+
+.whiteboard-top-right-line {
+  margin-right: 4px;
+  color: #bfbfbf;
+}
+
+.export-box {
+  width: 280px;
+  min-height: 280px;
 }

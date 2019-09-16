@@ -1,13 +1,13 @@
 import * as React from "react";
-import {Popover, Upload} from "antd";
+import {Icon, Popover, Upload} from "antd";
 import * as OSS from "ali-oss";
 import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
 import "./UploadBtn.less";
 import {PptKind, Room, WhiteWebSdk} from "white-react-sdk";
-import * as image from "../../assets/image/image.svg";
-import * as doc_to_image from "../../assets/image/doc_to_image.svg";
-import * as doc_to_web from "../../assets/image/doc_to_web.svg";
+import * as image_icon from "../../assets/image/image_icon.svg";
+import * as image_transform from "../../assets/image/image_transform.svg";
+import * as web_transform from "../../assets/image/web_transform.svg";
 import * as upload from "../../assets/image/upload.svg";
 import {ToolBarPositionEnum} from "../../components/RealTime";
 import {TooltipPlacement} from "antd/lib/tooltip";
@@ -106,52 +106,60 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
     }
 
     private renderPopoverContent = (): React.ReactNode => {
-        return <div className="popover-box">
-            <Upload
-                disabled={!this.props.roomToken}
-                accept={FileUploadStatic}
-                showUploadList={false}
-                customRequest={this.uploadStatic}>
-                <div className="popover-box-cell">
-                    <div className="popover-box-cell-img-box">
-                        <img src={doc_to_image} style={{height: 28}}/>
+        return (
+            <div className="popover-box">
+                <Upload
+                    disabled={!this.props.roomToken}
+                    accept={FileUploadStatic}
+                    showUploadList={false}
+                    customRequest={this.uploadStatic}>
+                    <div className="popover-section">
+                        <div className="popover-section-inner">
+                            <div className="popover-section-image">
+                                <img width={72} src={image_transform}/>
+                            </div>
+                            <div className="popover-section-script">
+                                <div className="popover-section-title">资料转图片</div>
+                                <div className="popover-section-text">支持 ppt、pptx、word 以及 pdf。</div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="popover-box-cell-title">
-                        资料转图片
+                </Upload>
+                <Upload
+                    disabled={!this.props.roomToken}
+                    accept={"application/vnd.openxmlformats-officedocument.presentationml.presentation"}
+                    showUploadList={false}
+                    customRequest={this.uploadDynamic}>
+                    <div className="popover-section">
+                        <div className="popover-section-inner">
+                            <div className="popover-section-image">
+                                <img width={72} src={web_transform}/>
+                            </div>
+                            <div className="popover-section-script">
+                                <div className="popover-section-title">资料转网页</div>
+                                <div className="popover-section-text">支持 pptx，如果是 ppt 格式文件，请手动转换。</div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="popover-box-cell-script">支持 pdf、ppt、pptx、word</div>
-                </div>
-            </Upload>
-            <Upload
-                disabled={!this.props.roomToken}
-                accept={"application/vnd.openxmlformats-officedocument.presentationml.presentation"}
-                showUploadList={false}
-                customRequest={this.uploadDynamic}>
-                <div className="popover-box-cell">
-                    <div className="popover-box-cell-img-box">
-                        <img src={doc_to_web} style={{height: 28}}/>
+                </Upload>
+                <Upload
+                    accept={"image/*"}
+                    showUploadList={false}
+                    customRequest={this.uploadImage}>
+                    <div className="popover-section">
+                        <div className="popover-section-inner">
+                            <div className="popover-section-image">
+                                <img width={68} src={image_icon}/>
+                            </div>
+                            <div className="popover-section-script">
+                                <div className="popover-section-title">上传图片</div>
+                                <div className="popover-section-text">支持常见格式，可以改变图片大小和位置。</div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="popover-box-cell-title">
-                        资料转网页
-                    </div>
-                    <div className="popover-box-cell-script">支持 pptx</div>
-                </div>
-            </Upload>
-            <Upload
-                accept={"image/*"}
-                showUploadList={false}
-                customRequest={this.uploadImage}>
-                <div className="popover-box-cell">
-                    <div className="popover-box-cell-img-box">
-                        <img src={image} style={{height: 28}}/>
-                    </div>
-                    <div className="popover-box-cell-title">
-                        上传图片
-                    </div>
-                    <div className="popover-box-cell-script">支持常见图片格式</div>
-                </div>
-            </Upload>
-        </div>;
+                </Upload>
+            </div>
+        );
     }
 
     private handlePlacement = (): TooltipPlacement => {
