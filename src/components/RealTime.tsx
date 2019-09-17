@@ -294,11 +294,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                             menuInnerState={this.state.menuInnerState}>
                             {this.renderMenuInner()}
                         </MenuBox>
-                        <WhiteboardChat
-                            isChatOpen={this.state.isChatOpen}
-                            handleChatState={this.handleChatState}
-                            room={this.state.room}
-                            userInf={this.props.userInf}/>
                         <Dropzone
                             accept={"image/*"}
                             disableClick={true}
@@ -314,11 +309,11 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 avatar={this.props.userInf.avatar}/>
                             <WhiteboardBottomLeft
                                 roomState={this.state.roomState}
-                                chatState={this.state.isChatOpen}
-                                handleChatState={this.handleChatState}
                                 room={this.state.room}/>
                             <WhiteboardBottomRight
                                 roomState={this.state.roomState}
+                                chatState={this.state.isChatOpen}
+                                handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={this.state.room}/>
                             <ToolBox
@@ -342,6 +337,11 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
+                        <WhiteboardChat
+                            isChatOpen={this.state.isChatOpen}
+                            handleChatState={this.handleChatState}
+                            room={this.state.room}
+                            userInf={this.props.userInf}/>
                     </div>
                 </RoomContextProvider>
             );

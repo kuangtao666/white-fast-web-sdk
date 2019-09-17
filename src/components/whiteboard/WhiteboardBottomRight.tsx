@@ -2,8 +2,9 @@ import * as React from "react";
 import * as annex_box from "../../assets/image/annex_box.svg";
 import * as left_arrow from "../../assets/image/left_arrow.svg";
 import * as right_arrow from "../../assets/image/right_arrow.svg";
+import * as chat from "../../assets/image/chat.svg";
 import "./WhiteboardBottomRight.less";
-import {Tooltip} from "antd";
+import {Badge, Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
 
 export type MessageType = {
@@ -20,14 +21,14 @@ export type hotkeyTooltipState = {
     annexBoxTooltipDisplay: boolean,
     messages:  MessageType[],
     seenMessagesLength: number,
-    isVisible: boolean,
-    isRecord: boolean,
 };
 
 export type WhiteboardBottomRightProps = {
     room: Room;
     roomState: RoomState;
     handleAnnexBoxMenuState: () => void;
+    chatState?: boolean;
+    handleChatState: () => void;
 };
 
 export default class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
@@ -39,8 +40,6 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             annexBoxTooltipDisplay: false,
             messages: [],
             seenMessagesLength: 0,
-            isVisible: false,
-            isRecord: false,
         };
         this.renderAnnexBox = this.renderAnnexBox.bind(this);
     }
@@ -50,6 +49,12 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         room.addMagixEventListener("message",  event => {
             this.setState({messages: [...this.state.messages, event.payload]});
         });
+    }
+
+    public componentWillReceiveProps(nextProps: WhiteboardBottomRightProps): void {
+        if (this.props.chatState !== nextProps.chatState && nextProps.chatState === false) {
+            this.setState({seenMessagesLength: this.state.messages.length});
+        }
     }
     private renderAnnexBox(): React.ReactNode {
         const {roomState, room} = this.props;
@@ -118,6 +123,11 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             <div className="whiteboard-box-bottom-right">
                 <div className="whiteboard-box-bottom-right-mid">
                     {this.renderAnnexBox()}
+                    <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                        <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
+                            <img src={chat}/>
+                        </div>
+                    </Badge>
                 </div>
             </div>
         );
