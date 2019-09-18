@@ -119,7 +119,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {id: userId, nickName: userInf.name, avatar: userInf.avatar ? userInf.avatar : userId}},
+                    userPayload: {userId: userId, name: userInf.name, avatar: userInf.avatar ? userInf.avatar : userId}},
                 {
                     onPhaseChanged: phase => {
                         if (!this.didLeavePage) {
@@ -304,8 +304,10 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                             <WhiteboardTopLeft
                                 logoUrl={this.props.logoUrl}/>
                             <WhiteboardTopRight
+                                roomState={this.state.roomState}
                                 name={this.props.userInf.name}
-                                id={this.props.userInf.id}
+                                userId={this.props.userInf.id}
+                                room={this.state.room}
                                 avatar={this.props.userInf.avatar}/>
                             <WhiteboardBottomLeft
                                 roomState={this.state.roomState}

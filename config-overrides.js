@@ -14,7 +14,6 @@ module.exports = function override(config, env) {
             typeof rule.loader === "string" &&
             rule.loader.includes("ts-loader")
     );
-
     tsLoader.options = {
         getCustomTransformers: () => ({
             before: [

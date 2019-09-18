@@ -11,6 +11,12 @@ export type ExtendToolInnerProps = {
     room: Room;
 };
 
+enum ExtendToolType {
+    plugin = "plugin",
+    geometry = "geometry",
+    subject = "subject",
+}
+
 export default class ExtendToolInner extends React.Component<ExtendToolInnerProps, {}> {
     public constructor(props: ExtendToolInnerProps) {
         super(props);
@@ -36,65 +42,13 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
     public render(): React.ReactNode {
         return (
             <div className="extend-inner-box">
-                <Tabs defaultActiveKey="1">
-                    <TabPane tab="几何图形" key="1">
-                        <div  className="extend-inner-detail">
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img style={{width: 64}} src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/triangle.svg")}>
-                                <img style={{width: 56}} src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/triangle.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                        </div>
-                    </TabPane>
-                    <TabPane tab="插件教具" key="2">
-                        <div  className="extend-inner-detail">
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/triangle.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                        </div>
-                    </TabPane>
-                    <TabPane tab="学科图形" key="3">
-                        <div  className="extend-inner-detail">
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                            <div className="extend-inner-detail-cell" onClick={() => this.addImage("https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg")}>
-                                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/star.svg"/>
-                            </div>
-                        </div>
-                    </TabPane>
-                </Tabs>
+                <div className="extend-inner-nav">
+                    <div className="extend-inner-title">插件教具</div>
+                    <div className="extend-inner-title">几何图形</div>
+                    <div className="extend-inner-title">学科图形</div>
+                </div>
+                <div className="extend-inner-body">
+                </div>
             </div>
         );
     }

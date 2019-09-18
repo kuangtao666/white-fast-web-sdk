@@ -55,7 +55,6 @@ export default class ExtendTool extends React.Component<ExtendToolProps, ExtendT
                         </div>
                     </div>
                 </Popover>
-        )}/>
-        );
+        )}/>);
     }
 }
