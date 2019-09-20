@@ -170,7 +170,6 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                                         暂无聊天记录~
                                     </div>
                                 </div>}
-                                <div className="under-cell" ref={ref => this.messagesEnd = ref}/>
                             </div>
                             {this.props.room &&
                             <div className="chat-box-input">
