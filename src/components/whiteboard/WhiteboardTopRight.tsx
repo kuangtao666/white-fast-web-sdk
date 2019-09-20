@@ -149,7 +149,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             <div className="whiteboard-top-right-box">
                 <Popover placement="bottomRight" content={this.setComponent()}>
                     <div className="whiteboard-top-right-cell">
-                        <img src={set_icon}/>
+                        <img style={{width: 16}} src={set_icon}/>
                     </div>
                 </Popover>
                 <Popover placement="bottomRight" content={this.exportComponent()}>
