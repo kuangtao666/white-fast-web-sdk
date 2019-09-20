@@ -19,19 +19,58 @@
 <body>
     <div id="app-root"></div>
     <script src="http://localhost:8080/bundle.js"></script>
-    <script type="text/javascript">
-        var userId = `${Math.floor(Math.random() * 100000)}`;
-        var uuid = "7406e356d813449989560f695d421bea";
-        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPThjY2M1MWRlZjg1Y2I3MGJjNDQwMDVlMjEzODUwNmIwOGIxNjc4NzQ6YWRtaW5JZD0xNTgmcm9vbUlkPTc0MDZlMzU2ZDgxMzQ0OTk4OTU2MGY2OTVkNDIxYmVhJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE1OTk3MzA3NjAmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1NjgxNzM4MDgmbm9uY2U9MTU2ODE3MzgwODE3NjAw";
-
-        WhiteFastSDK.Room("app-root",
-            {
+    <script>
+        // var sdkToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPTc1MTBkOWEwNzM1ZjA2MDYwMTMzODBkYjVlNTQ2NDA0OTAzOWU2NjE6YWRtaW5JZD0xNTgmcm9sZT1taW5pJmV4cGlyZV90aW1lPTE1OTAwNzM1NjEmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1NTg1MTY2MDkmbm9uY2U9MTU1ODUxNjYwODYxNzAw";
+        // var url = 'https://cloudcapiv4.herewhite.com/room?token=' + sdkToken;
+        // var requestInit = {
+        //     method: 'POST',
+        //     headers: {
+        //         "content-type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //         name: '我的第一个 White 房间',
+        //         limit: 100, // 房间人数限制
+        //     }),
+        // };
+        // fetch(url, requestInit).then(function(response) {
+        //     // Step1: 服务器返回房间唯一标识 uuid 和 进入房间的秘钥 roomToken
+        //     return response.json();
+        // }).then(function(json) {
+            // Step2: 加入房间
+            // var uuid = json.msg.room.uuid;
+            // var roomToken = json.msg.roomToken;
+        const userId = `${Math.floor(Math.random() * 100000)}`;
+        var uuid = "3dac59e714d2443eb733e9de5dc2beb4";
+        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWE4ZWIyZWE3ZDliMWJiZDkyNWQ0Yzg4YTgwYjVlYjFiOTQxOTZiYmY6YWRtaW5JZD0xNTgmcm9vbUlkPTNkYWM1OWU3MTRkMjQ0M2ViNzMzZTlkZTVkYzJiZWI0JnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MDEzNTkmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NDQ0MDcmbm9uY2U9MTU2ODk0NDQwNjY0MzAw";
+        WhiteFastSDK.Room("app-root",{
                 uuid: uuid,
-                roomToken: roomToken,
                 userInf: {
+                    name: "伍双",
                     id: userId,
+                    avatar: "https://ohuuyffq2.qnssl.com/netless_icon.png",
                 },
+                roomToken: roomToken,
+                logoUrl: "",
+                toolBarPosition: "left",
+                pagePreviewPosition: "right",
+                boardBackgroundColor: "#F2F2F2",
+                isReadOnly: false,
+                identity: "host",
+                defaultColorArray: [
+                    "#E77345",
+                    "#005BF6",
+                    "#F5AD46",
+                    "#68AB5D",
+                    "#9E51B6",
+                    "#1E2023",
+                ],
+                colorArrayStateCallback: (colorArray) => {
+                    console.log(colorArray);
+                }
             });
+        // }).catch(function(err) {
+        //     console.log(err);
+        // });
     </script>
 </body>
 
