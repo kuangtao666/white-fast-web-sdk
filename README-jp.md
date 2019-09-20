@@ -1,6 +1,6 @@
 # White Fast Web SDK
 
-English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md) 
+[English](./README.md) | [简体中文](./README-zh_CN.md)  | 日本語
 
 ![GitHub](https://img.shields.io/github/license/netless-io/whiteboard-designer)
 
@@ -30,7 +30,7 @@ WhiteFastSDK("app-root",{
 
 ## 🚀 Development
 
-1. Run `yarn dev` in your terminal
+1. yarn dev
 2. Live room by open facade/index.html
 3. Player by open facade/player.html
 
