@@ -343,7 +343,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                         onProgress={this.progress}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
-                                    <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={this.state.room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
