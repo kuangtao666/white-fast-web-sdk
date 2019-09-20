@@ -30,18 +30,21 @@
         //     body: JSON.stringify({
         //         name: '我的第一个 White 房间',
         //         limit: 100, // 房间人数限制
+        //         mode: 'historied',
         //     }),
         // };
         // fetch(url, requestInit).then(function(response) {
         //     // Step1: 服务器返回房间唯一标识 uuid 和 进入房间的秘钥 roomToken
         //     return response.json();
         // }).then(function(json) {
-            // Step2: 加入房间
-            // var uuid = json.msg.room.uuid;
-            // var roomToken = json.msg.roomToken;
+        //     // Step2: 加入房间
+        //     var uuid1 = json.msg.room.uuid;
+        //     var roomToken1 = json.msg.roomToken;
+            // console.log(uuid1);
+            // console.log(roomToken1);
         const userId = `${Math.floor(Math.random() * 100000)}`;
-        var uuid = "3dac59e714d2443eb733e9de5dc2beb4";
-        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWE4ZWIyZWE3ZDliMWJiZDkyNWQ0Yzg4YTgwYjVlYjFiOTQxOTZiYmY6YWRtaW5JZD0xNTgmcm9vbUlkPTNkYWM1OWU3MTRkMjQ0M2ViNzMzZTlkZTVkYzJiZWI0JnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MDEzNTkmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NDQ0MDcmbm9uY2U9MTU2ODk0NDQwNjY0MzAw";
+        var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
+        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
         WhiteFastSDK.Room("app-root",{
                 uuid: uuid,
                 userInf: {
