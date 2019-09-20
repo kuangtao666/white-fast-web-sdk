@@ -3,7 +3,6 @@ import close from "../../assets/image/close.svg";
 import add_icon from "../../assets/image/add_icon.svg";
 import TweenOne from "rc-tween-one";
 import {Room, RoomState, Scene} from "white-react-sdk";
-import html2canvas from "html2canvas";
 import "./MenuAnnexBox.less";
 
 export type MenuAnnexBoxState = {
@@ -119,7 +118,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                 ref={ref => this.ref = ref} className="menu-annex-box">
                 <div className="menu-title-line">
                     <div className="menu-title-text-box">
-                        PPT
+                        预览
                     </div>
                     <div className="menu-close-btn" onClick={this.props.handleAnnexBoxMenuState}>
                         <img className="menu-title-close-icon" src={close}/>
@@ -142,7 +141,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                     >
                         <img src={add_icon}/>
                         <div>
-                            add page
+                            加一页
                         </div>
                     </div>
                 </div>
@@ -170,9 +169,6 @@ class PageImage extends React.Component<PageImageProps, {}> {
     private setupDivRef = (ref: HTMLDivElement | null) => {
         if (ref) {
             this.ref = ref;
-            // html2canvas(ref).then(canvas => {
-            //     console.log(canvas);
-            // });
             this.props.room.scenePreview(this.props.path, ref, 192, 112.5);
         }
     }

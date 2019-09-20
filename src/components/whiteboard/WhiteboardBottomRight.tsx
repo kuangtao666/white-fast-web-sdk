@@ -1,15 +1,11 @@
 import * as React from "react";
 import * as annex_box from "../../assets/image/annex_box.svg";
-import * as whiteboard_keyboard from "../../assets/image/whiteboard_keyboard.svg";
 import * as left_arrow from "../../assets/image/left_arrow.svg";
 import * as right_arrow from "../../assets/image/right_arrow.svg";
 import * as chat from "../../assets/image/chat.svg";
 import "./WhiteboardBottomRight.less";
-import WhiteboardChat from "./WhiteboardChat";
-import {Badge, message, Popover, Tooltip} from "antd";
+import {Badge, Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
-import {netlessWhiteboardApi} from "../../apiMiddleware";
-import {isMobile} from "react-device-detect";
 
 export type MessageType = {
     name: string,
@@ -25,19 +21,17 @@ export type hotkeyTooltipState = {
     annexBoxTooltipDisplay: boolean,
     messages:  MessageType[],
     seenMessagesLength: number,
-    isVisible: boolean,
-    isRecord: boolean,
 };
 
 export type WhiteboardBottomRightProps = {
     room: Room;
-    userId: string;
     roomState: RoomState;
-    handleHotKeyMenuState: () => void;
     handleAnnexBoxMenuState: () => void;
+    chatState?: boolean;
+    handleChatState: () => void;
 };
 
-class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
+export default class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
 
     public constructor(props: WhiteboardBottomRightProps) {
         super(props);
@@ -46,8 +40,6 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
             annexBoxTooltipDisplay: false,
             messages: [],
             seenMessagesLength: 0,
-            isVisible: false,
-            isRecord: false,
         };
         this.renderAnnexBox = this.renderAnnexBox.bind(this);
     }
@@ -57,6 +49,12 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         room.addMagixEventListener("message",  event => {
             this.setState({messages: [...this.state.messages, event.payload]});
         });
+    }
+
+    public componentWillReceiveProps(nextProps: WhiteboardBottomRightProps): void {
+        if (this.props.chatState !== nextProps.chatState && nextProps.chatState === false) {
+            this.setState({seenMessagesLength: this.state.messages.length});
+        }
     }
     private renderAnnexBox(): React.ReactNode {
         const {roomState, room} = this.props;
@@ -120,88 +118,18 @@ class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, 
         );
     }
 
-    private renderAnnexBoxMobile(): React.ReactNode {
-        const {roomState, room} = this.props;
-        const activeIndex = roomState.sceneState.index;
-        const scenes = roomState.sceneState.scenes;
+    public render(): React.ReactNode {
         return (
-            <div className="whiteboard-annex-box">
-                <div
-                    onClick={() => room.pptPreviousStep()}
-                    className="whiteboard-annex-arrow-left-mb">
-                    <img src={left_arrow}/>
-                </div>
-                <div
-                    onMouseEnter={() => {
-                        this.setState({
-                            annexBoxTooltipDisplay: true,
-                        });
-                    }}
-                    onMouseLeave={() => {
-                        this.setState({
-                            annexBoxTooltipDisplay: false,
-                        });
-                    }}
-                    onClick={this.props.handleAnnexBoxMenuState}
-                    className="whiteboard-annex-arrow-mid">
-                    <div className="whiteboard-annex-arrow-page">
-                        {activeIndex + 1} / {scenes.length}
-                    </div>
-                </div>
-                <div
-                    onClick={() => room.pptNextStep()}
-                    className="whiteboard-annex-arrow-right-mb">
-                    <img src={right_arrow}/>
+            <div className="whiteboard-box-bottom-right">
+                <div className="whiteboard-box-bottom-right-mid">
+                    {this.renderAnnexBox()}
+                    <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                        <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
+                            <img src={chat}/>
+                        </div>
+                    </Badge>
                 </div>
             </div>
         );
     }
-    public render(): React.ReactNode {
-        if (isMobile) {
-            return (
-                <div className="whiteboard-box-bottom-right-mb">
-                    <div className="whiteboard-box-bottom-right-mid-mb">
-                        {this.renderAnnexBoxMobile()}
-                    </div>
-                </div>
-            );
-        } else {
-            return (
-                <div className="whiteboard-box-bottom-right">
-                    <div className="whiteboard-box-bottom-right-mid">
-                        {/*<Tooltip placement="top" title={"快捷键"} visible={this.state.hotkeyTooltipDisplay}>*/}
-                        {/*<div*/}
-                        {/*style={{marginRight: 8}}*/}
-                        {/*className="whiteboard-bottom-right-cell"*/}
-                        {/*onClick={this.startRec}>*/}
-                        {/*<img src={whiteboard_keyboard}/>*/}
-                        {/*</div>*/}
-                        {/*</Tooltip>*/}
-                        {this.renderAnnexBox()}
-                        <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isVisible ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                            <Popover
-                                overlayClassName="whiteboard-chat"
-                                content={<WhiteboardChat messages={this.state.messages} room={this.props.room} userId={this.props.userId}/>}
-                                trigger="click"
-                                onVisibleChange={(visible: boolean) => {
-                                    if (visible) {
-                                        this.setState({isVisible: true});
-                                    } else {
-                                        this.setState({isVisible: false, seenMessagesLength: this.state.messages.length});
-                                    }
-                                }}
-                                placement="topLeft">
-                                <div style={{marginLeft: 8}} className="whiteboard-bottom-right-cell">
-                                    <img style={{width: 17}} src={chat}/>
-                                </div>
-                            </Popover>
-                        </Badge>
-                    </div>
-                </div>
-            );
-        }
-    }
 }
-
-export default WhiteboardBottomRight;
-

@@ -1,9 +1,4 @@
 const config = require("./tokenConfig");
-
-export const netlessToken = {
-    sdkToken: config.netlessToken,
-};
-
 export const ossConfigObj = {
     accessKeyId: config.ossConfigObj.accessKeyId,
     accessKeySecret: config.ossConfigObj.accessKeySecret,

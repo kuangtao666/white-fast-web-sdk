@@ -1,9 +1,7 @@
 import * as React from "react";
 import "./PageError.less";
-import * as page404 from "../assets/image/page404.svg";
 import * as room_not_find from "../assets/image/room_not_find.svg";
-import {WhiteUIButton} from "../whiteUIKit/WhiteUIButton";
-// import {FormattedMessage} from "react-intl";
+import {Button} from "antd";
 
 class PageError extends React.Component<{}, {}> {
     public constructor(props: {}) {
@@ -19,7 +17,7 @@ class PageError extends React.Component<{}, {}> {
                             id="error-page.title-room-not-exist"
                         /> */}
                     </div>
-                    <WhiteUIButton
+                    <Button
                         type="primary"
                         size="large"
                         className="page404-btn"
@@ -28,7 +26,7 @@ class PageError extends React.Component<{}, {}> {
                         {/* <FormattedMessage
                             id="error-page.btn"
                         /> */}
-                    </WhiteUIButton>
+                    </Button>
                 </div>
             </div>
         );

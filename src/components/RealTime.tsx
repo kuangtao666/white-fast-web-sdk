@@ -1,34 +1,73 @@
-import { PPTProgressPhase, UploadManager } from "@netless/oss-upload-manager";
-import TopLoadingBar from "@netless/react-loading-bar";
-import * as OSS from "ali-oss";
-import { message } from "antd";
 import * as React from "react";
+import TopLoadingBar from "@netless/react-loading-bar";
+import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
+import * as OSS from "ali-oss";
+import {message} from "antd";
 import Dropzone from "react-dropzone";
-import * as uuidv4 from "uuid/v4";
-import { DeviceType, MemberState, PptConverter, Room, RoomPhase, RoomState, RoomWhiteboard, WhiteWebSdk } from "white-react-sdk";
+import {
+    WhiteWebSdk,
+    RoomWhiteboard,
+    Room,
+    RoomState,
+    RoomPhase,
+    PptConverter,
+    MemberState,
+    ViewMode,
+    DeviceType,
+} from "white-react-sdk";
 import "white-web-sdk/style/index.css";
-import { netlessWhiteboardApi, UserInfType } from "../apiMiddleware";
-import { netlessToken, ossConfigObj } from "../appToken";
-import * as loading from "../assets/image/loading.svg";
-import PageError from "../pages/PageError";
-import ExtendTool from "../tools/extendTool/ExtendTool";
-import ToolBox, { CustomerComponentPositionType } from "../tools/toolBox";
-import UploadBtn from "../tools/upload/UploadBtn";
-import MenuAnnexBox from "./menu/MenuAnnexBox";
-import MenuBox from "./menu/MenuBox";
-import MenuPPTDoc from "./menu/MenuPPTDoc";
 import "./RealTime.less";
-import { RoomContextProvider } from "./RoomContext";
-import { UserCursor } from "./whiteboard/UserCursor";
+import PageError from "../pages/PageError";
+import WhiteboardTopRight from "./whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "./whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "./whiteboard/WhiteboardBottomRight";
-import WhiteboardTopRight from "./whiteboard/WhiteboardTopRight";
+import * as loading from "../assets/image/loading.svg";
+import MenuBox from "./menu/MenuBox";
+import MenuAnnexBox from "./menu/MenuAnnexBox";
+import {ossConfigObj} from "../appToken";
+import {UserCursor} from "./whiteboard/UserCursor";
+import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
+import UploadBtn from "../tools/upload/UploadBtn";
+import ExtendTool from "../tools/extendTool/ExtendTool";
+import {RoomContextProvider} from "./RoomContext";
+import WhiteboardTopLeft from "./whiteboard/WhiteboardTopLeft";
+import WhiteboardChat from "./whiteboard/WhiteboardChat";
+import WhiteboardFile from "./whiteboard/WhiteboardFile";
 
 export enum MenuInnerType {
-    HotKey = "HotKey",
     AnnexBox = "AnnexBox",
     PPTBox = "PPTBox",
-    DocSet = "DocSet",
+}
+export type UserType = {
+    name: string;
+    id: string;
+    avatar: string;
+};
+export type RealTimeProps = {
+    uuid: string;
+    userInf: UserType;
+    roomToken: string;
+    isReadOnly?: boolean;
+    toolBarPosition?: ToolBarPositionEnum;
+    pagePreviewPosition?: PagePreviewPositionEnum;
+    boardBackgroundColor?: string;
+    defaultColorArray?: string[];
+    colorArrayStateCallback?: (colorArray: string[]) => void;
+    logoUrl?: string | boolean;
+    isChatOpen?: boolean;
+    isFileOpen?: boolean;
+};
+
+export enum ToolBarPositionEnum {
+    top = "top",
+    bottom = "bottom",
+    left = "left",
+    right = "right",
+}
+
+export enum PagePreviewPositionEnum {
+    left = "left",
+    right = "right",
 }
 
 export type RealTimeStates = {
@@ -40,24 +79,16 @@ export type RealTimeStates = {
     roomToken: string | null;
     ossPercent: number;
     converterPercent: number;
-    userId: string;
     isMenuOpen: boolean;
+    isChatOpen?: boolean;
+    isFileOpen?: boolean;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
-    isMenuLeft?: boolean;
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
 };
-
-export type RealTimeProps = {
-    uuid: string;
-    userId: string;
-    colorConfig?: string[];
-    onColorArrayChange?: (colorArray: string[]) => void;
-};
-
 
 export default class RealTime extends React.Component<RealTimeProps, RealTimeStates> {
     private didLeavePage: boolean = false;
@@ -68,45 +99,30 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             phase: RoomPhase.Connecting,
             connectedFail: false,
             didSlaveConnected: false,
-            menuInnerState: MenuInnerType.HotKey,
+            menuInnerState: MenuInnerType.AnnexBox,
             isMenuVisible: false,
             roomToken: null,
             ossPercent: 0,
             converterPercent: 0,
-            userId: "",
             isMenuOpen: false,
+            isChatOpen: this.props.isChatOpen,
+            isFileOpen: this.props.isFileOpen,
         };
         this.cursor = new UserCursor();
     }
 
-    private getRoomToken = async (uuid: string): Promise<string | null> => {
-        const res = await netlessWhiteboardApi.room.joinRoomApi(uuid);
-        if (res.code === 200) {
-            return res.msg.roomToken;
-        } else {
-            return null;
-        }
-    }
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, userId} = this.props;
-        this.setState({userId: userId});
-        const roomToken = await this.getRoomToken(uuid);
-        if (netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`) === `Netless uuid ${userId}`) {
-            const userUuid = uuidv4();
-            netlessWhiteboardApi.user.updateUserInf(userUuid, userUuid, userId);
-        }
-        const userUuid = netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${userId}`);
-        const name = netlessWhiteboardApi.user.getUserInf(UserInfType.name, `${userId}`);
+        const {uuid, userInf, roomToken} = this.props;
+        const userId = userInf.id;
         if (roomToken && uuid) {
             const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktop});
-
-            const pptConverter = whiteWebSdk.pptConverter(netlessToken.sdkToken);
+            const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {id: userId, userId: userUuid, nickName: name, avatar: userUuid}},
+                    userPayload: {userId: userId, name: userInf.name, avatar: userInf.avatar ? userInf.avatar : userId}},
                 {
                     onPhaseChanged: phase => {
                         if (!this.didLeavePage) {
@@ -158,18 +174,12 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     }
     private renderMenuInner = (): React.ReactNode => {
         switch (this.state.menuInnerState) {
-            case MenuInnerType.HotKey:
-                return null;
-                // return <MenuHotKey handleHotKeyMenuState={this.handleHotKeyMenuState}/>;
             case MenuInnerType.AnnexBox:
                 return <MenuAnnexBox
                     isMenuOpen={this.state.isMenuOpen}
                     room={this.state.room!}
                     roomState={this.state.roomState!}
                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}/>;
-            case MenuInnerType.PPTBox:
-                return <MenuPPTDoc
-                    room={this.state.room!}/>;
             default:
                 return null;
         }
@@ -180,25 +190,16 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
     }
 
-    private handleHotKeyMenuState = (): void => {
-        this.setState({
-            isMenuVisible: !this.state.isMenuVisible,
-            menuInnerState: MenuInnerType.HotKey,
-            isMenuLeft: false,
-        });
-    }
     private handleAnnexBoxMenuState = (): void => {
         this.setState({
             isMenuVisible: !this.state.isMenuVisible,
             menuInnerState: MenuInnerType.AnnexBox,
-            isMenuLeft: false,
         });
     }
 
     private resetMenu = () => {
         this.setState({
             isMenuVisible: false,
-            isMenuLeft: false,
         });
     }
 
@@ -251,6 +252,21 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
     private setMemberState = (modifyState: Partial<MemberState>) => {
         this.state.room!.setMemberState(modifyState);
     }
+
+    private handleChatState = (): void => {
+        if (this.state.isChatOpen === undefined) {
+            this.setState({isChatOpen: true});
+        } else {
+            this.setState({isChatOpen: !this.state.isChatOpen});
+        }
+    }
+    private handleFileState = (): void => {
+        if (this.state.isFileOpen === undefined) {
+            this.setState({isFileOpen: true});
+        } else {
+            this.setState({isFileOpen: !this.state.isFileOpen});
+        }
+    }
     public render(): React.ReactNode {
 
         if (this.state.connectedFail) {
@@ -272,80 +288,82 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         } else {
             return (
                 <RoomContextProvider value={{
-                    onColorArrayChange: this.props.onColorArrayChange,
+                    onColorArrayChange: this.props.colorArrayStateCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: this.state.room,
                 }}>
-                    <div id="outer-container">
+                    <div className="realtime-box">
                         <MenuBox
+                            pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setMenuState}
                             resetMenu={this.resetMenu}
-                            pageWrapId={"page-wrap" }
-                            outerContainerId={ "outer-container" }
-                            isLeft={this.state.isMenuLeft}
                             isVisible={this.state.isMenuVisible}
                             menuInnerState={this.state.menuInnerState}>
                             {this.renderMenuInner()}
                         </MenuBox>
-                        <div style={{backgroundColor: "white"}} id="page-wrap">
-                            <Dropzone
-                                accept={"image/*"}
-                                disableClick={true}
-                                onDrop={this.onDropFiles}
-                                className="whiteboard-drop-upload-box">
-                                <TopLoadingBar loadingPercent={this.state.ossPercent}/>
-                                <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
-                                <div className="whiteboard-out-box">
-                                    <WhiteboardTopRight
+                        <WhiteboardFile
+                            handleFileState={this.handleFileState}
+                            isFileOpen={this.state.isFileOpen}
+                            room={this.state.room}/>
+                        <Dropzone
+                            accept={"image/*"}
+                            disableClick={true}
+                            className="whiteboard-out-box"
+                            onDrop={this.onDropFiles}>
+                            <TopLoadingBar loadingPercent={this.state.ossPercent}/>
+                            <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
+                            <WhiteboardTopLeft
+                                logoUrl={this.props.logoUrl}/>
+                            <WhiteboardTopRight
+                                roomState={this.state.roomState}
+                                name={this.props.userInf.name}
+                                userId={this.props.userInf.id}
+                                room={this.state.room}
+                                avatar={this.props.userInf.avatar}/>
+                            <WhiteboardBottomLeft handleFileState={this.handleFileState}
+                                roomState={this.state.roomState}
+                                room={this.state.room}/>
+                            <WhiteboardBottomRight
+                                roomState={this.state.roomState}
+                                chatState={this.state.isChatOpen}
+                                handleChatState={this.handleChatState}
+                                handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
+                                room={this.state.room}/>
+                            <ToolBox
+                                isReadOnly={this.props.isReadOnly}
+                                toolBarPosition={this.props.toolBarPosition}
+                                colorConfig={this.props.defaultColorArray}
+                                setMemberState={this.setMemberState}
+                                customerComponent={[
+                                    <UploadBtn
+                                        toolBarPosition={this.props.toolBarPosition}
                                         oss={ossConfigObj}
+                                        room={this.state.room}
+                                        roomToken={this.state.roomToken}
                                         onProgress={this.progress}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
-                                        roomState={this.state.roomState}
-                                        uuid={"uuid"}
-                                        room={this.state.room}
-                                        number={this.state.userId}/>
-                                    <WhiteboardBottomLeft
-                                        uuid={"uuid"}
-                                        roomState={this.state.roomState}
-                                        room={this.state.room}
-                                        userId={this.state.userId}/>
-                                    <WhiteboardBottomRight
-                                        userId={this.state.userId}
-                                        roomState={this.state.roomState}
-                                        handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
-                                        handleHotKeyMenuState={this.handleHotKeyMenuState}
-                                        room={this.state.room}/>
-                                    <div className="whiteboard-tool-box">
-                                        <ToolBox
-                                            colorConfig={this.props.colorConfig}
-                                            setMemberState={this.setMemberState}
-                                            customerComponent={[
-                                                <UploadBtn
-                                                    oss={ossConfigObj}
-                                                    room={this.state.room}
-                                                    roomToken={this.state.roomToken}
-                                                    onProgress={this.progress}
-                                                    whiteboardRef={this.state.whiteboardLayerDownRef}
-                                                />,
-                                                <ExtendTool/>,
-                                            ]} customerComponentPosition={CustomerComponentPositionType.end}
-                                            memberState={this.state.room.state.memberState}/>
-                                    </div>
-                                    <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
-                                        {this.renderWhiteboard()}
-                                    </div>
-                                </div>
-                            </Dropzone>
-                        </div>
+                                    />,
+                                ]} customerComponentPosition={CustomerComponentPositionType.end}
+                                memberState={this.state.room.state.memberState}/>
+                            <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
+                                {this.renderWhiteboard()}
+                            </div>
+                        </Dropzone>
+                        <WhiteboardChat
+                            isChatOpen={this.state.isChatOpen}
+                            handleChatState={this.handleChatState}
+                            room={this.state.room}
+                            userInf={this.props.userInf}/>
                     </div>
                 </RoomContextProvider>
             );
         }
     }
     private renderWhiteboard(): React.ReactNode {
+        const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100vh", backgroundColor: "white"}}/>;
+                                   style={{width: "100%", height: "100%", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "white"}}/>;
         } else {
             return null;
         }

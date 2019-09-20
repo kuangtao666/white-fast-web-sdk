@@ -5,8 +5,9 @@ import toolPaletteConfig from "./ToolPaletteConfig";
 import * as add_white from "../../assets/image/add_white.svg";
 
 export type ToolBoxAddColorStates = {
-    isColorChanged: boolean;
-    newColor: string | null;
+    activeColor: string;
+    isAddColor: boolean;
+    isVisible: boolean;
 };
 
 export type ToolBoxAddColorProps = {
@@ -19,68 +20,69 @@ export default class ToolBoxAddColor extends React.Component<ToolBoxAddColorProp
 
     public constructor(props: ToolBoxAddColorProps) {
         super(props);
-        this.setState({
-            newColor: null,
-            isColorChanged: false,
-        });
+        this.state = {
+            activeColor: "#5B908E",
+            isAddColor: false,
+            isVisible: false,
+        };
     }
 
     private handleChangeComplete = (color: ColorResult): void => {
-        this.setState({ newColor: color.hex });
-        if (!this.state.isColorChanged) {
-            this.setState({isColorChanged: true});
+        this.setState({ activeColor: color.hex });
+        if (this.state.activeColor !== "#5B908E") {
+            this.setState({isAddColor: true});
         }
     }
 
     private updateColorArray = (): void => {
         const {newColorArray, colorConfig} = this.props;
-        if (this.state.newColor) {
-            if (colorConfig) {
-                colorConfig.push(this.state.newColor);
-                if (newColorArray) {
-                    newColorArray(colorConfig);
-                }
-            } else {
-                toolPaletteConfig.push(this.state.newColor);
-                if (newColorArray) {
-                    newColorArray(toolPaletteConfig);
-                }
+        if (colorConfig) {
+            colorConfig.push(this.state.activeColor);
+            if (newColorArray) {
+                newColorArray(colorConfig);
+            }
+        } else {
+            toolPaletteConfig.push(this.state.activeColor);
+            if (newColorArray) {
+                newColorArray(toolPaletteConfig);
             }
         }
     }
     private handleVisibleChange = (visible: boolean): void => {
-        if (!visible) {
-            this.updateColorArray();
+        this.setState({isVisible: visible});
+        if (!visible && this.state.isAddColor) {
             const {newColor} = this.props;
-            if (newColor && this.state.newColor) {
-                newColor(this.state.newColor);
+            if (newColor && this.state.activeColor) {
+                newColor(this.state.activeColor);
             }
+            this.updateColorArray();
         }
     }
 
     public componentWillUnmount(): void {
         this.updateColorArray();
         const {newColor} = this.props;
-        if (newColor && this.state.newColor) {
-            newColor(this.state.newColor);
+        if (newColor && this.state.isAddColor) {
+            newColor(this.state.activeColor);
         }
     }
     public render(): React.ReactNode {
-
+        const { activeColor, isVisible} = this.state;
         return (
             <Popover
                 onVisibleChange={this.handleVisibleChange}
                 trigger="click"
-                content={<ChromePicker color={"#BEBEBE"} onChangeComplete={this.handleChangeComplete}/>}
+                content={<ChromePicker color={activeColor} onChangeComplete={this.handleChangeComplete}/>}
                 placement="bottom"
             >
                 <div className="palette-color-inner-box">
                     <div className="palette-color"
-                         style={{backgroundColor: "#BEBEBE"}}>
-                        <img src={add_white}/>
+                         style={{backgroundColor: isVisible ? activeColor : "#BEBEBE"}}>
+                        {isVisible || <img src={add_white}/>}
                     </div>
                 </div>
-            </Popover>);
+            </Popover>
+        );
     }
 
 }

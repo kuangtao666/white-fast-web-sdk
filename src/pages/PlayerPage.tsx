@@ -1,39 +1,30 @@
 import * as React from "react";
 import {Badge, Icon, Popover} from "antd";
 import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player, Room} from "white-react-sdk";
-import * as loading from "../assets/image/loading.svg";
 import * as chat from "../assets/image/chat.svg";
 import "./PlayerPage.less";
-import {RouteComponentProps} from "react-router";
 import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
-import {push} from "@netless/i18n-react-router";
-import * as home from "../assets/image/home.svg";
-import * as board from "../assets/image/board.svg";
-import Identicon from "react-identicons";
 import TweenOne from "rc-tween-one";
 import * as like from "../assets/image/like.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
-import {netlessWhiteboardApi, UserInfType} from "../apiMiddleware";
-import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
-import videojs from "video.js";
-import Draggable from "react-draggable";
-import VideoPlaceholder from "../components/whiteboard/VideoPlaceholder";
-import {isMobile} from "react-device-detect";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
-export type PlayerPageProps = RouteComponentProps<{
+export type PlayerPageProps = {
     uuid: string;
+    roomToken: string;
     userId: string;
     time: string;
-    duration: string;
-    mediaSource?: string;
-}> & {room: Room};
+    duration?: number;
+    beginTimestamp?: number,
+    room?: string,
+    mediaUrl?: string,
+};
 
 
 export type PlayerPageStates = {
@@ -70,32 +61,16 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
         };
     }
 
-    private getRoomToken = async (uuid: string): Promise<string | null> => {
-        const res = await netlessWhiteboardApi.room.joinRoomApi(uuid);
-        if (res.code === 200) {
-            return res.msg.roomToken;
-        } else {
-            return null;
-        }
-    }
-
     public async componentDidMount(): Promise<void> {
-        const uuid = this.props.match.params.uuid;
-        const whiteWebSdk = new WhiteWebSdk();
-        const roomToken = await this.getRoomToken(uuid);
+        const {uuid, roomToken, beginTimestamp, duration, mediaUrl} = this.props;
         if (uuid && roomToken) {
-            const {time, duration} = this.props.match.params;
-
-            let {mediaSource} = this.props.match.params;
-
-            mediaSource = mediaSource === undefined ? undefined : `https://netless-media.oss-cn-hangzhou.aliyuncs.com/${mediaSource}`;
-
+            const whiteWebSdk = new WhiteWebSdk();
             const player = await whiteWebSdk.replayRoom(
                 {
-                    beginTimestamp: time ? parseInt(time) : undefined,
-                    duration: duration ? parseInt(duration) : undefined,
+                    beginTimestamp: beginTimestamp,
+                    duration: duration,
                     room: uuid,
-                    audioUrl: mediaSource,
+                    mediaURL: mediaUrl,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
                 }, {
@@ -224,28 +199,6 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                     <div className="player-mid-box-time">
                         {displayWatch(Math.floor(this.state.player.scheduleTime / 1000))} / {displayWatch(Math.floor(this.state.player.timeDuration / 1000))}
                     </div>
-                    {isMobile ||
-                    <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isVisible ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                        <Popover
-                            overlayClassName="whiteboard-chat"
-                            content={<WhiteboardChat messages={this.state.messages} room={this.props.room} userId={this.props.match.params.userId}/>}
-                            trigger="click"
-                            onVisibleChange={(visible: boolean) => {
-                                if (visible) {
-                                    this.setState({isVisible: true});
-                                } else {
-                                    this.setState({isVisible: false, seenMessagesLength: this.state.messages.length});
-                                }
-                            }}
-                            placement="topLeft">
-                            <div className="player-right-box">
-                                <div className="player-right-box-inner">
-                                    <img style={{width: 17}} src={chat}/>
-                                </div>
-                            </div>
-                        </Popover>
-                    </Badge>
-                    }
                 </div>
             );
         } else {
@@ -261,22 +214,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                     className="player-nav-box">
                     <div className="player-nav-left-box">
                         <div className="player-nav-left">
-                            <div
-                                onClick={() => push(this.props.history, `/`)}
-                                className="player-nav-icon-box-left">
-                                <img src={home}/>
-                            </div>
-                            <div
-                                onClick={() => push(this.props.history, `/whiteboard/${this.props.match.params.uuid}/${this.props.match.params.userId}/`)}
-                                className="player-nav-icon-box-right">
-                                <img src={board}/>
-                            </div>
                         </div>
-                    </div>
-                    <div className="player-nav-right">
-                        <Identicon
-                            size={36}
-                            string={netlessWhiteboardApi.user.getUserInf(UserInfType.uuid, `${parseInt(this.props.match.params.userId)}`)}/>
                     </div>
                 </div>
                 {this.renderScheduleView()}
@@ -303,16 +241,6 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                         <img src={like}/>
                     </TweenOne>
                 </div>}
-                {this.props.match.params.mediaSource &&
-                    <Draggable>
-                        <div className={isMobile ? "player-video-out-mb" : "player-video-out"}>
-                            <VideoPlaceholder
-                                controls={false}
-                                className="player-video"
-                            />
-                        </div>
-                    </Draggable>
-                }
                 {this.state.player && <PlayerWhiteboard className="player-box" player={this.state.player}/>}
             </div>
         );

@@ -4,11 +4,18 @@ import "./ExtendToolInner.less";
 import {
     Room,
 } from "white-react-sdk";
-
+import {Tabs} from "antd";
+const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
     room: Room;
 };
+
+enum ExtendToolType {
+    plugin = "plugin",
+    geometry = "geometry",
+    subject = "subject",
+}
 
 export default class ExtendToolInner extends React.Component<ExtendToolInnerProps, {}> {
     public constructor(props: ExtendToolInnerProps) {
@@ -27,17 +34,21 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
             height: 180,
         });
         this.props.room.completeImageUpload(uuid, url);
+        this.props.room.setMemberState({
+            currentApplianceName: "selector",
+        });
     }
 
     public render(): React.ReactNode {
         return (
             <div className="extend-inner-box">
-                <div onClick={() => {
-                    this.addImage("https://ohuuyffq2.qnssl.com/netless.png");
-                }}>三角形1</div>
-                <div>三角形1</div>
-                <div>三角形1</div>
-                <div>三角形1</div>
+                <div className="extend-inner-nav">
+                    <div className="extend-inner-title">插件教具</div>
+                    <div className="extend-inner-title">几何图形</div>
+                    <div className="extend-inner-title">学科图形</div>
+                </div>
+                <div className="extend-inner-body">
+                </div>
             </div>
         );
     }

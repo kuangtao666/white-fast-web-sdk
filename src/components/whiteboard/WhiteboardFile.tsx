@@ -1,19 +1,25 @@
 import * as React from "react";
-import "./MenuPPTDoc.less";
-import PPTDatas, {PPTDataType, PPTType} from "./PPTDatas";
-import {Room} from "white-react-sdk";
+import "./WhiteboardFile.less";
+import {Room} from "white-web-sdk";
+import * as close from "../../assets/image/close.svg";
+import {PPTDataType, PPTType} from "../menu/PPTDatas";
+import PPTDatas from "../menu/PPTDatas";
 
-export type MenuPPTDocProps = {
+export type WhiteboardFileProps = {
     room: Room;
+    isFileOpen?: boolean;
+    handleFileState: () => void;
 };
-export type MenuPPTDocStates = {
+
+export type WhiteboardFileStates = {
     docs: PPTDataType[];
     activeDocData?: PPTDataType;
 };
 
-class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
 
-    public constructor(props: MenuPPTDocProps) {
+export default class WhiteboardFile extends React.Component<WhiteboardFileProps, WhiteboardFileStates> {
+
+    public constructor(props: WhiteboardFileProps) {
         super(props);
         this.state = {
             docs: [],
@@ -78,7 +84,6 @@ class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
             room.moveCamera({scale: zoomNumber});
         }
     }
-
     public render(): React.ReactNode {
         let docCells: React.ReactNode;
         if (this.state.docs.length > 0) {
@@ -89,7 +94,7 @@ class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
                         onClick={() => this.selectDoc(data.id)}
                         className="menu-ppt-inner-cell">
                         <div
-                            style={{backgroundColor: data.active ? "#A2A7AD" : "#525252"}}
+                            style={{backgroundColor: data.active ? "#f2f2f2" : "#ffffff"}}
                             className="menu-ppt-image-box">
                             <svg key="" width={144} height={104}>
                                 <image
@@ -106,7 +111,7 @@ class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
                         onClick={() => this.selectDoc(data.id)}
                         className="menu-ppt-inner-cell">
                         <div
-                            style={{backgroundColor: data.active ? "#A2A7AD" : "#525252"}}
+                            style={{backgroundColor: data.active ? "#f2f2f2" : "#ffffff"}}
                             className="menu-ppt-image-box">
                             <div className="menu-ppt-image-box-inner">
                                 <img src={data.dynamic_cover}/>
@@ -119,22 +124,26 @@ class MenuPPTDoc extends React.Component<MenuPPTDocProps, MenuPPTDocStates> {
                 }
             });
         }
-
-        return (
-            <div className="menu-ppt-box">
-                <div className="menu-ppt-line">
-                    <div className="menu-ppt-text-box">
-                        Documents
+        if (this.props.isFileOpen) {
+            return (
+                <div className="file-box">
+                    <div className="chat-inner-box">
+                        <div className="chat-box-title">
+                            <div className="chat-box-name">
+                                <span>文档中心</span>
+                            </div>
+                            <div onClick={this.props.handleFileState} className="chat-box-close">
+                                <img src={close}/>
+                            </div>
+                        </div>
+                        <div className="file-inner-box">
+                            {docCells}
+                        </div>
                     </div>
                 </div>
-                <div style={{height: 42}}/>
-                <div style={{width: "100%", height: 24}}/>
-                <div className="menu-ppt-inner-box">
-                    {docCells}
-                </div>
-            </div>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 }
-
-export default MenuPPTDoc;

@@ -11,6 +11,8 @@ import {
     ToolBoxText,
 } from "./ToolIconComponent";
 import "./ToolBox.less";
+import {ToolBarPositionEnum} from "../../components/RealTime";
+import {TooltipPlacement} from "antd/lib/tooltip";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -33,6 +35,8 @@ export type MemberState = {
 export type ToolBoxProps = {
     memberState: Readonly<MemberState>;
     setMemberState: (modifyState: Partial<MemberState>) => void;
+    isReadOnly?: boolean;
+    toolBarPosition?: ToolBarPositionEnum;
     colorConfig?: string[];
     customerComponent?: React.ReactNode[];
     customerComponentPosition?: CustomerComponentPositionType;
@@ -146,22 +150,64 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     public render(): React.ReactNode {
+        const {toolBarPosition, isReadOnly} = this.props;
         const nodes: React.ReactNode[] = [];
         for (const applianceName in ToolBox.descriptions) {
             const description = ToolBox.descriptions[applianceName];
             const node = this.renderApplianceButton(applianceName, description);
             nodes.push(node);
         }
-        return (
-            <div className="tool-box">
-                <div className="tool-mid-box">
-                    {this.addCustomerComponent(nodes)}
-                </div>
-            </div>
-        );
+        switch (toolBarPosition) {
+            case ToolBarPositionEnum.top: {
+                return (
+                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box">
+                        <div className="tool-mid-box">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            case ToolBarPositionEnum.bottom: {
+                return (
+                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-bottom">
+                        <div className="tool-mid-box">
+                                {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            case ToolBarPositionEnum.left: {
+                return (
+                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-left">
+                        <div className="tool-mid-box-left">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            case ToolBarPositionEnum.right: {
+                return (
+                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-right">
+                        <div className="tool-mid-box-left">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+            default: {
+                return (
+                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box">
+                        <div className="tool-mid-box">
+                            {this.addCustomerComponent(nodes)}
+                        </div>
+                    </div>
+                );
+            }
+        }
     }
 
     private renderApplianceButton(applianceName: string, description: ApplianceDescription): React.ReactNode {
+        const {toolBarPosition} = this.props;
         const ToolIcon = description.iconView;
         const state = this.props.memberState;
         const isExtendable = description.hasStroke || description.hasColor;
@@ -169,7 +215,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         const buttonColor = this.buttonColor(isSelected);
 
         const cellBox: React.ReactNode = (
-            <div className="tool-box-cell-box" key={applianceName}>
+            <div className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right) ? "tool-box-cell-box-left" : "tool-box-cell-box"} key={applianceName}>
                 <div className="tool-box-cell"
                      onClick={() => this.clickAppliance(event, applianceName)}>
                     <ToolIcon color={buttonColor}/>
@@ -196,7 +242,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 <Popover key={applianceName}
                          visible={this.state.extendsPanel}
                          trigger="click"
-                         placement="bottom"
+                         placement={this.handlePlacement()}
                          onVisibleChange={this.onVisibleChange}
                          content={this.renderToolBoxPaletteBox(isSelected, description)}>
                     {cellBox}
@@ -207,13 +253,28 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         }
     }
 
-    private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
-        if (isSelected && this.state.extendsPanel) {
-            return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
-                memberState={this.props.memberState}
-                setMemberState={this.props.setMemberState}
-                displayStroke={description.hasStroke}/>;
+    private handlePlacement = (): TooltipPlacement => {
+        const {toolBarPosition} = this.props;
+        switch (toolBarPosition) {
+            case ToolBarPositionEnum.left: {
+                return "left";
+            }
+            case ToolBarPositionEnum.bottom: {
+                return "bottom";
+            }
+            case ToolBarPositionEnum.right: {
+                return "right";
+            }
+            default: {
+                return "bottom";
+            }
         }
-        return null;
+    }
+
+    private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
+        return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
+                                  memberState={this.props.memberState}
+                                  setMemberState={this.props.setMemberState}
+                                  displayStroke={description.hasStroke}/>;
     }
 }

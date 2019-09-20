@@ -1,20 +1,15 @@
 import * as React from "react";
 import {Room, RoomState} from "white-react-sdk";
 import "./WhiteboardBottomLeft.less";
-import ScaleController from "@netless/react-scale-controller";
-import * as player from "../../assets/image/player.svg";
-import {Tooltip} from "antd";
-// import {withRouter} from "react-router-dom";
-// import {RouteComponentProps} from "react-router";
+import ScaleController from "../../tools/scaleController";
+import file from "../../assets/image/file.svg";
 
-export type WhiteboardBottomLeftInnerProps = {
+export type WhiteboardBottomLeftProps = {
     room: Room;
     roomState: RoomState;
-    uuid: string;
-    userId: string;
+    handleFileState: () => void;
 };
 
-export type WhiteboardBottomLeftProps = WhiteboardBottomLeftInnerProps;
 
 class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
 
@@ -32,12 +27,10 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         const {roomState} = this.props;
         return (
             <div className="whiteboard-box-bottom-left">
+                <div onClick={this.props.handleFileState} className="whiteboard-box-bottom-left-chart">
+                    <img src={file}/>
+                </div>
                 <ScaleController zoomScale={roomState.zoomScale} zoomChange={this.zoomChange}/>
-                <Tooltip placement="top" title={"回放"}>
-                    <div className="whiteboard-box-bottom-left-player">
-                        <img src={player}/>
-                    </div>
-                </Tooltip>
             </div>
         );
     }

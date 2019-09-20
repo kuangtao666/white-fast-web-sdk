@@ -1,267 +1,182 @@
-import { Button, Input, message, Modal, Popover, Tooltip } from "antd";
-import QRCode from "qrcode.react";
 import * as React from "react";
-import Clipboard from "react-clipboard.js";
-import { isMobile } from "react-device-detect";
-import { Room, RoomState, ViewMode } from "white-react-sdk";
-import * as add from "../../assets/image/add.svg";
-import * as board from "../../assets/image/board.svg";
-import * as board_black from "../../assets/image/board_black.svg";
-import { UploadBtnMobile } from "../../tools/upload/UploadBtn";
-import { PPTProgressListener } from "../../tools/upload/UploadManager";
-import WhiteboardPerspectiveSet from "./WhiteboardPerspectiveSet";
+import {ViewMode, Room, RoomMember, RoomState, Scene} from "white-react-sdk";
+import set_icon from "../../assets/image/set_icon.svg";
+import export_icon from "../../assets/image/export_icon.svg";
+import image_export from "../../assets/image/image_export.svg";
+import pdf_export from "../../assets/image/pdf_export.svg";
+import WhiteSnapshot from "@netless/white-snapshot";
+import html2canvas from "html2canvas";
 import "./WhiteboardTopRight.less";
+import {Button, Modal, Popover} from "antd";
+import download from "downloadjs";
+import NsPDF from "jspdf";
 
-export type WhiteboardTopRightState = {
-    scaleAnimation: boolean;
-    reverseState: boolean;
-    isFirst: boolean;
-    isInviteVisible: boolean;
-};
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardTopRightProps = {
-    room: Room,
-    number: string,
-    uuid: string,
-    roomState: RoomState,
-    oss: {
-        accessKeyId: string,
-        accessKeySecret: string,
-        region: string,
-        bucket: string,
-        folder: string,
-        prefix: string,
-    },
-    whiteboardRef?: HTMLDivElement,
-    onProgress?: PPTProgressListener,
+    avatar: string;
+    name: string;
+    userId: string;
+    room: Room;
+    identity?: IdentityType;
+    roomState: RoomState;
 };
 
-class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightState> {
+export type WhiteboardTopRightStates = {
+    isVisible: boolean;
+    isLoading: boolean;
+    imageUrl: string;
+    canvas: any;
+};
 
+export enum IdentityType {
+    host = "host",
+    guest = "guest",
+    listener = "listener",
+}
+
+export default class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightStates> {
+
+    private pdf: any;
+    private ref: any;
     public constructor(props: WhiteboardTopRightProps) {
         super(props);
         this.state = {
-            scaleAnimation: true,
-            reverseState: false,
-            isFirst: true,
-            isInviteVisible: false,
+            isVisible: false,
+            isLoading: false,
+            imageUrl: "",
+            canvas: null,
         };
     }
 
-
-    public componentWillReceiveProps(nextProps: WhiteboardTopRightProps): void {
-        if (this.props.roomState.broadcastState !== nextProps.roomState.broadcastState ) {
-            const perspectiveState = nextProps.roomState.broadcastState;
-            const isBeforeBroadcaster = this.props.roomState.broadcastState.mode === ViewMode.Broadcaster;
-            const isBroadcaster = perspectiveState.mode === ViewMode.Broadcaster;
-            const hasBroadcaster = perspectiveState.broadcasterId !== undefined;
-            if (!isBroadcaster) {
-                if (hasBroadcaster) {
-                    if (perspectiveState.mode === ViewMode.Follower) {
-                        message.info("当前演讲者为：" + " " + perspectiveState.broadcasterInformation!.payload.nickName + "," + "您将跟随其视角");
-                    } else {
-                        message.info("目前为自由视角");
-                    }
-                } else {
-                    if (!isBeforeBroadcaster) {
-                        message.info("目前为自由视角");
-                    }
-                }
+    private handleExportPDF = async (): Promise<void> => {
+        const {room, roomState} = this.props;
+        const scenes = roomState.sceneState.scenes;
+        const snapshot = new WhiteSnapshot(room);
+        const sceneDir = roomState.sceneState.scenePath.split("/");
+        sceneDir.pop();
+        this.pdf = new NsPDF("", "pt", "a4");
+        await scenes.map( async(scene: Scene, index: number): Promise<void> => {
+            const base64 = await snapshot.previewBase64(sceneDir.concat(scene.name).join("/"), 600, 400);
+            this.pdf.addImage(base64, "JPEG", 0, 0, 600, 400);
+            if (scenes.length > (index + 1)) {
+                this.pdf.addPage();
             }
-        }
+        });
     }
 
+    private handleExportImage = async (): Promise<void> => {
+        this.setState({isVisible: true});
+        const {roomState, room} = this.props;
+        const snapshot = new WhiteSnapshot(room);
+        const path = roomState.sceneState.scenePath;
+        // await snapshot.divPreviewCanvas(path, this.ref);
+        // const test = await html2canvas(this.ref, {
+        //     useCORS: true,
+        //     logging: false,
+        // });
 
-    private renderBroadController = (): React.ReactNode => {
-        const {room, roomState} = this.props;
-        const perspectiveState = roomState.broadcastState;
-        const isBroadcaster = perspectiveState.mode === ViewMode.Broadcaster;
-        const hasBroadcaster = perspectiveState.broadcasterId !== undefined;
-        if (isBroadcaster) {
+        const test = await html2canvas(this.ref, {useCORS: true, onclone: function(doc: Document): void {
+                Array.from(doc.getElementsByTagName("svg")).forEach((s, i, array) => {
+                    (window as any).array = array;
+                //     console.log(s);
+                //     // if (s.clientHeight > 0) {
+                //     //
+                //     // }
+                //     // s.setAttribute("width", `${s.clientWidth}`);
+                //     // s.setAttribute("height", `${s.clientHeight}`);
+                });
+            }})
+        console.log(667);
+        console.log(test);
+        // const base64 = await snapshot.previewBase64(path, 600, 400);
+        const element = document.getElementById("uniquePlaceHolderKey")!;
+        element.parentNode!.replaceChild(test, element);
+        // this.setState({imageUrl: base64});
+        this.setState({canvas: test});
+
+    }
+
+    private dowloadImage = (): void => {
+        if (this.state.imageUrl) {
+            download(this.state.imageUrl, `test`, "image/png");
+        }
+    }
+    private exportComponent = (): React.ReactNode => {
+        return (
+            <div className="export-box">
+                <div onClick={this.handleExportImage} className="export-box-cell">
+                    <img src={image_export}/>本页导出为 PNG
+                </div>
+                <div className="export-box-cell">
+                    <img src={pdf_export}/>全部导出为 PDF
+                </div>
+            </div>
+        );
+    }
+
+    private setComponent = (): React.ReactNode => {
+        const {room} = this.props;
+        const roomMembers = room.state.roomMembers.map((roomMember: RoomMember, index: number) => {
             return (
-                <Tooltip placement="bottom" title={"您正在演讲中..."}>
-                    <div
-                        onClick={ () => {
-                            room.setViewMode(ViewMode.Freedom);
-                            message.info("退出演讲模式，他人不再跟随您的视角");
-                        }}
-                        className="whiteboard-top-bar-btn-mb">
-                        <img src={board_black}/>
+                <div className="room-member-cell" key={`${index}`}>
+                    <div className="room-member-cell-inner">
+                        <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
+                        <div className="control-box-name">{roomMember.payload.name}</div>
                     </div>
-                </Tooltip>
-            );
-        } else {
-            if (hasBroadcaster) {
-                return (
-                    <Popover
-                        overlayClassName="whiteboard-perspective"
-                        content={<WhiteboardPerspectiveSet roomState={roomState} room={room}/>}
-                        placement="bottom">
-                        <div
-                            className="whiteboard-top-bar-btn-mb">
-                            <img src={board}/>
-                        </div>
-                    </Popover>
-                );
-            } else {
-                return (
-                    <Tooltip placement="bottom" title={"成为演讲者"}>
-                        <div
-                            onClick={ () => {
-                                room.setViewMode(ViewMode.Broadcaster);
-                                message.info("进入演讲模式，他人会跟随您的视角");
-                            }}
-                            className="whiteboard-top-bar-btn-mb">
-                            <img src={board}/>
-                        </div>
-                    </Tooltip>
-                );
-            }
-        }
-    }
-
-    private renderBroadControllerMbile = (): React.ReactNode => {
-        const {room, roomState} = this.props;
-        const perspectiveState = roomState.broadcastState;
-        const isBroadcaster = perspectiveState.mode === ViewMode.Broadcaster;
-        const hasBroadcaster = perspectiveState.broadcasterId !== undefined;
-        if (isBroadcaster) {
-            return (
-                <div
-                    onClick={ () => {
-                        room.setViewMode(ViewMode.Freedom);
-                        message.info("退出演讲模式，他人不再跟随您的视角");
-                    }}
-                    className="whiteboard-top-bar-btn-mb">
-                    <img src={board_black}/>
+                    {/*<div className="room-member-cell-lock">*/}
+                        {/*<Icon type="lock" />*/}
+                    {/*</div>*/}
                 </div>
             );
-        } else {
-            if (hasBroadcaster) {
-                return (
-                    <Popover
-                        overlayClassName="whiteboard-perspective"
-                        content={<WhiteboardPerspectiveSet roomState={roomState} room={room}/>}
-                        placement="bottom">
-                        <div
-                            className="whiteboard-top-bar-btn-mb">
-                            <img src={board}/>
-                        </div>
-                    </Popover>
-                );
-            } else {
-                return (
-                    <div
-                        onClick={ () => {
-                            room.setViewMode(ViewMode.Broadcaster);
-                            message.info("进入演讲模式，他人会跟随您的视角");
-                        }}
-                        className="whiteboard-top-bar-btn-mb">
-                        <img src={board}/>
-                    </div>
-                );
-            }
-        }
-    }
-
-    private handleInvite = (): void => {
-        this.setState({isInviteVisible: true});
-    }
-
-    private handleUrl = (url: string): string => {
-        const regex = /[\w]+\/$/gm;
-        const match = regex.exec(url);
-        if (match) {
-            return url.substring(0, match.index);
-        } else {
-            return url;
-        }
-
+        });
+        return (
+            <div className="control-box">
+                {/*<div className="export-box-title">*/}
+                    {/*主持人*/}
+                {/*</div>*/}
+                <div className="control-box-title">
+                    参与者
+                </div>
+                {roomMembers}
+            </div>
+        );
     }
 
     public render(): React.ReactNode {
-        if (isMobile) {
-            return (
-                <div className="whiteboard-box-top-right-mb">
-                    <div
-                        className="whiteboard-box-top-right-mid-mb">
-                        <UploadBtnMobile
-                            room={this.props.room}
-                            oss={this.props.oss}
-                            onProgress={this.props.onProgress}
-                            whiteboardRef={this.props.whiteboardRef} />
-                        {isMobile ? this.renderBroadControllerMbile() : this.renderBroadController()}
-                        <div
-                            className="whiteboard-top-bar-btn-mb" onClick={this.handleInvite}>
-                            <img src={add}/>
-                        </div>
+        const  {avatar} = this.props;
+        return (
+            <div className="whiteboard-top-right-box">
+                <Popover placement="bottomRight" content={this.setComponent()}>
+                    <div className="whiteboard-top-right-cell">
+                        <img style={{width: 16}} src={set_icon}/>
                     </div>
-                    <Modal
-                        visible={this.state.isInviteVisible}
-                        footer={null}
-                        title="Invite"
-                        onCancel={() => this.setState({isInviteVisible: false})}
-                    >
-                        <div className="whiteboard-share-box">
-                            <QRCode value={`${this.handleUrl(location.href)}`} />
-                            <div className="whiteboard-share-text-box">
-                                <Input readOnly className="whiteboard-share-text" size="large" value={`${this.handleUrl(location.href)}`}/>
-                                <Clipboard
-                                    data-clipboard-text={`${this.handleUrl(location.href)}`}
-                                    component="div"
-                                    onSuccess={() => {
-                                        message.success("Copy already copied address to clipboard");
-                                        this.setState({isInviteVisible: false});
-                                    }}
-                                >
-                                    <Button size="large" className="white-btn-size" type="primary">复制链接</Button>
-                                </Clipboard>
-                            </div>
-                        </div>
-                    </Modal>
-                </div>
-            );
-        } else {
-            return (
-                <div className="whiteboard-box-top-right">
-                    <div
-                        className="whiteboard-box-top-right-mid">
-                        {this.renderBroadController()}
-                        <Tooltip placement="bottomLeft" title={"invite your friend"}>
-                            <div
-                                style={{marginRight: 12}}
-                                className="whiteboard-top-bar-btn" onClick={this.handleInvite}>
-                                <img src={add}/>
-                            </div>
-                        </Tooltip>
+                </Popover>
+                <Popover placement="bottomRight" content={this.exportComponent()}>
+                    <div className="whiteboard-top-right-cell">
+                        <img style={{width: 16}} src={export_icon}/>
                     </div>
-                    <Modal
-                        visible={this.state.isInviteVisible}
-                        footer={null}
-                        title="Invite"
-                        onCancel={() => this.setState({isInviteVisible: false})}
-                    >
-                        <div className="whiteboard-share-box">
-                            <QRCode value={`${this.handleUrl(location.href)}`} />
-                            <div className="whiteboard-share-text-box">
-                                <Input readOnly className="whiteboard-share-text" size="large" value={`${this.handleUrl(location.href)}`}/>
-                                <Clipboard
-                                    data-clipboard-text={`${this.handleUrl(location.href)}`}
-                                    component="div"
-                                    onSuccess={() => {
-                                        message.success("Copy already copied address to clipboard");
-                                        this.setState({isInviteVisible: false});
-                                    }}
-                                >
-                                    <Button size="large" className="white-btn-size" type="primary">复制链接</Button>
-                                </Clipboard>
-                            </div>
-                        </div>
-                    </Modal>
+                </Popover>
+                <div className="whiteboard-top-user-box">
+                    <div className="whiteboard-top-right-user">
+                        <img src={avatar}/>
+                    </div>
                 </div>
-            );
-        }
+                <Modal
+                    width={720}
+                    title="导出图片"
+                    visible={this.state.isVisible}
+                    onOk={this.dowloadImage}
+                    okText="下载"
+                    cancelText="取消"
+                    onCancel={() => {
+                        this.setState({isVisible: false, imageUrl: ""});
+                    }}
+                >
+
+                </Modal>
+            </div>
+        );
+
     }
 }
-
-export default WhiteboardTopRight;
