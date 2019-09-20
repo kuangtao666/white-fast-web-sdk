@@ -9,12 +9,16 @@
 
 ## 🎉 快速开始
 
+### 在线尝试
+
+[jsrun#china](http://jsrun.pro/zmbKp/edit)
+
 ### 实时互动白板
 
 ```html
 <body>
     <div id="app-root"></div>
-    <script src="https://sdk.herewhtie.com/fast.js"></script>
+    <script src="https://sdk.herewhite.com/fast-sdk/index.js"></script>
     <script type="text/javascript">
         var userId = `${Math.floor(Math.random() * 100000)}`;
         var uuid = "7406e356d813449989560f695d421bea";
@@ -36,7 +40,7 @@
 ```html
 <body>
     <div id="app-root"></div>
-    <script src="https://sdk.herewhtie.com/fast.js"></script>
+    <script src="https://sdk.herewhite.com/fast-sdk/index.js"></script>
     <script type="text/javascript">
         var userId = `${Math.floor(Math.random() * 100000)}`;
         var uuid = "7406e356d813449989560f695d421bea";
