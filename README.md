@@ -9,12 +9,17 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 
 ## 🎉 Quickstart 
 
+### Online
+
+[codepen](https://codepen.io/buhe/pen/XWryGWO?editors=1000#0)
+[jsrun#china](http://jsrun.pro/zmbKp/edit)
+
 ### Live White Board
 
 ```html
 <body>
     <div id="app-root"></div>
-    <script src="https://sdk.herewhtie.com/fast.js"></script>
+    <script src="https://sdk.herewhite.com/fast-sdk/index.js"></script>
     <script type="text/javascript">
         var userId = `${Math.floor(Math.random() * 100000)}`;
         var uuid = "7406e356d813449989560f695d421bea";
@@ -36,7 +41,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 ```html
 <body>
     <div id="app-root"></div>
-    <script src="https://sdk.herewhtie.com/fast.js"></script>
+    <script src="https://sdk.herewhite.com/fast-sdk/index.js"></script>
     <script type="text/javascript">
         var userId = `${Math.floor(Math.random() * 100000)}`;
         var uuid = "7406e356d813449989560f695d421bea";
