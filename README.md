@@ -6,19 +6,53 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 
 ⚡ Open source ultra fast white borad web SDK.
 
-## 🎉 Installation
+## 🎉 Quickstart 
 
-### Use CDN
+### Live White Board
 
 ```html
-<script src ="https://sdk.herewhtie.com/fast.js"></script>
+<body>
+    <div id="app-root"></div>
+    <script src="https://sdk.herewhtie.com/fast.js"></script>
+    <script type="text/javascript">
+        var userId = `${Math.floor(Math.random() * 100000)}`;
+        var uuid = "7406e356d813449989560f695d421bea";
+        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPThjY2M1MWRlZjg1Y2I3MGJjNDQwMDVlMjEzODUwNmIwOGIxNjc4NzQ6YWRtaW5JZD0xNTgmcm9vbUlkPTc0MDZlMzU2ZDgxMzQ0OTk4OTU2MGY2OTVkNDIxYmVhJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE1OTk3MzA3NjAmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1NjgxNzM4MDgmbm9uY2U9MTU2ODE3MzgwODE3NjAw";
+        
+        WhiteFastSDK.Room("app-root",{
+            uuid: uuid,
+            roomToken: roomToken,
+            userInf: {
+                id: userId,
+            },
+        });
+    </script>
+</body>
 ```
 
-### Use npm
+### White Board Player
 
+```html
+<body>
+    <div id="app-root"></div>
+    <script src="https://sdk.herewhtie.com/fast.js"></script>
+    <script type="text/javascript">
+        var userId = `${Math.floor(Math.random() * 100000)}`;
+        var uuid = "7406e356d813449989560f695d421bea";
+        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPThjY2M1MWRlZjg1Y2I3MGJjNDQwMDVlMjEzODUwNmIwOGIxNjc4NzQ6YWRtaW5JZD0xNTgmcm9vbUlkPTc0MDZlMzU2ZDgxMzQ0OTk4OTU2MGY2OTVkNDIxYmVhJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE1OTk3MzA3NjAmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1NjgxNzM4MDgmbm9uY2U9MTU2ODE3MzgwODE3NjAw";
+        
+        WhiteFastSDK.Player("app-root",{
+            uuid: uuid,
+            roomToken: roomToken,
+            userInf: {
+                id: userId,
+            },
+        });
+    </script>
+</body>
+```
 
-
-## 📋 Example code
+## 📖 Documentation
 
 ### Live White Board
 
@@ -91,8 +125,6 @@ WhiteFastSDK.Player("app-root",{
 1. Run `yarn dev` in your terminal
 2. Live room by open facade/index.html
 3. Player by open facade/player.html
-
-## 📖 Documentation
 
 ## 👏 Contributing
 
