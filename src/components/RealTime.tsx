@@ -26,13 +26,13 @@ import MenuBox from "./menu/MenuBox";
 import MenuAnnexBox from "./menu/MenuAnnexBox";
 import {ossConfigObj} from "../appToken";
 import {UserCursor} from "./whiteboard/UserCursor";
-import MenuPPTDoc from "./menu/MenuPPTDoc";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
 import UploadBtn from "../tools/upload/UploadBtn";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "./whiteboard/WhiteboardTopLeft";
 import WhiteboardChat from "./whiteboard/WhiteboardChat";
+import WhiteboardFile from "./whiteboard/WhiteboardFile";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -55,6 +55,7 @@ export type RealTimeProps = {
     colorArrayStateCallback?: (colorArray: string[]) => void;
     logoUrl?: string | boolean;
     isChatOpen?: boolean;
+    isFileOpen?: boolean;
 };
 
 export enum ToolBarPositionEnum {
@@ -80,6 +81,7 @@ export type RealTimeStates = {
     converterPercent: number;
     isMenuOpen: boolean;
     isChatOpen?: boolean;
+    isFileOpen?: boolean;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
@@ -104,6 +106,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             converterPercent: 0,
             isMenuOpen: false,
             isChatOpen: this.props.isChatOpen,
+            isFileOpen: this.props.isFileOpen,
         };
         this.cursor = new UserCursor();
     }
@@ -177,9 +180,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                     room={this.state.room!}
                     roomState={this.state.roomState!}
                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}/>;
-            case MenuInnerType.PPTBox:
-                return <MenuPPTDoc
-                    room={this.state.room!}/>;
             default:
                 return null;
         }
@@ -260,6 +260,13 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             this.setState({isChatOpen: !this.state.isChatOpen});
         }
     }
+    private handleFileState = (): void => {
+        if (this.state.isFileOpen === undefined) {
+            this.setState({isFileOpen: true});
+        } else {
+            this.setState({isFileOpen: !this.state.isFileOpen});
+        }
+    }
     public render(): React.ReactNode {
 
         if (this.state.connectedFail) {
@@ -294,6 +301,10 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                             menuInnerState={this.state.menuInnerState}>
                             {this.renderMenuInner()}
                         </MenuBox>
+                        <WhiteboardFile
+                            handleFileState={this.handleFileState}
+                            isFileOpen={this.state.isFileOpen}
+                            room={this.state.room}/>
                         <Dropzone
                             accept={"image/*"}
                             disableClick={true}
@@ -309,7 +320,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                                 userId={this.props.userInf.id}
                                 room={this.state.room}
                                 avatar={this.props.userInf.avatar}/>
-                            <WhiteboardBottomLeft
+                            <WhiteboardBottomLeft handleFileState={this.handleFileState}
                                 roomState={this.state.roomState}
                                 room={this.state.room}/>
                             <WhiteboardBottomRight

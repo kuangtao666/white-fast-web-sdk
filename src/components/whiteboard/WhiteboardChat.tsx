@@ -46,7 +46,9 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     }
 
     private scrollToBottom(): void {
-        this.messagesEnd!.scrollIntoView({behavior: "smooth"});
+        if (this.messagesEnd) {
+            this.messagesEnd.scrollIntoView({behavior: "smooth"});
+        }
     }
 
     public async componentDidMount(): Promise<void> {
@@ -57,8 +59,10 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         await timeout(0);
         this.scrollToBottom();
         const canvasArray: any = document.getElementsByClassName("identicon").item(0);
-        const url = canvasArray.toDataURL();
-        this.setState({url: url});
+        if (canvasArray) {
+            const url = canvasArray.toDataURL();
+            this.setState({url: url});
+        }
     }
 
     public async componentWillReceiveProps(): Promise<void> {
