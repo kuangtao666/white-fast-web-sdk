@@ -14,8 +14,8 @@
     "build:lib:types": "tsc --emitDeclarationOnly",
     "build:lib:js": "webpack --mode=production",
     "build:lib": "npm run build:lib:types && npm run build:lib:js",
-    "releaseToCDN": "TODO",
-    "releaseToNPM": "TODO",
+    "releaseToCDN": "",
+    "releaseToNPM": "",
     "predev": "yarn type-check",
     "dev": "webpack-dev-server --config webpack.config.js --progress --colors --open --mode=development"
   },
