@@ -2,7 +2,7 @@
 
 .player-box {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: black;
 }
 
@@ -29,7 +29,7 @@
 
 .player-out-box {
   width: 100%;
-  height: 100vh;
+  height: 100%;
 
   .operation {
     width: 100px;
@@ -41,6 +41,11 @@
     text-align: right;
   }
 
+}
+
+.player-board {
+  width: 100%;
+  height: 100%;
 }
 
 .player-loading-out-box {
@@ -396,7 +401,7 @@
   justify-content: center;
   width: 96%;
   height: 64px;
-  background-color: red;
+  background-color: white;
 }
 
 .player-selector {
@@ -423,6 +428,11 @@
 }
 
 .player-controller-left {
+  display: flex;
+  flex-direction: row;
+}
+
+.player-controller-right {
   display: flex;
   flex-direction: row;
 }

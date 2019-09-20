@@ -7,22 +7,25 @@ import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
-import * as like from "../assets/image/like.svg";
+import * as full_screen from "../assets/image/full_screen.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
+import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
+import {UserType} from "../components/RealTime";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
-    userId: string;
     time: string;
+    userInf: UserType;
     duration?: number;
     beginTimestamp?: number,
     room?: string,
     mediaUrl?: string,
+    chatState?: boolean;
 };
 
 
@@ -34,6 +37,7 @@ export type PlayerPageStates = {
     isPlayerSeeking: boolean;
     messages: MessageType[];
     seenMessagesLength: number;
+    chatState?: boolean;
 };
 
 export default class PlayerPage extends React.Component<PlayerPageProps, PlayerPageStates> {
@@ -51,6 +55,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             isPlayerSeeking: false,
             messages: [],
             seenMessagesLength: 0,
+            chatState: this.props.chatState,
         };
     }
     public async componentDidMount(): Promise<void> {
@@ -159,13 +164,18 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             }
         }
     }
+
+    private renderScale = (): React.ReactNode => {
+        return (
+            <img src={full_screen}/>
+        );
+    }
     private renderScheduleView(): React.ReactNode {
         if (this.state.player) {
             return (
                 <div
                     style={{display: "flex"}}
                     className="player-schedule">
-
                     <div className="player-mid-box">
                         <SeekSlider
                             fullTime={this.state.player.timeDuration}
@@ -192,11 +202,12 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                                 {displayWatch(Math.floor(this.state.player.scheduleTime / 1000))} / {displayWatch(Math.floor(this.state.player.timeDuration / 1000))}
                             </div>
                         </div>
-                        <div>
-                            <div
-                                onClick={() => this.onClickOperationButton(this.state.player!)}
-                                className="player-controller">
-                                {this.operationButton(this.state.phase)}
+                        <div className="player-controller-left">
+                            <div className="player-controller">
+                                {this.renderScale()}
+                            </div>
+                            <div className="player-controller">
+                                <img src={chat}/>
                             </div>
                         </div>
                     </div>
@@ -207,21 +218,21 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
         }
     }
 
+    private handleChatState = (): void => {
+        this.setState({chatState: !this.state.chatState});
+    }
+
     public render(): React.ReactNode {
         const {player} = this.state;
+        const {userInf} = this.props;
         if (player) {
             return (
                 <div className="player-out-box">
-                    <div
-                        style={{display: "flex"}}
-                        className="player-nav-box">
-                        <div className="player-nav-left-box">
-                            <div className="player-nav-left">
-                            </div>
-                        </div>
+                    <div className="player-board">
+                        {this.renderScheduleView()}
+                        <PlayerWhiteboard className="player-box" player={player}/>
                     </div>
-                    {this.renderScheduleView()}
-                    {this.state.player && <PlayerWhiteboard className="player-box" player={this.state.player}/>}
+                    <WhiteboardChat userInf={userInf} handleChatState={this.handleChatState}/>
                 </div>
             );
         } else {

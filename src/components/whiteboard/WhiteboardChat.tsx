@@ -11,7 +11,7 @@ import {
     TextInput,
     SendButton,
 } from "@livechat/ui-kit";
-import {Room} from "white-web-sdk";
+import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import {UserType} from "../RealTime";
 import * as empty from "../../assets/image/empty.svg";
@@ -20,7 +20,8 @@ import * as close from "../../assets/image/close.svg";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardChatProps = {
-    room: Room;
+    room?: Room;
+    player?: Player;
     userInf: UserType;
     isChatOpen?: boolean;
     handleChatState: () => void;
@@ -52,10 +53,16 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     }
 
     public async componentDidMount(): Promise<void> {
-        const {room} = this.props;
-        room.addMagixEventListener("message",  event => {
-            this.setState({messages: [...this.state.messages, event.payload]});
-        });
+        const {room, player} = this.props;
+        if (room) {
+            room.addMagixEventListener("message",  event => {
+                this.setState({messages: [...this.state.messages, event.payload]});
+            });
+        } else if (player) {
+            player.addMagixEventListener("message",  event => {
+                this.setState({messages: [...this.state.messages, event.payload]});
+            });
+        }
         await timeout(0);
         this.scrollToBottom();
         const canvasArray: any = document.getElementsByClassName("identicon").item(0);
@@ -165,15 +172,18 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                                 </div>}
                                 <div className="under-cell" ref={ref => this.messagesEnd = ref}/>
                             </div>
+                            {this.props.room &&
                             <div className="chat-box-input">
                                 <TextComposer
                                     onSend={(event: any) => {
-                                        this.props.room.dispatchMagixEvent("message", {
-                                            name: this.props.userInf.name,
-                                            avatar: this.props.userInf.avatar,
-                                            id: this.props.userInf.id,
-                                            messageInner: [event],
-                                        });
+                                        if (this.props.room) {
+                                            this.props.room.dispatchMagixEvent("message", {
+                                                name: this.props.userInf.name,
+                                                avatar: this.props.userInf.avatar,
+                                                id: this.props.userInf.id,
+                                                messageInner: [event],
+                                            });
+                                        }
                                     }}
                                 >
                                     <Row align="center">
@@ -181,7 +191,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                                         <SendButton fit />
                                     </Row>
                                 </TextComposer>
-                            </div>
+                            </div>}
                         </div>
                     </ThemeProvider>
                 </div>
