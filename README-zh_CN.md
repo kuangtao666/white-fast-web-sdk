@@ -1,26 +1,25 @@
 # White Fast Web SDK
 
-English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md) 
+[English](./README.md) | 简体中文 | [日本語](./README-jp.md)
 
 ![GitHub](https://img.shields.io/github/license/netless-io/whiteboard-designer)
 
-⚡ Open source ultra fast white borad web SDK.
+⚡ 超快的开源白板 SDK
 
-## 🎉 Installation
+## 🎉 安装
 
-### Use CDN
+### 使用 CDN
 
 ```html
 <script src ="https://sdk.herewhtie.com/fast.js"></script>
 ```
 
-### Use npm
+### 使用 npm
 
 
+## 📋 例子
 
-## 📋 Example code
-
-### Live White Board
+### 实时互动白板
 
 ```javascript
 var userId = `${Math.floor(Math.random() * 100000)}`;
@@ -55,7 +54,7 @@ WhiteFastSDK.Room("app-root",{
 });
 ```
 
-### White Board Player
+### 白板回放播放器
 
 ```javascript
 var uuid = "7406e356d813449989560f695d421bea";
@@ -86,21 +85,22 @@ WhiteFastSDK.Player("app-root",{
 });
 ```
 
-## 🚀 Development
 
-1. Run `yarn dev` in your terminal
-2. Live room by open facade/index.html
-3. Player by open facade/player.html
+## 🚀 开发
 
-## 📖 Documentation
+1. 在命令行运行 yarn dev
+2. 用浏览器打开 facade/index.html 进入互动白板
+3. 用浏览器打开 facade/player.html 进入白板播放器
 
-## 👏 Contributing
+## 📖 文档
 
-Please refer to each project's style and contribution guidelines for submitting patches and additions. In general, we follow the "fork-and-pull" Git workflow.
+## 👏 开源贡献
 
-1. Fork the repo on GitHub
-2. Clone the project to your own machine
-3. Commit changes to your own branch
-4. Push your work back up to your fork
-5. Submit a Pull request so that we can review your changes
-NOTE: Be sure to merge the latest from "upstream" before making a pull request!
+请参阅每个项目的样式和贡献指南，以提交补丁和特性。一般来说，我们遵循 “fork-and-pull” Git工作流程。
+
+1. 在GitHub上 Fork 项目
+2. 将项目克隆到您自己的计算机上
+3. 将更改提交到您自己的分支
+4. 将工作推到你的 Fork
+5. 提交 Pull Request，我们会尽快进行 Code Review
+请在提交 PR 之前拉取并合并上游的最新代码，感谢您的共享

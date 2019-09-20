@@ -9,13 +9,14 @@
   "private": true,
   "proxy": "http://localhost:3009/",
   "scripts": {
-    "start": "react-app-rewired start --scripts-version react-scripts-ts",
-    "build": "rimraf build && NODE_ENV=production react-app-rewired --max-old-space-size=4096 build --scripts-version react-scripts-ts",
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",
     "build:lib:types": "tsc --emitDeclarationOnly",
     "build:lib:js": "webpack --mode=production",
     "build:lib": "npm run build:lib:types && npm run build:lib:js",
+    "releaseToCDN": "",
+    "releaseToNPM": "",
+    "predev": "yarn type-check",
     "dev": "webpack-dev-server --config webpack.config.js --progress --colors --open --mode=development"
   },
   "dependencies": {
