@@ -3,6 +3,7 @@
 [English](./README.md) | 简体中文 | [日本語](./README-jp.md)
 
 ![GitHub](https://img.shields.io/github/license/netless-io/whiteboard-designer)
+![jenkins](http://ci.netless.group/job/fast-sdk-pr/badge/icon)
 
 ⚡ 超快的开源白板 SDK
 
