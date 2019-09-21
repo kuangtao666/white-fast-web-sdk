@@ -73,7 +73,7 @@ To create a whiteboard, invoke a ```WhiteFastSDK.Room``` method in which you wri
 
 #### WhiteBoard configurations
 
-`uuid [string] required`
+**uuid [string] required**
 
 Room indentify.
 
@@ -81,7 +81,7 @@ Room indentify.
 uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
 ```
 
-`roomToken [string] required`
+**roomToken [string] required**
 
 Room auth token.
 
@@ -89,7 +89,7 @@ Room auth token.
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
-`logoUrl [url] optional`
+**logoUrl [url] optional**
 
 With the default value as undefined, Custom branding logo.
 
@@ -97,7 +97,7 @@ With the default value as undefined, Custom branding logo.
 logoUrl: "https://path/to/logo.png"
 ```
 
-`toolBarPosition [string] optional`
+**toolBarPosition [string] optional**
 
 With the default value as top, ToolBar position, value include left,top,bottom,right.
 
@@ -105,7 +105,7 @@ With the default value as top, ToolBar position, value include left,top,bottom,r
 toolBarPosition: "left"
 ```
 
-`pagePreviewPosition [string] optional`
+**pagePreviewPosition [string] optional**
 
 With the default value as right, Preview view position, value include left,top,bottom,right.
 
@@ -113,7 +113,7 @@ With the default value as right, Preview view position, value include left,top,b
 pagePreviewPosition: "left"
 ```
 
-`boardBackgroundColor [color] optional`
+**boardBackgroundColor [color] optional**
 
 With the default value as white, Background color.
 
@@ -121,7 +121,7 @@ With the default value as white, Background color.
 boardBackgroundColor: "#F2F2F2"
 ```
 
-`isReadOnly [boolean] optional`
+**isReadOnly [boolean] optional**
 
 With the default value as false, read-only meaning can not write at board.
 
@@ -134,7 +134,7 @@ To create a player, invoke a ```WhiteFastSDK.Player``` method in which you write
 
 #### Player configurations
 
-`uuid [string] required`
+**uuid [string] required**
 
 Room indentify.
 
@@ -142,7 +142,7 @@ Room indentify.
 uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
 ```
 
-`roomToken [string] required`
+**roomToken [string] required**
 
 Room auth token.
 
@@ -150,7 +150,7 @@ Room auth token.
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
-`logoUrl [url] optional`
+**logoUrl [url] optional**
 
 With the default value as undefined, Custom branding logo.
 
