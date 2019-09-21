@@ -62,71 +62,102 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 
 ## 📖 Documentation
 
-### Live White Board
+When setting your whiteboard widget in code, you have several options at your disposal all of which are described in detail below.
 
-```javascript
-var userId = `${Math.floor(Math.random() * 100000)}`;
-var uuid = "3dac59e714d2443eb733e9de5dc2beb4";
-var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWE4ZWIyZWE3ZDliMWJiZDkyNWQ0Yzg4YTgwYjVlYjFiOTQxOTZiYmY6YWRtaW5JZD0xNTgmcm9vbUlkPTNkYWM1OWU3MTRkMjQ0M2ViNzMzZTlkZTVkYzJiZWI0JnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MDEzNTkmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NDQ0MDcmbm9uY2U9MTU2ODk0NDQwNjY0MzAw";
-WhiteFastSDK.Room("app-root",{
-        uuid: uuid,
-        userInf: {
-            name: "Netless",
-            id: userId,
-            avatar: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-        },
-        roomToken: roomToken,
-        logoUrl: "",
-        toolBarPosition: "left",
-        pagePreviewPosition: "right",
-        boardBackgroundColor: "#F2F2F2",
-        isReadOnly: false,
-        identity: "host",
-        defaultColorArray: [
-            "#E77345",
-            "#005BF6",
-            "#F5AD46",
-            "#68AB5D",
-            "#9E51B6",
-            "#1E2023",
-        ],
-        colorArrayStateCallback: (colorArray) => {
-            console.log(colorArray);
-        }
-    });
-});
+### WhiteBoard
+
+To create a whiteboard, invoke a ```WhiteFastSDK.Room``` method in which you write the selected element in which you want to add the whiteboard and preferred configs.
+
+- element [string] – contains a reference to the element in which whiteboard is
+- configs [object] – options object
+
+#### WhiteBoard configurations
+
+`uuid [string] required`
+
+Room indentify.
+
+```
+uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
 ```
 
-### White Board Player
+`roomToken [string] required`
 
-```javascript
-var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
-var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
-WhiteFastSDK.Player("app-root",{
-    uuid: uuid,
-    userInf: {
-        name: "Netless",
-        id: "1",
-    },
-    roomToken: roomToken,
-    logoUrl: "",
-    toolBarPosition: "left",
-    pagePreviewPosition: "left",
-    boardBackgroundColor: "#F2F2F2",
-    isReadOnly: false,
-    defaultColorArray: [
-        "#E77345",
-        "#005BF6",
-        "#F5AD46",
-        "#68AB5D",
-        "#9E51B6",
-        "#1E2023",
-    ],
-    colorArrayStateCallback: (colorArray) => {
-        console.log(colorArray);
-    }
-});
+Room auth token.
+
 ```
+roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
+```
+
+`logoUrl [url] optional`
+
+With the default value as undefined, Custom branding logo.
+
+```
+logoUrl: "https://path/to/logo.png"
+```
+
+`toolBarPosition [string] optional`
+
+With the default value as top, ToolBar position, value include left,top,bottom,right.
+
+```
+toolBarPosition: "left"
+```
+
+`pagePreviewPosition [string] optional`
+
+With the default value as right, Preview view position, value include left,top,bottom,right.
+
+```
+pagePreviewPosition: "left"
+```
+
+`boardBackgroundColor [color] optional`
+
+With the default value as white, Background color.
+
+```
+boardBackgroundColor: "#F2F2F2"
+```
+
+`isReadOnly [boolean] optional`
+
+With the default value as false, read-only meaning can not write at board.
+
+### WhiteBoard Player
+
+To create a player, invoke a ```WhiteFastSDK.Player``` method in which you write the selected element in which you want to add the player and preferred configs.
+
+- element [string] – contains a reference to the element in which whiteboard is
+- configs [object] – options object
+
+#### Player configurations
+
+`uuid [string] required`
+
+Room indentify.
+
+```
+uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
+```
+
+`roomToken [string] required`
+
+Room auth token.
+
+```
+roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
+```
+
+`logoUrl [url] optional`
+
+With the default value as undefined, Custom branding logo.
+
+```
+logoUrl: "https://path/to/logo.png"
+```
+
 
 ## 🚀 Development
 
