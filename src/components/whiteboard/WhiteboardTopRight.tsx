@@ -71,6 +71,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         const path = roomState.sceneState.scenePath;
         const image = await snapshot.previewBase64(path, 600, 400);
         this.setState({imageUrl: image});
+        // const image = await snapshot.divPreviewCanvas(path, this.ref);
     }
 
     private dowloadImage = (): void => {

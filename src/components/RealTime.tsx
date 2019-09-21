@@ -99,7 +99,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
             phase: RoomPhase.Connecting,
             connectedFail: false,
             didSlaveConnected: false,
-            menuInnerState: MenuInnerType.AnnexBox,
+            menuInnerState: MenuInnerType.PPTBox,
             isMenuVisible: false,
             roomToken: null,
             ossPercent: 0,

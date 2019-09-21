@@ -38,6 +38,7 @@
     "ali-oss": "^6.1.1",
     "antd": "^3.10.4",
     "downloadjs": "^1.4.7",
+    "html2canvas": "^1.0.0-rc.3",
     "is-color": "^1.0.2",
     "is-touch-device": "^1.0.1",
     "jspdf": "^1.5.3",
