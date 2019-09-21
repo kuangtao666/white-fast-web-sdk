@@ -14,6 +14,7 @@ import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import {UserType} from "../components/RealTime";
+import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 
 export type PlayerPageProps = {
     uuid: string;
@@ -25,6 +26,7 @@ export type PlayerPageProps = {
     room?: string,
     mediaUrl?: string,
     isChatOpen?: boolean;
+    logoUrl?: boolean;
 };
 
 
@@ -253,6 +255,11 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
         if (player) {
             return (
                 <div id="netless-player" className="player-out-box">
+                    <WhiteboardTopLeft
+                        logoUrl={this.props.logoUrl}/>
+                    <div className="player-big-icon">
+
+                    </div>
                     <div className="player-board">
                         {this.renderScheduleView()}
                         <div

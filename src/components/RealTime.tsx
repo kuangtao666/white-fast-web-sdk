@@ -115,7 +115,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
         const {uuid, userInf, roomToken} = this.props;
         const userId = userInf.id;
         if (roomToken && uuid) {
-            const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktop});
+            const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktops});
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
             const room = await whiteWebSdk.joinRoom({
