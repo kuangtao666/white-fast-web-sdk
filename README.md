@@ -16,7 +16,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 
 [jsrun#china](http://jsrun.pro/zmbKp/edit)
 
-### Live White Board
+### Live WhiteBoard
 
 ```html
 <body>
@@ -38,7 +38,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 </body>
 ```
 
-### White Board Player
+### WhiteBoard Player
 
 ```html
 <body>
@@ -62,7 +62,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 
 ## 📖 Documentation
 
-When setting your whiteboard widget in code, you have several options at your disposal all of which are described in detail below.
+When setting your whiteboard widget in code, you have several configs at your disposal all of which are described in detail below.
 
 ### WhiteBoard
 
@@ -70,8 +70,6 @@ To create a whiteboard, invoke a ```WhiteFastSDK.Room``` method in which you wri
 
 - element [string] – contains a reference to the element in which whiteboard is
 - configs [object] – options object
-
-#### WhiteBoard configurations
 
 **uuid [string] required**
 
@@ -131,8 +129,6 @@ To create a player, invoke a ```WhiteFastSDK.Player``` method in which you write
 
 - element [string] – contains a reference to the element in which whiteboard is
 - configs [object] – options object
-
-#### Player configurations
 
 **uuid [string] required**
 
