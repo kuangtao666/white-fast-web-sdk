@@ -1,11 +1,11 @@
-# White Fast Web SDK
+# Ultra Fast WhiteBoard
 
 [English](./README.md) | [简体中文](./README-zh_CN.md)  | 日本語
 
 ![GitHub](https://img.shields.io/github/license/netless-io/whiteboard-designer)
 ![jenkins](http://ci.netless.group/job/fast-sdk-pr/badge/icon)
 
-⚡ オープンソースの超高速ホワイトボラッド Web SDK
+⚡ オープンソースの超高速ホワイトボラッド
 
 ## 🎉 クイックスタート
 
