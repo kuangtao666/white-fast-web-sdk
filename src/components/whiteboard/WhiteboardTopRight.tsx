@@ -11,7 +11,6 @@ import {Button, Modal, Popover} from "antd";
 import download from "downloadjs";
 import NsPDF from "jspdf";
 
-const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardTopRightProps = {
     avatar: string;
@@ -70,31 +69,8 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         const {roomState, room} = this.props;
         const snapshot = new WhiteSnapshot(room);
         const path = roomState.sceneState.scenePath;
-        // await snapshot.divPreviewCanvas(path, this.ref);
-        // const test = await html2canvas(this.ref, {
-        //     useCORS: true,
-        //     logging: false,
-        // });
-
-        const test = await html2canvas(this.ref, {useCORS: true, onclone: function(doc: Document): void {
-                Array.from(doc.getElementsByTagName("svg")).forEach((s, i, array) => {
-                    (window as any).array = array;
-                //     console.log(s);
-                //     // if (s.clientHeight > 0) {
-                //     //
-                //     // }
-                //     // s.setAttribute("width", `${s.clientWidth}`);
-                //     // s.setAttribute("height", `${s.clientHeight}`);
-                });
-            }})
-        console.log(667);
-        console.log(test);
-        // const base64 = await snapshot.previewBase64(path, 600, 400);
-        const element = document.getElementById("uniquePlaceHolderKey")!;
-        element.parentNode!.replaceChild(test, element);
-        // this.setState({imageUrl: base64});
-        this.setState({canvas: test});
-
+        const image = await snapshot.previewBase64(path, 600, 400);
+        this.setState({imageUrl: image});
     }
 
     private dowloadImage = (): void => {
@@ -173,7 +149,9 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         this.setState({isVisible: false, imageUrl: ""});
                     }}
                 >
-
+                    <div className="preview-image">
+                        <img src={this.state.imageUrl}/>
+                    </div>
                 </Modal>
             </div>
         );

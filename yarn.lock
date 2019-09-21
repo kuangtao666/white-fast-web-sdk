@@ -902,10 +902,10 @@
   resolved "https://registry.yarnpkg.com/@netless/react-seek-slider/-/react-seek-slider-1.0.4.tgz#d21523f6476f35118df782acf97a8e2255d2744a"
   integrity sha512-smL1iufVg8XxsvO1GzLD4NZf3wFTev7FRIiHlIYDCjIgTS7/Yq6N2n8JMh2ZDjYi1nMBxDstkQPxZOEOpc/N8g==
 
-"@netless/white-snapshot@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@netless/white-snapshot/-/white-snapshot-0.1.1.tgz#be67be95580155df09363c7a44fb0708c578d250"
-  integrity sha512-j3iy9VRuAMCTgt61w47EI04jhd08Z3cJeq7dRz5Io47NRxRplhdjkuq+CnlEkq0i1x6Py3K+9HlvnSl2nNMquw==
+"@netless/white-snapshot@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@netless/white-snapshot/-/white-snapshot-0.1.2.tgz#651e364ea917567de29a1a45aa20878e68ef510e"
+  integrity sha512-bGD1yRohUkK5EK/nmCnj27mMXb3t1KW5Vh0364CVitoVGsJKOxKMoCdgzTHsz/dHd6+cL3lBVOFTR5OwNcdB5Q==
   dependencies:
     html2canvas "^1.0.0-rc.3"
 
@@ -1763,8 +1763,8 @@ base64-arraybuffer@^0.1.5:
 
 base64-arraybuffer@^0.2.0:
   version "0.2.0"
-  resolved "https://registry.yarnpkg.com/base64-arraybuffer/-/base64-arraybuffer-0.2.0.tgz#4b944fac0191aa5907afe2d8c999ccc57ce80f45"
-  integrity sha512-7emyCsu1/xiBXgQZrscw/8KPRT44I4Yq9Pe6EGs3aPRTsWuggML1/1DTuZUuIaJPIm1FTDUVXl4x/yW8s0kQDQ==
+  resolved "https://registry.npm.taobao.org/base64-arraybuffer/download/base64-arraybuffer-0.2.0.tgz#4b944fac0191aa5907afe2d8c999ccc57ce80f45"
+  integrity sha1-S5RPrAGRqlkHr+LYyZnMxXzoD0U=
 
 base64-js@^1.0.2:
   version "1.3.1"
@@ -2341,8 +2341,8 @@ color-name@1.1.3:
 
 color-name@^1.0.0:
   version "1.1.4"
-  resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
-  integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
+  resolved "https://registry.npm.taobao.org/color-name/download/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
+  integrity sha1-wqCah6y95pVD3m9j+jmVyCbFNqI=
 
 color-string@^1.5.2:
   version "1.5.3"
@@ -2642,8 +2642,8 @@ css-line-break@1.0.1:
 
 css-line-break@1.1.1:
   version "1.1.1"
-  resolved "https://registry.yarnpkg.com/css-line-break/-/css-line-break-1.1.1.tgz#d5e9bdd297840099eb0503c7310fd34927a026ef"
-  integrity sha512-1feNVaM4Fyzdj4mKPIQNL2n70MmuYzAXZ1aytlROFX1JsOo070OsugwGjj7nl6jnDJWHDM8zRZswkmeYVWZJQA==
+  resolved "https://registry.npm.taobao.org/css-line-break/download/css-line-break-1.1.1.tgz#d5e9bdd297840099eb0503c7310fd34927a026ef"
+  integrity sha1-1em90peEAJnrBQPHMQ/TSSegJu8=
   dependencies:
     base64-arraybuffer "^0.2.0"
 
@@ -8429,8 +8429,8 @@ which@^1.2.14, which@^1.2.9, which@^1.3.1:
 
 white-react-sdk@^2.3.4:
   version "2.3.4"
-  resolved "https://registry.yarnpkg.com/white-react-sdk/-/white-react-sdk-2.3.4.tgz#a15d5ce55ba912ce4c20624db92e096eacd4ce5f"
-  integrity sha512-zjXFWhDS5ZN8IUcCV4feCZrmr9G8TOjqRtHccgZPMv6pYbNttJtRQOPxoEu2cGgwXZlsBSPhzNrwH4PB9lhsiQ==
+  resolved "https://registry.npm.taobao.org/white-react-sdk/download/white-react-sdk-2.3.4.tgz#a15d5ce55ba912ce4c20624db92e096eacd4ce5f"
+  integrity sha1-oV1c5VupEs5MIGJNuS4JbqzUzl8=
   dependencies:
     react "^16.8.4"
     react-dom "^16.8.4"
@@ -8438,8 +8438,8 @@ white-react-sdk@^2.3.4:
 
 white-web-sdk@2.3.4:
   version "2.3.4"
-  resolved "https://registry.yarnpkg.com/white-web-sdk/-/white-web-sdk-2.3.4.tgz#8c96de475cd3dde60fae0465f987a54bfc95a7a6"
-  integrity sha512-41qRozzdXpg75wCcw4XY5aZw51WXckocX9ohB9wnY0kTv0tmFNrPRZ/4TmGOYkzjfPsYYGrlaCrc6DuSxHc2PQ==
+  resolved "https://registry.npm.taobao.org/white-web-sdk/download/white-web-sdk-2.3.4.tgz#8c96de475cd3dde60fae0465f987a54bfc95a7a6"
+  integrity sha1-jJbeR1zT3eYPrgRl+YelS/yVp6Y=
   dependencies:
     bezier-js "^2.4.0"
     color "^3.1.2"
