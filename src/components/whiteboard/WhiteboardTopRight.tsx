@@ -7,25 +7,30 @@ import pdf_export from "../../assets/image/pdf_export.svg";
 import WhiteSnapshot from "@netless/white-snapshot";
 import html2canvas from "html2canvas";
 import "./WhiteboardTopRight.less";
-import {Button, Modal, Popover} from "antd";
+import {Button, message, Modal, Popover} from "antd";
 import download from "downloadjs";
 import NsPDF from "jspdf";
-
+import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 
 export type WhiteboardTopRightProps = {
     avatar: string;
     name: string;
     userId: string;
     room: Room;
-    identity?: IdentityType;
     roomState: RoomState;
+    identity?: IdentityType;
+    whiteboardLayerDownRef?: HTMLDivElement;
 };
 
 export type WhiteboardTopRightStates = {
     isVisible: boolean;
     isLoading: boolean;
-    imageUrl: string;
     canvas: any;
+    imageRef: any;
+    classSize: {
+        width: number,
+        height: number,
+    } | null;
 };
 
 export enum IdentityType {
@@ -37,19 +42,33 @@ export enum IdentityType {
 export default class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightStates> {
 
     private pdf: any;
-    private ref: any;
+    private message: any;
     public constructor(props: WhiteboardTopRightProps) {
         super(props);
         this.state = {
             isVisible: false,
             isLoading: false,
-            imageUrl: "",
             canvas: null,
+            imageRef: null,
+            classSize: null,
         };
+    }
+
+    public componentDidMount(): void {
+        const {whiteboardLayerDownRef} = this.props;
+        if (whiteboardLayerDownRef) {
+            this.setState({
+                classSize: {
+                    width: whiteboardLayerDownRef.clientWidth,
+                    height: whiteboardLayerDownRef.clientHeight,
+                },
+            });
+        }
     }
 
     private handleExportPDF = async (): Promise<void> => {
         const {room, roomState} = this.props;
+        // this.setState({isVisible: true});
         const scenes = roomState.sceneState.scenes;
         const snapshot = new WhiteSnapshot(room);
         const sceneDir = roomState.sceneState.scenePath.split("/");
@@ -65,20 +84,31 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     private handleExportImage = async (): Promise<void> => {
-        this.setState({isVisible: true});
-        const {roomState, room} = this.props;
-        const snapshot = new WhiteSnapshot(room);
-        const path = roomState.sceneState.scenePath;
-        await snapshot.divPreviewCanvas(path, this.ref);
-        const test = await html2canvas(this.ref, {
-            useCORS: true,
-            logging: false,
-        });
+        if (this.props.whiteboardLayerDownRef) {
+            message.loading("正在导出图片");
+            const imageCanvas = await html2canvas(this.props.whiteboardLayerDownRef, {
+                useCORS: true,
+                logging: false,
+            });
+            const image = imageCanvas.toDataURL();
+            download(image, `未命名资料`, "image/png");
+        }
     }
 
-    private dowloadImage = (): void => {
-        if (this.state.imageUrl) {
-            download(this.state.imageUrl, `test`, "image/png");
+    private setImageRef = (ref: any): void => {
+        this.setState({imageRef: ref});
+    }
+
+    private dowloadImage = async (): Promise<void> => {
+        if (this.state.imageRef) {
+            const netlessMessage = message.loading("正在导出图片，请耐心等待", 0);
+            const imageCanvas = await html2canvas(this.state.imageRef, {
+                useCORS: true,
+                logging: false,
+            });
+            const image = imageCanvas.toDataURL();
+            download(image, `test`, "image/png");
+            netlessMessage();
         }
     }
     private exportComponent = (): React.ReactNode => {
@@ -87,7 +117,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <div onClick={this.handleExportImage} className="export-box-cell">
                     <img src={image_export}/>本页导出为 PNG
                 </div>
-                <div className="export-box-cell">
+                <div onClick={this.handleExportPDF} className="export-box-cell">
                     <img src={pdf_export}/>全部导出为 PDF
                 </div>
             </div>
@@ -123,7 +153,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     public render(): React.ReactNode {
-        const  {avatar} = this.props;
+        const  {avatar, room, roomState} = this.props;
         return (
             <div className="whiteboard-top-right-box">
                 <Popover placement="bottomRight" content={this.setComponent()}>
@@ -142,18 +172,18 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                     </div>
                 </div>
                 <Modal
+                    destroyOnClose={true}
                     width={720}
-                    title="导出图片"
+                    title="导出图片预览"
                     visible={this.state.isVisible}
                     onOk={this.dowloadImage}
                     okText="下载"
                     cancelText="取消"
-                    onCancel={() => {
-                        this.setState({isVisible: false, imageUrl: ""});
-                    }}
+                    onCancel={() => this.setState({isVisible: false})}
                 >
-                    <div className="preview-image">
-                        <img src={this.state.imageUrl}/>
+                    <WhiteboardPreviewCell setImageRef={this.setImageRef} roomState={roomState} room={room}/>
+                    <div>
+                        请等待预览内容加载完毕再导出图片
                     </div>
                 </Modal>
             </div>

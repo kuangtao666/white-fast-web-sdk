@@ -315,6 +315,7 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                             <WhiteboardTopLeft
                                 logoUrl={this.props.logoUrl}/>
                             <WhiteboardTopRight
+                                whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={this.state.roomState}
                                 name={this.props.userInf.name}
                                 userId={this.props.userInf.id}
