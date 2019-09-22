@@ -1,7 +1,6 @@
 import * as React from "react";
 import {ViewMode, Scene, RoomState, Room} from "white-react-sdk";
 import "./WhiteboardPreviewCell.less";
-import WhiteSnapshot from "@netless/white-snapshot";
 
 export type WhiteboardPreviewCellProps = {
     room: Room;
@@ -17,11 +16,11 @@ export default class WhiteboardPreviewCell extends React.Component<WhiteboardPre
     }
 
     public async componentDidMount(): Promise<void> {
-        const {roomState, room, setImageRef} = this.props;
-        const snapshot = new WhiteSnapshot(room);
-        const path = roomState.sceneState.scenePath;
-        await snapshot.divPreviewCanvas(path, this.ref);
-        setImageRef(this.ref);
+        // const {roomState, room, setImageRef} = this.props;
+        // const snapshot = new WhiteSnapshot(room);
+        // const path = roomState.sceneState.scenePath;
+        // await snapshot.divPreviewCanvas(path, this.ref);
+        // setImageRef(this.ref);
     }
 
 

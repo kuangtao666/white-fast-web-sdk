@@ -102,7 +102,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                             this.setScenePath(index);
                         }} className="page-mid-box">
                             <div className="page-box">
-                                <PageImage isActive={isActive} isMenuOpen={this.props.isMenuOpen} scene={scene} room={this.props.room} path={sceneDir.concat(scene.name).join("/")}/>
+                                <PageImage isMenuOpen={this.props.isMenuOpen} scene={scene} room={this.props.room} path={sceneDir.concat(scene.name).join("/")}/>
                             </div>
                         </div>
                         <div className="page-box-inner-index-delete-box">
@@ -150,12 +150,11 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     }
 }
 
-export type PageImageProps = { scene: Scene, path: string, room: Room, isMenuOpen: boolean, isActive: boolean};
+export type PageImageProps = { scene: Scene, path: string, room: Room, isMenuOpen: boolean};
 
 class PageImage extends React.Component<PageImageProps, {}> {
 
     private ref?: HTMLDivElement | null;
-    private clock: any;
 
     public constructor(props: any) {
         super(props);

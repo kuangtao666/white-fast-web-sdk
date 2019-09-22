@@ -314,13 +314,14 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                             <WhiteboardTopLeft
                                 logoUrl={this.props.logoUrl}/>
+                            {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={this.state.roomState}
                                 name={this.props.userInf.name}
                                 userId={this.props.userInf.id}
                                 room={this.state.room}
-                                avatar={this.props.userInf.avatar}/>
+                                avatar={this.props.userInf.avatar}/>}
                             <WhiteboardBottomLeft handleFileState={this.handleFileState}
                                 roomState={this.state.roomState}
                                 room={this.state.room}/>
