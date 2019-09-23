@@ -13,11 +13,11 @@ import NsPDF from "jspdf";
 import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 
 export type WhiteboardTopRightProps = {
-    avatar: string;
-    name: string;
     userId: string;
     room: Room;
     roomState: RoomState;
+    userAvatarUrl?: string;
+    userName?: string;
     identity?: IdentityType;
     whiteboardLayerDownRef: HTMLDivElement;
 };
@@ -133,7 +133,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     public render(): React.ReactNode {
-        const  {avatar, room, roomState} = this.props;
+        const  {userAvatarUrl, room, roomState} = this.props;
         return (
             <div className="whiteboard-top-right-box">
                 <Popover placement="bottomRight" content={this.setComponent()}>
@@ -148,7 +148,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 </Tooltip>
                 <div className="whiteboard-top-user-box">
                     <div className="whiteboard-top-right-user">
-                        <img src={avatar}/>
+                        <img src={userAvatarUrl}/>
                     </div>
                 </div>
                 <Modal

@@ -53,13 +53,11 @@
         var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
         WhiteFastSDK.Room("app-root",{
                 uuid: uuid,
-                userInf: {
-                    name: "伍双",
-                    id: userId,
-                    avatar: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-                },
                 roomToken: roomToken,
-                logoUrl: "",
+                userId: userId,
+                userName: "伍双",
+                userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
                 toolBarPosition: "left",
                 pagePreviewPosition: "right",
                 boardBackgroundColor: "#F2F2F2",
@@ -73,6 +71,9 @@
                     "#9E51B6",
                     "#1E2023",
                 ],
+                roomCallback: (room) => {
+                    console.log(room);
+                },
                 colorArrayStateCallback: (colorArray) => {
                     console.log(colorArray);
                 }

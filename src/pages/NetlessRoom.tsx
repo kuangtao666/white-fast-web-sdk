@@ -45,15 +45,18 @@ export type UserType = {
 };
 export type RealTimeProps = {
     uuid: string;
-    userInf: UserType;
     roomToken: string;
+    userId: string;
+    userName?: string;
+    userAvatarUrl?: string;
     isReadOnly?: boolean;
     toolBarPosition?: ToolBarPositionEnum;
     pagePreviewPosition?: PagePreviewPositionEnum;
     boardBackgroundColor?: string;
     defaultColorArray?: string[];
     colorArrayStateCallback?: (colorArray: string[]) => void;
-    logoUrl?: string | boolean;
+    roomCallback?: (room: Room) => void;
+    logoUrl?: string;
     isChatOpen?: boolean;
     isFileOpen?: boolean;
 };
@@ -112,8 +115,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, userInf, roomToken} = this.props;
-        const userId = userInf.id;
+        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl} = this.props;
         if (roomToken && uuid) {
             const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktops});
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
@@ -122,7 +124,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {userId: userId, name: userInf.name, avatar: userInf.avatar ? userInf.avatar : userId}},
+                    userPayload: {userId: userId, name: userName, avatar: userAvatarUrl ? userAvatarUrl : userId}},
                 {
                     onPhaseChanged: phase => {
                         console.log(phase);
@@ -146,6 +148,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
+            if (roomCallback) {
+                roomCallback(room);
+            }
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
@@ -343,10 +348,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <WhiteboardTopRight
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState}
-                                name={this.props.userInf.name}
-                                userId={this.props.userInf.id}
+                                userName={this.props.userName}
+                                userId={this.props.userId}
                                 room={room}
-                                avatar={this.props.userInf.avatar}/>}
+                                userAvatarUrl={this.props.userAvatarUrl}/>}
                             <WhiteboardBottomLeft handleFileState={this.handleFileState}
                                 roomState={roomState}
                                 room={room}/>
@@ -379,8 +384,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         <WhiteboardChat
                             isChatOpen={this.state.isChatOpen}
                             handleChatState={this.handleChatState}
-                            room={this.state.room}
-                            userInf={this.props.userInf}/>
+                            userAvatarUrl={this.props.userAvatarUrl}
+                            userId={this.props.userId}
+                            userName={this.props.userName}
+                            room={this.state.room}/>
                     </div>
                 </RoomContextProvider>
             );

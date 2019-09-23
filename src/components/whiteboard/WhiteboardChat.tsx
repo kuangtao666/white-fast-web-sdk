@@ -13,18 +13,19 @@ import {
 } from "@livechat/ui-kit";
 import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
-import {UserType} from "../../pages/NetlessRoom";
 import * as empty from "../../assets/image/empty.svg";
 import * as close from "../../assets/image/close.svg";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardChatProps = {
+    userId: string;
+    handleChatState: () => void;
+    userAvatarUrl?: string;
+    userName?: string;
     room?: Room;
     player?: Player;
-    userInf: UserType;
     isChatOpen?: boolean;
-    handleChatState: () => void;
 };
 
 export type WhiteboardChatStates = {
@@ -101,7 +102,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                 const messageTextNode = data.messageInner.map((inner: string, index: number) => {
                     return (
                         <Message key={`${index}`}
-                                 isOwn={this.props.userInf.id === data.id} authorName={data.name}
+                                 isOwn={this.props.userId === data.id} authorName={data.name}
                         >
                             <MessageText>{inner}</MessageText>
                         </Message>
@@ -111,7 +112,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                     <MessageGroup
                         key={`${index}`}
                         avatar={data.avatar}
-                        isOwn={this.props.userInf.id === data.id}
+                        isOwn={this.props.userId === data.id}
                         onlyFirstWithMeta
                     >
                         {messageTextNode}
@@ -177,9 +178,9 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                                     onSend={(event: any) => {
                                         if (this.props.room) {
                                             this.props.room.dispatchMagixEvent("message", {
-                                                name: this.props.userInf.name,
-                                                avatar: this.props.userInf.avatar,
-                                                id: this.props.userInf.id,
+                                                name: this.props.userName,
+                                                avatar: this.props.userAvatarUrl,
+                                                id: this.props.userId,
                                                 messageInner: [event],
                                             });
                                         }

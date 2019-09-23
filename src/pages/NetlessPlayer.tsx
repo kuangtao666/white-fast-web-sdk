@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Badge, Icon, Popover} from "antd";
-import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player} from "white-react-sdk";
+import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player, Room} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import "./NetlessPlayer.less";
 import SeekSlider from "@netless/react-seek-slider";
@@ -21,13 +21,16 @@ import PageError from "../components/PageError";
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
-    userInf: UserType;
+    userId: string;
+    userName?: string;
+    userAvatarUrl?: string;
     boardBackgroundColor?: string;
     duration?: number;
     beginTimestamp?: number,
     mediaUrl?: string,
     isChatOpen?: boolean;
-    logoUrl?: boolean;
+    logoUrl?: string;
+    playerCallback?: (player: Player) => void;
 };
 
 
@@ -67,7 +70,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         };
     }
     public async componentDidMount(): Promise<void> {
-        const {uuid, roomToken, beginTimestamp, duration, mediaUrl} = this.props;
+        const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
         if (uuid && roomToken) {
             const whiteWebSdk = new WhiteWebSdk();
             const player = await whiteWebSdk.replayRoom(
@@ -103,6 +106,9 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         this.setState({currentTime: scheduleTime});
                     },
                 });
+            if (playerCallback) {
+                playerCallback(player);
+            }
             this.setState({
                 player: player,
             });
@@ -279,7 +285,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
 
     public render(): React.ReactNode {
         const {player} = this.state;
-        const {userInf, boardBackgroundColor} = this.props;
+        const {userId, userAvatarUrl, userName, boardBackgroundColor} = this.props;
         if (this.state.replayFail) {
             return <PageError/>;
         } else if (!player) {
@@ -309,7 +315,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             <PlayerWhiteboard style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}  className="player-box" player={player}/>
                         </div>
                     </div>
-                    <WhiteboardChat isChatOpen={this.state.isChatOpen} userInf={userInf} handleChatState={this.handleChatState}/>
+                    <WhiteboardChat isChatOpen={this.state.isChatOpen} userId={userId} userName={userName} userAvatarUrl={userAvatarUrl} handleChatState={this.handleChatState}/>
                 </div>
             );
         }

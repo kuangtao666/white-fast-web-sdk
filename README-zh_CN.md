@@ -27,9 +27,29 @@
         WhiteFastSDK.Room("app-root",{
             uuid: uuid,
             roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            userId: userId,
+            userName: "rick", // 选填，名字
+            userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png", // 选填，头像
+            logoUrl: "", // 选填，头像
+            toolBarPosition: "left", // 选填，工具栏位置
+            pagePreviewPosition: "right", // 选填，预览侧边的位置
+            boardBackgroundColor: "#F2F2F2", // 选填，白板背景图片
+            isReadOnly: false, // 选填，订阅者是否可以操作
+            identity: "host", // 选填，身份
+            defaultColorArray: [
+                "#E77345",
+                "#005BF6",
+                "#F5AD46",
+                "#68AB5D",
+                "#9E51B6",
+                "#1E2023",
+            ], // 选填，默认的颜色列表
+            roomCallback: (room) => {
+                console.log(room);
+            }, // 选填，获取 room 对象，方便二次开发
+            colorArrayStateCallback: (colorArray) => {
+                console.log(colorArray);
+            }, // 选填, 新增颜色时给出的回调
         });
     </script>
 </body>
@@ -47,83 +67,108 @@
         var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
         
         WhiteFastSDK.Player("app-root",{
-            uuid: uuid,
-            roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            uuid: uuid, // 必填，需要播放房间的 id
+            roomToken: roomToken,  // 必填，进入房间的凭证
+            userId: userId, // 必填，进入房间的凭证
         });
     </script>
 </body>
 ```
 
-## 📖 文档
+## 📖 开发文档
 
-### 实时互动白板
+您可以通过以下配置选项来，更改白板中各个组件。
 
-```javascript
-var userId = `${Math.floor(Math.random() * 100000)}`;
-var uuid = "3dac59e714d2443eb733e9de5dc2beb4";
-var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWE4ZWIyZWE3ZDliMWJiZDkyNWQ0Yzg4YTgwYjVlYjFiOTQxOTZiYmY6YWRtaW5JZD0xNTgmcm9vbUlkPTNkYWM1OWU3MTRkMjQ0M2ViNzMzZTlkZTVkYzJiZWI0JnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MDEzNTkmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NDQ0MDcmbm9uY2U9MTU2ODk0NDQwNjY0MzAw";
-WhiteFastSDK.Room("app-root",{
-        uuid: uuid,
-        userInf: {
-            name: "Netless",
-            id: userId,
-            avatar: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-        },
-        roomToken: roomToken,
-        logoUrl: "",
-        toolBarPosition: "left",
-        pagePreviewPosition: "right",
-        boardBackgroundColor: "#F2F2F2",
-        isReadOnly: false,
-        identity: "host",
-        defaultColorArray: [
-            "#E77345",
-            "#005BF6",
-            "#F5AD46",
-            "#68AB5D",
-            "#9E51B6",
-            "#1E2023",
-        ],
-        colorArrayStateCallback: (colorArray) => {
-            console.log(colorArray);
-        }
-    });
-});
+### WhiteBoard
+
+To create a whiteboard, invoke a ```WhiteFastSDK.Room``` method in which you write the selected element in which you want to add the whiteboard and preferred configs.
+
+- element [string] – contains a reference to the element in which whiteboard is
+- configs [object] – options object
+
+**uuid [string] required**
+
+Room indentify.
+
+```
+uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
 ```
 
-### 白板回放播放器
+**roomToken [string] required**
 
-```javascript
-var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
-var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
-WhiteFastSDK.Player("app-root",{
-    uuid: uuid,
-    userInf: {
-        name: "Netless",
-        id: "1",
-    },
-    roomToken: roomToken,
-    logoUrl: "",
-    toolBarPosition: "left",
-    pagePreviewPosition: "left",
-    boardBackgroundColor: "#F2F2F2",
-    isReadOnly: false,
-    defaultColorArray: [
-        "#E77345",
-        "#005BF6",
-        "#F5AD46",
-        "#68AB5D",
-        "#9E51B6",
-        "#1E2023",
-    ],
-    colorArrayStateCallback: (colorArray) => {
-        console.log(colorArray);
-    }
-});
+Room auth token.
+
 ```
+roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
+```
+
+**logoUrl [url] optional**
+
+With the default value as undefined, Custom branding logo.
+
+```
+logoUrl: "https://path/to/logo.png"
+```
+
+**toolBarPosition [string] optional**
+
+With the default value as top, ToolBar position, value include left,top,bottom,right.
+
+```
+toolBarPosition: "left"
+```
+
+**pagePreviewPosition [string] optional**
+
+With the default value as right, Preview view position, value include left,top,bottom,right.
+
+```
+pagePreviewPosition: "left"
+```
+
+**boardBackgroundColor [color] optional**
+
+With the default value as white, Background color.
+
+```
+boardBackgroundColor: "#F2F2F2"
+```
+
+**isReadOnly [boolean] optional**
+
+With the default value as false, read-only meaning can not write at board.
+
+### WhiteBoard Player
+
+To create a player, invoke a ```WhiteFastSDK.Player``` method in which you write the selected element in which you want to add the player and preferred configs.
+
+- element [string] – contains a reference to the element in which whiteboard is
+- configs [object] – options object
+
+**uuid [string] required**
+
+Room indentify.
+
+```
+uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
+```
+
+**roomToken [string] required**
+
+Room auth token.
+
+```
+roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
+```
+
+**logoUrl [url] optional**
+
+With the default value as undefined, Custom branding logo.
+
+```
+logoUrl: "https://path/to/logo.png"
+```
+
 
 ## 🚀 开发
 

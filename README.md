@@ -29,10 +29,30 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
         
         WhiteFastSDK.Room("app-root",{
             uuid: uuid,
-            roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+                       roomToken: roomToken,
+                       userId: userId,
+                       userName: "rick", // 选填，名字
+                       userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png", // 选填，头像
+                       logoUrl: "", // 选填，头像
+                       toolBarPosition: "left", // 选填，工具栏位置
+                       pagePreviewPosition: "right", // 选填，预览侧边的位置
+                       boardBackgroundColor: "#F2F2F2", // 选填，白板背景图片
+                       isReadOnly: false, // 选填，订阅者是否可以操作
+                       identity: "host", // 选填，身份
+                       defaultColorArray: [
+                           "#E77345",
+                           "#005BF6",
+                           "#F5AD46",
+                           "#68AB5D",
+                           "#9E51B6",
+                           "#1E2023",
+                       ], // 选填，默认的颜色列表
+                       roomCallback: (room) => {
+                           console.log(room);
+                       }, // 选填，获取 room 对象，方便二次开发
+                       colorArrayStateCallback: (colorArray) => {
+                           console.log(colorArray);
+                       }, // 选填, 新增颜色时给出的回调
         });
     </script>
 </body>
@@ -52,9 +72,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
         WhiteFastSDK.Player("app-root",{
             uuid: uuid,
             roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            userId: userId,
         });
     </script>
 </body>
@@ -87,6 +105,30 @@ Room auth token.
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
+**userId [string] required**
+
+User indentify.
+
+```
+userId: "wdqzidmac"
+```
+
+**userName [string] optional**
+
+User name.
+
+```
+userName: "rick"
+```
+
+**userAvatarUrl [string] optional**
+
+User avatar url.
+
+```
+userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png"
+```
+
 **logoUrl [url] optional**
 
 With the default value as undefined, Custom branding logo.
@@ -105,7 +147,7 @@ toolBarPosition: "left"
 
 **pagePreviewPosition [string] optional**
 
-With the default value as right, Preview view position, value include left,top,bottom,right.
+With the default value as right, Preview view position, value include left, right.
 
 ```
 pagePreviewPosition: "left"
@@ -122,6 +164,18 @@ boardBackgroundColor: "#F2F2F2"
 **isReadOnly [boolean] optional**
 
 With the default value as false, read-only meaning can not write at board.
+
+```
+isReadOnly: false
+```
+
+**identity [string] optional**
+
+With the default value as host, value include host, guest, listener.
+
+```
+identity: “guest”
+```
 
 ### WhiteBoard Player
 
