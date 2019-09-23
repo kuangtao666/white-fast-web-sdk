@@ -9,12 +9,14 @@ import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
 import * as full_screen from "../assets/image/full_screen.svg";
 import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
+import * as loading from "../assets/image/loading.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import {UserType} from "../components/RealTime";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
+import PageError from "./PageError";
 
 export type PlayerPageProps = {
     uuid: string;
@@ -41,6 +43,7 @@ export type PlayerPageStates = {
     isChatOpen?: boolean;
     isVisible: boolean;
     isFullScreen: boolean;
+    replayFail: boolean;
 };
 
 export default class PlayerPage extends React.Component<PlayerPageProps, PlayerPageStates> {
@@ -61,6 +64,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             isChatOpen: this.props.isChatOpen,
             isVisible: false,
             isFullScreen: false,
+            replayFail: false,
         };
     }
     public async componentDidMount(): Promise<void> {
@@ -94,6 +98,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                 },
                 onStoppedWithError: error => {
                     message.error("Playback error");
+                    this.setState({replayFail: true});
                 },
                 onScheduleTimeChanged: scheduleTime => {
                     this.setState({currentTime: scheduleTime});
@@ -276,7 +281,13 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
     public render(): React.ReactNode {
         const {player} = this.state;
         const {userInf} = this.props;
-        if (player) {
+        if (this.state.replayFail) {
+            return <PageError/>;
+        } else if (!player) {
+            return <div className="white-board-loading">
+                <img src={loading}/>
+            </div>;
+        } else {
             return (
                 <div id="netless-player" className="player-out-box">
                     <WhiteboardTopLeft
@@ -302,8 +313,6 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                     <WhiteboardChat isChatOpen={this.state.isChatOpen} userInf={userInf} handleChatState={this.handleChatState}/>
                 </div>
             );
-        } else {
-            return null;
         }
     }
 }

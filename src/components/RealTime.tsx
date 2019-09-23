@@ -271,7 +271,6 @@ export default class RealTime extends React.Component<RealTimeProps, RealTimeSta
 
         if (this.state.connectedFail) {
             return <PageError/>;
-
         } else if (this.state.phase === RoomPhase.Connecting ||
             this.state.phase === RoomPhase.Disconnecting) {
             return <div className="white-board-loading">
