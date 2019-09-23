@@ -1,18 +1,18 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import PlayerPage from "../pages/PlayerPage";
-import RealTime from "../components/RealTime";
+import NetlessPlayer from "../pages/NetlessPlayer";
+import NetlessRoom from "../pages/NetlessRoom";
 
 const RoomFacade = function (element: string, config: any): void {
     ReactDOM.render(
-        <RealTime {...config}/>,
+        <NetlessRoom {...config}/>,
         document.getElementById(element),
     );
 };
 
 const PlayerFacade = function (element: string, config: any): void {
     ReactDOM.render(
-        <PlayerPage {...config}/>,
+        <NetlessPlayer {...config}/>,
         document.getElementById(element),
     );
 };

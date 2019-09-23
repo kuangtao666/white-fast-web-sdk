@@ -5,7 +5,7 @@ import  "./ToolBoxPaletteBox.less";
 import isColor from "is-color";
 import {message} from "antd";
 import ToolBoxAddColor from "./ToolBoxAddColor";
-import {RoomContextConsumer} from "../../components/RoomContext";
+import {RoomContextConsumer} from "../../pages/RoomContext";
 export type ToolBoxPaletteBoxProps = {
     displayStroke: boolean;
     setMemberState: (modifyState: Partial<any>) => void;

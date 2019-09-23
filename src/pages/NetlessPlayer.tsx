@@ -1,8 +1,8 @@
 import * as React from "react";
 import {Badge, Icon, Popover} from "antd";
-import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player, Room} from "white-react-sdk";
+import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
-import "./PlayerPage.less";
+import "./NetlessPlayer.less";
 import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
@@ -14,9 +14,9 @@ import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
-import {UserType} from "../components/RealTime";
+import {UserType} from "./NetlessRoom";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
-import PageError from "./PageError";
+import PageError from "../components/PageError";
 
 export type PlayerPageProps = {
     uuid: string;
@@ -45,7 +45,7 @@ export type PlayerPageStates = {
     replayFail: boolean;
 };
 
-export default class PlayerPage extends React.Component<PlayerPageProps, PlayerPageStates> {
+export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> {
     private scheduleTime: number = 0;
     private readonly cursor: any;
 
@@ -79,30 +79,30 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
                 }, {
-                onPhaseChanged: phase => {
-                    this.setState({phase: phase});
-                },
-                onLoadFirstFrame: () => {
-                    this.setState({isFirstScreenReady: true});
-                    if (player.state.roomMembers) {
-                        this.cursor.setColorAndAppliance(player.state.roomMembers);
-                    }
-                },
-                onSliceChanged: slice => {
-                },
-                onPlayerStateChanged: modifyState => {
-                    if (modifyState.roomMembers) {
-                        this.cursor.setColorAndAppliance(modifyState.roomMembers);
-                    }
-                },
-                onStoppedWithError: error => {
-                    message.error("Playback error");
-                    this.setState({replayFail: true});
-                },
-                onScheduleTimeChanged: scheduleTime => {
-                    this.setState({currentTime: scheduleTime});
-                },
-            });
+                    onPhaseChanged: phase => {
+                        this.setState({phase: phase});
+                    },
+                    onLoadFirstFrame: () => {
+                        this.setState({isFirstScreenReady: true});
+                        if (player.state.roomMembers) {
+                            this.cursor.setColorAndAppliance(player.state.roomMembers);
+                        }
+                    },
+                    onSliceChanged: slice => {
+                    },
+                    onPlayerStateChanged: modifyState => {
+                        if (modifyState.roomMembers) {
+                            this.cursor.setColorAndAppliance(modifyState.roomMembers);
+                        }
+                    },
+                    onStoppedWithError: error => {
+                        message.error("Playback error");
+                        this.setState({replayFail: true});
+                    },
+                    onScheduleTimeChanged: scheduleTime => {
+                        this.setState({currentTime: scheduleTime});
+                    },
+                });
             this.setState({
                 player: player,
             });
@@ -223,7 +223,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                             onChange={(time: number, offsetTime: number) => {
                                 if (this.state.player) {
                                     this.setState({currentTime: time});
-                                   this.state.player.seekToScheduleTime(time);
+                                    this.state.player.seekToScheduleTime(time);
                                 }
                             }}
                             hideHoverTime={true}
@@ -247,7 +247,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                                 const  element = document.getElementById("netless-player");
                                 if (this.state.isFullScreen) {
                                     if (document.exitFullscreen) {
-                                       await  document.exitFullscreen();
+                                        await  document.exitFullscreen();
                                         this.setState({isFullScreen: false});
                                     }
                                 } else {

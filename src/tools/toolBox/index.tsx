@@ -11,7 +11,7 @@ import {
     ToolBoxText,
 } from "./ToolIconComponent";
 import "./ToolBox.less";
-import {ToolBarPositionEnum} from "../../components/RealTime";
+import {ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 type ApplianceDescription = {

@@ -16,23 +16,23 @@ import {
     DeviceType,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
-import "./RealTime.less";
-import PageError from "../pages/PageError";
-import WhiteboardTopRight from "./whiteboard/WhiteboardTopRight";
-import WhiteboardBottomLeft from "./whiteboard/WhiteboardBottomLeft";
-import WhiteboardBottomRight from "./whiteboard/WhiteboardBottomRight";
+import "./NetlessRoom.less";
+import PageError from "../components/PageError";
+import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
+import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
+import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRight";
 import * as loading from "../assets/image/loading.svg";
-import MenuBox from "./menu/MenuBox";
-import MenuAnnexBox from "./menu/MenuAnnexBox";
+import MenuBox from "../components/menu/MenuBox";
+import MenuAnnexBox from "../components/menu/MenuAnnexBox";
 import {ossConfigObj} from "../appToken";
-import {UserCursor} from "./whiteboard/UserCursor";
-import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox";
+import {UserCursor} from "../components/whiteboard/UserCursor";
+import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox/index";
 import UploadBtn from "../tools/upload/UploadBtn";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import {RoomContextProvider} from "./RoomContext";
-import WhiteboardTopLeft from "./whiteboard/WhiteboardTopLeft";
-import WhiteboardChat from "./whiteboard/WhiteboardChat";
-import WhiteboardFile from "./whiteboard/WhiteboardFile";
+import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
+import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
+import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -90,7 +90,7 @@ export type RealTimeStates = {
     whiteboardLayerDownRef?: HTMLDivElement;
 };
 
-export default class RealTime extends React.Component<RealTimeProps, RealTimeStates> {
+export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
     private didLeavePage: boolean = false;
     private readonly cursor: UserCursor;
     public constructor(props: RealTimeProps) {

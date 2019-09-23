@@ -13,7 +13,7 @@ import {
 } from "@livechat/ui-kit";
 import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
-import {UserType} from "../RealTime";
+import {UserType} from "../../pages/NetlessRoom";
 import * as empty from "../../assets/image/empty.svg";
 import * as close from "../../assets/image/close.svg";
 

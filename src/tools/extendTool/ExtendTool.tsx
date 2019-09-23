@@ -3,8 +3,8 @@ import {Popover} from "antd";
 import "./ExtendTool.less";
 import {ExtendToolIcon} from "./ExtendToolIcon";
 import ExtendToolInner from "./ExtendToolInner";
-import {RoomContextConsumer} from "../../components/RoomContext";
-import {ToolBarPositionEnum} from "../../components/RealTime";
+import {RoomContextConsumer} from "../../pages/RoomContext";
+import {ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ExtendToolStates = {

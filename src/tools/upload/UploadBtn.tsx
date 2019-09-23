@@ -9,7 +9,7 @@ import * as image_icon from "../../assets/image/image_icon.svg";
 import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";
 import * as upload from "../../assets/image/upload.svg";
-import {ToolBarPositionEnum} from "../../components/RealTime";
+import {ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ToolBoxUploadBoxState = {
