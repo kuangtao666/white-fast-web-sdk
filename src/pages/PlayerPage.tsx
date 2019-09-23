@@ -112,13 +112,21 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             this.state.player.refreshViewSize();
         }
     }
+
+    private handleSpaceKey = (evt: any): void => {
+        if (evt.code === "Space") {
+            this.onClickOperationButton(this.state.player!);
+        }
+    }
     public componentWillMount(): void {
         window.addEventListener("resize", this.onWindowResize);
+        window.addEventListener("keydown", this.handleSpaceKey);
     }
 
 
     public componentWillUnmount(): void {
         window.removeEventListener("resize", this.onWindowResize);
+        window.removeEventListener("keydown", this.handleSpaceKey);
     }
 
     private operationButton = (phase: PlayerPhase): React.ReactNode => {
@@ -134,6 +142,23 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             }
             default: {
                 return <img style={{marginLeft: 2}} src={player_stop}/>;
+            }
+        }
+    }
+
+    private operationButtonBig = (phase: PlayerPhase): React.ReactNode => {
+        switch (phase) {
+            case PlayerPhase.Playing: {
+                return <img style={{width: 28}} src={player_begin}/>;
+            }
+            case PlayerPhase.Buffering: {
+                return <Icon style={{fontSize: 28, color: "white"}} type="loading" />;
+            }
+            case PlayerPhase.Ended: {
+                return <img style={{marginLeft: 6, width: 28}} src={player_stop}/>;
+            }
+            default: {
+                return <img style={{marginLeft: 6, width: 28}} src={player_stop}/>;
             }
         }
     }
@@ -186,7 +211,6 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
             return (
                 <div
                     onMouseEnter={() => this.setState({isVisible: true})}
-                    // onMouseLeave={() => this.setState({isVisible: false})}
                     className="player-schedule">
                     <div className="player-mid-box">
                         <SeekSlider
@@ -257,16 +281,21 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                 <div id="netless-player" className="player-out-box">
                     <WhiteboardTopLeft
                         logoUrl={this.props.logoUrl}/>
-                    <div className="player-big-icon">
-
-                    </div>
                     <div className="player-board">
                         {this.renderScheduleView()}
                         <div
-                            className={"player-board-inner"}
+                            className="player-board-inner"
                             onMouseOver={() => this.setState({isVisible: true})}
                             onMouseLeave={() => this.setState({isVisible: false})}
                         >
+                            <div
+                                onClick={() => this.onClickOperationButton(this.state.player!)}
+                                className="player-mask">
+                                {this.state.phase === PlayerPhase.Pause &&
+                                <div className="player-big-icon">
+                                    {this.operationButtonBig(this.state.phase)}
+                                </div>}
+                            </div>
                             <PlayerWhiteboard  className="player-box" player={player}/>
                         </div>
                     </div>
