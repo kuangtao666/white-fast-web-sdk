@@ -21,11 +21,10 @@ import PageError from "./PageError";
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
-    time: string;
     userInf: UserType;
+    boardBackgroundColor?: string;
     duration?: number;
     beginTimestamp?: number,
-    room?: string,
     mediaUrl?: string,
     isChatOpen?: boolean;
     logoUrl?: boolean;
@@ -280,7 +279,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
 
     public render(): React.ReactNode {
         const {player} = this.state;
-        const {userInf} = this.props;
+        const {userInf, boardBackgroundColor} = this.props;
         if (this.state.replayFail) {
             return <PageError/>;
         } else if (!player) {
@@ -307,7 +306,7 @@ export default class PlayerPage extends React.Component<PlayerPageProps, PlayerP
                                     {this.operationButtonBig(this.state.phase)}
                                 </div>}
                             </div>
-                            <PlayerWhiteboard  className="player-box" player={player}/>
+                            <PlayerWhiteboard style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}  className="player-box" player={player}/>
                         </div>
                     </div>
                     <WhiteboardChat isChatOpen={this.state.isChatOpen} userInf={userInf} handleChatState={this.handleChatState}/>

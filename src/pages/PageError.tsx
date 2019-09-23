@@ -13,19 +13,15 @@ class PageError extends React.Component<{}, {}> {
                 <div className="page404-image-box">
                     <img className="page404-image-inner" src={room_not_find}/>
                     <div className="page404-inner">
-                        {/* <FormattedMessage
-                            id="error-page.title-room-not-exist"
-                        /> */}
+                        创建播放器失败，请检查网络！
                     </div>
                     <Button
                         type="primary"
                         size="large"
                         className="page404-btn"
-                        onClick={() => console.warn("TODO")}
+                        onClick={() => location.reload()}
                     >
-                        {/* <FormattedMessage
-                            id="error-page.btn"
-                        /> */}
+                       刷新重试
                     </Button>
                 </div>
             </div>
