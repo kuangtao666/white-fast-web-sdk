@@ -6,9 +6,9 @@ import screen_shot from "../../assets/image/screen_shot.svg";
 import image_export from "../../assets/image/image_export.svg";
 import pdf_export from "../../assets/image/pdf_export.svg";
 import html2canvas from "html2canvas";
+import download from "downloadjs";
 import "./WhiteboardTopRight.less";
 import {Button, message, Modal, Popover, Tooltip} from "antd";
-import download from "downloadjs";
 import NsPDF from "jspdf";
 import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 

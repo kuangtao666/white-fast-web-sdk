@@ -125,6 +125,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     userPayload: {userId: userId, name: userInf.name, avatar: userInf.avatar ? userInf.avatar : userId}},
                 {
                     onPhaseChanged: phase => {
+                        console.log(phase);
                         if (!this.didLeavePage) {
                             this.setState({phase});
                         }
@@ -269,27 +270,52 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public render(): React.ReactNode {
 
-        if (this.state.connectedFail) {
+        const {phase, connectedFail, room, roomState} = this.state;
+        if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
-        } else if (this.state.phase === RoomPhase.Connecting ||
-            this.state.phase === RoomPhase.Disconnecting) {
+        } else if (phase === RoomPhase.Reconnecting) {
             return <div className="white-board-loading">
-                <img src={loading}/>
+                <div className="white-board-loading-mid">
+                    <img src={loading}/>
+                    <div>
+                        正在重连当中
+                    </div>
+                </div>
             </div>;
-        } else if (!this.state.room) {
+        } else if (phase === RoomPhase.Connecting ||
+            phase === RoomPhase.Disconnecting) {
             return <div className="white-board-loading">
-                <img src={loading}/>
+                <div className="white-board-loading-mid">
+                    <img src={loading}/>
+                    <div>
+                        正在链接房间
+                    </div>
+                </div>
             </div>;
-        } else if (!this.state.roomState) {
+        } else if (!room) {
             return <div className="white-board-loading">
-                <img src={loading}/>
+                <div className="white-board-loading-mid">
+                    <img src={loading}/>
+                    <div>
+                        正在创建房间
+                    </div>
+                </div>
+            </div>;
+        } else if (!roomState) {
+            return <div className="white-board-loading">
+                <div className="white-board-loading-mid">
+                    <img src={loading}/>
+                    <div>
+                        正在创建房间
+                    </div>
+                </div>
             </div>;
         } else {
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
-                    room: this.state.room,
+                    room: room,
                 }}>
                     <div className="realtime-box">
                         <MenuBox
@@ -303,7 +329,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         <WhiteboardFile
                             handleFileState={this.handleFileState}
                             isFileOpen={this.state.isFileOpen}
-                            room={this.state.room}/>
+                            room={room}/>
                         <Dropzone
                             accept={"image/*"}
                             disableClick={true}
@@ -316,20 +342,20 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
-                                roomState={this.state.roomState}
+                                roomState={roomState}
                                 name={this.props.userInf.name}
                                 userId={this.props.userInf.id}
-                                room={this.state.room}
+                                room={room}
                                 avatar={this.props.userInf.avatar}/>}
                             <WhiteboardBottomLeft handleFileState={this.handleFileState}
-                                roomState={this.state.roomState}
-                                room={this.state.room}/>
+                                roomState={roomState}
+                                room={room}/>
                             <WhiteboardBottomRight
-                                roomState={this.state.roomState}
+                                roomState={roomState}
                                 chatState={this.state.isChatOpen}
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
-                                room={this.state.room}/>
+                                room={room}/>
                             <ToolBox
                                 isReadOnly={this.props.isReadOnly}
                                 toolBarPosition={this.props.toolBarPosition}
@@ -339,13 +365,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                     <UploadBtn
                                         toolBarPosition={this.props.toolBarPosition}
                                         oss={ossConfigObj}
-                                        room={this.state.room}
+                                        room={room}
                                         roomToken={this.state.roomToken}
                                         onProgress={this.progress}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
-                                memberState={this.state.room.state.memberState}/>
+                                memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
