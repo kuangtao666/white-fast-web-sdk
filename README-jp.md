@@ -48,28 +48,6 @@
             uuid: uuid,
             roomToken: roomToken,
             userId: userId,
-            userName: "rick",
-            userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-            logoUrl: "",
-            toolBarPosition: "left",
-            pagePreviewPosition: "right",
-            boardBackgroundColor: "#F2F2F2",
-            isReadOnly: false,
-            identity: "host",
-            defaultColorArray: [
-                "#E77345",
-                "#005BF6",
-                "#F5AD46",
-                "#68AB5D",
-                "#9E51B6",
-                "#1E2023",
-            ],
-            roomCallback: (room) => {
-                console.log(room);
-            },
-            colorArrayStateCallback: (colorArray) => {
-                console.log(colorArray);
-            }
         });
     </script>
 </body>

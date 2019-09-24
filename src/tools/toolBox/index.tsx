@@ -256,8 +256,8 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     private handlePlacement = (): TooltipPlacement => {
         const {toolBarPosition} = this.props;
         switch (toolBarPosition) {
-            case ToolBarPositionEnum.left: {
-                return "left";
+            case ToolBarPositionEnum.top: {
+                return "top";
             }
             case ToolBarPositionEnum.bottom: {
                 return "bottom";
@@ -266,7 +266,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 return "right";
             }
             default: {
-                return "bottom";
+                return "left";
             }
         }
     }

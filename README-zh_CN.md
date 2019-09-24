@@ -25,9 +25,9 @@
         var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
         
         WhiteFastSDK.Room("app-root",{
-            uuid: uuid,
-            roomToken: roomToken,
-            userId: userId,
+            uuid: uuid, // 必填，需要播放房间的 id
+            roomToken: roomToken, // 必填，进入房间的凭证
+            userId: userId, // 必填，进入房间的凭证
             userName: "rick", // 选填，名字
             userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png", // 选填，头像
             logoUrl: "", // 选填，头像
@@ -77,18 +77,18 @@
 
 ## 📖 开发文档
 
-您可以通过以下配置选项来，更改白板中各个组件。
+您可以使用多个配置在代码中设置白板小部件，下面将详细介绍所有配置。
 
 ### WhiteBoard
 
-To create a whiteboard, invoke a ```WhiteFastSDK.Room``` method in which you write the selected element in which you want to add the whiteboard and preferred configs.
+要创建白板，请调用`WhiteFastSDK.Room`方法，并填入相关参数。
 
-- element [string] – contains a reference to the element in which whiteboard is
-- configs [object] – options object
+- element [string] – 包含对白板所在元素的引用
+- configs [object] – 配置项
 
 **uuid [string] required**
 
-Room indentify.
+房间 id，房间的唯一识别标志
 
 ```
 uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
@@ -96,15 +96,39 @@ uuid: "8c2ee602f11e4883a75a9be9dd51b4cd"
 
 **roomToken [string] required**
 
-Room auth token.
+进入房间的凭证
 
 ```
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
+**userId [string] required**
+
+用户 id，用户身份的唯一识别标志
+
+```
+userId: "wdqzidmac"
+```
+
+**userName [string] optional**
+
+用户名称
+
+```
+userName: "rick"
+```
+
+**userAvatarUrl [string] optional**
+
+用户头像地址
+
+```
+userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png"
+```
+
 **logoUrl [url] optional**
 
-With the default value as undefined, Custom branding logo.
+产品 logo 的地址
 
 ```
 logoUrl: "https://path/to/logo.png"
@@ -112,7 +136,7 @@ logoUrl: "https://path/to/logo.png"
 
 **toolBarPosition [string] optional**
 
-With the default value as top, ToolBar position, value include left,top,bottom,right.
+产品工具条摆放的位置，默认是放在左侧。可配置为 `left`  `right`  `top`  `bottom`
 
 ```
 toolBarPosition: "left"
@@ -120,7 +144,7 @@ toolBarPosition: "left"
 
 **pagePreviewPosition [string] optional**
 
-With the default value as right, Preview view position, value include left,top,bottom,right.
+With the default value as right, Preview view position, value include left, right.
 
 ```
 pagePreviewPosition: "left"
@@ -137,6 +161,49 @@ boardBackgroundColor: "#F2F2F2"
 **isReadOnly [boolean] optional**
 
 With the default value as false, read-only meaning can not write at board.
+
+```
+isReadOnly: false
+```
+
+**identity [string] optional**
+
+With the default value as host, value include host, guest, listener.
+
+```
+identity: “guest”
+```
+
+**defaultColorArray [string[]] optional**
+
+```
+defaultColorArray: [
+    "#EC3455",
+    "#005BF6",
+    "#F5AD46",
+    "#68AB5D",
+    "#9E51B6",
+    "#1E2023",
+];
+```
+
+**roomCallback [(room: Room) => void] optional**
+
+```
+roomCallback: (room) => {
+                    console.log(room);
+                }
+```
+
+**colorArrayStateCallback [(colorArray: string[]) => void] optional**
+
+```
+colorArrayStateCallback: (colorArray) => {
+                    console.log(colorArray);
+                }
+```
+
+
 
 ### WhiteBoard Player
 
@@ -161,6 +228,30 @@ Room auth token.
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
+**userId [string] required**
+
+User indentify.
+
+```
+userId: "wdqzidmac"
+```
+
+**userName [string] optional**
+
+User name.
+
+```
+userName: "rick"
+```
+
+**userAvatarUrl [string] optional**
+
+User avatar url.
+
+```
+userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png"
+```
+
 **logoUrl [url] optional**
 
 With the default value as undefined, Custom branding logo.
@@ -169,6 +260,51 @@ With the default value as undefined, Custom branding logo.
 logoUrl: "https://path/to/logo.png"
 ```
 
+**beginTimestamp [number] optional**
+
+UTC time when the player starts playing
+
+```
+beginTimestamp: 1569290494106
+```
+
+**duration [number] optional**
+
+How long the player plays
+
+```
+duration: 94106
+```
+
+**mediaUrl [url] optional**
+
+Recorded media
+
+```
+mediaUrl: "https://path/to/media.m3u8"
+```
+
+**isChatOpen [boolean] optional**
+
+```
+isChatOpen: true
+```
+
+**boardBackgroundColor [color] optional**
+
+With the default value as white, Background color.
+
+```
+boardBackgroundColor: "#F2F2F2"
+```
+
+**Callback [(player: Player) => void] optional**
+
+```
+playerCallback: (player) => {
+                    console.log(player);
+                }
+```
 
 ## 🚀 开发
 

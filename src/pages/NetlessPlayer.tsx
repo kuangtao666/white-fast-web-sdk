@@ -14,7 +14,6 @@ import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
-import {UserType} from "./NetlessRoom";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
 
