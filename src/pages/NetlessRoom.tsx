@@ -28,7 +28,6 @@ import {ossConfigObj} from "../appToken";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox/index";
 import UploadBtn from "../tools/upload/UploadBtn";
-import ExtendTool from "../tools/extendTool/ExtendTool";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
@@ -38,11 +37,10 @@ export enum MenuInnerType {
     AnnexBox = "AnnexBox",
     PPTBox = "PPTBox",
 }
-export type UserType = {
-    name: string;
-    id: string;
-    avatar: string;
-};
+
+export enum LanguageEnum {
+
+}
 export type RealTimeProps = {
     uuid: string;
     roomToken: string;
@@ -59,6 +57,7 @@ export type RealTimeProps = {
     logoUrl?: string;
     isChatOpen?: boolean;
     isFileOpen?: boolean;
+    language?: LanguageEnum;
 };
 
 export enum ToolBarPositionEnum {
@@ -351,12 +350,16 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 userName={this.props.userName}
                                 userId={this.props.userId}
                                 room={room}
+                                isReadOnly={this.props.isReadOnly}
                                 userAvatarUrl={this.props.userAvatarUrl}/>}
-                            <WhiteboardBottomLeft handleFileState={this.handleFileState}
+                            <WhiteboardBottomLeft
+                                handleFileState={this.handleFileState}
+                                isReadOnly={this.props.isReadOnly}
                                 roomState={roomState}
                                 room={room}/>
                             <WhiteboardBottomRight
                                 roomState={roomState}
+                                isReadOnly={this.props.isReadOnly}
                                 chatState={this.state.isChatOpen}
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}

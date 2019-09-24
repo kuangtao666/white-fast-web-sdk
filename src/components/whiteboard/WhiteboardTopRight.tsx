@@ -16,10 +16,11 @@ export type WhiteboardTopRightProps = {
     userId: string;
     room: Room;
     roomState: RoomState;
+    whiteboardLayerDownRef: HTMLDivElement;
     userAvatarUrl?: string;
     userName?: string;
     identity?: IdentityType;
-    whiteboardLayerDownRef: HTMLDivElement;
+    isReadOnly?: boolean;
 };
 
 export type WhiteboardTopRightStates = {
@@ -136,11 +137,12 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         const  {userAvatarUrl, room, roomState} = this.props;
         return (
             <div className="whiteboard-top-right-box">
+                {this.props.isReadOnly ||
                 <Popover placement="bottomRight" content={this.setComponent()}>
                     <div className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={set_icon}/>
                     </div>
-                </Popover>
+                </Popover>}
                 <Tooltip title="截图">
                     <div onClick={this.handleExportImage} className="whiteboard-top-right-cell">
                         <img style={{width: 22}} src={screen_shot}/>

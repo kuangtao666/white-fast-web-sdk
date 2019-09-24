@@ -8,15 +8,15 @@ export type WhiteboardBottomLeftProps = {
     room: Room;
     roomState: RoomState;
     handleFileState: () => void;
+    isReadOnly?: boolean;
 };
 
 
-class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
+export default class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
 
     public constructor(props: WhiteboardBottomLeftProps) {
         super(props);
     }
-
 
     private zoomChange = (scale: number): void => {
         const {room} = this.props;
@@ -24,7 +24,10 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
     }
 
     public render(): React.ReactNode {
-        const {roomState} = this.props;
+        const {roomState, isReadOnly} = this.props;
+        if (isReadOnly) {
+            return null;
+        }
         return (
             <div className="whiteboard-box-bottom-left">
                 <div onClick={this.props.handleFileState} className="whiteboard-box-bottom-left-chart">
@@ -34,6 +37,5 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
             </div>
         );
     }
-}
 
-export default WhiteboardBottomLeft;
+}
