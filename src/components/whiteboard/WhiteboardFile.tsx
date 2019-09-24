@@ -2,13 +2,15 @@ import * as React from "react";
 import "./WhiteboardFile.less";
 import {Room} from "white-web-sdk";
 import * as close from "../../assets/image/close.svg";
+import * as default_cover from "../../assets/image/default_cover.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
 import PPTDatas from "../menu/PPTDatas";
 
 export type WhiteboardFileProps = {
     room: Room;
-    isFileOpen?: boolean;
     handleFileState: () => void;
+    isFileOpen?: boolean;
+    documentArray?: PPTDataType[];
 };
 
 export type WhiteboardFileStates = {
@@ -26,40 +28,74 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
         };
     }
     public componentDidMount(): void {
-        const docs: PPTDataType[] = PPTDatas.map((PPTData: PPTDataType) => {
-            const dataObj = JSON.parse(PPTData.data);
-            if (PPTData.pptType === PPTType.static) {
-                const newDataObj = dataObj.map((data: any) => {
-                    data.ppt.width = 1200;
-                    data.ppt.height = 675;
-                    return data;
-                });
-                return {
-                    active: PPTData.active,
-                    static_cover: dataObj[0].ppt.src,
-                    id: PPTData.id,
-                    data: newDataObj,
-                    pptType: PPTData.pptType,
-                };
-            } else {
-                const newDataObj = dataObj.map((data: any) => {
-                    data.ppt.width = 1200;
-                    data.ppt.height = 675;
-                    return data;
-                });
-                return {
-                    active: PPTData.active,
-                    dynamic_cover: PPTData.dynamic_cover,
-                    id: PPTData.id,
-                    data: newDataObj,
-                    pptType: PPTData.pptType,
-                };
-            }
-        });
+        let docs: PPTDataType[] = [];
+        if (this.props.documentArray) {
+            docs = this.props.documentArray.map((PPTData: PPTDataType) => {
+                const dataObj = JSON.parse(PPTData.data);
+                if (PPTData.pptType === PPTType.static) {
+                    const newDataObj = dataObj.map((data: any) => {
+                        data.ppt.width = 1200;
+                        data.ppt.height = 675;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                } else {
+                    const newDataObj = dataObj.map((data: any) => {
+                        data.ppt.width = 1200;
+                        data.ppt.height = 675;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                }
+            });
+        } else {
+            docs = PPTDatas.map((PPTData: PPTDataType) => {
+                const dataObj = JSON.parse(PPTData.data);
+                if (PPTData.pptType === PPTType.static) {
+                    const newDataObj = dataObj.map((data: any) => {
+                        data.ppt.width = 1200;
+                        data.ppt.height = 675;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                } else {
+                    const newDataObj = dataObj.map((data: any) => {
+                        data.ppt.width = 1200;
+                        data.ppt.height = 675;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                }
+            });
+        }
         this.setState({docs: docs});
     }
 
-    private selectDoc = (id: number) => {
+    private selectDoc = (id: string) => {
         const {room} = this.props;
         const activeData = this.state.docs!.find(data => data.id === id)!;
         this.setState({activeDocData: activeData});
@@ -100,7 +136,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                                 <image
                                     width="100%"
                                     height="100%"
-                                    xlinkHref={data.static_cover + "?x-oss-process=style/ppt_preview"}
+                                    xlinkHref={data.cover}
                                 />
                             </svg>
                         </div>
@@ -114,7 +150,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                             style={{backgroundColor: data.active ? "#f2f2f2" : "#ffffff"}}
                             className="menu-ppt-image-box">
                             <div className="menu-ppt-image-box-inner">
-                                <img src={data.dynamic_cover}/>
+                                <img src={data.cover}/>
                                 <div>
                                     动态 PPT
                                 </div>

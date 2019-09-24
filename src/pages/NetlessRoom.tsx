@@ -32,6 +32,7 @@ import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
+import {PPTDataType} from "../components/menu/PPTDatas";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -53,6 +54,7 @@ export type RealTimeProps = {
     boardBackgroundColor?: string;
     defaultColorArray?: string[];
     colorArrayStateCallback?: (colorArray: string[]) => void;
+    documentArray?: PPTDataType[];
     roomCallback?: (room: Room) => void;
     logoUrl?: string;
     isChatOpen?: boolean;
@@ -332,6 +334,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         </MenuBox>
                         <WhiteboardFile
                             handleFileState={this.handleFileState}
+                            documentArray={this.props.documentArray}
                             isFileOpen={this.state.isFileOpen}
                             room={room}/>
                         <Dropzone
