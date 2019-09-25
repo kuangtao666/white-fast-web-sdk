@@ -1,6 +1,6 @@
 import * as React from "react";
 import {slide as Menu} from "react-burger-menu";
-import {MenuInnerType, PagePreviewPositionEnum} from "../RealTime";
+import {MenuInnerType, PagePreviewPositionEnum} from "../../pages/NetlessRoom";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 

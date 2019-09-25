@@ -27,8 +27,9 @@ export type WhiteboardBottomRightProps = {
     room: Room;
     roomState: RoomState;
     handleAnnexBoxMenuState: () => void;
-    chatState?: boolean;
     handleChatState: () => void;
+    isReadOnly?: boolean;
+    chatState?: boolean;
 };
 
 export default class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
@@ -119,6 +120,10 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     }
 
     public render(): React.ReactNode {
+        const {isReadOnly} = this.props;
+        if (isReadOnly) {
+            return null;
+        }
         return (
             <div className="whiteboard-box-bottom-right">
                 <div className="whiteboard-box-bottom-right-mid">

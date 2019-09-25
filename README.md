@@ -30,9 +30,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
         WhiteFastSDK.Room("app-root",{
             uuid: uuid,
             roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            userId: userId,
         });
     </script>
 </body>
@@ -52,9 +50,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
         WhiteFastSDK.Player("app-root",{
             uuid: uuid,
             roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            userId: userId,
         });
     </script>
 </body>
@@ -87,6 +83,30 @@ Room auth token.
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
+**userId [string] required**
+
+User indentify.
+
+```
+userId: "wdqzidmac"
+```
+
+**userName [string] optional**
+
+User name.
+
+```
+userName: "rick"
+```
+
+**userAvatarUrl [string] optional**
+
+User avatar url.
+
+```
+userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png"
+```
+
 **logoUrl [url] optional**
 
 With the default value as undefined, Custom branding logo.
@@ -105,7 +125,7 @@ toolBarPosition: "left"
 
 **pagePreviewPosition [string] optional**
 
-With the default value as right, Preview view position, value include left,top,bottom,right.
+With the default value as right, Preview view position, value include left, right.
 
 ```
 pagePreviewPosition: "left"
@@ -122,6 +142,49 @@ boardBackgroundColor: "#F2F2F2"
 **isReadOnly [boolean] optional**
 
 With the default value as false, read-only meaning can not write at board.
+
+```
+isReadOnly: false
+```
+
+**identity [string] optional**
+
+With the default value as host, value include host, guest, listener.
+
+```
+identity: “guest”
+```
+
+**defaultColorArray [string[]] optional**
+
+```
+defaultColorArray: [
+    "#EC3455",
+    "#005BF6",
+    "#F5AD46",
+    "#68AB5D",
+    "#9E51B6",
+    "#1E2023",
+];
+```
+
+**roomCallback [(room: Room) => void] optional**
+
+```
+roomCallback: (room) => {
+                    console.log(room);
+                }
+```
+
+**colorArrayStateCallback [(colorArray: string[]) => void] optional**
+
+```
+colorArrayStateCallback: (colorArray) => {
+                    console.log(colorArray);
+                }
+```
+
+
 
 ### WhiteBoard Player
 
@@ -146,6 +209,30 @@ Room auth token.
 roomToken: "WHITEcGFydG5lcl9pZD....TOO...LONG"
 ```
 
+**userId [string] required**
+
+User indentify.
+
+```
+userId: "wdqzidmac"
+```
+
+**userName [string] optional**
+
+User name.
+
+```
+userName: "rick"
+```
+
+**userAvatarUrl [string] optional**
+
+User avatar url.
+
+```
+userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png"
+```
+
 **logoUrl [url] optional**
 
 With the default value as undefined, Custom branding logo.
@@ -154,6 +241,51 @@ With the default value as undefined, Custom branding logo.
 logoUrl: "https://path/to/logo.png"
 ```
 
+**beginTimestamp [number] optional**
+
+UTC time when the player starts playing
+
+```
+beginTimestamp: 1569290494106
+```
+
+**duration [number] optional**
+
+How long the player plays
+
+```
+duration: 94106
+```
+
+**mediaUrl [url] optional**
+
+Recorded media
+
+```
+mediaUrl: "https://path/to/media.m3u8"
+```
+
+**isChatOpen [boolean] optional**
+
+```
+isChatOpen: true
+```
+
+**boardBackgroundColor [color] optional**
+
+With the default value as white, Background color.
+
+```
+boardBackgroundColor: "#F2F2F2"
+```
+
+**Callback [(player: Player) => void] optional**
+
+```
+playerCallback: (player) => {
+                    console.log(player);
+                }
+```
 
 ## 🚀 Development
 

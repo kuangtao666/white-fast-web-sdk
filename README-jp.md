@@ -27,9 +27,7 @@
         WhiteFastSDK.Room("app-root",{
             uuid: uuid,
             roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            userId: userId,
         });
     </script>
 </body>
@@ -49,9 +47,7 @@
         WhiteFastSDK.Player("app-root",{
             uuid: uuid,
             roomToken: roomToken,
-            userInf: {
-                id: userId,
-            },
+            userId: userId,
         });
     </script>
 </body>

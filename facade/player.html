@@ -45,12 +45,34 @@
             // Step2: 加入房间
             // var uuid = json.msg.room.uuid;
             // var roomToken = json.msg.roomToken;
+        // uuid: string;
+        // roomToken: string;
+        // time: string;
+        // userInf: UserType;
+        // duration?: number;
+        // beginTimestamp?: number,
+        //     room?: string,
+        //     mediaUrl?: string,
+        //     isChatOpen?: boolean;
+        // logoUrl?: boolean;
+
         var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
         var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
         WhiteFastSDK.Player("app-root",{
                 uuid: uuid,
                 roomToken: roomToken,
-                logoUrl: "",
+                userId: userId,
+                userName: "伍双",
+                userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
+                boardBackgroundColor: "#F2F2F2",
+                playerCallback: (player) => {
+                    console.log(player);
+                },
+                // beginTimestamp:
+                // duration:
+                // mediaUrl:
+                // isChatOpen:
             });
         // }).catch(function(err) {
         //     console.log(err);

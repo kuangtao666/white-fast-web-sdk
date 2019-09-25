@@ -2,30 +2,32 @@ import * as React from "react";
 import {ViewMode, Room, RoomMember, RoomState, Scene} from "white-react-sdk";
 import set_icon from "../../assets/image/set_icon.svg";
 import export_icon from "../../assets/image/export_icon.svg";
+import screen_shot from "../../assets/image/screen_shot.svg";
 import image_export from "../../assets/image/image_export.svg";
 import pdf_export from "../../assets/image/pdf_export.svg";
-import WhiteSnapshot from "@netless/white-snapshot";
 import html2canvas from "html2canvas";
-import "./WhiteboardTopRight.less";
-import {Button, Modal, Popover} from "antd";
 import download from "downloadjs";
+import "./WhiteboardTopRight.less";
+import {Button, message, Modal, Popover, Tooltip} from "antd";
 import NsPDF from "jspdf";
-
+import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 
 export type WhiteboardTopRightProps = {
-    avatar: string;
-    name: string;
     userId: string;
     room: Room;
-    identity?: IdentityType;
     roomState: RoomState;
+    whiteboardLayerDownRef: HTMLDivElement;
+    userAvatarUrl?: string;
+    userName?: string;
+    identity?: IdentityType;
+    isReadOnly?: boolean;
 };
 
 export type WhiteboardTopRightStates = {
     isVisible: boolean;
     isLoading: boolean;
-    imageUrl: string;
     canvas: any;
+    imageRef: any;
 };
 
 export enum IdentityType {
@@ -37,45 +39,54 @@ export enum IdentityType {
 export default class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightStates> {
 
     private pdf: any;
-    private ref: any;
     public constructor(props: WhiteboardTopRightProps) {
         super(props);
         this.state = {
             isVisible: false,
             isLoading: false,
-            imageUrl: "",
             canvas: null,
+            imageRef: null,
         };
     }
 
     private handleExportPDF = async (): Promise<void> => {
-        const {room, roomState} = this.props;
+        const {room, roomState, whiteboardLayerDownRef} = this.props;
         const scenes = roomState.sceneState.scenes;
-        const snapshot = new WhiteSnapshot(room);
         const sceneDir = roomState.sceneState.scenePath.split("/");
         sceneDir.pop();
         this.pdf = new NsPDF("", "pt", "a4");
         await scenes.map( async(scene: Scene, index: number): Promise<void> => {
-            const base64 = await snapshot.previewBase64(sceneDir.concat(scene.name).join("/"), 600, 400);
-            this.pdf.addImage(base64, "JPEG", 0, 0, 600, 400);
-            if (scenes.length > (index + 1)) {
-                this.pdf.addPage();
-            }
+            // this.pdf.addImage(base64, "JPEG", 0, 0, whiteboardLayerDownRef.clientWidth, whiteboardLayerDownRef.clientHeight);
+            // if (scenes.length > (index + 1)) {
+            //     this.pdf.addPage();
+            // }
         });
     }
 
     private handleExportImage = async (): Promise<void> => {
-        this.setState({isVisible: true});
-        const {roomState, room} = this.props;
-        const snapshot = new WhiteSnapshot(room);
-        const path = roomState.sceneState.scenePath;
-        const image = await snapshot.previewBase64(path, 600, 400);
-        this.setState({imageUrl: image});
+        message.loading("正在导出图片");
+        const imageCanvas = await html2canvas(this.props.whiteboardLayerDownRef, {
+            useCORS: true,
+            logging: false,
+        });
+        const image = imageCanvas.toDataURL();
+        download(image, `未命名资料`, "image/png");
     }
 
-    private dowloadImage = (): void => {
-        if (this.state.imageUrl) {
-            download(this.state.imageUrl, `test`, "image/png");
+    private setImageRef = (ref: any): void => {
+        this.setState({imageRef: ref});
+    }
+
+    private dowloadImage = async (): Promise<void> => {
+        if (this.state.imageRef) {
+            const netlessMessage = message.loading("正在导出图片，请耐心等待", 0);
+            const imageCanvas = await html2canvas(this.state.imageRef, {
+                useCORS: true,
+                logging: false,
+            });
+            const image = imageCanvas.toDataURL();
+            download(image, `test`, "image/png");
+            netlessMessage();
         }
     }
     private exportComponent = (): React.ReactNode => {
@@ -84,8 +95,11 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <div onClick={this.handleExportImage} className="export-box-cell">
                     <img src={image_export}/>本页导出为 PNG
                 </div>
-                <div className="export-box-cell">
+                <div onClick={this.handleExportPDF} className="export-box-cell">
                     <img src={pdf_export}/>全部导出为 PDF
+                </div>
+                <div onClick={() => this.pdf.save("我的简历.pdf")} className="export-box-cell">
+                    <img src={pdf_export}/>下载
                 </div>
             </div>
         );
@@ -120,37 +134,38 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     public render(): React.ReactNode {
-        const  {avatar} = this.props;
+        const  {userAvatarUrl, room, roomState} = this.props;
         return (
             <div className="whiteboard-top-right-box">
+                {this.props.isReadOnly ||
                 <Popover placement="bottomRight" content={this.setComponent()}>
                     <div className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={set_icon}/>
                     </div>
-                </Popover>
-                <Popover placement="bottomRight" content={this.exportComponent()}>
-                    <div className="whiteboard-top-right-cell">
-                        <img style={{width: 16}} src={export_icon}/>
+                </Popover>}
+                <Tooltip title="截图">
+                    <div onClick={this.handleExportImage} className="whiteboard-top-right-cell">
+                        <img style={{width: 22}} src={screen_shot}/>
                     </div>
-                </Popover>
+                </Tooltip>
                 <div className="whiteboard-top-user-box">
                     <div className="whiteboard-top-right-user">
-                        <img src={avatar}/>
+                        <img src={userAvatarUrl}/>
                     </div>
                 </div>
                 <Modal
+                    destroyOnClose={true}
                     width={720}
-                    title="导出图片"
+                    title="导出图片预览"
                     visible={this.state.isVisible}
                     onOk={this.dowloadImage}
                     okText="下载"
                     cancelText="取消"
-                    onCancel={() => {
-                        this.setState({isVisible: false, imageUrl: ""});
-                    }}
+                    onCancel={() => this.setState({isVisible: false})}
                 >
-                    <div className="preview-image">
-                        <img src={this.state.imageUrl}/>
+                    <WhiteboardPreviewCell setImageRef={this.setImageRef} roomState={roomState} room={room}/>
+                    <div>
+                        请等待预览内容加载完毕再导出图片
                     </div>
                 </Modal>
             </div>

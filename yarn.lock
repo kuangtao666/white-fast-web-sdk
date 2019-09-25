@@ -902,13 +902,6 @@
   resolved "https://registry.yarnpkg.com/@netless/react-seek-slider/-/react-seek-slider-1.0.4.tgz#d21523f6476f35118df782acf97a8e2255d2744a"
   integrity sha512-smL1iufVg8XxsvO1GzLD4NZf3wFTev7FRIiHlIYDCjIgTS7/Yq6N2n8JMh2ZDjYi1nMBxDstkQPxZOEOpc/N8g==
 
-"@netless/white-snapshot@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.npmjs.org/@netless/white-snapshot/-/white-snapshot-0.1.2.tgz#651e364ea917567de29a1a45aa20878e68ef510e"
-  integrity sha512-bGD1yRohUkK5EK/nmCnj27mMXb3t1KW5Vh0364CVitoVGsJKOxKMoCdgzTHsz/dHd6+cL3lBVOFTR5OwNcdB5Q==
-  dependencies:
-    html2canvas "^1.0.0-rc.3"
-
 "@popmotion/easing@^1.0.1":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@popmotion/easing/-/easing-1.0.2.tgz#17d925c45b4bf44189e5a38038d149df42d8c0b4"
