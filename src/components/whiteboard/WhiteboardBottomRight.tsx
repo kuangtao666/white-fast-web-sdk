@@ -6,6 +6,7 @@ import * as chat from "../../assets/image/chat.svg";
 import "./WhiteboardBottomRight.less";
 import {Badge, Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 
 export type MessageType = {
     name: string,
@@ -30,6 +31,7 @@ export type WhiteboardBottomRightProps = {
     handleChatState: () => void;
     isReadOnly?: boolean;
     chatState?: boolean;
+    language?: LanguageEnum;
 };
 
 export default class WhiteboardBottomRight extends React.Component<WhiteboardBottomRightProps, hotkeyTooltipState> {
@@ -58,7 +60,8 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         }
     }
     private renderAnnexBox(): React.ReactNode {
-        const {roomState, room} = this.props;
+        const {roomState, room, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         const activeIndex = roomState.sceneState.index;
         const scenes = roomState.sceneState.scenes;
         return (
@@ -70,7 +73,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                             className="whiteboard-annex-arrow-left">
                             <img src={left_arrow}/>
                         </div>
-                        <Tooltip placement="top" title={"附件资料"} visible={this.state.annexBoxTooltipDisplay}>
+                        <Tooltip placement="top" title={isEnglish ? "Preview" : "预览"} visible={this.state.annexBoxTooltipDisplay}>
                             <div
                                 onMouseEnter={() => {
                                     this.setState({
@@ -98,7 +101,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                             <img src={right_arrow}/>
                         </div>
                     </div> :
-                    <Tooltip placement="topRight" title={"附件资料"} visible={this.state.annexBoxTooltipDisplay}>
+                    <Tooltip placement="topRight" title={isEnglish ? "Preview" : "预览"} visible={this.state.annexBoxTooltipDisplay}>
                         <div
                             onMouseEnter={() => {
                                 this.setState({

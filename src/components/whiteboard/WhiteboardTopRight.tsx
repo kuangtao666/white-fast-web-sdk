@@ -11,6 +11,7 @@ import "./WhiteboardTopRight.less";
 import {Button, message, Modal, Popover, Tooltip} from "antd";
 import NsPDF from "jspdf";
 import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 
 export type WhiteboardTopRightProps = {
     userId: string;
@@ -21,6 +22,7 @@ export type WhiteboardTopRightProps = {
     userName?: string;
     identity?: IdentityType;
     isReadOnly?: boolean;
+    language?: LanguageEnum;
 };
 
 export type WhiteboardTopRightStates = {
@@ -64,13 +66,15 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     private handleExportImage = async (): Promise<void> => {
-        message.loading("正在导出图片");
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
+        message.loading(isEnglish ? "Exporting image" : "正在导出图片");
         const imageCanvas = await html2canvas(this.props.whiteboardLayerDownRef, {
             useCORS: true,
             logging: false,
         });
         const image = imageCanvas.toDataURL();
-        download(image, `未命名资料`, "image/png");
+        download(image, isEnglish ? "unnamed" : "未命名资料", "image/png");
     }
 
     private setImageRef = (ref: any): void => {
@@ -106,7 +110,8 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     private setComponent = (): React.ReactNode => {
-        const {room} = this.props;
+        const {room, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         const roomMembers = room.state.roomMembers.map((roomMember: RoomMember, index: number) => {
             return (
                 <div className="room-member-cell" key={`${index}`}>
@@ -126,7 +131,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                     {/*主持人*/}
                 {/*</div>*/}
                 <div className="control-box-title">
-                    参与者
+                    {isEnglish ? "Guest" : "参与者"}
                 </div>
                 {roomMembers}
             </div>
@@ -134,8 +139,9 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     public render(): React.ReactNode {
-        const  {userAvatarUrl, room, roomState, identity} = this.props;
+        const  {userAvatarUrl, room, roomState, identity, language} = this.props;
         const isHost = identity === IdentityType.host;
+        const isEnglish = language === LanguageEnum.English;
         return (
             <div className="whiteboard-top-right-box">
                 {isHost ||
@@ -144,7 +150,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img style={{width: 16}} src={set_icon}/>
                     </div>
                 </Popover>}
-                <Tooltip title="截图">
+                <Tooltip title={isEnglish ? "Screen shot" : "截图"}>
                     <div onClick={this.handleExportImage} className="whiteboard-top-right-cell">
                         <img style={{width: 22}} src={screen_shot}/>
                     </div>

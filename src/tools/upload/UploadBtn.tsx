@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Icon, Popover, Upload} from "antd";
+import {Popover, Upload} from "antd";
 import * as OSS from "ali-oss";
 import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
@@ -109,7 +109,8 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
     }
 
     private renderUploadButton = (): React.ReactNode => {
-        const {uploadToolBox} = this.props;
+        const {uploadToolBox, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         let Nodes: React.ReactNode[];
         if (uploadToolBox) {
             Nodes = uploadToolBox.map((data: UploadToolBoxType, index: number) => {
@@ -127,8 +128,8 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
                                             <img width={68} src={data.icon ? data.icon : image_icon}/>
                                         </div>
                                         <div className="popover-section-script">
-                                            <div className="popover-section-title">{data.title ? data.title : "上传图片"}</div>
-                                            <div className="popover-section-text">{data.script ? data.script : "支持常见格式，可以改变图片大小和位置。"}</div>
+                                            <div className="popover-section-title">{data.title ? data.title : (isEnglish ? "upload image" : "上传图片")}</div>
+                                            <div className="popover-section-text">{data.script ? data.script : (isEnglish ? "Support for common formats." : "支持常见格式，可以改变图片大小和位置。")}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -143,17 +144,17 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
                             <Upload
                                 key={`${index}`}
                                 disabled={!this.props.roomToken}
-                                accept={FileUploadStatic}
+                                accept={"application/vnd.openxmlformats-officedocument.presentationml.presentation"}
                                 showUploadList={false}
-                                customRequest={this.uploadStatic}>
+                                customRequest={this.uploadDynamic}>
                                 <div className="popover-section">
                                     <div className="popover-section-inner">
                                         <div className="popover-section-image">
-                                            <img width={72} src={data.icon ? data.icon : image_transform}/>
+                                            <img width={72} src={data.icon ? data.icon : web_transform}/>
                                         </div>
                                         <div className="popover-section-script">
-                                            <div className="popover-section-title">{data.title ? data.title : "资料转图片"}</div>
-                                            <div className="popover-section-text">{data.script ? data.script : "支持 ppt、pptx、word 以及 pdf。"}</div>
+                                            <div className="popover-section-title">{data.title ? data.title : (isEnglish ? "PPTX transfer web" : "资料转网页")}</div>
+                                            <div className="popover-section-text">{data.script ? data.script : (isEnglish ? "Turn pptx into a web page for syncing." : "支持 pptx，如果是 ppt 格式文件，请手动转换。")}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -177,8 +178,8 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
                                             <img width={72} src={data.icon ? data.icon : image_transform}/>
                                         </div>
                                         <div className="popover-section-script">
-                                            <div className="popover-section-title">{data.title ? data.title : "资料转图片"}</div>
-                                            <div className="popover-section-text">{data.script ? data.script : "支持 ppt、pptx、word 以及 pdf。"}</div>
+                                            <div className="popover-section-title">{data.title ? data.title : (isEnglish ? "Docs transfer image" : "资料转图片")}</div>
+                                            <div className="popover-section-text">{data.script ? data.script : (isEnglish ? "Support ppt、pptx、word and pdf." : "支持 ppt、pptx、word 以及 pdf。")}</div>
                                         </div>
                                     </div>
                                 </div>

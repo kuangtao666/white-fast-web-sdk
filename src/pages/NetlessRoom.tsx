@@ -379,6 +379,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 userName={this.props.userName}
                                 userId={this.props.userId}
                                 room={room}
+                                language={this.props.language}
                                 isReadOnly={isReadOnly}
                                 userAvatarUrl={this.props.userAvatarUrl}/>}
                             <WhiteboardBottomLeft
@@ -388,6 +389,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 room={room}/>
                             <WhiteboardBottomRight
                                 roomState={roomState}
+                                language={this.props.language}
                                 isReadOnly={isReadOnly}
                                 chatState={this.state.isChatOpen}
                                 handleChatState={this.handleChatState}
