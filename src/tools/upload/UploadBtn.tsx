@@ -4,14 +4,13 @@ import * as OSS from "ali-oss";
 import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
 import "./UploadBtn.less";
-import {PptKind, Room, WhiteWebSdk} from "white-react-sdk";
+import {DeviceType, PptKind, Room, WhiteWebSdk} from "white-react-sdk";
 import * as image_icon from "../../assets/image/image_icon.svg";
 import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";
 import * as upload from "../../assets/image/upload.svg";
 import {LanguageEnum, ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
-
 export type ToolBoxUploadBoxState = {
     toolBoxColor: string,
 };
@@ -38,6 +37,7 @@ export type UploadBtnProps = {
     toolBarPosition?: ToolBarPositionEnum;
     uploadToolBox?: UploadToolBoxType[],
     language?: LanguageEnum;
+    deviceType: DeviceType;
 };
 
 export type UploadBtnMobileProps = {
@@ -232,10 +232,18 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
         }
     }
 
+    private handleVisibleChange = (e: any): void => {
+        if (e) {
+            this.setState({toolBoxColor: "#141414"});
+        } else {
+            this.setState({toolBoxColor: "#A2A7AD"});
+        }
+    }
+
     public render(): React.ReactNode {
         const {toolBarPosition} = this.props;
         return (
-            <Popover placement={this.handlePlacement()} content={this.renderPopoverContent()}>
+            <Popover trigger="click" onVisibleChange={this.handleVisibleChange} placement={this.handlePlacement()} content={this.renderPopoverContent()}>
                 <div
                     onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                     onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

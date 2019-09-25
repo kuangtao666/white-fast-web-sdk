@@ -21,7 +21,6 @@ import PageError from "../components/PageError";
 import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRight";
-import * as loading from "../assets/image/loading.svg";
 import MenuBox from "../components/menu/MenuBox";
 import MenuAnnexBox from "../components/menu/MenuAnnexBox";
 import {ossConfigObj} from "../appToken";
@@ -34,6 +33,7 @@ import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
+import {isMobile} from "react-device-detect";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -80,6 +80,7 @@ export type RealTimeProps = {
     isFileOpen?: boolean;
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
+    deviceType: DeviceType;
 };
 
 export enum ToolBarPositionEnum {
@@ -112,6 +113,7 @@ export type RealTimeStates = {
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
+    deviceType: DeviceType;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
@@ -131,6 +133,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isMenuOpen: false,
             isChatOpen: this.props.isChatOpen,
             isFileOpen: this.props.isFileOpen,
+            deviceType: DeviceType.Desktop,
         };
         this.cursor = new UserCursor();
     }
@@ -138,7 +141,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private startJoinRoom = async (): Promise<void> => {
         const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl} = this.props;
         if (roomToken && uuid) {
-            const whiteWebSdk = new WhiteWebSdk({deviceType: DeviceType.Desktops});
+            let whiteWebSdk;
+            if (isMobile) {
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
+            } else {
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " "});
+            }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
             const room = await whiteWebSdk.joinRoom({
@@ -187,6 +195,15 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount(): void {
         window.addEventListener("resize", this.onWindowResize);
+        if (this.props.deviceType) {
+            this.setState({deviceType: this.props.deviceType});
+        } else {
+           if (isMobile) {
+               this.setState({deviceType: DeviceType.Touch});
+           } else {
+               this.setState({deviceType: DeviceType.Desktop});
+           }
+        }
     }
 
     public async componentDidMount(): Promise<void> {
@@ -380,6 +397,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 customerComponent={[
                                     <UploadBtn
                                         toolBarPosition={this.props.toolBarPosition}
+                                        deviceType={this.props.deviceType}
                                         oss={ossConfigObj}
                                         room={room}
                                         uploadToolBox={this.props.uploadToolBox}

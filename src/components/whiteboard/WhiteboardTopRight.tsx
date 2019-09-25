@@ -8,7 +8,7 @@ import pdf_export from "../../assets/image/pdf_export.svg";
 import html2canvas from "html2canvas";
 import download from "downloadjs";
 import "./WhiteboardTopRight.less";
-import {Icon, message, Modal, Popover, Tooltip} from "antd";
+import {Button, Icon, message, Modal, Popover, Tooltip} from "antd";
 import NsPDF from "jspdf";
 import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 import {LanguageEnum} from "../../pages/NetlessRoom";
@@ -120,9 +120,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
                         <div className="control-box-name">{roomMember.payload.name}</div>
                     </div>
-                    <div className="room-member-cell-lock">
-                        <Icon type="setting" />
-                    </div>
+                    <Button className="control-box-btn" size={"small"}>控制</Button>
                 </div>
             );
         });

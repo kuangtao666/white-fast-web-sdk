@@ -1,5 +1,6 @@
 import * as React from "react";
 import TweenOne from "rc-tween-one";
+import {isMobile} from "react-device-detect";
 import "./styles.less";
 export type ScaleControllerState = {
   scaleAnimation: boolean;
@@ -141,18 +142,22 @@ export default class ScaleController extends React.Component<ScaleControllerProp
           width: 104,
         }}
         onMouseEnter={() => {
-          this.setState({
-            scaleAnimation: false,
-            reverseState: false,
-            isMouseOn: true,
-          });
+            if (!isMobile) {
+                this.setState({
+                    scaleAnimation: false,
+                    reverseState: false,
+                    isMouseOn: true,
+                });
+            }
         }}
         onMouseLeave={() => {
-          this.setState({
-            scaleAnimation: false,
-            reverseState: true,
-            isMouseOn: false,
-          });
+            if (!isMobile) {
+                this.setState({
+                    scaleAnimation: false,
+                    reverseState: true,
+                    isMouseOn: false,
+                });
+            }
         }}
         style={{
           height: 32,
