@@ -168,7 +168,11 @@ isReadOnly: false
 
 **identity [string] 可选**
 
-用户身份，默认是主播。
+用户身份，默认是主播。可配置为 `host`, `guest`, `listener`.
+
+- host 主持人，可以控制其他人的角色，可以在 guest 和 listener 之间进行切换
+- guest 嘉宾，可以参与互动（同 isReadOnly = false）
+- listener 听众，不可以参与互动（同 isReadOnly = true）
 
 ```
 identity: “guest”
