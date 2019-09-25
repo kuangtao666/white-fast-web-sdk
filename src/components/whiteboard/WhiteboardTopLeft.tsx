@@ -5,6 +5,7 @@ import * as netless_black from "../../assets/image/netless_black.svg";
 
 export type WhiteboardTopLeftProps = {
     logoUrl?: string;
+    clickLogoCallback?: () => void;
 };
 
 
@@ -15,9 +16,13 @@ export default class WhiteboardTopLeft extends React.Component<WhiteboardTopLeft
     }
 
     public render(): React.ReactNode {
-        const {logoUrl} = this.props;
+        const {logoUrl, clickLogoCallback} = this.props;
         return (
-            <div className="whiteboard-box-top-left">
+            <div onClick={() => {
+                if (clickLogoCallback) {
+                    clickLogoCallback();
+                }
+            }} className="whiteboard-box-top-left">
                 {logoUrl &&  <img src={logoUrl}/>}
             </div>
         );

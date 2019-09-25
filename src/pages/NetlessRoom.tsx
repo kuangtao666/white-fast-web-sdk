@@ -77,6 +77,7 @@ export type RealTimeProps = {
     isChatOpen?: boolean;
     isFileOpen?: boolean;
     language?: LanguageEnum;
+    clickLogoCallback?: () => void;
 };
 
 export enum ToolBarPositionEnum {
@@ -367,6 +368,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <TopLoadingBar loadingPercent={this.state.ossPercent}/>
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                             <WhiteboardTopLeft
+                                clickLogoCallback={this.props.clickLogoCallback}
                                 logoUrl={this.props.logoUrl}/>
                             {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
