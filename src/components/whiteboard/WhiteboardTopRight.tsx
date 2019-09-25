@@ -134,10 +134,11 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     public render(): React.ReactNode {
-        const  {userAvatarUrl, room, roomState} = this.props;
+        const  {userAvatarUrl, room, roomState, identity} = this.props;
+        const isHost = identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
-                {this.props.isReadOnly ||
+                {isHost ||
                 <Popover placement="bottomRight" content={this.setComponent()}>
                     <div className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={set_icon}/>

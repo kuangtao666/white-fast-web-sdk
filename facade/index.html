@@ -59,6 +59,29 @@
                 userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
                 logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
                 toolBarPosition: "left",
+                uploadToolBox: [
+                    {
+                        enable: false,
+                        type: "image",
+                        icon: "",
+                        title: "",
+                        script: "",
+                    },
+                    {
+                        enable: true,
+                        type: "static_conversion",
+                        icon: "",
+                        title: "",
+                        script: "",
+                    },
+                    {
+                        enable: true,
+                        type: "dynamic_conversion",
+                        icon: "",
+                        title: "",
+                        script: "",
+                    },
+                ],
                 pagePreviewPosition: "right",
                 boardBackgroundColor: "#F2F2F2",
                 isReadOnly: false,
@@ -84,9 +107,6 @@
                 colorArrayStateCallback: (colorArray) => {
                     console.log(colorArray);
                 },
-                // documentArrayCallback: (documentArray) => {
-                //     console.log(documentArray);
-                // }
             });
         // }).catch(function(err) {
         //     console.log(err);

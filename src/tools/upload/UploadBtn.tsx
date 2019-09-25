@@ -9,7 +9,7 @@ import * as image_icon from "../../assets/image/image_icon.svg";
 import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";
 import * as upload from "../../assets/image/upload.svg";
-import {ToolBarPositionEnum} from "../../pages/NetlessRoom";
+import {ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ToolBoxUploadBoxState = {
@@ -36,6 +36,7 @@ export type UploadBtnProps = {
     whiteboardRef?: HTMLDivElement,
     onProgress?: PPTProgressListener,
     toolBarPosition?: ToolBarPositionEnum;
+    uploadToolBox?: UploadToolBoxType[],
 };
 
 export type UploadBtnMobileProps = {
@@ -50,6 +51,7 @@ export type UploadBtnMobileProps = {
     room: Room,
     whiteboardRef?: HTMLDivElement,
     onProgress?: PPTProgressListener,
+    uploadToolBox?: UploadToolBoxType[],
 };
 
 export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUploadBoxState> {
@@ -105,61 +107,109 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
         }
     }
 
+    private renderUploadButton = (): React.ReactNode => {
+        const {uploadToolBox} = this.props;
+        let Nodes: React.ReactNode[];
+        if (uploadToolBox) {
+            Nodes = uploadToolBox.map((data: UploadToolBoxType, index: number) => {
+                if (data.type === UploadDocumentEnum.image) {
+                    if (data.enable) {
+                        return (
+                            <Upload
+                                key={`${index}`}
+                                accept={"image/*"}
+                                showUploadList={false}
+                                customRequest={this.uploadImage}>
+                                <div className="popover-section">
+                                    <div className="popover-section-inner">
+                                        <div className="popover-section-image">
+                                            <img width={68} src={data.icon ? data.icon : image_icon}/>
+                                        </div>
+                                        <div className="popover-section-script">
+                                            <div className="popover-section-title">{data.title ? data.title : "上传图片"}</div>
+                                            <div className="popover-section-text">{data.script ? data.script : "支持常见格式，可以改变图片大小和位置。"}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Upload>
+                        );
+                    } else {
+                        return null;
+                    }
+                } else if (data.type === UploadDocumentEnum.dynamic_conversion) {
+                    if (data.enable) {
+                        return (
+                            <Upload
+                                key={`${index}`}
+                                disabled={!this.props.roomToken}
+                                accept={FileUploadStatic}
+                                showUploadList={false}
+                                customRequest={this.uploadStatic}>
+                                <div className="popover-section">
+                                    <div className="popover-section-inner">
+                                        <div className="popover-section-image">
+                                            <img width={72} src={data.icon ? data.icon : image_transform}/>
+                                        </div>
+                                        <div className="popover-section-script">
+                                            <div className="popover-section-title">{data.title ? data.title : "资料转图片"}</div>
+                                            <div className="popover-section-text">{data.script ? data.script : "支持 ppt、pptx、word 以及 pdf。"}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Upload>
+                        );
+                    } else {
+                        return null;
+                    }
+                } else {
+                    if (data.enable) {
+                        return (
+                            <Upload
+                                key={`${index}`}
+                                disabled={!this.props.roomToken}
+                                accept={FileUploadStatic}
+                                showUploadList={false}
+                                customRequest={this.uploadStatic}>
+                                <div className="popover-section">
+                                    <div className="popover-section-inner">
+                                        <div className="popover-section-image">
+                                            <img width={72} src={data.icon ? data.icon : image_transform}/>
+                                        </div>
+                                        <div className="popover-section-script">
+                                            <div className="popover-section-title">{data.title ? data.title : "资料转图片"}</div>
+                                            <div className="popover-section-text">{data.script ? data.script : "支持 ppt、pptx、word 以及 pdf。"}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Upload>
+                        );
+                    } else {
+                        return null;
+                    }
+                }
+            });
+            return Nodes;
+        } else {
+            return null;
+        }
+    }
+
     private renderPopoverContent = (): React.ReactNode => {
-        return (
-            <div className="popover-box">
-                <Upload
-                    disabled={!this.props.roomToken}
-                    accept={FileUploadStatic}
-                    showUploadList={false}
-                    customRequest={this.uploadStatic}>
-                    <div className="popover-section">
-                        <div className="popover-section-inner">
-                            <div className="popover-section-image">
-                                <img width={72} src={image_transform}/>
-                            </div>
-                            <div className="popover-section-script">
-                                <div className="popover-section-title">资料转图片</div>
-                                <div className="popover-section-text">支持 ppt、pptx、word 以及 pdf。</div>
-                            </div>
-                        </div>
-                    </div>
-                </Upload>
-                <Upload
-                    disabled={!this.props.roomToken}
-                    accept={"application/vnd.openxmlformats-officedocument.presentationml.presentation"}
-                    showUploadList={false}
-                    customRequest={this.uploadDynamic}>
-                    <div className="popover-section">
-                        <div className="popover-section-inner">
-                            <div className="popover-section-image">
-                                <img width={72} src={web_transform}/>
-                            </div>
-                            <div className="popover-section-script">
-                                <div className="popover-section-title">资料转网页</div>
-                                <div className="popover-section-text">支持 pptx，如果是 ppt 格式文件，请手动转换。</div>
-                            </div>
-                        </div>
-                    </div>
-                </Upload>
-                <Upload
-                    accept={"image/*"}
-                    showUploadList={false}
-                    customRequest={this.uploadImage}>
-                    <div className="popover-section">
-                        <div className="popover-section-inner">
-                            <div className="popover-section-image">
-                                <img width={68} src={image_icon}/>
-                            </div>
-                            <div className="popover-section-script">
-                                <div className="popover-section-title">上传图片</div>
-                                <div className="popover-section-text">支持常见格式，可以改变图片大小和位置。</div>
-                            </div>
-                        </div>
-                    </div>
-                </Upload>
-            </div>
-        );
+        const {uploadToolBox} = this.props;
+        if (uploadToolBox) {
+            const length = uploadToolBox.filter(data => data.enable).length;
+            return (
+                <div style={{height: 118 * length}} className="popover-box">
+                    {this.renderUploadButton()}
+                </div>
+            );
+        } else {
+            return (
+                <div className="popover-box">
+                    {this.renderUploadButton()}
+                </div>
+            );
+        }
     }
 
     private handlePlacement = (): TooltipPlacement => {

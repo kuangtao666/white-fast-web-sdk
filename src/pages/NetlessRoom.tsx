@@ -18,7 +18,7 @@ import {
 import "white-web-sdk/style/index.css";
 import "./NetlessRoom.less";
 import PageError from "../components/PageError";
-import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
+import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRight";
 import * as loading from "../assets/image/loading.svg";
@@ -40,8 +40,23 @@ export enum MenuInnerType {
 }
 
 export enum LanguageEnum {
-
+    Chinese = "Chinese",
+    English = "English",
 }
+
+export enum UploadDocumentEnum {
+    image = "image",
+    static_conversion = "static_conversion",
+    dynamic_conversion = "dynamic_conversion",
+}
+
+export type UploadToolBoxType = {
+    enable: boolean,
+    type: UploadDocumentEnum,
+    icon?: string,
+    title?: string,
+    script?: string,
+};
 export type RealTimeProps = {
     uuid: string;
     roomToken: string;
@@ -49,10 +64,12 @@ export type RealTimeProps = {
     userName?: string;
     userAvatarUrl?: string;
     isReadOnly?: boolean;
+    uploadToolBox?: UploadToolBoxType[],
     toolBarPosition?: ToolBarPositionEnum;
     pagePreviewPosition?: PagePreviewPositionEnum;
     boardBackgroundColor?: string;
     defaultColorArray?: string[];
+    identity?: IdentityType;
     colorArrayStateCallback?: (colorArray: string[]) => void;
     documentArray?: PPTDataType[];
     roomCallback?: (room: Room) => void;
@@ -274,9 +291,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             this.setState({isFileOpen: !this.state.isFileOpen});
         }
     }
-    public render(): React.ReactNode {
 
+    private detectIsReadOnly = (): boolean => {
+        const {isReadOnly, identity} = this.props;
+        return isReadOnly || (identity === IdentityType.listener);
+    }
+    public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
+        const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
         } else if (phase === RoomPhase.Reconnecting) {
@@ -350,25 +372,26 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <WhiteboardTopRight
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState}
+                                identity={this.props.identity}
                                 userName={this.props.userName}
                                 userId={this.props.userId}
                                 room={room}
-                                isReadOnly={this.props.isReadOnly}
+                                isReadOnly={isReadOnly}
                                 userAvatarUrl={this.props.userAvatarUrl}/>}
                             <WhiteboardBottomLeft
                                 handleFileState={this.handleFileState}
-                                isReadOnly={this.props.isReadOnly}
+                                isReadOnly={isReadOnly}
                                 roomState={roomState}
                                 room={room}/>
                             <WhiteboardBottomRight
                                 roomState={roomState}
-                                isReadOnly={this.props.isReadOnly}
+                                isReadOnly={isReadOnly}
                                 chatState={this.state.isChatOpen}
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
                             <ToolBox
-                                isReadOnly={this.props.isReadOnly}
+                                isReadOnly={isReadOnly}
                                 toolBarPosition={this.props.toolBarPosition}
                                 colorConfig={this.props.defaultColorArray}
                                 setMemberState={this.setMemberState}
@@ -377,6 +400,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         toolBarPosition={this.props.toolBarPosition}
                                         oss={ossConfigObj}
                                         room={room}
+                                        uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}
                                         onProgress={this.progress}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
