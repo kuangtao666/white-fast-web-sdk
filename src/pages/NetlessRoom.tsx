@@ -33,6 +33,7 @@ import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
+import LoadingPage from "../components/LoadingPage";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -74,6 +75,7 @@ export type RealTimeProps = {
     documentArray?: PPTDataType[];
     roomCallback?: (room: Room) => void;
     logoUrl?: string;
+    loadingSvgUrl?: string;
     isChatOpen?: boolean;
     isFileOpen?: boolean;
     language?: LanguageEnum;
@@ -299,46 +301,20 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
+        const {language, loadingSvgUrl} = this.props;
         const isReadOnly = this.detectIsReadOnly();
+        const isEnglish = language === LanguageEnum.English;
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
         } else if (phase === RoomPhase.Reconnecting) {
-            return <div className="white-board-loading">
-                <div className="white-board-loading-mid">
-                    <img src={loading}/>
-                    <div>
-                        正在重连当中
-                    </div>
-                </div>
-            </div>;
+            return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else if (phase === RoomPhase.Connecting ||
             phase === RoomPhase.Disconnecting) {
-            return <div className="white-board-loading">
-                <div className="white-board-loading-mid">
-                    <img src={loading}/>
-                    <div>
-                        正在链接房间
-                    </div>
-                </div>
-            </div>;
+            return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else if (!room) {
-            return <div className="white-board-loading">
-                <div className="white-board-loading-mid">
-                    <img src={loading}/>
-                    <div>
-                        正在创建房间
-                    </div>
-                </div>
-            </div>;
+            return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else if (!roomState) {
-            return <div className="white-board-loading">
-                <div className="white-board-loading-mid">
-                    <img src={loading}/>
-                    <div>
-                        正在创建房间
-                    </div>
-                </div>
-            </div>;
+            return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else {
             return (
                 <RoomContextProvider value={{
