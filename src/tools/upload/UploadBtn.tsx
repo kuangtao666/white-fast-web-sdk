@@ -9,7 +9,7 @@ import * as image_icon from "../../assets/image/image_icon.svg";
 import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";
 import * as upload from "../../assets/image/upload.svg";
-import {ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoom";
+import {LanguageEnum, ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ToolBoxUploadBoxState = {
@@ -37,6 +37,7 @@ export type UploadBtnProps = {
     onProgress?: PPTProgressListener,
     toolBarPosition?: ToolBarPositionEnum;
     uploadToolBox?: UploadToolBoxType[],
+    language?: LanguageEnum;
 };
 
 export type UploadBtnMobileProps = {

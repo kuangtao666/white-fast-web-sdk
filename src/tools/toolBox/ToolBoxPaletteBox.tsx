@@ -6,11 +6,13 @@ import isColor from "is-color";
 import {message} from "antd";
 import ToolBoxAddColor from "./ToolBoxAddColor";
 import {RoomContextConsumer} from "../../pages/RoomContext";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 export type ToolBoxPaletteBoxProps = {
     displayStroke: boolean;
     setMemberState: (modifyState: Partial<any>) => void;
     memberState: Readonly<any>;
     colorConfig?: string[];
+    language?: LanguageEnum;
 };
 
 export type ToolBoxPaletteBoxStates = {
@@ -102,9 +104,11 @@ export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBox
         return nodes;
     }
     private renderColorSelector = (): React.ReactNode => {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         return [
             <div key="title" className="palette-title-one">
-                颜色
+                {isEnglish ? "Color" : "颜色"}
             </div>,
             <div key="cells" className="palette-color-box">
                 {this.renderColorCellArray()}
@@ -122,9 +126,11 @@ export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBox
     }
 
     private renderStrokeSelector(): React.ReactNode {
-        const [r, g, b] = this.props.memberState.strokeColor;
+        const {memberState, language} = this.props;
+        const [r, g, b] = memberState.strokeColor;
+        const isEnglish = language === LanguageEnum.English;
         return [
-            <div key="title" className="palette-title-two">宽度</div>,
+            <div key="title" className="palette-title-two">{isEnglish ? "Width" : "宽度"}</div>,
             <div key="box" className="palette-stroke-width-box">
                 <StrokeWidth
                     className="palette-stroke-under-layer"

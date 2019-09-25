@@ -11,7 +11,7 @@ import {
     ToolBoxText,
 } from "./ToolIconComponent";
 import "./ToolBox.less";
-import {ToolBarPositionEnum} from "../../pages/NetlessRoom";
+import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 type ApplianceDescription = {
@@ -40,6 +40,7 @@ export type ToolBoxProps = {
     colorConfig?: string[];
     customerComponent?: React.ReactNode[];
     customerComponentPosition?: CustomerComponentPositionType;
+    language?: LanguageEnum;
 };
 
 export type ToolBoxStates = {
@@ -274,6 +275,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
         return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}
                                   memberState={this.props.memberState}
+                                  language={this.props.language}
                                   setMemberState={this.props.setMemberState}
                                   displayStroke={description.hasStroke}/>;
     }

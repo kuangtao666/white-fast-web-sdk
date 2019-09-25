@@ -15,6 +15,7 @@ import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";
 import * as close from "../../assets/image/close.svg";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
@@ -26,6 +27,7 @@ export type WhiteboardChatProps = {
     room?: Room;
     player?: Player;
     isChatOpen?: boolean;
+    language?: LanguageEnum;
 };
 
 export type WhiteboardChatStates = {
@@ -79,7 +81,9 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     }
 
     public render(): React.ReactNode {
-        const messages: MessageType[] = this.state.messages; // 有很多内容
+        const messages: MessageType[] = this.state.messages;
+        const {isChatOpen, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         if (messages.length > 0) {
             let previousName = messages[0].name;
             let previousId = messages[0].id;
@@ -120,7 +124,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                 );
             });
         }
-        if (this.props.isChatOpen) {
+        if (isChatOpen) {
             return (
                 <div className="chat-box">
                     <ThemeProvider
@@ -156,7 +160,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                         <div className="chat-inner-box">
                             <div className="chat-box-title">
                                 <div className="chat-box-name">
-                                    <span>聊天室</span>
+                                    <span>{isEnglish ? "Chatroom" : "聊天室"}</span>
                                 </div>
                                 <div onClick={this.props.handleChatState} className="chat-box-close">
                                     <img src={close}/>
@@ -168,7 +172,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                                 </MessageList> : <div className="chat-box-message-empty">
                                     <img src={empty}/>
                                     <div>
-                                        暂无聊天记录~
+                                        {isEnglish ? "No chat history ~" : "暂无聊天记录~"}
                                     </div>
                                 </div>}
                             </div>

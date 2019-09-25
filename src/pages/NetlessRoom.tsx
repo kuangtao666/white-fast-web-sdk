@@ -357,6 +357,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         </MenuBox>
                         <WhiteboardFile
                             handleFileState={this.handleFileState}
+                            language={this.props.language}
                             documentArray={this.props.documentArray}
                             isFileOpen={this.state.isFileOpen}
                             room={room}/>
@@ -394,6 +395,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 room={room}/>
                             <ToolBox
                                 isReadOnly={isReadOnly}
+                                language={this.props.language}
                                 toolBarPosition={this.props.toolBarPosition}
                                 colorConfig={this.props.defaultColorArray}
                                 setMemberState={this.setMemberState}
@@ -405,6 +407,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}
                                         onProgress={this.progress}
+                                        language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
@@ -414,6 +417,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             </div>
                         </Dropzone>
                         <WhiteboardChat
+                            language={this.props.language}
                             isChatOpen={this.state.isChatOpen}
                             handleChatState={this.handleChatState}
                             userAvatarUrl={this.props.userAvatarUrl}

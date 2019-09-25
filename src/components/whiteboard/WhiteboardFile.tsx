@@ -5,12 +5,14 @@ import * as close from "../../assets/image/close.svg";
 import * as default_cover from "../../assets/image/default_cover.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
 import PPTDatas from "../menu/PPTDatas";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 
 export type WhiteboardFileProps = {
     room: Room;
     handleFileState: () => void;
     isFileOpen?: boolean;
     documentArray?: PPTDataType[];
+    language?: LanguageEnum;
 };
 
 export type WhiteboardFileStates = {
@@ -121,6 +123,8 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
         }
     }
     public render(): React.ReactNode {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         let docCells: React.ReactNode;
         if (this.state.docs.length > 0) {
             docCells = this.state.docs.map(data => {
@@ -152,7 +156,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                             <div className="menu-ppt-image-box-inner">
                                 <img src={data.cover}/>
                                 <div>
-                                    动态 PPT
+                                    {isEnglish ? "Dynamic PPT" : "动态 PPT"}
                                 </div>
                             </div>
                         </div>
@@ -166,7 +170,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                     <div className="chat-inner-box">
                         <div className="chat-box-title">
                             <div className="chat-box-name">
-                                <span>文档中心</span>
+                                <span>{isEnglish ? "Document" : "文档中心"}</span>
                             </div>
                             <div onClick={this.props.handleFileState} className="chat-box-close">
                                 <img src={close}/>
