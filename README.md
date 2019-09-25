@@ -16,7 +16,7 @@ English | [简体中文](./README-zh_CN.md) | [日本語](./README-jp.md)
 
 [jsrun#china](http://jsrun.pro/zmbKp/edit)
 
-### Live WhiteBoard
+### Collaborative WhiteBoard
 
 ```html
 <body>
