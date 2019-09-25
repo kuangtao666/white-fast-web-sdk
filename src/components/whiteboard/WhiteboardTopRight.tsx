@@ -8,7 +8,7 @@ import pdf_export from "../../assets/image/pdf_export.svg";
 import html2canvas from "html2canvas";
 import download from "downloadjs";
 import "./WhiteboardTopRight.less";
-import {Button, message, Modal, Popover, Tooltip} from "antd";
+import {Icon, message, Modal, Popover, Tooltip} from "antd";
 import NsPDF from "jspdf";
 import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 import {LanguageEnum} from "../../pages/NetlessRoom";
@@ -112,28 +112,67 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     private setComponent = (): React.ReactNode => {
         const {room, language} = this.props;
         const isEnglish = language === LanguageEnum.English;
-        const roomMembers = room.state.roomMembers.map((roomMember: RoomMember, index: number) => {
+        const hostRoomMembers = room.state.roomMembers.filter((roomMember: RoomMember) => roomMember.memberState.identity === IdentityType.host);
+        const hostNodes = hostRoomMembers.map((roomMember: RoomMember, index: number) => {
             return (
                 <div className="room-member-cell" key={`${index}`}>
                     <div className="room-member-cell-inner">
                         <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
                         <div className="control-box-name">{roomMember.payload.name}</div>
                     </div>
-                    {/*<div className="room-member-cell-lock">*/}
-                        {/*<Icon type="lock" />*/}
-                    {/*</div>*/}
+                    <div className="room-member-cell-lock">
+                        <Icon type="setting" />
+                    </div>
+                </div>
+            );
+        });
+        const guestRoomMembers = room.state.roomMembers.filter((roomMember: RoomMember) => roomMember.memberState.identity === IdentityType.guest);
+        const guestNodes = guestRoomMembers.map((roomMember: RoomMember, index: number) => {
+            return (
+                <div className="room-member-cell" key={`${index}`}>
+                    <div className="room-member-cell-inner">
+                        <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
+                        <div className="control-box-name">{roomMember.payload.name}</div>
+                    </div>
+                    <div className="room-member-cell-lock">
+                        <Icon type="lock" />
+                    </div>
+                </div>
+            );
+        });
+        const listenerRoomMembers = room.state.roomMembers.filter((roomMember: RoomMember) => roomMember.memberState.identity === IdentityType.listener);
+        const listenerNodes = listenerRoomMembers.map((roomMember: RoomMember, index: number) => {
+            return (
+                <div className="room-member-cell" key={`${index}`}>
+                    <div className="room-member-cell-inner">
+                        <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
+                        <div className="control-box-name">{roomMember.payload.name}</div>
+                    </div>
+                    <div className="room-member-cell-lock">
+                        <Icon type="lock" />
+                    </div>
                 </div>
             );
         });
         return (
             <div className="control-box">
-                {/*<div className="export-box-title">*/}
-                    {/*主持人*/}
-                {/*</div>*/}
+                {hostNodes.length > 0 &&
+                <div className="control-box-title">
+                    {isEnglish ? "Host" : "主持人"}
+                </div>}
+                {hostNodes}
+                {guestNodes.length > 0 &&
                 <div className="control-box-title">
                     {isEnglish ? "Guest" : "参与者"}
                 </div>
-                {roomMembers}
+                }
+                {guestNodes}
+                {listenerNodes.length > 0 &&
+                <div className="control-box-title">
+                    {isEnglish ? "Listener" : "观众"}
+                </div>
+                }
+                {listenerNodes}
             </div>
         );
     }
@@ -144,7 +183,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         const isEnglish = language === LanguageEnum.English;
         return (
             <div className="whiteboard-top-right-box">
-                {isHost ||
+                {isHost &&
                 <Popover placement="bottomRight" content={this.setComponent()}>
                     <div className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={set_icon}/>

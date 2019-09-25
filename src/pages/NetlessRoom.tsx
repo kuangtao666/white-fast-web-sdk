@@ -169,6 +169,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
+            room.setMemberState({identity: this.props.identity ? this.props.identity : IdentityType.guest});
             if (roomCallback) {
                 roomCallback(room);
             }
@@ -303,7 +304,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl} = this.props;
         const isReadOnly = this.detectIsReadOnly();
-        const isEnglish = language === LanguageEnum.English;
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
         } else if (phase === RoomPhase.Reconnecting) {
