@@ -1,4 +1,4 @@
-# Ultra Fast WhiteBoard
+![](https://sdk.herewhite.com/fast-sdk/back2.png)
 
 [English](./README.md) | 简体中文 | [日本語](./README-jp.md)
 
