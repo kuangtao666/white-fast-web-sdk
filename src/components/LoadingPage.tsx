@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./LoadingPage.less";
-import * as loading from "../assets/image/loading.svg";
 import {RoomPhase} from "white-react-sdk";
 import {LanguageEnum} from "../pages/NetlessRoom";
 export type LoadingPageProps = {
@@ -64,6 +63,7 @@ export default class LoadingPage extends React.Component<LoadingPageProps, {}> {
     }
     public render(): React.ReactNode {
         const {loadingSvgUrl} = this.props;
+        const loading = "https://white-sdk.oss-cn-beijing.aliyuncs.com/fast-sdk/icons/loading.svg";
         return (
             <div className="white-board-loading">
                 <div className="white-board-loading-mid">

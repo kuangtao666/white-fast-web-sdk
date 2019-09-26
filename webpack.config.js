@@ -1,6 +1,10 @@
 const path = require('path');
+const webpack = require('webpack');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 module.exports = {
     entry: path.resolve(__dirname, 'src/facade/index.tsx'),
 
@@ -20,6 +24,12 @@ module.exports = {
             }, {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader'],
+            }, {
+                loader:'webpack-ant-icon-loader',
+                enforce: 'pre',
+                include:[
+                    require.resolve('@ant-design/icons/lib/dist')
+                ]
             }, {
                 test: /\.ya?ml$/,
                 use: [
@@ -53,9 +63,34 @@ module.exports = {
                 ],
             },],
     },
-
+    optimization: {
+        minimizer: [
+            // 自定义js优化配置，将会覆盖默认配置
+            new TerserPlugin({
+                parallel: true,
+            }),
+            // 用于优化css文件
+            new OptimizeCssAssetsPlugin({
+                assetNameRegExp: /\.css$/g,
+                cssProcessorOptions: {
+                    safe: true,
+                    autoprefixer: { disable: true }, // 这里是个大坑，稍后会提到
+                    mergeLonghand: false,
+                    discardComments: {
+                        removeAll: true // 移除注释
+                    }
+                },
+                canPrint: true
+            })
+        ]
+    },
     plugins: [
         new ForkTsCheckerWebpackPlugin(),
+        new webpack.ContextReplacementPlugin(
+            /moment[/\\]locale$/,
+            /zh-cn/,
+        ),
+        new LodashModuleReplacementPlugin,
         new BundleAnalyzerPlugin({
             analyzerMode: 'server',
             analyzerHost: '127.0.0.1',

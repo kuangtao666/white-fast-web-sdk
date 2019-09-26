@@ -9,7 +9,6 @@ import html2canvas from "html2canvas";
 import download from "downloadjs";
 import "./WhiteboardTopRight.less";
 import {Button, Icon, message, Modal, Popover, Tooltip} from "antd";
-import NsPDF from "jspdf";
 import WhiteboardPreviewCell from "./WhiteboardPreviewCell";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 
@@ -52,17 +51,17 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     private handleExportPDF = async (): Promise<void> => {
-        const {room, roomState, whiteboardLayerDownRef} = this.props;
-        const scenes = roomState.sceneState.scenes;
-        const sceneDir = roomState.sceneState.scenePath.split("/");
-        sceneDir.pop();
-        this.pdf = new NsPDF("", "pt", "a4");
-        await scenes.map( async(scene: Scene, index: number): Promise<void> => {
-            // this.pdf.addImage(base64, "JPEG", 0, 0, whiteboardLayerDownRef.clientWidth, whiteboardLayerDownRef.clientHeight);
-            // if (scenes.length > (index + 1)) {
-            //     this.pdf.addPage();
-            // }
-        });
+        // const {room, roomState, whiteboardLayerDownRef} = this.props;
+        // const scenes = roomState.sceneState.scenes;
+        // const sceneDir = roomState.sceneState.scenePath.split("/");
+        // sceneDir.pop();
+        // this.pdf = new NsPDF("", "pt", "a4");
+        // await scenes.map( async(scene: Scene, index: number): Promise<void> => {
+        //     // this.pdf.addImage(base64, "JPEG", 0, 0, whiteboardLayerDownRef.clientWidth, whiteboardLayerDownRef.clientHeight);
+        //     // if (scenes.length > (index + 1)) {
+        //     //     this.pdf.addPage();
+        //     // }
+        // });
     }
 
     private handleExportImage = async (): Promise<void> => {

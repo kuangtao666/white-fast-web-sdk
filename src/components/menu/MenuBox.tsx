@@ -1,5 +1,5 @@
 import * as React from "react";
-import {slide as Menu} from "react-burger-menu";
+import {slide as Menu} from "react-burger-menu/lib/menus/slide";
 import {MenuInnerType, PagePreviewPositionEnum} from "../../pages/NetlessRoom";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
@@ -73,7 +73,7 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
                 width={280}
                 right={isRight}
                 isOpen={this.props.isVisible}
-                onStateChange={async menuState => {
+                onStateChange={async (menuState: any) => {
                     if (!menuState.isOpen) {
                         await timeout(500);
                         this.props.setMenuState(false);

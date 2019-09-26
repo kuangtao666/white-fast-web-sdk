@@ -9,7 +9,6 @@ import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
 import * as full_screen from "../assets/image/full_screen.svg";
 import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
-import * as loading from "../assets/image/loading.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
@@ -289,7 +288,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             return <PageError/>;
         } else if (!player) {
             return <div className="white-board-loading">
-                <img src={loading}/>
+                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/fast-sdk/icons/loading.svg"/>
             </div>;
         } else {
             return (

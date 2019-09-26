@@ -12,6 +12,11 @@ declare module "*.png" {
     export = content;
 }
 
+declare module "react-burger-menu/lib/menus/slide" {
+    export const slide: any;
+}
+
+
 declare module "@livechat/ui-kit" {
     export const ThemeProvider: any;
     export const MessageGroup: any;

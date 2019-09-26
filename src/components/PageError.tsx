@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./PageError.less";
-import * as room_not_find from "../assets/image/room_not_find.svg";
 import {Button} from "antd";
 
 class PageError extends React.Component<{}, {}> {
@@ -11,7 +10,7 @@ class PageError extends React.Component<{}, {}> {
         return (
             <div className="page404-box">
                 <div className="page404-image-box">
-                    <img className="page404-image-inner" src={room_not_find}/>
+                    <img className="page404-image-inner" src="https://white-sdk.oss-cn-beijing.aliyuncs.com/fast-sdk/icons/room_not_find.svg"/>
                     <div className="page404-inner">
                         创建播放器失败，请检查网络！
                     </div>

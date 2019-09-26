@@ -1,8 +1,9 @@
 import * as React from "react";
 import {Popover} from "antd";
-import {ChromePicker, ColorResult} from "react-color";
+import ChromePicker from "react-color/lib/components/chrome/Chrome";
 import toolPaletteConfig from "./ToolPaletteConfig";
 import * as add_white from "../../assets/image/add_white.svg";
+
 
 export type ToolBoxAddColorStates = {
     activeColor: string;
@@ -27,7 +28,7 @@ export default class ToolBoxAddColor extends React.Component<ToolBoxAddColorProp
         };
     }
 
-    private handleChangeComplete = (color: ColorResult): void => {
+    private handleChangeComplete = (color: any): void => {
         this.setState({ activeColor: color.hex });
         if (this.state.activeColor !== "#5B908E") {
             this.setState({isAddColor: true});
