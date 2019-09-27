@@ -14,7 +14,7 @@ export type MenuAnnexBoxProps = {
     room: Room;
     roomState: RoomState;
     handleAnnexBoxMenuState: () => void;
-    isMenuOpen: boolean;
+    isPreviewMenuOpen: boolean;
 };
 
 class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState> {
@@ -102,7 +102,11 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                             this.setScenePath(index);
                         }} className="page-mid-box">
                             <div className="page-box">
-                                <PageImage isMenuOpen={this.props.isMenuOpen} scene={scene} room={this.props.room} path={sceneDir.concat(scene.name).join("/")}/>
+                                <PageImage
+                                    isMenuOpen={this.props.isPreviewMenuOpen}
+                                    scene={scene}
+                                    room={this.props.room}
+                                    path={sceneDir.concat(scene.name).join("/")}/>
                             </div>
                         </div>
                         <div className="page-box-inner-index-delete-box">

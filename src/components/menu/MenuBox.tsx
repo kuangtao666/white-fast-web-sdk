@@ -26,10 +26,9 @@ const styles2: any = {
 
 export type MenuBoxProps = {
     isVisible: boolean;
-    menuInnerState: MenuInnerType;
-    resetMenu: () => void;
-    setMenuState: (state: boolean) => void;
+    setMenuState?: (state: boolean) => void;
     pagePreviewPosition?: PagePreviewPositionEnum;
+    sideMenuWidth?: number;
 };
 
 
@@ -42,39 +41,43 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
         };
     }
 
-    private async getMenuStyle(): Promise<void> {
-
-        if (this.props.isVisible) {
+    private async getMenuStyle(isOpen: boolean): Promise<void> {
+        if (isOpen) {
             this.setState({
                 menuStyles: styles,
             });
         } else {
-            await timeout(300);
+            await timeout(200);
             this.setState({
                 menuStyles: styles2,
             });
         }
     }
     public render(): React.ReactNode {
-        const isRight = this.props.pagePreviewPosition === PagePreviewPositionEnum.right;
+        const {pagePreviewPosition, sideMenuWidth, setMenuState} = this.props;
+        const isRight = pagePreviewPosition === PagePreviewPositionEnum.right;
+        const menuWidth = sideMenuWidth ? sideMenuWidth : 280;
         return (
             <Menu
-                pageWrapId="page-wrap"
-                outerContainerId="outer-container"
                 noOverlay
                 styles={this.state.menuStyles}
-                width={280}
+                width={menuWidth}
                 right={isRight}
                 isOpen={this.props.isVisible}
                 onStateChange={async (menuState: any) => {
                     if (!menuState.isOpen) {
                         await timeout(300);
-                        this.props.setMenuState(false);
+                        if (setMenuState) {
+                            setMenuState(false);
+                        }
+                        await this.getMenuStyle(false);
                     }
                     else {
-                        this.props.setMenuState(true);
+                        if (setMenuState) {
+                            setMenuState(true);
+                        }
+                        await this.getMenuStyle(true);
                     }
-                    await this.getMenuStyle();
                 }}>
                 {this.props.children}
             </Menu>

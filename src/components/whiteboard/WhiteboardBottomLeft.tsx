@@ -7,7 +7,7 @@ import file from "../../assets/image/file.svg";
 export type WhiteboardBottomLeftProps = {
     room: Room;
     roomState: RoomState;
-    handleFileState: () => void;
+    handleFileState: (state: boolean) => void;
     deviceType: DeviceType;
     isReadOnly?: boolean;
 };
@@ -25,13 +25,13 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
     }
 
     public render(): React.ReactNode {
-        const {roomState, isReadOnly} = this.props;
+        const {roomState, isReadOnly, handleFileState} = this.props;
         if (isReadOnly) {
             return null;
         }
         return (
             <div className="whiteboard-box-bottom-left">
-                <div onClick={this.props.handleFileState} className="whiteboard-box-bottom-left-chart">
+                <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart">
                     <img src={file}/>
                 </div>
                 <ScaleController

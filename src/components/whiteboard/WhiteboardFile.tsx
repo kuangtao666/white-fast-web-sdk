@@ -13,6 +13,7 @@ export type WhiteboardFileProps = {
     isFileOpen?: boolean;
     documentArray?: PPTDataType[];
     language?: LanguageEnum;
+    isFileMenuOpen: boolean;
 };
 
 export type WhiteboardFileStates = {
@@ -123,7 +124,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
         }
     }
     public render(): React.ReactNode {
-        const {language} = this.props;
+        const {language, handleFileState} = this.props;
         const isEnglish = language === LanguageEnum.English;
         let docCells: React.ReactNode;
         if (this.state.docs.length > 0) {
@@ -164,26 +165,23 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                 }
             });
         }
-        if (this.props.isFileOpen) {
-            return (
-                <div className="file-box">
-                    <div className="chat-inner-box">
-                        <div className="chat-box-title">
-                            <div className="chat-box-name">
-                                <span>{isEnglish ? "Document" : "文档中心"}</span>
-                            </div>
-                            <div onClick={this.props.handleFileState} className="chat-box-close">
-                                <img src={close}/>
-                            </div>
+        console.log(this.props.isFileMenuOpen);
+        return (
+            <div className="file-box">
+                <div className="chat-inner-box">
+                    <div className="chat-box-title">
+                        <div className="chat-box-name">
+                            <span>{isEnglish ? "Document" : "文档中心"}</span>
                         </div>
-                        <div className="file-inner-box">
-                            {docCells}
+                        <div onClick={() => handleFileState()} className="chat-box-close">
+                            <img src={close}/>
                         </div>
                     </div>
+                    <div className="file-inner-box">
+                        {docCells}
+                    </div>
                 </div>
-            );
-        } else {
-            return null;
-        }
+            </div>
+        );
     }
 }

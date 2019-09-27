@@ -77,7 +77,6 @@ export type RealTimeProps = {
     logoUrl?: string;
     loadingSvgUrl?: string;
     isChatOpen?: boolean;
-    isFileOpen?: boolean;
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
@@ -104,9 +103,10 @@ export type RealTimeStates = {
     roomToken: string | null;
     ossPercent: number;
     converterPercent: number;
-    isMenuOpen: boolean;
+    isPreviewMenuOpen: boolean;
+    isFileMenuOpen: boolean;
     isChatOpen?: boolean;
-    isFileOpen?: boolean;
+    isFileOpen: boolean;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
@@ -130,9 +130,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             roomToken: null,
             ossPercent: 0,
             converterPercent: 0,
-            isMenuOpen: false,
+            isPreviewMenuOpen: false,
+            isFileMenuOpen: false,
             isChatOpen: this.props.isChatOpen,
-            isFileOpen: this.props.isFileOpen,
+            isFileOpen: false,
             deviceType: DeviceType.Desktop,
         };
         this.cursor = new UserCursor();
@@ -221,7 +222,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         switch (this.state.menuInnerState) {
             case MenuInnerType.AnnexBox:
                 return <MenuAnnexBox
-                    isMenuOpen={this.state.isMenuOpen}
+                    isPreviewMenuOpen={this.state.isPreviewMenuOpen}
                     room={this.state.room!}
                     roomState={this.state.roomState!}
                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}/>;
@@ -239,12 +240,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({
             isMenuVisible: !this.state.isMenuVisible,
             menuInnerState: MenuInnerType.AnnexBox,
-        });
-    }
-
-    private resetMenu = () => {
-        this.setState({
-            isMenuVisible: false,
         });
     }
 
@@ -291,8 +286,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             }
         }
     }
-    private setMenuState = (state: boolean) => {
-        this.setState({isMenuOpen: state});
+    private setPreviewMenuState = (state: boolean) => {
+        this.setState({isPreviewMenuOpen: state});
+    }
+    private setFileMenuState = (state: boolean) => {
+        this.setState({isFileMenuOpen: state});
     }
     private setMemberState = (modifyState: Partial<MemberState>) => {
         this.state.room!.setMemberState(modifyState);
@@ -306,11 +304,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
     private handleFileState = (): void => {
-        if (this.state.isFileOpen === undefined) {
-            this.setState({isFileOpen: true});
-        } else {
-            this.setState({isFileOpen: !this.state.isFileOpen});
-        }
+        this.setState({isFileOpen: !this.state.isFileOpen});
     }
 
     private detectIsReadOnly = (): boolean => {
@@ -342,18 +336,24 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     <div className="realtime-box">
                         <MenuBox
                             pagePreviewPosition={this.props.pagePreviewPosition}
-                            setMenuState={this.setMenuState}
-                            resetMenu={this.resetMenu}
+                            setMenuState={this.setPreviewMenuState}
                             isVisible={this.state.isMenuVisible}
-                            menuInnerState={this.state.menuInnerState}>
+                        >
                             {this.renderMenuInner()}
                         </MenuBox>
-                        <WhiteboardFile
-                            handleFileState={this.handleFileState}
-                            language={this.props.language}
-                            documentArray={this.props.documentArray}
-                            isFileOpen={this.state.isFileOpen}
-                            room={room}/>
+                        <MenuBox
+                            pagePreviewPosition={PagePreviewPositionEnum.left}
+                            setMenuState={this.setFileMenuState}
+                            sideMenuWidth={336}
+                            isVisible={this.state.isFileOpen}
+                        >
+                            <WhiteboardFile
+                                handleFileState={this.handleFileState}
+                                isFileMenuOpen={this.state.isFileMenuOpen}
+                                language={this.props.language}
+                                documentArray={this.props.documentArray}
+                                room={room}/>
+                        </MenuBox>
                         <Dropzone
                             accept={"image/*"}
                             disableClick={true}

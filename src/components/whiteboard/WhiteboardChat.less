@@ -30,6 +30,11 @@
   margin-left: 12px;
   font-weight: bold;
 }
+.bm-cross-button {
+  button {
+    display: none;
+  }
+}
 
 .chat-box-close {
   width: 28px;
@@ -38,14 +43,18 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  margin-right: 12px;
+  right: 12px;
   cursor: pointer;
+  position: absolute;
+  z-index: 10;
   .main-duration;
   &:hover {
     .main-duration;
+    cursor: pointer;
     background-color: #F2F2F2;
   }
   img {
+    cursor: pointer;
     width: 18px;
   }
 }
