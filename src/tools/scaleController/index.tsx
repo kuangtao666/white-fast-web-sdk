@@ -1,7 +1,7 @@
 import * as React from "react";
 import TweenOne from "rc-tween-one";
-import {isMobile} from "react-device-detect";
 import "./styles.less";
+import {DeviceType} from "white-react-sdk";
 export type ScaleControllerState = {
   scaleAnimation: boolean;
   reverseState: boolean;
@@ -11,6 +11,7 @@ export type ScaleControllerState = {
 export type ScaleControllerProps = {
   zoomScale: number;
   zoomChange: (scale: number) => void;
+  deviceType: DeviceType;
   style?: React.CSSProperties;
 };
 
@@ -133,7 +134,7 @@ export default class ScaleController extends React.Component<ScaleControllerProp
   }
 
   public render(): React.ReactNode {
-
+    const isMobile = this.props.deviceType === DeviceType.Touch;
     return (
       <TweenOne
         animation={{

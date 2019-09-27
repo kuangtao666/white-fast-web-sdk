@@ -80,7 +80,7 @@ export type RealTimeProps = {
     isFileOpen?: boolean;
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
-    deviceType: DeviceType;
+    deviceType?: DeviceType;
 };
 
 export enum ToolBarPositionEnum {
@@ -367,7 +367,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
-                                roomState={roomState}
+                                roomState={roomState} deviceType={this.state.deviceType}
                                 identity={this.props.identity}
                                 userName={this.props.userName}
                                 userId={this.props.userId}
@@ -378,9 +378,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <WhiteboardBottomLeft
                                 handleFileState={this.handleFileState}
                                 isReadOnly={isReadOnly}
+                                deviceType={this.state.deviceType}
                                 roomState={roomState}
                                 room={room}/>
                             <WhiteboardBottomRight
+                                deviceType={this.state.deviceType}
                                 roomState={roomState}
                                 language={this.props.language}
                                 isReadOnly={isReadOnly}
@@ -397,7 +399,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 customerComponent={[
                                     <UploadBtn
                                         toolBarPosition={this.props.toolBarPosition}
-                                        deviceType={this.props.deviceType}
+                                        deviceType={this.state.deviceType}
                                         oss={ossConfigObj}
                                         room={room}
                                         uploadToolBox={this.props.uploadToolBox}

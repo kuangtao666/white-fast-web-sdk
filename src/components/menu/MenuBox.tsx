@@ -1,6 +1,6 @@
 import * as React from "react";
-import {slide as Menu} from "react-burger-menu/lib/menus/slide";
 import {MenuInnerType, PagePreviewPositionEnum} from "../../pages/NetlessRoom";
+const Menu = require("react-burger-menu/lib/menus/slide");
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
@@ -21,13 +21,6 @@ const styles2: any = {
     bmBurgerButton: {
         display: "none",
     },
-};
-
-
-const styles3: any = {
-    bmOverlay: {
-        background: "rgba(0, 0, 0, 0.0)",
-   },
 };
 
 
@@ -56,7 +49,7 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
                 menuStyles: styles,
             });
         } else {
-            await timeout(500);
+            await timeout(300);
             this.setState({
                 menuStyles: styles2,
             });
@@ -75,7 +68,7 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
                 isOpen={this.props.isVisible}
                 onStateChange={async (menuState: any) => {
                     if (!menuState.isOpen) {
-                        await timeout(500);
+                        await timeout(300);
                         this.props.setMenuState(false);
                     }
                     else {

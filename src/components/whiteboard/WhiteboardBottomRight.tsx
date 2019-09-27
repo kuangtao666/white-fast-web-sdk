@@ -7,6 +7,7 @@ import "./WhiteboardBottomRight.less";
 import {Badge, Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
+import {DeviceType} from "white-react-sdk";
 
 export type MessageType = {
     name: string,
@@ -19,7 +20,6 @@ export type MessageType = {
 
 export type hotkeyTooltipState = {
     hotkeyTooltipDisplay: boolean,
-    annexBoxTooltipDisplay: boolean,
     messages:  MessageType[],
     seenMessagesLength: number,
 };
@@ -29,6 +29,7 @@ export type WhiteboardBottomRightProps = {
     roomState: RoomState;
     handleAnnexBoxMenuState: () => void;
     handleChatState: () => void;
+    deviceType: DeviceType;
     isReadOnly?: boolean;
     chatState?: boolean;
     language?: LanguageEnum;
@@ -40,11 +41,9 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         super(props);
         this.state = {
             hotkeyTooltipDisplay: false,
-            annexBoxTooltipDisplay: false,
             messages: [],
             seenMessagesLength: 0,
         };
-        this.renderAnnexBox = this.renderAnnexBox.bind(this);
     }
 
     public componentDidMount(): void {
@@ -59,10 +58,70 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             this.setState({seenMessagesLength: this.state.messages.length});
         }
     }
-    private renderAnnexBox(): React.ReactNode {
-        const {roomState, room, language} = this.props;
-        const isEnglish = language === LanguageEnum.English;
+
+    private pageNumber = (): React.ReactNode => {
+        const {deviceType, language, roomState} = this.props;
         const activeIndex = roomState.sceneState.index;
+        const scenes = roomState.sceneState.scenes;
+        const isMobile = deviceType === DeviceType.Touch;
+        const isEnglish = language === LanguageEnum.English;
+        if (isMobile) {
+            return (
+                <div
+                    onClick={this.props.handleAnnexBoxMenuState}
+                    className="whiteboard-annex-arrow-mid">
+                    <div className="whiteboard-annex-img-box">
+                        <img src={annex_box}/>
+                    </div>
+                    <div className="whiteboard-annex-arrow-page">
+                        {activeIndex + 1} / {scenes.length}
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <Tooltip placement="top" title={isEnglish ? "Preview" : "预览"}>
+                    <div
+                        onClick={this.props.handleAnnexBoxMenuState}
+                        className="whiteboard-annex-arrow-mid">
+                        <div className="whiteboard-annex-img-box">
+                            <img src={annex_box}/>
+                        </div>
+                        <div className="whiteboard-annex-arrow-page">
+                            {activeIndex + 1} / {scenes.length}
+                        </div>
+                    </div>
+                </Tooltip>
+            );
+        }
+    }
+
+    private pageIcon = (): React.ReactNode => {
+        const {deviceType, language} = this.props;
+        const isMobile = deviceType === DeviceType.Touch;
+        const isEnglish = language === LanguageEnum.English;
+        if (isMobile) {
+            return (
+                <div
+                    onClick={this.props.handleAnnexBoxMenuState}
+                    className="whiteboard-bottom-right-cell">
+                    <img src={annex_box}/>
+                </div>
+            );
+        } else {
+            return (
+                <Tooltip placement="topRight" title={isEnglish ? "Preview" : "预览"}>
+                    <div
+                        onClick={this.props.handleAnnexBoxMenuState}
+                        className="whiteboard-bottom-right-cell">
+                        <img src={annex_box}/>
+                    </div>
+                </Tooltip>
+            );
+        }
+    }
+    private renderAnnexBox = (): React.ReactNode => {
+        const {roomState, room} = this.props;
         const scenes = roomState.sceneState.scenes;
         return (
             <div>
@@ -73,51 +132,15 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                             className="whiteboard-annex-arrow-left">
                             <img src={left_arrow}/>
                         </div>
-                        <Tooltip placement="top" title={isEnglish ? "Preview" : "预览"} visible={this.state.annexBoxTooltipDisplay}>
-                            <div
-                                onMouseEnter={() => {
-                                    this.setState({
-                                        annexBoxTooltipDisplay: true,
-                                    });
-                                }}
-                                onMouseLeave={() => {
-                                    this.setState({
-                                        annexBoxTooltipDisplay: false,
-                                    });
-                                }}
-                                onClick={this.props.handleAnnexBoxMenuState}
-                                className="whiteboard-annex-arrow-mid">
-                                <div className="whiteboard-annex-img-box">
-                                    <img src={annex_box}/>
-                                </div>
-                                <div className="whiteboard-annex-arrow-page">
-                                    {activeIndex + 1} / {scenes.length}
-                                </div>
-                            </div>
-                        </Tooltip>
+                        {this.pageNumber()}
                         <div
                             onClick={() => room.pptNextStep()}
                             className="whiteboard-annex-arrow-right">
                             <img src={right_arrow}/>
                         </div>
                     </div> :
-                    <Tooltip placement="topRight" title={isEnglish ? "Preview" : "预览"} visible={this.state.annexBoxTooltipDisplay}>
-                        <div
-                            onMouseEnter={() => {
-                                this.setState({
-                                    annexBoxTooltipDisplay: true,
-                                });
-                            }}
-                            onMouseLeave={() => {
-                                this.setState({
-                                    annexBoxTooltipDisplay: false,
-                                });
-                            }}
-                            onClick={this.props.handleAnnexBoxMenuState}
-                            className="whiteboard-bottom-right-cell">
-                            <img src={annex_box}/>
-                        </div>
-                    </Tooltip>}
+                    this.pageIcon()
+                }
             </div>
         );
     }
