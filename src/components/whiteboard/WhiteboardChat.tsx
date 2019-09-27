@@ -33,6 +33,7 @@ export type WhiteboardChatProps = {
 export type WhiteboardChatStates = {
     messages: MessageType[];
     url: string;
+    isLandscape: boolean;
 };
 
 
@@ -45,6 +46,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         this.state = {
             messages: [],
             url: "",
+            isLandscape: true,
         };
         this.scrollToBottom = this.scrollToBottom.bind(this);
     }
@@ -53,6 +55,13 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         if (this.messagesEnd) {
             this.messagesEnd.scrollIntoView({behavior: "smooth"});
         }
+    }
+
+    public componentWillMount(): void {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const isLandscape = (width / height) >= 1;
+        this.setState({isLandscape: isLandscape});
     }
 
     public async componentDidMount(): Promise<void> {
@@ -126,7 +135,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         }
         if (isChatOpen) {
             return (
-                <div className="chat-box">
+                <div className={this.state.isLandscape ? "chat-box" : "chat-box-mask"}>
                     <ThemeProvider
                         theme={{
                             vars: {
