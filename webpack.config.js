@@ -25,13 +25,15 @@ module.exports = {
             }, {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader'],
-            }, {
-                loader:'webpack-ant-icon-loader',
-                enforce: 'pre',
-                include:[
-                    require.resolve('@ant-design/icons/lib/dist')
-                ]
-            }, {
+            },
+            // {
+            //     loader:'webpack-ant-icon-loader',
+            //     enforce: 'pre',
+            //     include:[
+            //         require.resolve('@ant-design/icons/lib/dist')
+            //     ]
+            // },
+            {
                 test: /\.ya?ml$/,
                 use: [
                     { loader: 'json-loader' },

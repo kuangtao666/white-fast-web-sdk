@@ -2,7 +2,7 @@ import * as React from "react";
 import TopLoadingBar from "@netless/react-loading-bar";
 import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
 import * as OSS from "ali-oss";
-import {message} from "antd";
+import {Button, message, notification} from "antd";
 import Dropzone from "react-dropzone";
 import {
     WhiteWebSdk,
@@ -34,6 +34,7 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
+import Identicon from "react-identicons";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -113,6 +114,7 @@ export type RealTimeStates = {
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
+    isReadOnly?: boolean;
     deviceType: DeviceType;
 };
 
@@ -154,7 +156,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {userId: userId, name: userName, avatar: userAvatarUrl ? userAvatarUrl : userId}},
+                    userPayload: {userId: userId, name: userName, avatar: userAvatarUrl}},
                 {
                     onPhaseChanged: phase => {
                         console.log(phase);
@@ -179,6 +181,85 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     },
                 });
             room.setMemberState({identity: this.props.identity ? this.props.identity : IdentityType.guest});
+            if (this.props.identity === IdentityType.listener) {
+                await room.setWritable(false);
+                this.setState({isReadOnly: true});
+            } else if (this.props.identity === IdentityType.guest) {
+                if (room.state.globalState.guestUsers === undefined) {
+                    this.setState({isReadOnly: true});
+                    room.disableDeviceInputs = true;
+                } else {
+                    console.log(room.state.globalState.guestUsers);
+                    const myUser = room.state.globalState.guestUsers.find((data: any) => data.userId === this.props.userId);
+                    if (myUser) {
+                        this.setState({isReadOnly: myUser.isReadOnly});
+                        room.disableDeviceInputs = myUser.isReadOnly;
+                    } else {
+                        this.setState({isReadOnly: true});
+                    }
+                }
+                room.addMagixEventListener("take-back-all", () => {
+                    this.setState({isReadOnly: true});
+                    room.disableDeviceInputs = true;
+                    message.info("主持人收回权限");
+                });
+                room.addMagixEventListener("agree", event => {
+                    if (event.payload.userId === this.props.userId && event.payload.isReadyOnly !== undefined) {
+                        this.setState({isReadOnly: event.payload.isReadyOnly});
+                        room.disableDeviceInputs = false;
+                        const guestUser = {
+                            userId: this.props.userId,
+                            isReadOnly: event.payload.isReadyOnly,
+                        };
+                        if (room.state.globalState.guestUsers) {
+                            const userArray = room.state.globalState.guestUsers;
+                            const myUser = room.state.globalState.guestUsers.find((data: any) => data.userId === this.props.userId);
+                            if (myUser) {
+                               const users = userArray.map((data: any) => {
+                                   if (data.userId === myUser.userId) {
+                                       return {
+                                           userId: data.userId,
+                                           isReadOnly: event.payload.isReadyOnly,
+                                       };
+                                   } else {
+                                       return data;
+                                   }
+                               });
+                               room.setGlobalState({guestUsers: users});
+                            } else {
+                                userArray.push(guestUser);
+                                room.setGlobalState({guestUsers: userArray});
+                            }
+                        } else {
+                            room.setGlobalState({guestUsers: [guestUser]});
+                        }
+                    }
+                });
+            } else {
+                room.addMagixEventListener("handup", event => {
+                    const key = `open${Date.now()}`;
+                    notification.open({
+                        message: event.payload.name,
+                        description: "申请获得操作权限",
+                        onClose: close,
+                        duration: 12,
+                        top: 56,
+                        key,
+                        btn: <Button type="primary" size="small" onClick={() => {
+                            notification.close(key);
+                            room.dispatchMagixEvent("agree", {userId: event.payload.userId, isReadyOnly: false});
+                        }}>
+                            同意
+                        </Button>,
+                        icon: <div className="cursor-box">
+                            {event.payload.userAvatarUrl ? <img style={{width: 28}} src={event.payload.userAvatarUrl}/> :
+                                <Identicon
+                                    size={24}
+                                    string={event.payload.userId}/>}
+                        </div>,
+                    });
+                });
+            }
             if (roomCallback) {
                 roomCallback(room);
             }
@@ -196,6 +277,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount(): void {
         window.addEventListener("resize", this.onWindowResize);
+        if (this.props.isReadOnly !== undefined) {
+            this.setState({isReadOnly: this.props.isReadOnly});
+        }
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
@@ -216,6 +300,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
 
     public componentWillUnmount(): void {
         this.didLeavePage = true;
+        if (this.state.room) {
+            this.state.room.removeMagixEventListener("handup");
+            this.state.room.removeMagixEventListener("agree");
+        }
         window.removeEventListener("resize", this.onWindowResize);
     }
     private renderMenuInner = (): React.ReactNode => {
@@ -308,8 +396,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private detectIsReadOnly = (): boolean => {
-        const {isReadOnly, identity} = this.props;
-        return isReadOnly || (identity === IdentityType.listener);
+        const {identity} = this.props;
+        return this.state.isReadOnly || (identity === IdentityType.listener);
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;

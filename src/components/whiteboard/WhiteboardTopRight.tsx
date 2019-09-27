@@ -2,6 +2,7 @@ import * as React from "react";
 import {ViewMode, Room, RoomMember, RoomState, Scene, DeviceType} from "white-react-sdk";
 import set_icon from "../../assets/image/set_icon.svg";
 import screen_shot from "../../assets/image/screen_shot.svg";
+import raise_hands from "../../assets/image/raise_hands.svg";
 import html2canvas from "html2canvas";
 import download from "downloadjs";
 import "./WhiteboardTopRight.less";
@@ -69,7 +70,17 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
                         <div className="control-box-name">{roomMember.payload.name}</div>
                     </div>
-                    <Button className="control-box-btn" size={"small"}>控制</Button>
+                    <Button onClick={() => {
+                        if (room.state.globalState.guestUsers !== undefined) {
+                           const users = room.state.globalState.guestUsers.map((data: any) => {
+                               data.isReadOnly = true;
+                               return data;
+                           });
+                           room.setGlobalState({guestUsers: users});
+                           room.dispatchMagixEvent("take-back-all", {});
+                        }
+                    }} className="control-box-btn" size={"small"}>控制</Button>
+                    <Button className="control-box-btn" size={"small"}>讨论</Button>
                 </div>
             );
         });
@@ -144,17 +155,32 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             );
         }
     }
-    public render(): React.ReactNode {
-        const  {userAvatarUrl, identity} = this.props;
-        const isHost = identity === IdentityType.host;
-        return (
-            <div className="whiteboard-top-right-box">
-                {isHost &&
+
+    private renderSetIcon = (): React.ReactNode => {
+        const {identity, room} = this.props;
+        if (identity === IdentityType.host) {
+            return (
                 <Popover trigger="click" placement="bottomRight" content={this.setComponent()}>
                     <div className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={set_icon}/>
                     </div>
-                </Popover>}
+                </Popover>
+            );
+        } else if (identity === IdentityType.guest) {
+            return (
+                <div onClick={() => room.dispatchMagixEvent("handup", {userId: this.props.userId, name: this.props.userName, userAvatarUrl: this.props.userAvatarUrl})} className="whiteboard-top-right-cell">
+                    <img style={{width: 20}} src={raise_hands}/>
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
+    public render(): React.ReactNode {
+        const  {userAvatarUrl} = this.props;
+        return (
+            <div className="whiteboard-top-right-box">
+                {this.renderSetIcon()}
                 {this.renderScreenShot()}
                 <div className="whiteboard-top-user-box">
                     <div className="whiteboard-top-right-user">
