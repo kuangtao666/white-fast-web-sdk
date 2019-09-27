@@ -165,7 +165,6 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                 }
             });
         }
-        console.log(this.props.isFileMenuOpen);
         return (
             <div className="file-box">
                 <div className="chat-inner-box">
