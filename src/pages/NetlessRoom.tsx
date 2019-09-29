@@ -35,6 +35,8 @@ import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
 import Identicon from "react-identicons";
+import {RoomManager} from "./RoomManager";
+import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -120,6 +122,7 @@ export type RealTimeStates = {
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
     private didLeavePage: boolean = false;
+    private roomManager: RoomManager;
     private readonly cursor: UserCursor;
     public constructor(props: RealTimeProps) {
         super(props);
@@ -142,7 +145,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl} = this.props;
+        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity} = this.props;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
@@ -180,86 +183,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
-            room.setMemberState({identity: this.props.identity ? this.props.identity : IdentityType.guest});
-            if (this.props.identity === IdentityType.listener) {
-                await room.setWritable(false);
-                this.setState({isReadOnly: true});
-            } else if (this.props.identity === IdentityType.guest) {
-                if (room.state.globalState.guestUsers === undefined) {
-                    this.setState({isReadOnly: true});
-                    room.disableDeviceInputs = true;
-                } else {
-                    console.log(room.state.globalState.guestUsers);
-                    const myUser = room.state.globalState.guestUsers.find((data: any) => data.userId === this.props.userId);
-                    if (myUser) {
-                        this.setState({isReadOnly: myUser.isReadOnly});
-                        room.disableDeviceInputs = myUser.isReadOnly;
-                    } else {
-                        this.setState({isReadOnly: true});
-                    }
-                }
-                room.addMagixEventListener("take-back-all", () => {
-                    this.setState({isReadOnly: true});
-                    room.disableDeviceInputs = true;
-                    message.info("主持人收回权限");
-                });
-                room.addMagixEventListener("agree", event => {
-                    if (event.payload.userId === this.props.userId && event.payload.isReadyOnly !== undefined) {
-                        this.setState({isReadOnly: event.payload.isReadyOnly});
-                        room.disableDeviceInputs = false;
-                        const guestUser = {
-                            userId: this.props.userId,
-                            isReadOnly: event.payload.isReadyOnly,
-                        };
-                        if (room.state.globalState.guestUsers) {
-                            const userArray = room.state.globalState.guestUsers;
-                            const myUser = room.state.globalState.guestUsers.find((data: any) => data.userId === this.props.userId);
-                            if (myUser) {
-                               const users = userArray.map((data: any) => {
-                                   if (data.userId === myUser.userId) {
-                                       return {
-                                           userId: data.userId,
-                                           isReadOnly: event.payload.isReadyOnly,
-                                       };
-                                   } else {
-                                       return data;
-                                   }
-                               });
-                               room.setGlobalState({guestUsers: users});
-                            } else {
-                                userArray.push(guestUser);
-                                room.setGlobalState({guestUsers: userArray});
-                            }
-                        } else {
-                            room.setGlobalState({guestUsers: [guestUser]});
-                        }
-                    }
-                });
-            } else {
-                room.addMagixEventListener("handup", event => {
-                    const key = `open${Date.now()}`;
-                    notification.open({
-                        message: event.payload.name,
-                        description: "申请获得操作权限",
-                        onClose: close,
-                        duration: 12,
-                        top: 56,
-                        key,
-                        btn: <Button type="primary" size="small" onClick={() => {
-                            notification.close(key);
-                            room.dispatchMagixEvent("agree", {userId: event.payload.userId, isReadyOnly: false});
-                        }}>
-                            同意
-                        </Button>,
-                        icon: <div className="cursor-box">
-                            {event.payload.userAvatarUrl ? <img style={{width: 28}} src={event.payload.userAvatarUrl}/> :
-                                <Identicon
-                                    size={24}
-                                    string={event.payload.userId}/>}
-                        </div>,
-                    });
-                });
-            }
+            this.roomManager = new RoomManager(userId, room, this.setReadOnlyState, userAvatarUrl, identity, userName);
+            await this.roomManager.start();
             if (roomCallback) {
                 roomCallback(room);
             }
@@ -269,6 +194,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
+    private setReadOnlyState = (state: boolean): void => {
+        this.setState({isReadOnly: state});
+    }
 
     private onWindowResize = (): void => {
         if (this.state.room) {
@@ -302,7 +230,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
-            this.state.room.removeMagixEventListener("agree");
+        }
+        if (this.roomManager) {
+            this.roomManager.stop();
         }
         window.removeEventListener("resize", this.onWindowResize);
     }
@@ -510,6 +440,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             userId={this.props.userId}
                             userName={this.props.userName}
                             room={this.state.room}/>
+                        <WhiteboardManager room={room}/>
                     </div>
                 </RoomContextProvider>
             );
