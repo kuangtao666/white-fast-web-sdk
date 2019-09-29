@@ -92,7 +92,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
                         <div className="control-box-name">{roomMember.payload.name}</div>
                     </div>
-                    <div className="room-member-cell-lock">
+                    <div className="room-member-cell-icon">
                         <Icon type="lock" />
                     </div>
                 </div>
@@ -106,7 +106,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
                         <div className="control-box-name">{roomMember.payload.name}</div>
                     </div>
-                    <div className="room-member-cell-lock">
+                    <div className="room-member-cell-icon">
                         <Icon type="lock" />
                     </div>
                 </div>

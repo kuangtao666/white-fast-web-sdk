@@ -2,8 +2,9 @@ import {Room} from "white-react-sdk";
 import {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import {message} from "antd";
 
-enum ModeType {
+export enum ModeType {
     lecture = "lecture",
+    handUp = "handUp",
     discuss = "discuss",
 }
 
@@ -52,6 +53,7 @@ export class RoomManager {
                   avatar: this.userAvatarUrl,
                   name: this.name,
                   isReadOnly: true,
+                  isHandUp: false,
               };
               this.room.setGlobalState({guestUsers: [guestUser]});
               this.setReadOnlyState(true);

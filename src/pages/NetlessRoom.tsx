@@ -159,7 +159,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {userId: userId, name: userName, avatar: userAvatarUrl}},
+                    userPayload: {
+                        userId: userId,
+                        name: userName,
+                        avatar: userAvatarUrl,
+                        identity: identity,
+                    }},
                 {
                     onPhaseChanged: phase => {
                         console.log(phase);
@@ -440,7 +445,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             userId={this.props.userId}
                             userName={this.props.userName}
                             room={this.state.room}/>
-                        <WhiteboardManager room={room}/>
+                        <WhiteboardManager userAvatarUrl={this.props.userAvatarUrl} userName={this.props.userName} userId={this.props.userId} identity={this.props.identity} room={room}/>
                     </div>
                 </RoomContextProvider>
             );
