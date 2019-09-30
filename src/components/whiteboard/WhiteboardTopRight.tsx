@@ -83,8 +83,13 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
 
     public render(): React.ReactNode {
         const  {userAvatarUrl} = this.props;
+        const isHost = this.props.identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
+                {isHost &&
+                <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                    <img style={{width: 16}} src={set_icon}/>
+                </div>}
                 {this.renderScreenShot()}
                 <div className="whiteboard-top-user-box">
                     <div className="whiteboard-top-right-user">

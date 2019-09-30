@@ -12,6 +12,7 @@ export type ScaleControllerProps = {
   zoomScale: number;
   zoomChange: (scale: number) => void;
   deviceType: DeviceType;
+  isReadOnly?: boolean;
   style?: React.CSSProperties;
 };
 
@@ -135,69 +136,79 @@ export default class ScaleController extends React.Component<ScaleControllerProp
 
   public render(): React.ReactNode {
     const isMobile = this.props.deviceType === DeviceType.Touch;
-    return (
-      <TweenOne
-        animation={{
-          duration: 300,
-          height: 32,
-          width: 104,
-        }}
-        onMouseEnter={() => {
-            if (!isMobile) {
-                this.setState({
-                    scaleAnimation: false,
-                    reverseState: false,
-                    isMouseOn: true,
-                });
-            }
-        }}
-        onMouseLeave={() => {
-            if (!isMobile) {
-                this.setState({
-                    scaleAnimation: false,
-                    reverseState: true,
-                    isMouseOn: false,
-                });
-            }
-        }}
-        style={{
-          height: 32,
-          width: 62,
-          ...this.props.style,
-        }}
-        reverse={this.state.reverseState}
-        paused={this.state.scaleAnimation}
-        className="scale-controller-box">
-        <div className="scale-controller-num"
-             onClick={() => this.moveTo100()}>
-          {Math.ceil(this.props.zoomScale * 100)} %
-        </div>
-        <TweenOne animation={{
+    if (this.props.isReadOnly) {
+        return (
+            <div className="scale-controller-box">
+                <div className="scale-controller-num">
+                    {Math.ceil(this.props.zoomScale * 100)} %
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <TweenOne
+                animation={{
+                    duration: 300,
+                    height: 32,
+                    width: 104,
+                }}
+                onMouseEnter={() => {
+                    if (!isMobile) {
+                        this.setState({
+                            scaleAnimation: false,
+                            reverseState: false,
+                            isMouseOn: true,
+                        });
+                    }
+                }}
+                onMouseLeave={() => {
+                    if (!isMobile) {
+                        this.setState({
+                            scaleAnimation: false,
+                            reverseState: true,
+                            isMouseOn: false,
+                        });
+                    }
+                }}
+                style={{
+                    height: 32,
+                    width: 62,
+                    ...this.props.style,
+                }}
+                reverse={this.state.reverseState}
+                paused={this.state.scaleAnimation}
+                className="scale-controller-box">
+                <div className="scale-controller-num"
+                     onClick={() => this.moveTo100()}>
+                    {Math.ceil(this.props.zoomScale * 100)} %
+                </div>
+                <TweenOne animation={{
                     delay: 150,
                     display: "flex",
                     duration: 150,
                     opacity: 1,
                     width: 40,
                     marginLeft: 4,
-                  }}
-                  reverse={this.state.reverseState}
-                  paused={this.state.scaleAnimation}
-                  style={{
-                    display: "none",
-                    opacity: 0,
-                    width: 0,
-                    marginLeft: 0,
-                  }}>
-          <div className="scale-controller-icon"
-               onClick={() => this.moveRuleIndex(-1)}>
-            -
-          </div>
-          <div className="scale-controller-icon"
-               onClick={() => this.moveRuleIndex(+1)}>
-            +
-          </div>
-        </TweenOne>
-      </TweenOne>
-    );
+                }}
+                          reverse={this.state.reverseState}
+                          paused={this.state.scaleAnimation}
+                          style={{
+                              display: "none",
+                              opacity: 0,
+                              width: 0,
+                              marginLeft: 0,
+                          }}>
+                    <div className="scale-controller-icon"
+                         onClick={() => this.moveRuleIndex(-1)}>
+                        -
+                    </div>
+                    <div className="scale-controller-icon"
+                         onClick={() => this.moveRuleIndex(+1)}>
+                        +
+                    </div>
+                </TweenOne>
+            </TweenOne>
+        );
+    }
   }
 }
