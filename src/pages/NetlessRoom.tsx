@@ -116,7 +116,6 @@ export type RealTimeStates = {
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
-    isReadOnly?: boolean;
     deviceType: DeviceType;
 };
 
@@ -188,7 +187,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
-            this.roomManager = new RoomManager(userId, room, this.setReadOnlyState, userAvatarUrl, identity, userName);
+            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName);
             await this.roomManager.start();
             if (roomCallback) {
                 roomCallback(room);
@@ -199,10 +198,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-    private setReadOnlyState = (state: boolean): void => {
-        this.setState({isReadOnly: state});
-    }
-
     private onWindowResize = (): void => {
         if (this.state.room) {
             this.state.room.refreshViewSize();
@@ -210,9 +205,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount(): void {
         window.addEventListener("resize", this.onWindowResize);
-        if (this.props.isReadOnly !== undefined) {
-            this.setState({isReadOnly: this.props.isReadOnly});
-        }
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
@@ -331,12 +323,33 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private detectIsReadOnly = (): boolean => {
-        const {identity} = this.props;
-        return this.state.isReadOnly || (identity === IdentityType.listener);
+        const {identity, userId} = this.props;
+        const {room} = this.state;
+        if (identity === IdentityType.listener) {
+            return true;
+        } else if (identity === IdentityType.host) {
+            return false;
+        }
+        if (room) {
+            const selfUser = room.state.globalState.guestUsers.find((user: any) => user.userId === userId);
+            if (selfUser) {
+                room.disableDeviceInputs = selfUser.isReadOnly;
+                return selfUser.isReadOnly;
+            } else {
+                if (this.props.isReadOnly) {
+                    room.disableDeviceInputs = this.props.isReadOnly;
+                    return this.props.isReadOnly;
+                } else {
+                    return true;
+                }
+            }
+        } else {
+            return true;
+        }
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
-        const {language, loadingSvgUrl} = this.props;
+        const {language, loadingSvgUrl, userId} = this.props;
         const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
@@ -350,6 +363,24 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         } else if (!roomState) {
             return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else {
+            let cameraState;
+            let disableCameraTransform;
+            if (this.props.identity === IdentityType.host) {
+                const userSelf = room.state.globalState.hostInfo;
+                if (userSelf) {
+                    cameraState = userSelf.cameraState;
+                    disableCameraTransform = userSelf.disableCameraTransform;
+                }
+            } else if (this.props.identity === IdentityType.guest) {
+                const userSelf = room.state.globalState.guestUsers.find((user: any) => user.userId === userId);
+                if (userSelf) {
+                    cameraState = userSelf.cameraState;
+                    disableCameraTransform = userSelf.disableCameraTransform;
+                }
+            } else {
+                cameraState = ViewMode.Follower;
+                disableCameraTransform = true;
+            }
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
@@ -445,7 +476,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             userId={this.props.userId}
                             userName={this.props.userName}
                             room={this.state.room}/>
-                        <WhiteboardManager userAvatarUrl={this.props.userAvatarUrl} userName={this.props.userName} userId={this.props.userId} identity={this.props.identity} room={room}/>
+                        <WhiteboardManager
+                            userAvatarUrl={this.props.userAvatarUrl}
+                            userName={this.props.userName}
+                            userId={this.props.userId}
+                            identity={this.props.identity}
+                            cameraState={cameraState} disableCameraTransform={disableCameraTransform}
+                            room={room}/>
                     </div>
                 </RoomContextProvider>
             );
