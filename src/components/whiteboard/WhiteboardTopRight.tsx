@@ -13,6 +13,7 @@ export type WhiteboardTopRightProps = {
     room: Room;
     roomState: RoomState;
     whiteboardLayerDownRef: HTMLDivElement;
+    handleManagerState: () => void;
     deviceType: DeviceType;
     userAvatarUrl?: string;
     userName?: string;

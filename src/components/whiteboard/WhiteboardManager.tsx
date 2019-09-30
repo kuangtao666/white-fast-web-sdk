@@ -14,6 +14,8 @@ import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 export type WhiteboardManagerProps = {
     room: Room;
     userId: string;
+    handleManagerState: () => void;
+    isManagerOpen: boolean;
     cameraState?: ViewMode;
     disableCameraTransform?: boolean;
     identity?: IdentityType;
@@ -285,43 +287,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             return null;
         }
     }
-    private renderListener = (): React.ReactNode => {
-        const {room} = this.props;
-        const listenerRoomMembers = room.state.roomMembers.filter((roomMember: RoomMember) =>
-            roomMember.payload.identity === IdentityType.listener);
-        const listenerNodes = listenerRoomMembers.map((roomMember: RoomMember, index: number) => {
-            return (
-                <div className="room-member-cell" key={`${index}`}>
-                    <div className="room-member-cell-inner">
-                        {roomMember.payload.avatar ?
-                            <div className="manager-avatar-box">
-                                <img className="room-member-avatar"  src={roomMember.payload.avatar}/>
-                            </div>
-                            :
-                            <div className="manager-avatar-box">
-                                <Identicon
-                                    size={24}
-                                    string={roomMember.payload.userId}/>
-                            </div>
-                        }
-                        <div className="control-box-name">{roomMember.payload.name}</div>
-                    </div>
-                    <div className="room-member-cell-icon">
-                        <Icon type="lock" />
-                    </div>
-                </div>
-            );
-        });
-        if (listenerNodes) {
-            return <div>
-                <div>Listener</div>
-                {listenerNodes}
-            </div>;
-        } else {
-            return null;
-        }
-    }
-
     private renderHandUpBtn = (): React.ReactNode => {
         const {room} = this.props;
         const hostInfo = room.state.globalState.hostInfo;
@@ -348,20 +313,26 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     public render(): React.ReactNode {
-        return (
-            <div className="manager-box">
-                <div className="chat-box-title">
-                    <div className="chat-box-name">
-                        <span>课堂管理</span>
+        if (this.props.isManagerOpen) {
+            return (
+                <div className="manager-box">
+                    <div className="chat-box-title">
+                        <div className="chat-box-name">
+                            <span>课堂管理</span>
+                        </div>
+                        <div onClick={() => {
+                            this.props.handleManagerState();
+                        }} className="chat-box-close">
+                            <img src={close}/>
+                        </div>
                     </div>
-                    <div className="chat-box-close">
-                        <img src={close}/>
-                    </div>
+                    {this.renderHost()}
+                    {this.renderGuest()}
+                    {this.renderHandUpBtn()}
                 </div>
-                {this.renderHost()}
-                {this.renderGuest()}
-                {this.renderHandUpBtn()}
-            </div>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 }

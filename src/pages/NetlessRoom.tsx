@@ -116,6 +116,7 @@ export type RealTimeStates = {
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
+    isManagerOpen: boolean;
     deviceType: DeviceType;
 };
 
@@ -139,6 +140,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isChatOpen: this.props.isChatOpen,
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
+            isManagerOpen: false,
         };
         this.cursor = new UserCursor();
     }
@@ -318,6 +320,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             this.setState({isChatOpen: !this.state.isChatOpen});
         }
     }
+    private handleManagerState = (): void => {
+        this.setState({isManagerOpen: !this.state.isManagerOpen});
+    }
     private handleFileState = (): void => {
         this.setState({isFileOpen: !this.state.isFileOpen});
     }
@@ -420,6 +425,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 logoUrl={this.props.logoUrl}/>
                             {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
+                                handleManagerState={this.handleManagerState}
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState} deviceType={this.state.deviceType}
                                 identity={this.props.identity}
@@ -481,6 +487,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             userName={this.props.userName}
                             userId={this.props.userId}
                             identity={this.props.identity}
+                            isManagerOpen={this.state.isManagerOpen}
+                            handleManagerState={this.handleManagerState}
                             cameraState={cameraState} disableCameraTransform={disableCameraTransform}
                             room={room}/>
                     </div>
