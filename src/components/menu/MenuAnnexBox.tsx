@@ -45,7 +45,11 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     private pathName = (path: string): string => {
         const reg = /\/([^\/]*)\//g;
         reg.exec(path);
-        return RegExp.$1;
+        if (RegExp.$1 === "aria") {
+            return "";
+        } else {
+            return RegExp.$1;
+        }
     }
 
     public componentDidMount(): void {

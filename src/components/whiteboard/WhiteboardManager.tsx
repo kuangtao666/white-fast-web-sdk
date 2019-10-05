@@ -144,8 +144,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     <div className="manager-box-image">
                         <img src={hostInfo.avatar}/>
                     </div>
-                    <div className="manager-box-text">身份：老师</div>
-                    <div className="manager-box-text">名字：{hostInfo.name}</div>
+                    <div className="manager-box-text">老师：{hostInfo.name}</div>
                     {this.renderHostController(hostInfo)}
                 </div>
             );
@@ -333,7 +332,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 </div>
             );
         } else if (this.props.identity === IdentityType.guest) {
-            return this.renderHandUpBtn();
+            return null;
+            // return this.renderHandUpBtn();
         } else {
             return null;
         }

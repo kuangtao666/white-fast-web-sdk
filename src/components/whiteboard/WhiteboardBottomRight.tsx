@@ -148,19 +148,30 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     public render(): React.ReactNode {
         const {isReadOnly} = this.props;
         if (isReadOnly) {
-            return null;
-        }
-        return (
-            <div className="whiteboard-box-bottom-right">
-                <div className="whiteboard-box-bottom-right-mid">
-                    {this.renderAnnexBox()}
-                    <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                        <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
-                            <img src={chat}/>
-                        </div>
-                    </Badge>
+            return (
+                <div className="whiteboard-box-bottom-right">
+                    <div className="whiteboard-box-bottom-right-mid">
+                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                            <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
+                                <img src={chat}/>
+                            </div>
+                        </Badge>
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            return (
+                <div className="whiteboard-box-bottom-right">
+                    <div className="whiteboard-box-bottom-right-mid">
+                        {this.renderAnnexBox()}
+                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                            <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
+                                <img src={chat}/>
+                            </div>
+                        </Badge>
+                    </div>
+                </div>
+            );
+        }
     }
 }
