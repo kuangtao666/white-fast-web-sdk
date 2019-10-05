@@ -8,15 +8,35 @@ export enum ModeType {
     discuss = "discuss",
 }
 
+export type GuestUserType = {
+    userId: string,
+    identity: IdentityType,
+    avatar?: string,
+    name?: string,
+    isReadOnly: boolean,
+    isHandUp: boolean,
+    cameraState: ViewMode,
+    disableCameraTransform: boolean,
+};
+export type HostUserType = {
+    userId: string,
+    identity: IdentityType,
+    avatar?: string,
+    name?: string,
+    mode: ModeType,
+    cameraState: ViewMode,
+    disableCameraTransform: boolean,
+};
+
 export class RoomManager {
-  private readonly identity?: IdentityType;
+  private readonly identity: IdentityType;
   private readonly userAvatarUrl?: string;
   private readonly name?: string;
   private readonly userId: string;
   private readonly room: Room;
   public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string) {
     this.room = room;
-    this.identity = identity;
+    this.identity = identity ? identity : IdentityType.guest;
     this.userId = userId;
     this.userAvatarUrl = userAvatarUrl;
     this.name = name;
@@ -24,14 +44,14 @@ export class RoomManager {
 
   public start = async (): Promise<void> => {
       if (this.identity === IdentityType.host) {
-          const hostInfo = this.room.state.globalState.hostInfo;
+          const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
           if (hostInfo) {
               this.room.setViewMode(ViewMode.Broadcaster);
               if (hostInfo.userId !== this.userId) {
                   message.warning("已经有主持人");
               }
           } else {
-              const myHostInfo = {
+              const myHostInfo: HostUserType = {
                   userId: this.userId,
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
@@ -49,9 +69,9 @@ export class RoomManager {
           this.room.disableCameraTransform = true;
           await this.room.setWritable(false);
       } else {
-          const globalGuestUsers = this.room.state.globalState.guestUsers;
+          const globalGuestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
           if (globalGuestUsers === undefined) {
-              const guestUser = {
+              const guestUser: GuestUserType = {
                   userId: this.userId,
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
@@ -66,12 +86,12 @@ export class RoomManager {
               this.room.disableDeviceInputs = true;
               this.room.setViewMode(ViewMode.Follower);
           } else {
-              const myUser = globalGuestUsers.find((data: any) => data.userId === this.userId);
+              const myUser = globalGuestUsers.find((data: GuestUserType) => data.userId === this.userId);
               if (myUser) {
                   this.room.disableDeviceInputs = myUser.isReadOnly;
                   this.room.disableCameraTransform = myUser.disableCameraTransform;
               } else {
-                  const guestUser = {
+                  const guestUser: GuestUserType = {
                       userId: this.userId,
                       identity: this.identity,
                       avatar: this.userAvatarUrl,

@@ -2,7 +2,7 @@ import * as React from "react";
 import TopLoadingBar from "@netless/react-loading-bar";
 import {PPTProgressPhase, UploadManager} from "@netless/oss-upload-manager";
 import * as OSS from "ali-oss";
-import {Button, message, notification} from "antd";
+import {Icon, message} from "antd";
 import Dropzone from "react-dropzone";
 import {
     WhiteWebSdk,
@@ -34,8 +34,7 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
-import Identicon from "react-identicons";
-import {RoomManager} from "./RoomManager";
+import {GuestUserType, HostUserType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 
 export enum MenuInnerType {
@@ -66,6 +65,7 @@ export type RealTimeProps = {
     roomToken: string;
     userId: string;
     userName?: string;
+    roomName?: string;
     userAvatarUrl?: string;
     isReadOnly?: boolean;
     uploadToolBox?: UploadToolBoxType[],
@@ -336,7 +336,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return false;
         }
         if (room) {
-            const selfUser = room.state.globalState.guestUsers.find((user: any) => user.userId === userId);
+            const selfUser: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
             if (selfUser) {
                 room.disableDeviceInputs = selfUser.isReadOnly;
                 return selfUser.isReadOnly;
@@ -371,13 +371,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             let cameraState;
             let disableCameraTransform;
             if (this.props.identity === IdentityType.host) {
-                const userSelf = room.state.globalState.hostInfo;
+                const userSelf: HostUserType = room.state.globalState.hostInfo;
                 if (userSelf) {
                     cameraState = userSelf.cameraState;
                     disableCameraTransform = userSelf.disableCameraTransform;
                 }
             } else if (this.props.identity === IdentityType.guest) {
-                const userSelf = room.state.globalState.guestUsers.find((user: any) => user.userId === userId);
+                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
                 if (userSelf) {
                     cameraState = userSelf.cameraState;
                     disableCameraTransform = userSelf.disableCameraTransform;
@@ -422,9 +422,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                             <WhiteboardTopLeft
                                 clickLogoCallback={this.props.clickLogoCallback}
+                                identity={this.props.identity}
+                                roomName={this.props.roomName}
                                 logoUrl={this.props.logoUrl}/>
                             {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
+                                isManagerOpen={this.state.isManagerOpen}
                                 handleManagerState={this.handleManagerState}
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState} deviceType={this.state.deviceType}
@@ -438,6 +441,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <WhiteboardBottomLeft
                                 handleFileState={this.handleFileState}
                                 isReadOnly={isReadOnly}
+                                identity={this.props.identity}
                                 deviceType={this.state.deviceType}
                                 roomState={roomState}
                                 room={room}/>
@@ -489,8 +493,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             identity={this.props.identity}
                             isManagerOpen={this.state.isManagerOpen}
                             handleManagerState={this.handleManagerState}
-                            cameraState={cameraState} disableCameraTransform={disableCameraTransform}
+                            cameraState={cameraState}
+                            disableCameraTransform={disableCameraTransform}
                             room={room}/>
+                        {isReadOnly &&
+                        <div onClick={() => message.warning("老师正在讲课，屏幕被锁定。")} className="lock-icon">
+                            <Icon type="lock"/>
+                        </div>}
                     </div>
                 </RoomContextProvider>
             );

@@ -5,9 +5,9 @@ import * as close from "../../assets/image/close.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {RoomMember, ViewMode} from "white-react-sdk";
-import {Icon, Radio} from "antd";
+import {Icon, message, Radio} from "antd";
 import Identicon from "react-identicons";
-import {ModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 
@@ -44,21 +44,26 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private getSelfUserInfo = (): any => {
-        const globalGuestUsers = this.props.room.state.globalState.guestUsers;
+    private getSelfUserInfo = (): GuestUserType | null => {
+        const globalGuestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
         if (globalGuestUsers) {
-            return globalGuestUsers.find((user: any) => user.userId === this.props.userId);
+            const self = globalGuestUsers.find((user: GuestUserType) => user.userId === this.props.userId);
+            if (self) {
+                return self;
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
 
     private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
-        const globalGuestUsers = room.state.globalState.guestUsers;
-        const selfHostInfo = room.state.globalState.hostInfo;
+        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
+        const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
             if (mode === ModeType.handUp && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: any) => {
+                const users = globalGuestUsers.map((user: GuestUserType) => {
                     if (user.userId === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
                     }
@@ -68,7 +73,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             }
         } else {
             if (mode !== ModeType.discuss && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: any) => {
+                const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = true;
                     user.cameraState = ViewMode.Follower;
@@ -79,7 +84,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 selfHostInfo.disableCameraTransform = false;
                 room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
             } else if (mode === ModeType.discuss && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: any) => {
+                const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = false;
                     user.cameraState = ViewMode.Freedom;
@@ -106,7 +111,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             }
         }
     }
-    private renderHostController = (hostInfo: any): React.ReactNode => {
+    private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
         const {room} = this.props;
         if (hostInfo.mode) {
             if (this.props.identity === IdentityType.host) {
@@ -132,7 +137,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
 
     private renderHost = (): React.ReactNode => {
         const {room} = this.props;
-        const hostInfo = room.state.globalState.hostInfo;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (hostInfo) {
             return (
                 <div className="manager-box-inner-host">
@@ -149,10 +154,10 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private handleAgree = (room: Room, guestUser: any, guestUsers: any[]): void => {
+    private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
         if (this.props.identity === IdentityType.host) {
             if (guestUsers) {
-                const users = guestUsers.map((user: any) => {
+                const users = guestUsers.map((user: GuestUserType) => {
                     if (user.userId === guestUser.userId) {
                         user.isReadOnly = false;
                         user.cameraState = ViewMode.Freedom;
@@ -165,13 +170,13 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private handleUnlock = (state: boolean, room: Room, guestUser: any, guestUsers: any[]): void => {
+    private handleUnlock = (state: boolean, room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
         const {identity} = this.props;
         if (identity === IdentityType.host && guestUsers) {
             let users;
             if (state) {
                 // 解锁
-                users = guestUsers.map((user: any) => {
+                users = guestUsers.map((user: GuestUserType) => {
                     if (user.userId === guestUser.userId) {
                         user.isReadOnly = false;
                         user.cameraState = ViewMode.Freedom;
@@ -181,7 +186,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 });
             } else {
                 // 锁定
-                users = guestUsers.map((user: any) => {
+                users = guestUsers.map((user: GuestUserType) => {
                     if (user.userId === guestUser.userId) {
                         user.isReadOnly = true;
                         user.cameraState = ViewMode.Follower;
@@ -194,9 +199,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             room.setGlobalState({guestUsers: users});
         }
     }
-    private renderGuestIcon = (guestUser: any, guestUsers: any[]): React.ReactNode => {
+    private renderGuestIcon = (guestUser: GuestUserType, guestUsers: GuestUserType[]): React.ReactNode => {
         const {room} = this.props;
-        const hostInfo = room.state.globalState.hostInfo;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isHost = this.props.identity === IdentityType.host;
         if (hostInfo.mode === ModeType.handUp) {
             if (guestUser.isHandUp) {
@@ -253,10 +258,10 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
     private renderGuest = (): React.ReactNode => {
         const {room} = this.props;
-        const globalGuestUsers = room.state.globalState.guestUsers;
+        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
 
         if (globalGuestUsers) {
-            const guestNodes = globalGuestUsers.map((guestUser: any, index: number) => {
+            const guestNodes = globalGuestUsers.map((guestUser: GuestUserType, index: number) => {
                 return (
                     <div className="room-member-cell" key={`${index}`}>
                         <div className="room-member-cell-inner">
@@ -289,8 +294,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
     private renderHandUpBtn = (): React.ReactNode => {
         const {room} = this.props;
-        const hostInfo = room.state.globalState.hostInfo;
-        if (this.props.identity === IdentityType.guest && hostInfo.mode === ModeType.handUp) {
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        if (hostInfo.mode === ModeType.handUp) {
             const user = this.getSelfUserInfo();
             if (user) {
                 if (user.isReadOnly) {
@@ -302,10 +307,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     return null;
                 }
             } else {
-                return <div onClick={() => this.handleHandup(hostInfo.mode, room, this.props.userId)}
-                            className="manager-under-btn">
-                    {user.isHandUp ? "放下" : "举手"}
-                </div>;
+                return null;
             }
         } else {
             return null;
@@ -313,7 +315,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     public render(): React.ReactNode {
-        if (this.props.isManagerOpen) {
+        if (this.props.isManagerOpen && this.props.identity === IdentityType.host) {
             return (
                 <div className="manager-box">
                     <div className="chat-box-title">
@@ -328,9 +330,10 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     </div>
                     {this.renderHost()}
                     {this.renderGuest()}
-                    {this.renderHandUpBtn()}
                 </div>
             );
+        } else if (this.props.identity === IdentityType.guest) {
+            return this.renderHandUpBtn();
         } else {
             return null;
         }

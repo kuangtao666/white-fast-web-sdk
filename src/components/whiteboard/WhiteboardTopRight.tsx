@@ -5,8 +5,9 @@ import screen_shot from "../../assets/image/screen_shot.svg";
 import html2canvas from "html2canvas";
 import download from "downloadjs";
 import "./WhiteboardTopRight.less";
-import {Button, Icon, message, Popover, Tooltip} from "antd";
+import {Badge, Button, Icon, message, Popover, Tooltip} from "antd";
 import {LanguageEnum} from "../../pages/NetlessRoom";
+import {GuestUserType} from "../../pages/RoomManager";
 
 export type WhiteboardTopRightProps = {
     userId: string;
@@ -20,6 +21,7 @@ export type WhiteboardTopRightProps = {
     identity?: IdentityType;
     isReadOnly?: boolean;
     language?: LanguageEnum;
+    isManagerOpen: boolean;
 };
 
 export type WhiteboardTopRightStates = {
@@ -27,6 +29,8 @@ export type WhiteboardTopRightStates = {
     isLoading: boolean;
     canvas: any;
     imageRef: any;
+    handUpNumber: number;
+    seenHandUpNumber: number;
 };
 
 export enum IdentityType {
@@ -44,9 +48,10 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             isLoading: false,
             canvas: null,
             imageRef: null,
+            handUpNumber: 0,
+            seenHandUpNumber: 0,
         };
     }
-
     private handleExportImage = async (): Promise<void> => {
         const {language} = this.props;
         const isEnglish = language === LanguageEnum.English;
@@ -81,15 +86,31 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         }
     }
 
+    private handleDotState = (): boolean => {
+        if (!this.props.isManagerOpen) {
+            const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+            if (guestUsers && guestUsers.length > 0) {
+                const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
+                return handUpGuestUsers && handUpGuestUsers.length > 0;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
     public render(): React.ReactNode {
         const  {userAvatarUrl} = this.props;
         const isHost = this.props.identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
                 {isHost &&
-                <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                    <img style={{width: 16}} src={set_icon}/>
-                </div>}
+                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                        <img style={{width: 16}} src={set_icon}/>
+                    </div>
+                </Badge>}
                 {this.renderScreenShot()}
                 <div className="whiteboard-top-user-box">
                     <div className="whiteboard-top-right-user">

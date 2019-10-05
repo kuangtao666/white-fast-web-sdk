@@ -3,12 +3,14 @@ import {DeviceType, Room, RoomState} from "white-react-sdk";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
 import file from "../../assets/image/file.svg";
+import {IdentityType} from "./WhiteboardTopRight";
 
 export type WhiteboardBottomLeftProps = {
     room: Room;
     roomState: RoomState;
     handleFileState: (state: boolean) => void;
     deviceType: DeviceType;
+    identity?: IdentityType;
     isReadOnly?: boolean;
 };
 
@@ -36,9 +38,9 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         }
         return (
             <div className="whiteboard-box-bottom-left">
-                <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart">
+                {this.props.identity === IdentityType.host && <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart">
                     <img src={file}/>
-                </div>
+                </div>}
                 <ScaleController
                     zoomScale={roomState.zoomScale}
                     deviceType={this.props.deviceType}

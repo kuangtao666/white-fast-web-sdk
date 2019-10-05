@@ -8,9 +8,40 @@
   left: 12px;
   position: absolute;
   height: 32px;
-  cursor: pointer;
   z-index: 1001;
   user-select: none;
+  flex-direction: row;
+}
+.whiteboard-box-top-left-logo {
+  cursor: pointer;
+}
+.whiteboard-box-top-left-text-box {
+  display: flex;
+  flex-direction: row;
+}
+
+.whiteboard-box-top-left-text {
+  display: flex;
+  flex-direction: row;
+  padding-top: 7px;
+  color: @black_light;
+  font-weight: 300;
+  img {
+    width: 16px;
+  }
+}
+
+.rename-box {
+  padding: 16px;
+}
+
+.whiteboard-box-top-left-cutline {
+  width: 1px;
+  height: 16px;
+  background-color: @gray_light;
+  margin-left: 8px;
+  margin-right: 8px;
+  margin-top: 9px;
 }
 
 .whiteboard-box-top-left-name {
