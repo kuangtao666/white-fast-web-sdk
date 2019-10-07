@@ -7,12 +7,14 @@ import {Button, Input, Popover} from "antd";
 export type WhiteboardTopLeftProps = {
     logoUrl?: string;
     clickLogoCallback?: () => void;
+    roomRenameCallback?: (name: string) => void;
     roomName?: string;
     identity?: IdentityType;
 };
 
 export type WhiteboardTopLeftStates = {
     isVisible: boolean;
+    roomName?: string;
 };
 
 
@@ -22,13 +24,17 @@ export default class WhiteboardTopLeft extends React.Component<WhiteboardTopLeft
         super(props);
         this.state = {
             isVisible: false,
+            roomName: this.props.roomName,
         };
     }
 
     private handleReset = (): void => {
-        this.setState({isVisible: false});
+        this.setState({isVisible: false, roomName: this.props.roomName});
     }
     private handleRename = (): void => {
+        if (this.props.roomRenameCallback && this.state.roomName) {
+            this.props.roomRenameCallback(this.state.roomName);
+        }
         this.setState({isVisible: false});
     }
     private handlePopoverVisible = (): void => {
@@ -41,7 +47,8 @@ export default class WhiteboardTopLeft extends React.Component<WhiteboardTopLeft
         });
     }
     private renderRoomName = (): React.ReactNode => {
-        const {identity, roomName} = this.props;
+        const {identity} = this.props;
+        const {roomName} = this.state;
         const isHost = identity === IdentityType.host;
         if (isHost) {
             return (
@@ -50,7 +57,9 @@ export default class WhiteboardTopLeft extends React.Component<WhiteboardTopLeft
                     onVisibleChange={this.handleChange}
                     visible={this.state.isVisible}
                     content={<div className="rename-box">
-                        <Input defaultValue={roomName} style={{width: "100%", marginBottom: 12}}/>
+                        <Input onChange={ evt => {
+                            this.setState({roomName: evt.target.value});
+                        }} value={roomName} style={{width: "100%", marginBottom: 12}}/>
                         <div>
                             <Button
                                 type="primary"
@@ -80,7 +89,8 @@ export default class WhiteboardTopLeft extends React.Component<WhiteboardTopLeft
         }
     }
     public render(): React.ReactNode {
-        const {logoUrl, clickLogoCallback, roomName} = this.props;
+        const {logoUrl, clickLogoCallback} = this.props;
+        const {roomName} = this.state;
         return (
             <div className="whiteboard-box-top-left">
                 <div onClick={() => {

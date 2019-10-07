@@ -75,6 +75,7 @@ export type RealTimeProps = {
     defaultColorArray?: string[];
     identity?: IdentityType;
     colorArrayStateCallback?: (colorArray: string[]) => void;
+    roomRenameCallback?: (name: string) => void;
     documentArray?: PPTDataType[];
     roomCallback?: (room: Room) => void;
     logoUrl?: string;
@@ -424,6 +425,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
                             <WhiteboardTopLeft
                                 clickLogoCallback={this.props.clickLogoCallback}
+                                roomRenameCallback={this.props.roomRenameCallback}
                                 identity={this.props.identity}
                                 roomName={this.props.roomName}
                                 logoUrl={this.props.logoUrl}/>
