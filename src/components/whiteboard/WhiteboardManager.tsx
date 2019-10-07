@@ -44,20 +44,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private getSelfUserInfo = (): GuestUserType | null => {
-        const globalGuestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
-        if (globalGuestUsers) {
-            const self = globalGuestUsers.find((user: GuestUserType) => user.userId === this.props.userId);
-            if (self) {
-                return self;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
     private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
@@ -291,27 +277,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             return null;
         }
     }
-    private renderHandUpBtn = (): React.ReactNode => {
-        const {room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (hostInfo.mode === ModeType.handUp) {
-            const user = this.getSelfUserInfo();
-            if (user) {
-                if (user.isReadOnly) {
-                    return <div onClick={() => this.handleHandup(hostInfo.mode, room, this.props.userId)}
-                                className="manager-under-btn">
-                        {user.isHandUp ? "放下" : "举手"}
-                    </div>;
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
 
     public render(): React.ReactNode {
         if (this.props.isManagerOpen && this.props.identity === IdentityType.host) {
@@ -331,9 +296,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     {this.renderGuest()}
                 </div>
             );
-        } else if (this.props.identity === IdentityType.guest) {
-            return null;
-            // return this.renderHandUpBtn();
         } else {
             return null;
         }

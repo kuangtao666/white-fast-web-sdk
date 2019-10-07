@@ -3,11 +3,14 @@ import * as annex_box from "../../assets/image/annex_box.svg";
 import * as left_arrow from "../../assets/image/left_arrow.svg";
 import * as right_arrow from "../../assets/image/right_arrow.svg";
 import * as chat from "../../assets/image/chat.svg";
+import * as handup from "../../assets/image/handup.svg";
+import * as handup_black from "../../assets/image/handup_black.svg";
 import "./WhiteboardBottomRight.less";
-import {Badge, Tooltip} from "antd";
+import {Badge, message, Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
-import {DeviceType} from "white-react-sdk";
+import {DeviceType, ViewMode} from "white-react-sdk";
+import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 
 export type MessageType = {
     name: string,
@@ -27,6 +30,7 @@ export type hotkeyTooltipState = {
 export type WhiteboardBottomRightProps = {
     room: Room;
     roomState: RoomState;
+    userId: string;
     handleAnnexBoxMenuState: () => void;
     handleChatState: () => void;
     deviceType: DeviceType;
@@ -144,13 +148,92 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             </div>
         );
     }
+    private getSelfUserInfo = (): GuestUserType | null => {
+        const globalGuestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+        if (globalGuestUsers) {
+            const self = globalGuestUsers.find((user: GuestUserType) => user.userId === this.props.userId);
+            if (self) {
+                return self;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
+        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
+        const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
+        if (userId) {
+            if (mode === ModeType.handUp && globalGuestUsers) {
+                const users = globalGuestUsers.map((user: GuestUserType) => {
+                    if (user.userId === this.props.userId) {
+                        user.isHandUp = !user.isHandUp;
+                        if (user.isHandUp) {
+                            message.info("您已举手，请等待批准。");
+                        } else {
+                            message.info("您已取消举手。");
+                        }
+                    }
+                    return user;
+                });
+                room.setGlobalState({guestUsers: users});
+            }
+        } else {
+            if (mode !== ModeType.discuss && globalGuestUsers) {
+                const users = globalGuestUsers.map((user: GuestUserType) => {
+                    user.isHandUp = false;
+                    user.isReadOnly = true;
+                    user.cameraState = ViewMode.Follower;
+                    user.disableCameraTransform = true;
+                    return user;
+                });
+                selfHostInfo.cameraState = ViewMode.Broadcaster;
+                selfHostInfo.disableCameraTransform = false;
+                room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
+            } else if (mode === ModeType.discuss && globalGuestUsers) {
+                const users = globalGuestUsers.map((user: GuestUserType) => {
+                    user.isHandUp = false;
+                    user.isReadOnly = false;
+                    user.cameraState = ViewMode.Freedom;
+                    user.disableCameraTransform = false;
+                    return user;
+                });
+                selfHostInfo.cameraState = ViewMode.Freedom;
+                selfHostInfo.disableCameraTransform = false;
+                room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
+            }
+        }
+    }
 
+    private renderHandUpBtn = (): React.ReactNode => {
+        const {room} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        if (hostInfo.mode === ModeType.handUp) {
+            const user = this.getSelfUserInfo();
+            if (user) {
+                if (user.isReadOnly) {
+                    return <div onClick={() => this.handleHandup(hostInfo.mode, room, this.props.userId)}
+                                className="manager-under-btn">
+                        <img src={user.isHandUp ? handup_black : handup}/>
+                    </div>;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         const {isReadOnly} = this.props;
         if (isReadOnly) {
             return (
                 <div className="whiteboard-box-bottom-right">
                     <div className="whiteboard-box-bottom-right-mid">
+                        {this.renderHandUpBtn()}
                         <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                             <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
                                 <img src={chat}/>
