@@ -3,14 +3,14 @@ import * as ReactDOM from "react-dom";
 import NetlessPlayer from "../pages/NetlessPlayer";
 import NetlessRoom from "../pages/NetlessRoom";
 
-const RoomFacade = function (element: string, config: any): void {
+const RoomFacade = (element: string, config: any): void => {
     ReactDOM.render(
         <NetlessRoom {...config}/>,
         document.getElementById(element),
     );
 };
 
-const PlayerFacade = function (element: string, config: any): void {
+const PlayerFacade = (element: string, config: any): void => {
     ReactDOM.render(
         <NetlessPlayer {...config}/>,
         document.getElementById(element),
