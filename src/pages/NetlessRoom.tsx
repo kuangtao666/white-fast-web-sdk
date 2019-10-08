@@ -34,7 +34,7 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
-import {GuestUserType, HostUserType, RoomManager} from "./RoomManager";
+import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 
 export enum MenuInnerType {
@@ -64,6 +64,7 @@ export type RealTimeProps = {
     uuid: string;
     roomToken: string;
     userId: string;
+    mode?: ModeType,
     userName?: string;
     roomName?: string;
     userAvatarUrl?: string;
@@ -147,7 +148,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity} = this.props;
+        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity, mode} = this.props;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
@@ -190,7 +191,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
-            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName);
+            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, mode);
             await this.roomManager.start();
             if (roomCallback) {
                 roomCallback(room);

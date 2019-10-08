@@ -11,11 +11,19 @@
 }
 
 .player-video-out {
-  width: 300px;
-  height: 300px;
-  margin-top: 120px;
+  padding: 6px;
+  right: 0;
+  top: 120px;
   position: absolute;
-  z-index: 10;
+  box-shadow: 0 0 4px rgba(0,0,0,.2);
+  background-color: white;
+  border-radius: 4px;
+  z-index: 100;
+  cursor: pointer;
+  margin: 16px;
+  .vjs-poster {
+    background-color: #5B908E;
+  }
 }
 
 .player-video-out-mb {
@@ -43,6 +51,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .player-mask {
@@ -54,6 +63,14 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.player-video-box {
+  width: 240px;
+  height: 60px;
+  background-color: black;
+  position: absolute;
+  z-index: 60;
 }
 
 .player-board {
@@ -422,7 +439,7 @@
   z-index: 100;
   left: 16px;
   right: 16px;
-  bottom: 42px;
+  bottom: 24px;
   margin-left: auto;
   margin-right: auto;
   border-radius: 4px;

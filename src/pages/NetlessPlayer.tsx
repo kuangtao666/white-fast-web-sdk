@@ -11,11 +11,12 @@ import * as full_screen from "../assets/image/full_screen.svg";
 import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
-import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
+import {MessageType, WhiteboardBottomRightProps} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
-
+import Draggable from "react-draggable";
+import "video.js/dist/video-js.css";
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
@@ -67,7 +68,20 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             replayFail: false,
         };
     }
+
+    public componentWillReceiveProps(nextProps: PlayerPageProps): void {
+        if (this.props.isChatOpen !== nextProps.isChatOpen && nextProps.isChatOpen === false) {
+            this.setState({seenMessagesLength: this.state.messages.length});
+        }
+    }
+
     public async componentDidMount(): Promise<void> {
+        const {player} = this.state;
+        if (player) {
+            player.addMagixEventListener("message",  event => {
+                this.setState({messages: [...this.state.messages, event.payload]});
+            });
+        }
         const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
         if (uuid && roomToken) {
             const whiteWebSdk = new WhiteWebSdk();
@@ -265,9 +279,11 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             }} className="player-controller">
                                 {this.renderScale()}
                             </div>
-                            <div onClick={this.handleChatState} className="player-controller">
-                                <img src={chat_white}/>
-                            </div>
+                            <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isChatOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                                <div onClick={this.handleChatState} className="player-controller">
+                                    <img src={chat_white}/>
+                                </div>
+                            </Badge>
                         </div>
                     </div>
                 </div>
@@ -281,41 +297,77 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         this.setState({isChatOpen: !this.state.isChatOpen});
     }
 
+    private renderMedia = (): React.ReactNode => {
+        const {mediaUrl} = this.props;
+        if (mediaUrl) {
+            return (
+                <Draggable bounds="parent">
+                    <div className="player-video-out">
+                        <video
+                            poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
+                            className="video-js video-layout"
+                            id="white-sdk-video-js"/>
+                    </div>
+                </Draggable>
+            );
+        } else {
+            return null;
+        }
+    }
+
+    private renderLoading = (): React.ReactNode => {
+        const {player} = this.state;
+        if (player) {
+            return null;
+        } else {
+            return <div className="white-board-loading">
+                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/fast-sdk/icons/loading.svg"/>
+            </div>;
+        }
+    }
     public render(): React.ReactNode {
         const {player} = this.state;
         const {userId, userAvatarUrl, userName, boardBackgroundColor} = this.props;
         if (this.state.replayFail) {
             return <PageError/>;
-        } else if (!player) {
-            return <div className="white-board-loading">
-                <img src="https://white-sdk.oss-cn-beijing.aliyuncs.com/fast-sdk/icons/loading.svg"/>
-            </div>;
-        } else {
-            return (
-                <div id="netless-player" className="player-out-box">
-                    <WhiteboardTopLeft
-                        logoUrl={this.props.logoUrl}/>
-                    <div className="player-board">
-                        {this.renderScheduleView()}
-                        <div
-                            className="player-board-inner"
-                            onMouseOver={() => this.setState({isVisible: true})}
-                            onMouseLeave={() => this.setState({isVisible: false})}
-                        >
-                            <div
-                                onClick={() => this.onClickOperationButton(this.state.player!)}
-                                className="player-mask">
-                                {this.state.phase === PlayerPhase.Pause &&
-                                <div className="player-big-icon">
-                                    {this.operationButtonBig(this.state.phase)}
-                                </div>}
-                            </div>
-                            <PlayerWhiteboard style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}  className="player-box" player={player}/>
-                        </div>
-                    </div>
-                    <WhiteboardChat isChatOpen={this.state.isChatOpen} userId={userId} userName={userName} userAvatarUrl={userAvatarUrl} handleChatState={this.handleChatState}/>
-                </div>
-            );
         }
+        return (
+            <div id="netless-player" className="player-out-box">
+                {this.renderLoading()}
+                <WhiteboardTopLeft
+                    logoUrl={this.props.logoUrl}/>
+                <div className="player-board">
+                    {this.renderMedia()}
+                    {this.renderScheduleView()}
+                    <div
+                        className="player-board-inner"
+                        onMouseOver={() => this.setState({isVisible: true})}
+                        onMouseLeave={() => this.setState({isVisible: false})}
+                    >
+                        <div
+                            onClick={() => this.onClickOperationButton(this.state.player!)}
+                            className="player-mask">
+                            {this.state.phase === PlayerPhase.Pause &&
+                            <div className="player-big-icon">
+                                {this.operationButtonBig(this.state.phase)}
+                            </div>}
+                        </div>
+                        {player &&
+                        <PlayerWhiteboard
+                            style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}
+                            className="player-box"
+                            player={player}/>}
+                    </div>
+                </div>
+                {player &&
+                <WhiteboardChat
+                    player={player}
+                    isChatOpen={this.state.isChatOpen}
+                    userId={userId}
+                    userName={userName}
+                    userAvatarUrl={userAvatarUrl}
+                    handleChatState={this.handleChatState}/>}
+            </div>
+        );
     }
 }
