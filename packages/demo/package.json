@@ -5,7 +5,6 @@
   "author": "Wushuang",
   "license": "MIT",
   "theme": "./theme.js",
-  "private": true,
   "proxy": "http://localhost:3009/",
   "scripts": {
     "start": "react-app-rewired start --scripts-version react-scripts-ts",
