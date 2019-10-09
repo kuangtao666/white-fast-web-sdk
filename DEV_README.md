@@ -3,7 +3,7 @@
 ## Install lerna
 
 ```
-yarn add global lerna
+yarn global add lerna
 ```
 
 ## Install all

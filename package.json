@@ -3,5 +3,8 @@
   "private": true,
   "devDependencies": {
     "lerna": "^3.16.5"
+  },
+  "dependencies": {
+    "global": "^4.4.0"
   }
 }

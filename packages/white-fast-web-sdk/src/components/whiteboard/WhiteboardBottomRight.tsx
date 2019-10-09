@@ -208,8 +208,8 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
 
     private renderHandUpBtn = (): React.ReactNode => {
         const {room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (hostInfo.mode === ModeType.handUp) {
+        const hostInfo = room.state.globalState.hostInfo;
+        if (hostInfo && hostInfo.mode === ModeType.handUp) {
             const user = this.getSelfUserInfo();
             if (user) {
                 if (user.isReadOnly) {
