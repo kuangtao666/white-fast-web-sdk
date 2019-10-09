@@ -11,6 +11,7 @@ module.exports = {
 
     output: {
         filename: 'bundle.js',
+        libraryTarget: "umd",
         path: path.resolve(__dirname, 'dist'),
     },
 
@@ -68,19 +69,17 @@ module.exports = {
     },
     optimization: {
         minimizer: [
-            // 自定义js优化配置，将会覆盖默认配置
             new TerserPlugin({
                 parallel: true,
             }),
-            // 用于优化css文件
             new OptimizeCssAssetsPlugin({
                 assetNameRegExp: /\.css$/g,
                 cssProcessorOptions: {
                     safe: true,
-                    autoprefixer: { disable: true }, // 这里是个大坑，稍后会提到
+                    autoprefixer: { disable: true },
                     mergeLonghand: false,
                     discardComments: {
-                        removeAll: true // 移除注释
+                        removeAll: true
                     }
                 },
                 canPrint: true
