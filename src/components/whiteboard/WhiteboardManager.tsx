@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Tabs } from "antd";
+const { TabPane } = Tabs;
 import "./WhiteboardManager.less";
 import {Room, Player} from "white-web-sdk";
 import * as close from "../../assets/image/close.svg";
@@ -25,6 +27,7 @@ export type WhiteboardManagerProps = {
 };
 
 export type WhiteboardManagerStates = {
+    isLandscape: boolean;
 };
 
 
@@ -33,8 +36,23 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
 
     public constructor(props: WhiteboardManagerProps) {
         super(props);
+        this.state = {
+            isLandscape: false,
+        };
     }
-
+    private detectLandscape = (): void => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const isLandscape = (width / height) >= 1;
+        this.setState({isLandscape: isLandscape});
+    }
+    public componentWillUnmount(): void {
+        window.removeEventListener("resize", this.detectLandscape);
+    }
+    public componentDidMount(): void {
+        this.detectLandscape();
+        window.addEventListener("resize", this.detectLandscape);
+    }
     public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
         if (this.props.cameraState !== undefined && this.props.disableCameraTransform !== undefined && nextProps.cameraState !== undefined && nextProps.disableCameraTransform !== undefined) {
            if (this.props.cameraState !== nextProps.cameraState) {
@@ -281,7 +299,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     public render(): React.ReactNode {
         if (this.props.isManagerOpen && this.props.identity === IdentityType.host) {
             return (
-                <div className="manager-box">
+                <div className={this.state.isLandscape ? "manager-box" : "manager-box-mask"}>
                     <div className="chat-box-title">
                         <div className="chat-box-name">
                             <span>课堂管理</span>
@@ -293,7 +311,16 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         </div>
                     </div>
                     {this.renderHost()}
-                    {this.renderGuest()}
+                    <div className="chat-box-switch">
+                        <Tabs defaultActiveKey="1">
+                            <TabPane tab="聊天" key="1">
+
+                            </TabPane>
+                            <TabPane tab="权限" key="2">
+                                {this.renderGuest()}
+                            </TabPane>
+                        </Tabs>
+                    </div>
                 </div>
             );
         } else {

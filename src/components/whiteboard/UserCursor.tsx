@@ -1,6 +1,5 @@
 import * as React from "react";
 import {CursorAdapter, CursorDescription, Cursor, RoomMember, Color} from "white-react-sdk";
-import Identicon from "react-identicons";
 import "./UserCursor.less";
 import * as selector from "../../assets/image/selector.svg";
 import * as pencil from "../../assets/image/pencil.svg";
@@ -8,6 +7,7 @@ import * as text from "../../assets/image/text.svg";
 import * as eraser from "../../assets/image/eraser.svg";
 import * as ellipse from "../../assets/image/ellipse.svg";
 import * as rectangle from "../../assets/image/rectangle.svg";
+import Identicon from "react-identicons";
 
 export type CursorComponentProps = {
     roomMember: RoomMember;

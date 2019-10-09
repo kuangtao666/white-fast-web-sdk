@@ -34,12 +34,14 @@ export class RoomManager {
   private readonly name?: string;
   private readonly userId: string;
   private readonly room: Room;
-  public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string) {
+  private readonly mode?: ModeType;
+  public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string, mode?: ModeType) {
     this.room = room;
     this.identity = identity ? identity : IdentityType.guest;
     this.userId = userId;
     this.userAvatarUrl = userAvatarUrl;
     this.name = name;
+    this.mode = mode;
   }
 
   public start = async (): Promise<void> => {
@@ -48,7 +50,18 @@ export class RoomManager {
           if (hostInfo) {
               this.room.setViewMode(ViewMode.Broadcaster);
               if (hostInfo.userId !== this.userId) {
-                  message.warning("已经有主持人");
+                  const myHostInfo: HostUserType = {
+                      userId: this.userId,
+                      identity: this.identity,
+                      avatar: this.userAvatarUrl,
+                      name: this.name,
+                      mode: this.mode ? this.mode : ModeType.discuss,
+                      cameraState: ViewMode.Broadcaster,
+                      disableCameraTransform: false,
+                  };
+                  this.room.disableCameraTransform = false;
+                  this.room.setGlobalState({hostInfo: myHostInfo});
+                  message.success("您成为主持人");
               }
           } else {
               const myHostInfo: HostUserType = {
@@ -56,7 +69,7 @@ export class RoomManager {
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
                   name: this.name,
-                  mode: ModeType.lecture,
+                  mode: this.mode ? this.mode : ModeType.discuss,
                   cameraState: ViewMode.Broadcaster,
                   disableCameraTransform: false,
               };
