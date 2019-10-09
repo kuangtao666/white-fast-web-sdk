@@ -1,5 +1,6 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
+import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "white-fast-web-sdk";
@@ -31,6 +32,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
     private startJoinRoom = async (): Promise<void> => {
         const {userId, uuid, identityType} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
+        const agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
         if (roomToken) {
             WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
@@ -43,6 +45,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 loadingSvgUrl: "",
                 clickLogoCallback: () => {
                 },
+                agoraClient: agoraClient,
                 identity: identityType,
                 language: "Chinese",
                 toolBarPosition: "left",
@@ -98,8 +101,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
 
     public render(): React.ReactNode {
         return (
-            <div id="whiteboard" className="whiteboard-box">
-            </div>
+            <div id="whiteboard" className="whiteboard-box"/>
         );
     }
 }

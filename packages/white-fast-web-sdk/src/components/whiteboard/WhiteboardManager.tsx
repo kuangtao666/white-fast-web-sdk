@@ -12,12 +12,14 @@ import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
+import WhiteboardChat from "./WhiteboardChat";
 
 export type WhiteboardManagerProps = {
     room: Room;
     userId: string;
     handleManagerState: () => void;
     isManagerOpen: boolean;
+    isChatOpen: boolean;
     cameraState?: ViewMode;
     disableCameraTransform?: boolean;
     identity?: IdentityType;
@@ -28,6 +30,7 @@ export type WhiteboardManagerProps = {
 
 export type WhiteboardManagerStates = {
     isLandscape: boolean;
+    activeKey: string;
 };
 
 
@@ -38,6 +41,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         super(props);
         this.state = {
             isLandscape: false,
+            activeKey: "1",
         };
     }
     private detectLandscape = (): void => {
@@ -59,6 +63,13 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                this.props.room.setViewMode(nextProps.cameraState);
                this.props.room.disableCameraTransform = nextProps.disableCameraTransform;
            }
+        }
+        if (this.props.isChatOpen !== nextProps.isChatOpen) {
+            if (nextProps.isChatOpen) {
+                this.setState({activeKey: "2"});
+            } else {
+                this.setState({activeKey: "1"});
+            }
         }
     }
 
@@ -286,8 +297,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 );
             });
             return (
-                <div className="guest-box">
-                    <div className="guest-box-title">学生</div>
+                <div>
                     {guestNodes}
                 </div>
             );
@@ -297,7 +307,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     public render(): React.ReactNode {
-        if (this.props.isManagerOpen && this.props.identity === IdentityType.host) {
+        if (this.props.isManagerOpen) {
             return (
                 <div className={this.state.isLandscape ? "manager-box" : "manager-box-mask"}>
                     <div className="chat-box-title">
@@ -312,12 +322,17 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     </div>
                     {this.renderHost()}
                     <div className="chat-box-switch">
-                        <Tabs defaultActiveKey="1">
-                            <TabPane tab="聊天" key="1">
-
-                            </TabPane>
-                            <TabPane tab="权限" key="2">
+                        <Tabs defaultActiveKey={this.state.activeKey}>
+                            <TabPane tab="用户列表" key="1">
                                 {this.renderGuest()}
+                            </TabPane>
+                            <TabPane tab="聊天群组" key="2">
+                                <WhiteboardChat
+                                    language={this.props.language}
+                                    userAvatarUrl={this.props.userAvatarUrl}
+                                    userId={this.props.userId}
+                                    userName={this.props.userName}
+                                    room={this.props.room}/>
                             </TabPane>
                         </Tabs>
                     </div>

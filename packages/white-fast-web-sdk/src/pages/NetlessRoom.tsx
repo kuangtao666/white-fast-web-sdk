@@ -81,10 +81,10 @@ export type RealTimeProps = {
     roomCallback?: (room: Room) => void;
     logoUrl?: string;
     loadingSvgUrl?: string;
-    isChatOpen?: boolean;
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
+    agoraClient?: any;
 };
 
 export enum ToolBarPositionEnum {
@@ -110,7 +110,7 @@ export type RealTimeStates = {
     converterPercent: number;
     isPreviewMenuOpen: boolean;
     isFileMenuOpen: boolean;
-    isChatOpen?: boolean;
+    isChatOpen: boolean;
     isFileOpen: boolean;
     room?: Room;
     roomState?: RoomState;
@@ -139,7 +139,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             converterPercent: 0,
             isPreviewMenuOpen: false,
             isFileMenuOpen: false,
-            isChatOpen: this.props.isChatOpen,
+            isChatOpen: false,
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
             isManagerOpen: false,
@@ -191,6 +191,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
+            room.moveCameraToContain({
+                originX: - 600,
+                originY: - 337.5,
+                width: 1200,
+                height: 675,
+                animationMode: "immediately",
+            });
             this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, mode);
             await this.roomManager.start();
             if (roomCallback) {
@@ -316,16 +323,17 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private handleChatState = (): void => {
-        this.setState({isManagerOpen: false});
-        if (this.state.isChatOpen === undefined) {
-            this.setState({isChatOpen: true});
-        } else {
-            this.setState({isChatOpen: !this.state.isChatOpen});
+
+        if (!this.state.isManagerOpen) {
+            this.setState({isChatOpen: true, isManagerOpen: true});
         }
     }
     private handleManagerState = (): void => {
-        this.setState({isChatOpen: false});
-        this.setState({isManagerOpen: !this.state.isManagerOpen});
+        if (this.state.isManagerOpen) {
+            this.setState({isManagerOpen: false, isChatOpen: false});
+        } else {
+            this.setState({isManagerOpen: true});
+        }
     }
     private handleFileState = (): void => {
         this.setState({isFileOpen: !this.state.isFileOpen});
@@ -484,18 +492,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
-                        <WhiteboardChat
-                            language={this.props.language}
-                            isChatOpen={this.state.isChatOpen}
-                            handleChatState={this.handleChatState}
-                            userAvatarUrl={this.props.userAvatarUrl}
-                            userId={this.props.userId}
-                            userName={this.props.userName}
-                            room={this.state.room}/>
                         <WhiteboardManager
                             userAvatarUrl={this.props.userAvatarUrl}
                             userName={this.props.userName}
                             userId={this.props.userId}
+                            isChatOpen={this.state.isChatOpen}
                             identity={this.props.identity}
                             isManagerOpen={this.state.isManagerOpen}
                             handleManagerState={this.handleManagerState}

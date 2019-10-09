@@ -362,11 +362,9 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                 {player &&
                 <WhiteboardChat
                     player={player}
-                    isChatOpen={this.state.isChatOpen}
                     userId={userId}
                     userName={userName}
-                    userAvatarUrl={userAvatarUrl}
-                    handleChatState={this.handleChatState}/>}
+                    userAvatarUrl={userAvatarUrl}/>}
             </div>
         );
     }

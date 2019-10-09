@@ -1,12 +1,9 @@
 import * as React from "react";
-import {ViewMode, Room, RoomMember, RoomState, Scene, DeviceType} from "white-react-sdk";
+import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
 import QRCode from "qrcode.react";
 import set_icon from "../../assets/image/set_icon.svg";
-// import screen_shot from "../../assets/image/screen_shot.svg";
 import * as add from "../../assets/image/add.svg";
-// import html2canvas from "html2canvas";
-// import download from "downloadjs";
-import {Badge, Button, Icon, message, Popover, Tooltip, Modal, Input} from "antd";
+import {Badge, Button, message, Modal, Input} from "antd";
 import Clipboard from "react-clipboard.js";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
@@ -59,39 +56,6 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             url: location.href,
         };
     }
-    // private handleExportImage = async (): Promise<void> => {
-    //     const {language} = this.props;
-    //     const isEnglish = language === LanguageEnum.English;
-    //     message.loading(isEnglish ? "Exporting image" : "正在导出图片");
-    //     const imageCanvas = await html2canvas(this.props.whiteboardLayerDownRef, {
-    //         useCORS: true,
-    //         logging: false,
-    //     });
-    //     const image = imageCanvas.toDataURL();
-    //     download(image, isEnglish ? "unnamed" : "未命名资料", "image/png");
-    // }
-
-
-    // private renderScreenShot = (): React.ReactNode => {
-    //     const  {deviceType, language} = this.props;
-    //     const isEnglish = language === LanguageEnum.English;
-    //     const isMobile = deviceType === DeviceType.Touch;
-    //     if (isMobile) {
-    //         return (
-    //             <div onClick={this.handleExportImage} className="whiteboard-top-right-cell">
-    //                 <img style={{width: 22}} src={screen_shot}/>
-    //             </div>
-    //         );
-    //     } else {
-    //         return (
-    //             <Tooltip title={isEnglish ? "Screen shot" : "截图"}>
-    //                 <div onClick={this.handleExportImage} className="whiteboard-top-right-cell">
-    //                     <img style={{width: 22}} src={screen_shot}/>
-    //                 </div>
-    //             </Tooltip>
-    //         );
-    //     }
-    // }
 
     private handleDotState = (): boolean => {
         if (!this.props.isManagerOpen) {
@@ -125,29 +89,6 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             return classUrl;
         }
     }
-    // private renderShareTitle = (): React.ReactNode => {
-    //     if (this.props.identity === IdentityType.host) {
-    //         if (this.props.) {
-    //             return  "未开启只读模式";
-    //         } else {
-    //             return  "已开启只读模式";
-    //         }
-    //     } else {
-    //         return "分享只读房间";
-    //     }
-    // }
-    // private switchWhiteboardRoomType = (): void => {
-    //     if (this.state.netlessRoomType === NetlessRoomType.interactive) {
-    //         const shareUrl = this.state.url.replace(`${NetlessRoomType.interactive}`, `${NetlessRoomType.live}`);
-    //         this.setState({url: shareUrl, netlessRoomType: NetlessRoomType.live});
-    //     } else if (this.state.netlessRoomType === NetlessRoomType.teacher_interactive) {
-    //         const shareUrl = this.state.url.replace(`${NetlessRoomType.teacher_interactive}`, `${NetlessRoomType.live}`);
-    //         this.setState({url: shareUrl, netlessRoomType: NetlessRoomType.live});
-    //     } else {
-    //         const shareUrl = this.state.url.replace(`${NetlessRoomType.live}`, `${NetlessRoomType.interactive}`);
-    //         this.setState({url: shareUrl, netlessRoomType: NetlessRoomType.interactive});
-    //     }
-    // }
     private handleInvite = (): void => {
         this.setState({isInviteVisible: true});
     }
@@ -163,7 +104,6 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img style={{width: 16}} src={set_icon}/>
                     </div>
                 </Badge>}
-                {/*{this.renderScreenShot()}*/}
                 <div
                     className="whiteboard-top-right-cell" onClick={this.handleInvite}>
                     <img style={{width: 18}} src={add}/>
