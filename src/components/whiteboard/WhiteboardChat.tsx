@@ -69,6 +69,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     }
 
     public async componentDidMount(): Promise<void> {
+        this.detectLandscape();
         window.addEventListener("resize", this.detectLandscape);
         const {room, player} = this.props;
         if (room) {

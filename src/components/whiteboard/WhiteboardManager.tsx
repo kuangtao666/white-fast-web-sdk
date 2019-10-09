@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Tabs } from "antd";
+const { TabPane } = Tabs;
 import "./WhiteboardManager.less";
 import {Room, Player} from "white-web-sdk";
 import * as close from "../../assets/image/close.svg";
@@ -48,6 +50,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         window.removeEventListener("resize", this.detectLandscape);
     }
     public componentDidMount(): void {
+        this.detectLandscape();
         window.addEventListener("resize", this.detectLandscape);
     }
     public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
@@ -308,7 +311,16 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         </div>
                     </div>
                     {this.renderHost()}
-                    {this.renderGuest()}
+                    <div className="chat-box-switch">
+                        <Tabs defaultActiveKey="1">
+                            <TabPane tab="聊天" key="1">
+
+                            </TabPane>
+                            <TabPane tab="权限" key="2">
+                                {this.renderGuest()}
+                            </TabPane>
+                        </Tabs>
+                    </div>
                 </div>
             );
         } else {
