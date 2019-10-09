@@ -7,7 +7,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 // const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 module.exports = {
-    entry: path.resolve(__dirname, 'src/facade/index.tsx'),
+    entry: path.resolve(__dirname, 'src/facade/index.ts'),
 
     output: {
         filename: 'bundle.js',

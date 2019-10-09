@@ -1,5 +1,6 @@
 import { RoomFacade, PlayerFacade } from "./Facade";
-const WhiteFastSDK: { Room: any, Player: any } = {
+type FastSDK = { Room: any, Player: any };
+const WhiteFastSDK: FastSDK = {
     Room: RoomFacade,
     Player: PlayerFacade,
 };
