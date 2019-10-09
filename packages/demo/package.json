@@ -7,7 +7,7 @@
   "theme": "./theme.js",
   "proxy": "http://localhost:3009/",
   "scripts": {
-    "start": "react-app-rewired start --scripts-version react-scripts-ts",
+    "dev": "react-app-rewired start --scripts-version react-scripts-ts",
     "build": "rimraf build && NODE_ENV=production react-app-rewired --max-old-space-size=4096 build --scripts-version react-scripts-ts",
     "build:app": "rm -rf ./dist && electron-builder build --win --x64 && electron-builder build --mac --x64"
   },

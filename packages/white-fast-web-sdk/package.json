@@ -16,7 +16,9 @@
     "releaseToCDN": "",
     "releaseToNPM": "",
     "predev": "yarn type-check",
-    "dev": "webpack-dev-server --config webpack.config.js --progress --colors --open --mode=development",
+    "prestart": "yarn type-check",
+    "dev": "webpack --config webpack.config.js  --watch --progress --colors --mode=development",
+    "start": "webpack-dev-server --config webpack.config.js --progress --colors --open --mode=development",
     "profile": "webpack-dev-server --config webpack.config.js --progress --colors --open --mode=production"
   },
   "dependencies": {
