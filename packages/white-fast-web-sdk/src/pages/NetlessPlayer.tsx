@@ -361,6 +361,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                 </div>
                 {player &&
                 <WhiteboardChat
+                    messages={this.state.messages}
                     player={player}
                     userId={userId}
                     userName={userName}

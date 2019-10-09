@@ -20,6 +20,7 @@ const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardChatProps = {
     userId: string;
+    messages: MessageType[];
     userAvatarUrl?: string;
     userName?: string;
     room?: Room;
@@ -28,7 +29,6 @@ export type WhiteboardChatProps = {
 };
 
 export type WhiteboardChatStates = {
-    messages: MessageType[];
     url: string;
     isLandscape: boolean;
 };
@@ -41,7 +41,6 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     public constructor(props: WhiteboardChatProps) {
         super(props);
         this.state = {
-            messages: [],
             url: "",
             isLandscape: true,
         };
@@ -68,16 +67,13 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     public async componentDidMount(): Promise<void> {
         this.detectLandscape();
         window.addEventListener("resize", this.detectLandscape);
-        const {room, player} = this.props;
-        if (room) {
-            room.addMagixEventListener("message",  event => {
-                this.setState({messages: [...this.state.messages, event.payload]});
-            });
-        } else if (player) {
-            player.addMagixEventListener("message",  event => {
-                this.setState({messages: [...this.state.messages, event.payload]});
-            });
-        }
+        // const {room, player} = this.props;
+        // if (room) {
+        // } else if (player) {
+        //     player.addMagixEventListener("message",  event => {
+        //         this.setState({messages: [...this.state.messages, event.payload]});
+        //     });
+        // }
         await timeout(0);
         this.scrollToBottom();
         const canvasArray: any = document.getElementsByClassName("identicon").item(0);
@@ -93,7 +89,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     }
 
     public render(): React.ReactNode {
-        const messages: MessageType[] = this.state.messages;
+        const messages: MessageType[] = this.props.messages;
         const {language} = this.props;
         const isEnglish = language === LanguageEnum.English;
         if (messages.length > 0) {

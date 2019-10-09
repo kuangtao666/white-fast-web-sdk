@@ -13,6 +13,7 @@ import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
+import {MessageType} from "./WhiteboardBottomRight";
 
 export type WhiteboardManagerProps = {
     room: Room;
@@ -31,6 +32,7 @@ export type WhiteboardManagerProps = {
 export type WhiteboardManagerStates = {
     isLandscape: boolean;
     activeKey: string;
+    messages: MessageType[];
 };
 
 
@@ -42,6 +44,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         this.state = {
             isLandscape: false,
             activeKey: "1",
+            messages: [],
         };
     }
     private detectLandscape = (): void => {
@@ -53,8 +56,12 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     public componentWillUnmount(): void {
         window.removeEventListener("resize", this.detectLandscape);
     }
+
     public componentDidMount(): void {
         this.detectLandscape();
+        this.props.room.addMagixEventListener("message",  (event: any) => {
+            this.setState({messages: [...this.state.messages, event.payload]});
+        });
         window.addEventListener("resize", this.detectLandscape);
     }
     public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
@@ -323,12 +330,13 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     {this.renderHost()}
                     <div className="chat-box-switch">
                         <Tabs defaultActiveKey={this.state.activeKey}>
-                            <TabPane tab="用户列表" key="1">
+                            <TabPane forceRender={true}  tab="用户列表" key="1">
                                 {this.renderGuest()}
                             </TabPane>
-                            <TabPane tab="聊天群组" key="2">
+                            <TabPane forceRender={true} tab="聊天群组" key="2">
                                 <WhiteboardChat
                                     language={this.props.language}
+                                    messages={this.state.messages}
                                     userAvatarUrl={this.props.userAvatarUrl}
                                     userId={this.props.userId}
                                     userName={this.props.userName}

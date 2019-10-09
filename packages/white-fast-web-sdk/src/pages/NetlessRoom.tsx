@@ -323,9 +323,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private handleChatState = (): void => {
-
         if (!this.state.isManagerOpen) {
             this.setState({isChatOpen: true, isManagerOpen: true});
+        } else {
+            this.setState({isChatOpen: true});
         }
     }
     private handleManagerState = (): void => {
@@ -459,12 +460,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 roomState={roomState}
                                 room={room}/>
                             <WhiteboardBottomRight
+                                isManagerOpen={this.state.isManagerOpen}
                                 deviceType={this.state.deviceType}
                                 roomState={roomState}
                                 userId={this.props.userId}
                                 language={this.props.language}
                                 isReadOnly={isReadOnly}
-                                chatState={this.state.isChatOpen}
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
