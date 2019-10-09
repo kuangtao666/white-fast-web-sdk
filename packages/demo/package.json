@@ -1,6 +1,6 @@
 {
   "name": "netless-rtc-react-whiteboard",
-  "version": "2.0.0",
+  "version": "1.1.0",
   "main": "./main.js",
   "author": "Wushuang",
   "license": "MIT",
@@ -51,8 +51,8 @@
     "react-dropzone": "4.2.10",
     "react-identicons": "^1.1.7",
     "uuid": "^3.3.2",
-    "white-react-sdk": "^2.3.7",
-    "white-fast-web-sdk": "1.0.3"
+    "white-fast-web-sdk": "^1.1.0",
+    "white-react-sdk": "^2.3.7"
   },
   "devDependencies": {
     "@types/agora-rtc-sdk": "^2.6.0",
