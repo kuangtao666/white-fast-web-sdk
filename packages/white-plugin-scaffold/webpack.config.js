@@ -4,6 +4,7 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 module.exports = {
     entry: path.resolve(__dirname, 'src/index.tsx'),
 
@@ -74,6 +75,7 @@ module.exports = {
         ]
     },
     plugins: [
+        new PeerDepsExternalsPlugin(),
         new ForkTsCheckerWebpackPlugin(),
         new webpack.ContextReplacementPlugin(
             /moment[/\\]locale$/,
