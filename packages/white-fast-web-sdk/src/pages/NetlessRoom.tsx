@@ -36,7 +36,7 @@ import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
-import {CounterComponent} from "../components/Counter";
+import CounterComponent from "white-plugin-scaffold";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
