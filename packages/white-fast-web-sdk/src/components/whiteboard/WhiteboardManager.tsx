@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Tabs } from "antd";
+import {Badge, Tabs} from "antd";
 const { TabPane } = Tabs;
 import "./WhiteboardManager.less";
 import {Room, Player} from "white-web-sdk";
@@ -12,22 +12,29 @@ import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
+import WhiteboardChat from "./WhiteboardChat";
+import {MessageType} from "./WhiteboardBottomRight";
 
 export type WhiteboardManagerProps = {
     room: Room;
     userId: string;
     handleManagerState: () => void;
     isManagerOpen: boolean;
+    isChatOpen: boolean;
     cameraState?: ViewMode;
     disableCameraTransform?: boolean;
     identity?: IdentityType;
     userName?: string;
     userAvatarUrl?: string;
     language?: LanguageEnum;
+    agoraClient?: any;
 };
 
 export type WhiteboardManagerStates = {
     isLandscape: boolean;
+    activeKey: string;
+    messages: MessageType[];
+    seenMessagesLength: number,
 };
 
 
@@ -38,6 +45,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         super(props);
         this.state = {
             isLandscape: false,
+            activeKey: "1",
+            messages: [],
+            seenMessagesLength: 0,
         };
     }
     private detectLandscape = (): void => {
@@ -46,11 +56,16 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const isLandscape = (width / height) >= 1;
         this.setState({isLandscape: isLandscape});
     }
+
     public componentWillUnmount(): void {
         window.removeEventListener("resize", this.detectLandscape);
     }
+
     public componentDidMount(): void {
         this.detectLandscape();
+        this.props.room.addMagixEventListener("message",  (event: any) => {
+            this.setState({messages: [...this.state.messages, event.payload]});
+        });
         window.addEventListener("resize", this.detectLandscape);
     }
     public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
@@ -59,6 +74,13 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                this.props.room.setViewMode(nextProps.cameraState);
                this.props.room.disableCameraTransform = nextProps.disableCameraTransform;
            }
+        }
+        if (this.props.isChatOpen !== nextProps.isChatOpen) {
+            if (nextProps.isChatOpen) {
+                this.setState({activeKey: "2"});
+            } else {
+                this.setState({activeKey: "1"});
+            }
         }
     }
 
@@ -120,7 +142,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         if (hostInfo.mode) {
             if (this.props.identity === IdentityType.host) {
                 return (
-                    <Radio.Group style={{marginTop: 6}} value={hostInfo.mode} onChange={evt => {
+                    <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.mode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
                         room.setGlobalState({hostInfo: {...hostInfo, mode: evt.target.value}});
                     }}>
@@ -131,7 +153,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 );
             } else {
                 return (
-                    <div style={{marginTop: 6}}>模式: {this.handleModeText(hostInfo.mode)}</div>
+                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.mode)}</div>
                 );
             }
         } else {
@@ -286,8 +308,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 );
             });
             return (
-                <div className="guest-box">
-                    <div className="guest-box-title">学生</div>
+                <div>
                     {guestNodes}
                 </div>
             );
@@ -296,28 +317,69 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
+    private handleDotState = (): boolean => {
+        const isActive = this.state.activeKey === "1";
+        if (this.props.isManagerOpen && !isActive) {
+            const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+            if (guestUsers && guestUsers.length > 0) {
+                const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
+                return handUpGuestUsers && handUpGuestUsers.length > 0;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private renderUserListTitle = (): React.ReactNode => {
+        if (this.props.identity === IdentityType.host) {
+            return (
+                <Badge dot={this.handleDotState()} overflowCount={99} offset={[8, -2]}>
+                    <div>用户列表</div>
+                </Badge>
+            );
+        } else {
+            return (
+                <div>用户列表</div>
+            );
+        }
+    }
+
+    private renderChatListTitle = (): React.ReactNode => {
+        const isActive = this.state.activeKey === "2";
+        return (
+            <Badge overflowCount={99} offset={[8, -2]} count={isActive ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                <div>聊天群组</div>
+            </Badge>
+        );
+    }
+
+    private handleTabsChange = (evt: any): void => {
+        if (evt === "1") {
+            this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
+        } else {
+            this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
+        }
+    }
     public render(): React.ReactNode {
-        if (this.props.isManagerOpen && this.props.identity === IdentityType.host) {
+        if (this.props.isManagerOpen) {
             return (
                 <div className={this.state.isLandscape ? "manager-box" : "manager-box-mask"}>
-                    <div className="chat-box-title">
-                        <div className="chat-box-name">
-                            <span>课堂管理</span>
-                        </div>
-                        <div onClick={() => {
-                            this.props.handleManagerState();
-                        }} className="chat-box-close">
-                            <img src={close}/>
-                        </div>
-                    </div>
                     {this.renderHost()}
                     <div className="chat-box-switch">
-                        <Tabs defaultActiveKey="1">
-                            <TabPane tab="聊天" key="1">
-
-                            </TabPane>
-                            <TabPane tab="权限" key="2">
+                        <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
+                            <TabPane tab={this.renderUserListTitle()} key="1">
                                 {this.renderGuest()}
+                            </TabPane>
+                            <TabPane tab={this.renderChatListTitle()} key="2">
+                                <WhiteboardChat
+                                    language={this.props.language}
+                                    messages={this.state.messages}
+                                    userAvatarUrl={this.props.userAvatarUrl}
+                                    userId={this.props.userId}
+                                    userName={this.props.userName}
+                                    room={this.props.room}/>
                             </TabPane>
                         </Tabs>
                     </div>

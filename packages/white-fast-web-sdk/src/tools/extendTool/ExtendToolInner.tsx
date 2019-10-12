@@ -17,9 +17,16 @@ enum ExtendToolType {
     subject = "subject",
 }
 
-export default class ExtendToolInner extends React.Component<ExtendToolInnerProps, {}> {
+export type ExtendToolInnerStates = {
+    activeKey: string;
+};
+
+export default class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolInnerStates> {
     public constructor(props: ExtendToolInnerProps) {
         super(props);
+        this.state = {
+            activeKey: "1",
+        };
     }
 
     private addImage = (url: string): void => {
@@ -39,16 +46,44 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         });
     }
 
+    private handleTabsChange = (evt: any): void => {
+        if (evt === "1") {
+            this.setState({activeKey: evt});
+        } else {
+            this.setState({activeKey: evt});
+        }
+    }
     public render(): React.ReactNode {
+    // readonly protocal: string;
+    // readonly props?: {
+    //         [key: string]: any;
+    // };
+    // readonly centerX: number;
+    // readonly centerY: number;
+    // readonly width: number;
+    // readonly height: number;
         return (
             <div className="extend-inner-box">
-                <div className="extend-inner-nav">
-                    <div className="extend-inner-title">插件教具</div>
-                    <div className="extend-inner-title">几何图形</div>
-                    <div className="extend-inner-title">学科图形</div>
-                </div>
-                <div className="extend-inner-body">
-                </div>
+                <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
+                    <TabPane tab="插件教具" key="1">
+                        <div>
+                            <div onClick={() => this.props.room.insertPlugin({protocal: "test", centerX: 0, centerY: 0, width: 300, height: 300})}>
+                                <div></div>
+                                网页
+                            </div>
+                            <div>
+                                <div></div>
+                                视频
+                            </div>
+                            <div>
+                                <div></div>
+                                文字编辑
+                            </div>
+                        </div>
+                    </TabPane>
+                    <TabPane tab="常用图形" key="2">
+                    </TabPane>
+                </Tabs>
             </div>
         );
     }

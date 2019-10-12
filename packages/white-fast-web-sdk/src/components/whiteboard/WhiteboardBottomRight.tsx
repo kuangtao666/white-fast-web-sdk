@@ -35,7 +35,7 @@ export type WhiteboardBottomRightProps = {
     handleChatState: () => void;
     deviceType: DeviceType;
     isReadOnly?: boolean;
-    chatState?: boolean;
+    isManagerOpen: boolean;
     language?: LanguageEnum;
 };
 
@@ -58,7 +58,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     }
 
     public componentWillReceiveProps(nextProps: WhiteboardBottomRightProps): void {
-        if (this.props.chatState !== nextProps.chatState && nextProps.chatState === false) {
+        if (this.props.isManagerOpen !== nextProps.isManagerOpen && !nextProps.isManagerOpen) {
             this.setState({seenMessagesLength: this.state.messages.length});
         }
     }
@@ -208,8 +208,8 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
 
     private renderHandUpBtn = (): React.ReactNode => {
         const {room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (hostInfo.mode === ModeType.handUp) {
+        const hostInfo = room.state.globalState.hostInfo;
+        if (hostInfo && hostInfo.mode === ModeType.handUp) {
             const user = this.getSelfUserInfo();
             if (user) {
                 if (user.isReadOnly) {
@@ -234,7 +234,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                 <div className="whiteboard-box-bottom-right">
                     <div className="whiteboard-box-bottom-right-mid">
                         {this.renderHandUpBtn()}
-                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                             <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
                                 <img src={chat}/>
                             </div>
@@ -247,7 +247,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                 <div className="whiteboard-box-bottom-right">
                     <div className="whiteboard-box-bottom-right-mid">
                         {this.renderAnnexBox()}
-                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.chatState ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                             <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
                                 <img src={chat}/>
                             </div>

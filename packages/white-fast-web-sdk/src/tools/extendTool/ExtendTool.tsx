@@ -45,7 +45,7 @@ export default class ExtendTool extends React.Component<ExtendToolProps, ExtendT
         const {toolBarPosition} = this.props;
         return (
             <RoomContextConsumer key={"add"} children={context => (
-                <Popover placement={this.handlePlacement()} content={<ExtendToolInner room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
+                <Popover trigger="click" placement={this.handlePlacement()} content={<ExtendToolInner room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
                     <div
                         onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                         onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

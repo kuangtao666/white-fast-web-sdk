@@ -29,13 +29,14 @@ import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox/index";
 import UploadBtn from "../tools/upload/UploadBtn";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
-import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
+import ExtendTool from "../tools/extendTool/ExtendTool";
+import {CounterComponent} from "../components/Counter";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -81,10 +82,10 @@ export type RealTimeProps = {
     roomCallback?: (room: Room) => void;
     logoUrl?: string;
     loadingSvgUrl?: string;
-    isChatOpen?: boolean;
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
+    agoraClient?: any;
 };
 
 export enum ToolBarPositionEnum {
@@ -110,7 +111,7 @@ export type RealTimeStates = {
     converterPercent: number;
     isPreviewMenuOpen: boolean;
     isFileMenuOpen: boolean;
-    isChatOpen?: boolean;
+    isChatOpen: boolean;
     isFileOpen: boolean;
     room?: Room;
     roomState?: RoomState;
@@ -139,7 +140,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             converterPercent: 0,
             isPreviewMenuOpen: false,
             isFileMenuOpen: false,
-            isChatOpen: this.props.isChatOpen,
+            isChatOpen: false,
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
             isManagerOpen: false,
@@ -152,9 +153,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: CounterComponent});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " "});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: CounterComponent});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -191,6 +192,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
+            room.moveCameraToContain({
+                originX: - 600,
+                originY: - 337.5,
+                width: 1200,
+                height: 675,
+                animationMode: "immediately",
+            });
             this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, mode);
             await this.roomManager.start();
             if (roomCallback) {
@@ -316,16 +324,18 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private handleChatState = (): void => {
-        this.setState({isManagerOpen: false});
-        if (this.state.isChatOpen === undefined) {
-            this.setState({isChatOpen: true});
+        if (!this.state.isManagerOpen) {
+            this.setState({isChatOpen: true, isManagerOpen: true});
         } else {
-            this.setState({isChatOpen: !this.state.isChatOpen});
+            this.setState({isChatOpen: true});
         }
     }
     private handleManagerState = (): void => {
-        this.setState({isChatOpen: false});
-        this.setState({isManagerOpen: !this.state.isManagerOpen});
+        if (this.state.isManagerOpen) {
+            this.setState({isManagerOpen: false, isChatOpen: false});
+        } else {
+            this.setState({isManagerOpen: true});
+        }
     }
     private handleFileState = (): void => {
         this.setState({isFileOpen: !this.state.isFileOpen});
@@ -451,12 +461,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 roomState={roomState}
                                 room={room}/>
                             <WhiteboardBottomRight
+                                isManagerOpen={this.state.isManagerOpen}
                                 deviceType={this.state.deviceType}
                                 roomState={roomState}
                                 userId={this.props.userId}
                                 language={this.props.language}
                                 isReadOnly={isReadOnly}
-                                chatState={this.state.isChatOpen}
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
@@ -478,24 +488,19 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
+                                    <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
-                        <WhiteboardChat
-                            language={this.props.language}
-                            isChatOpen={this.state.isChatOpen}
-                            handleChatState={this.handleChatState}
-                            userAvatarUrl={this.props.userAvatarUrl}
-                            userId={this.props.userId}
-                            userName={this.props.userName}
-                            room={this.state.room}/>
                         <WhiteboardManager
                             userAvatarUrl={this.props.userAvatarUrl}
                             userName={this.props.userName}
                             userId={this.props.userId}
+                            isChatOpen={this.state.isChatOpen}
+                            agoraClient={this.props.agoraClient}
                             identity={this.props.identity}
                             isManagerOpen={this.state.isManagerOpen}
                             handleManagerState={this.handleManagerState}
