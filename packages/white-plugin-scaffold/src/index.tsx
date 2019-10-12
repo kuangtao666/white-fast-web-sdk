@@ -5,7 +5,7 @@ export type CounterComponentProps = PluginComponentProps & {
     readonly count: number;
 };
 
-export class CounterComponent extends React.Component<CounterComponentProps> {
+export default class CounterComponent extends React.Component<CounterComponentProps> {
 
     public static readonly protocol: string = "test";
     public static readonly backgroundProps: Partial<CounterComponentProps> = {count: 0};

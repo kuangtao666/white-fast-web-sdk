@@ -50,7 +50,8 @@
     "react-dropzone": "4.2.10",
     "react-identicons": "^1.1.7",
     "uuid": "^3.3.2",
-    "white-react-sdk": "^2.3.7"
+    "white-react-sdk": "^2.3.7",
+    "white-plugin-scaffold": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
