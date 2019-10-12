@@ -29,13 +29,14 @@ import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox/index";
 import UploadBtn from "../tools/upload/UploadBtn";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
-import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
+import ExtendTool from "../tools/extendTool/ExtendTool";
+import {CounterComponent} from "../components/Counter";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -152,9 +153,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: CounterComponent});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " "});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: CounterComponent});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -487,6 +488,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
+                                    <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
@@ -498,6 +500,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             userName={this.props.userName}
                             userId={this.props.userId}
                             isChatOpen={this.state.isChatOpen}
+                            agoraClient={this.props.agoraClient}
                             identity={this.props.identity}
                             isManagerOpen={this.state.isManagerOpen}
                             handleManagerState={this.handleManagerState}
