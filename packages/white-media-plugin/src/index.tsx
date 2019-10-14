@@ -10,7 +10,7 @@ export type VideoPluginProps = PluginComponentProps & {
 
 export default class VideoPlugin extends React.Component<VideoPluginProps> {
 
-    public static readonly protocol: string = "video";
+    public static readonly protocol: string = "media";
     public static readonly backgroundProps: Partial<VideoPluginProps> = {};
 
     public static willInterruptEvent(props: any, event: any): boolean {
