@@ -54,30 +54,18 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         }
     }
     public render(): React.ReactNode {
-    // readonly protocal: string;
-    // readonly props?: {
-    //         [key: string]: any;
-    // };
-    // readonly centerX: number;
-    // readonly centerY: number;
-    // readonly width: number;
-    // readonly height: number;
         return (
             <div className="extend-inner-box">
                 <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
                     <TabPane tab="插件教具" key="1">
                         <div>
-                            <div onClick={() => this.props.room.insertPlugin({protocal: "test", centerX: 0, centerY: 0, width: 300, height: 300})}>
+                            <div onClick={() => this.props.room.insertPlugin({protocal: "iframe", centerX: 0, centerY: 0, width: 600, height: 600})}>
                                 <div></div>
                                 网页
                             </div>
-                            <div>
+                            <div onClick={() => this.props.room.insertPlugin({protocal: "test", centerX: 0, centerY: 0, width: 300, height: 300})}>
                                 <div></div>
-                                视频
-                            </div>
-                            <div>
-                                <div></div>
-                                文字编辑
+                                test
                             </div>
                         </div>
                     </TabPane>
