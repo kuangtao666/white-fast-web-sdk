@@ -6,6 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "type-gen": "tsc --emitDeclarationOnly",
+    "predev": "yarn type-gen",
     "dev": "webpack --config webpack.config.js  --watch --progress --colors --mode=development"
   },
   "types": "dist/index.d.ts",
