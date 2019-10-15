@@ -4,7 +4,9 @@ import "./ExtendToolInner.less";
 import {
     Room,
 } from "white-react-sdk";
-import {Tabs} from "antd";
+import {Tabs, Tooltip} from "antd";
+import web_plugin from "../../assets/image/web_plugin.svg";
+import editor_plugin from "../../assets/image/editor_plugin.svg";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
@@ -53,19 +55,34 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
             this.setState({activeKey: evt});
         }
     }
+    private insertPlugin = (protocal: string): void => {
+        this.props.room.insertPlugin({
+            protocal: protocal,
+            centerX: 0,
+            centerY: 0,
+            width: 600,
+            height: 600,
+        });
+    }
     public render(): React.ReactNode {
         return (
             <div className="extend-inner-box">
                 <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
                     <TabPane tab="插件教具" key="1">
-                        <div>
-                            <div onClick={() => this.props.room.insertPlugin({protocal: "iframe", centerX: 0, centerY: 0, width: 600, height: 600})}>
-                                <div></div>
-                                网页
+                        <div className="extend-icon-out-box">
+                            <div className="extend-icon-box">
+                                <Tooltip placement="bottom" title="H5 课件">
+                                    <div onClick={() => this.insertPlugin("iframe")} className="extend-inner-icon">
+                                        <img src={web_plugin}/>
+                                    </div>
+                                </Tooltip>
                             </div>
-                            <div onClick={() => this.props.room.insertPlugin({protocal: "test", centerX: 0, centerY: 0, width: 300, height: 300})}>
-                                <div></div>
-                                test
+                            <div className="extend-icon-box">
+                                <Tooltip placement="bottom" title="文本编辑器">
+                                    <div onClick={() => this.insertPlugin("editor")} className="extend-inner-icon">
+                                        <img src={editor_plugin}/>
+                                    </div>
+                                </Tooltip>
                             </div>
                         </div>
                     </TabPane>
