@@ -1,9 +1,9 @@
 import * as React from "react";
-import {Badge, Tabs} from "antd";
+import {Badge, Button, Tabs, Tooltip} from "antd";
 const { TabPane } = Tabs;
 import "./WhiteboardManager.less";
 import {Room, Player} from "white-web-sdk";
-import * as close from "../../assets/image/close.svg";
+import * as close_white from "../../assets/image/close_white.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {RoomMember, ViewMode} from "white-react-sdk";
@@ -11,6 +11,7 @@ import {Icon, message, Radio} from "antd";
 import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
+import user_empty from "../../assets/image/user_empty.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
@@ -27,7 +28,7 @@ export type WhiteboardManagerProps = {
     userName?: string;
     userAvatarUrl?: string;
     language?: LanguageEnum;
-    agoraClient?: any;
+    rtc?: any;
 };
 
 export type WhiteboardManagerStates = {
@@ -162,11 +163,24 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room} = this.props;
+        const {room, handleManagerState, rtc} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (hostInfo) {
             return (
                 <div className="manager-box-inner-host">
+                    {rtc &&
+                    <div className="manager-box-btn">
+                        <Tooltip placement={"right"} title={"开启音视频通信"}>
+                            <Button style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                        </Tooltip>
+                    </div>}
+                    <div className="manager-box-btn-right">
+                        <Tooltip placement={"left"} title={"隐藏侧边栏"}>
+                            <div onClick={() => handleManagerState()} className="manager-box-btn-right-inner">
+                                <img src={close_white}/>
+                            </div>
+                        </Tooltip>
+                    </div>
                     <div className="manager-box-image">
                         <img src={hostInfo.avatar}/>
                     </div>
@@ -313,7 +327,10 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 </div>
             );
         } else {
-            return null;
+            return <div className="room-member-empty">
+                <img src={user_empty}/>
+                <div>尚且无学生加入</div>
+            </div>;
         }
     }
 
@@ -370,7 +387,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     <div className="chat-box-switch">
                         <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
                             <TabPane tab={this.renderUserListTitle()} key="1">
-                                {this.renderGuest()}
+                                <div className="guest-box">
+                                    {this.renderGuest()}
+                                </div>
                             </TabPane>
                             <TabPane tab={this.renderChatListTitle()} key="2">
                                 <WhiteboardChat

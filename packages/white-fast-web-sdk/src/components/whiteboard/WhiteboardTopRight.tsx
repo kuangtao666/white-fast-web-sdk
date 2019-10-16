@@ -2,6 +2,9 @@ import * as React from "react";
 import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
 import QRCode from "qrcode.react";
 import set_icon from "../../assets/image/set_icon.svg";
+import set_black_icon from "../../assets/image/set_black_icon.svg";
+import stop_icon from "../../assets/image/stop_icon.svg";
+import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
 import {Badge, Button, message, Modal, Input} from "antd";
 import Clipboard from "react-clipboard.js";
@@ -22,6 +25,8 @@ export type WhiteboardTopRightProps = {
     isReadOnly?: boolean;
     language?: LanguageEnum;
     isManagerOpen: boolean;
+    exitRoomCallback?: () => void;
+    replayCallback?: () => void;
 };
 
 export type WhiteboardTopRightStates = {
@@ -32,6 +37,7 @@ export type WhiteboardTopRightStates = {
     handUpNumber: number;
     seenHandUpNumber: number;
     isInviteVisible: boolean;
+    isCloseTipsVisible: boolean;
     url: string;
 };
 
@@ -53,6 +59,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             handUpNumber: 0,
             seenHandUpNumber: 0,
             isInviteVisible: false,
+            isCloseTipsVisible: false,
             url: location.href,
         };
     }
@@ -93,15 +100,18 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         this.setState({isInviteVisible: true});
     }
 
+    private handleClose = (): void => {
+        this.setState({isCloseTipsVisible: true});
+    }
     public render(): React.ReactNode {
-        const  {userAvatarUrl} = this.props;
+        const  {userAvatarUrl, isManagerOpen} = this.props;
         const isHost = this.props.identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
                 {isHost &&
                 <Badge offset={[-5, 7]} dot={this.handleDotState()}>
                     <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                        <img style={{width: 16}} src={set_icon}/>
+                        {isManagerOpen ? <img style={{width: 16}} src={set_black_icon}/> : <img style={{width: 16}} src={set_icon}/>}
                     </div>
                 </Badge>}
                 <div
@@ -109,9 +119,14 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                     <img style={{width: 18}} src={add}/>
                 </div>
                 <div className="whiteboard-top-user-box">
-                    <div className="whiteboard-top-right-user">
-                        <img src={userAvatarUrl}/>
-                    </div>
+                    {isHost ?
+                        <div onClick={this.handleClose} className="whiteboard-top-right-user">
+                            <img src={stop_icon}/>
+                        </div> :
+                        <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
+                            <img src={userAvatarUrl}/>
+                        </div>
+                    }
                 </div>
                 <Modal
                     visible={this.state.isInviteVisible}
@@ -133,6 +148,37 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                             >
                                 <Button style={{marginTop: 16, width: 240}} size="large" type="primary">复制链接</Button>
                             </Clipboard>
+                        </div>
+                    </div>
+                </Modal>
+                <Modal
+                    visible={this.state.isCloseTipsVisible}
+                    footer={null}
+                    title="退出教室"
+                    onCancel={() => this.setState({isCloseTipsVisible: false})}
+                >
+                    <div className="whiteboard-share-box">
+                        <div className="whiteboard-share-text-box">
+                            {/*<Button style={{marginTop: 16, width: 240}} size="large" type="primary">观看回放</Button>*/}
+                            <div onClick={() => {
+                                if (this.props.replayCallback) {
+                                    this.props.replayCallback();
+                                    this.setState({isCloseTipsVisible: false});
+                                }
+                            }} className="replay-video-cover">
+                                <img src={replay_video_cover}/>
+                            </div>
+                            <Button
+                                    onClick={() => {
+                                        if (this.props.exitRoomCallback) {
+                                            this.props.exitRoomCallback();
+                                            this.setState({isCloseTipsVisible: false});
+                                        }
+                                    }}
+                                    style={{marginTop: 16, width: 240}}
+                                    size="large">
+                                确认退出
+                            </Button>
                         </div>
                     </div>
                 </Modal>

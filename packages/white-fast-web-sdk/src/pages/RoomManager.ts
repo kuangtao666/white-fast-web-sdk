@@ -82,6 +82,7 @@ export class RoomManager {
           this.room.disableCameraTransform = true;
           await this.room.setWritable(false);
       } else {
+          const isReadOnly = this.mode !== ModeType.discuss;
           const globalGuestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
           if (globalGuestUsers === undefined) {
               const guestUser: GuestUserType = {
@@ -89,7 +90,7 @@ export class RoomManager {
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
                   name: this.name,
-                  isReadOnly: true,
+                  isReadOnly: isReadOnly,
                   isHandUp: false,
                   cameraState: ViewMode.Follower,
                   disableCameraTransform: true,
@@ -109,7 +110,7 @@ export class RoomManager {
                       identity: this.identity,
                       avatar: this.userAvatarUrl,
                       name: this.name,
-                      isReadOnly: true,
+                      isReadOnly: isReadOnly,
                       isHandUp: false,
                       cameraState: ViewMode.Follower,
                       disableCameraTransform: true,

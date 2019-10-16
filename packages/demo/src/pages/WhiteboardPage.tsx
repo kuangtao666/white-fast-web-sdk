@@ -1,5 +1,5 @@
 import * as React from "react";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, withRouter} from "react-router";
 import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
@@ -14,7 +14,7 @@ export type WhiteboardPageProps = RouteComponentProps<{
 export type WhiteboardPageState = {
 };
 
-export default class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
+class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
     public constructor(props: WhiteboardPageProps) {
         super(props);
     }
@@ -44,11 +44,25 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
                 loadingSvgUrl: "",
                 clickLogoCallback: () => {
+                    // this.props.history.push("/");
                 },
-                agoraClient: agoraClient,
+                exitRoomCallback: () => {
+                    this.props.history.push("/");
+                },
+                recordDataCallback: (data: any) => {
+                    console.log();
+                },
+                replayCallback: () => {
+                   this.props.history.push(`/replay/${uuid}/${userId}/`);
+                },
+                rtc: {
+                    type: "agora",
+                    Client: agoraClient,
+                },
                 identity: identityType,
                 language: "Chinese",
                 toolBarPosition: "left",
+                isManagerOpen: true,
                 uploadToolBox: [
                     {
                         enable: true,
@@ -105,3 +119,5 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
         );
     }
 }
+
+export default withRouter(WhiteboardPage);
