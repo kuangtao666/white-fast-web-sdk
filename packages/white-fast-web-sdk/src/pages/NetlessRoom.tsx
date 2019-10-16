@@ -36,7 +36,6 @@ import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
-import {CounterComponent} from "../components/Counter";
 import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
@@ -55,6 +54,12 @@ export enum UploadDocumentEnum {
     image = "image",
     static_conversion = "static_conversion",
     dynamic_conversion = "dynamic_conversion",
+}
+
+export enum RtcType {
+    agora = "agora",
+    zego = "zego",
+    qiniu = "qiniu",
 }
 
 export type UploadToolBoxType = {
@@ -89,8 +94,8 @@ export type RealTimeProps = {
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
     rtc?: {
+        type: RtcType,
         client: any,
-        type: "agora",
     };
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
@@ -165,9 +170,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [CounterComponent, Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [Iframe, Editor]});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [CounterComponent, Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [Iframe, Editor]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -360,7 +365,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
 
     private detectIsReadOnly = (): boolean => {
         const {identity, userId} = this.props;
-        const {mode, room} = this.state;
+        const {room} = this.state;
         if (identity === IdentityType.listener) {
             return true;
         } else if (identity === IdentityType.host) {
@@ -515,6 +520,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             </div>
                         </Dropzone>
                         <WhiteboardManager
+                            uuid={this.props.uuid}
                             userAvatarUrl={this.props.userAvatarUrl}
                             userName={this.props.userName}
                             userId={this.props.userId}

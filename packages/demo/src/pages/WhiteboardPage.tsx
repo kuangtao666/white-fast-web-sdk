@@ -57,7 +57,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                 },
                 rtc: {
                     type: "agora",
-                    Client: agoraClient,
+                    client: agoraClient,
                 },
                 identity: identityType,
                 language: "Chinese",

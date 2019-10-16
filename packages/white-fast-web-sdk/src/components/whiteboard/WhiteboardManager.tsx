@@ -1,13 +1,11 @@
 import * as React from "react";
-import {Badge, Button, Tabs, Tooltip} from "antd";
+import {Badge, Tabs, Icon} from "antd";
 const { TabPane } = Tabs;
 import "./WhiteboardManager.less";
 import {Room, Player} from "white-web-sdk";
-import * as close_white from "../../assets/image/close_white.svg";
-import {LanguageEnum} from "../../pages/NetlessRoom";
+import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {RoomMember, ViewMode} from "white-react-sdk";
-import {Icon, message, Radio} from "antd";
 import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
@@ -15,6 +13,7 @@ import user_empty from "../../assets/image/user_empty.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
+import ClassroomMedia from "./ClassroomMedia";
 
 export type WhiteboardManagerProps = {
     room: Room;
@@ -22,13 +21,17 @@ export type WhiteboardManagerProps = {
     handleManagerState: () => void;
     isManagerOpen: boolean;
     isChatOpen: boolean;
+    uuid: string;
     cameraState?: ViewMode;
     disableCameraTransform?: boolean;
     identity?: IdentityType;
     userName?: string;
     userAvatarUrl?: string;
     language?: LanguageEnum;
-    rtc?: any;
+    rtc?: {
+        type: RtcType,
+        client: any,
+    };
 };
 
 export type WhiteboardManagerStates = {
@@ -36,6 +39,7 @@ export type WhiteboardManagerStates = {
     activeKey: string;
     messages: MessageType[];
     seenMessagesLength: number,
+    isRtcReady: boolean,
 };
 
 
@@ -49,6 +53,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             activeKey: "1",
             messages: [],
             seenMessagesLength: 0,
+            isRtcReady: false,
         };
     }
     private detectLandscape = (): void => {
@@ -85,112 +90,21 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
-        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-        const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (userId) {
-            if (mode === ModeType.handUp && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: GuestUserType) => {
-                    if (user.userId === this.props.userId) {
-                        user.isHandUp = !user.isHandUp;
-                    }
-                    return user;
-                });
-                room.setGlobalState({guestUsers: users});
-            }
-        } else {
-            if (mode !== ModeType.discuss && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: GuestUserType) => {
-                    user.isHandUp = false;
-                    user.isReadOnly = true;
-                    user.cameraState = ViewMode.Follower;
-                    user.disableCameraTransform = true;
-                    return user;
-                });
-                selfHostInfo.cameraState = ViewMode.Broadcaster;
-                selfHostInfo.disableCameraTransform = false;
-                room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            } else if (mode === ModeType.discuss && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: GuestUserType) => {
-                    user.isHandUp = false;
-                    user.isReadOnly = false;
-                    user.cameraState = ViewMode.Freedom;
-                    user.disableCameraTransform = false;
-                    return user;
-                });
-                selfHostInfo.cameraState = ViewMode.Freedom;
-                selfHostInfo.disableCameraTransform = false;
-                room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            }
-        }
-    }
-
-    private handleModeText = (mode: ModeType) => {
-        switch (mode) {
-            case ModeType.discuss: {
-                return "自由讨论";
-            }
-            case ModeType.lecture: {
-                return "讲课模式";
-            }
-            default: {
-                return "举手问答";
-            }
-        }
-    }
-    private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
-        const {room} = this.props;
-        if (hostInfo.mode) {
-            if (this.props.identity === IdentityType.host) {
-                return (
-                    <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.mode} onChange={evt => {
-                        this.handleHandup(evt.target.value, room);
-                        room.setGlobalState({hostInfo: {...hostInfo, mode: evt.target.value}});
-                    }}>
-                        <Radio.Button value={ModeType.lecture}>讲课模式</Radio.Button>
-                        <Radio.Button value={ModeType.handUp}>举手问答</Radio.Button>
-                        <Radio.Button value={ModeType.discuss}>自由讨论</Radio.Button>
-                    </Radio.Group>
-                );
-            } else {
-                return (
-                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.mode)}</div>
-                );
-            }
-        } else {
-            return null;
-        }
+    private setMediaState = (state: boolean): void => {
+        console.log(state);
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room, handleManagerState, rtc} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (hostInfo) {
-            return (
-                <div className="manager-box-inner-host">
-                    {rtc &&
-                    <div className="manager-box-btn">
-                        <Tooltip placement={"right"} title={"开启音视频通信"}>
-                            <Button style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
-                        </Tooltip>
-                    </div>}
-                    <div className="manager-box-btn-right">
-                        <Tooltip placement={"left"} title={"隐藏侧边栏"}>
-                            <div onClick={() => handleManagerState()} className="manager-box-btn-right-inner">
-                                <img src={close_white}/>
-                            </div>
-                        </Tooltip>
-                    </div>
-                    <div className="manager-box-image">
-                        <img src={hostInfo.avatar}/>
-                    </div>
-                    <div className="manager-box-text">老师：{hostInfo.name}</div>
-                    {this.renderHostController(hostInfo)}
-                </div>
-            );
-        } else {
-            return null;
-        }
+        return (
+            <ClassroomMedia
+                rtc={this.props.rtc}
+                userId={parseInt(this.props.userId)}
+                handleManagerState={this.props.handleManagerState}
+                identity={this.props.identity}
+                room={this.props.room}
+                setMediaState={this.setMediaState}
+                channelId={this.props.uuid} agoraAppId={"8595fd46955f427db44b4e9ba90f015d"}/>
+        );
     }
 
     private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
