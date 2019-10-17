@@ -116,7 +116,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                 return (
                     <MessageGroup
                         key={`${index}`}
-                        avatar={data.avatar}
+                        avatar={data.avatar ? data.avatar : this.state.url}
                         isOwn={this.props.userId === data.id}
                         onlyFirstWithMeta
                     >

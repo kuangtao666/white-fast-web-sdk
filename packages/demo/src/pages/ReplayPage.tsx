@@ -6,6 +6,9 @@ import WhiteFastSDK from "white-fast-web-sdk";
 export type ReplayPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;
+    startTime?: string;
+    endTime?: string;
+    mediaUrl?: string;
 }>;
 
 export type WhiteboardPageState = {
@@ -25,9 +28,17 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
         }
     }
 
+    private getDuration = (): number | undefined => {
+        const {startTime, endTime} = this.props.match.params;
+        if (startTime && endTime) {
+            return parseInt(endTime) - parseInt(startTime);
+        } else {
+            return undefined;
+        }
+    }
 
     private startReplay = async (): Promise<void> => {
-        const {userId, uuid} = this.props.match.params;
+        const {userId, uuid, startTime, mediaUrl} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
         if (roomToken) {
             WhiteFastSDK.Player("netless-replay", {
@@ -41,9 +52,13 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
                 playerCallback: (player: any) => {
                     console.log(player);
                 },
-                // beginTimestamp:
-                // duration:
-                mediaUrl: "https://netless-media.oss-cn-hangzhou.aliyuncs.com/ad5ce237124d7210e24ca5838d79f509_b9fc17d5d017466ab446c3094c87b1b3.m3u8",
+                clickLogoCallback: () => {
+                    this.props.history.push("/");
+                },
+                roomName: "伍双的教室",
+                beginTimestamp: startTime && parseInt(startTime),
+                duration: this.getDuration(),
+                mediaUrl: mediaUrl,
                 // isChatOpen:
             });
         }

@@ -7,8 +7,8 @@ import {Button, Input, Popover} from "antd";
 export type WhiteboardTopLeftProps = {
     logoUrl?: string;
     clickLogoCallback?: () => void;
-    roomRenameCallback?: (name: string) => void;
     roomName?: string;
+    roomRenameCallback?: (name: string) => void;
     identity?: IdentityType;
 };
 

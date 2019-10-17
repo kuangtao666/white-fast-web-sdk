@@ -28,10 +28,7 @@ export type WhiteboardManagerProps = {
     userName?: string;
     userAvatarUrl?: string;
     language?: LanguageEnum;
-    rtc?: {
-        type: RtcType,
-        client: any,
-    };
+    rtc?: RtcType;
 };
 
 export type WhiteboardManagerStates = {
@@ -103,7 +100,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 identity={this.props.identity}
                 room={this.props.room}
                 setMediaState={this.setMediaState}
-                channelId={this.props.uuid} agoraAppId={"8595fd46955f427db44b4e9ba90f015d"}/>
+                channelId={this.props.uuid}/>
         );
     }
 
@@ -293,33 +290,41 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
         }
     }
-    public render(): React.ReactNode {
+
+    private handleManagerStyle = (): string => {
         if (this.props.isManagerOpen) {
-            return (
-                <div className={this.state.isLandscape ? "manager-box" : "manager-box-mask"}>
-                    {this.renderHost()}
-                    <div className="chat-box-switch">
-                        <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                            <TabPane tab={this.renderUserListTitle()} key="1">
-                                <div className="guest-box">
-                                    {this.renderGuest()}
-                                </div>
-                            </TabPane>
-                            <TabPane tab={this.renderChatListTitle()} key="2">
-                                <WhiteboardChat
-                                    language={this.props.language}
-                                    messages={this.state.messages}
-                                    userAvatarUrl={this.props.userAvatarUrl}
-                                    userId={this.props.userId}
-                                    userName={this.props.userName}
-                                    room={this.props.room}/>
-                            </TabPane>
-                        </Tabs>
-                    </div>
-                </div>
-            );
+            if (this.state.isLandscape) {
+                return "manager-box";
+            } else {
+                return "manager-box-mask";
+            }
         } else {
-            return null;
+            return "manager-box-mask-close";
         }
+    }
+    public render(): React.ReactNode {
+        return (
+            <div className={this.handleManagerStyle()}>
+                {this.renderHost()}
+                <div className="chat-box-switch">
+                    <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
+                        <TabPane tab={this.renderUserListTitle()} key="1">
+                            <div className="guest-box">
+                                {this.renderGuest()}
+                            </div>
+                        </TabPane>
+                        <TabPane tab={this.renderChatListTitle()} key="2">
+                            <WhiteboardChat
+                                language={this.props.language}
+                                messages={this.state.messages}
+                                userAvatarUrl={this.props.userAvatarUrl}
+                                userId={this.props.userId}
+                                userName={this.props.userName}
+                                room={this.props.room}/>
+                        </TabPane>
+                    </Tabs>
+                </div>
+            </div>
+        );
     }
 }

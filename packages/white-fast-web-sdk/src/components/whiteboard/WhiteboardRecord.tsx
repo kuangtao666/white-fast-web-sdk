@@ -1,40 +1,69 @@
 import * as React from "react";
 import "./WhiteboardRecord.less";
 import {message} from "antd";
+import {displayWatch} from "../../tools/WatchDisplayer";
+import {RecordDataType} from "../../pages/NetlessRoom";
 
 export type WhiteboardRecordState = {
-    isRecord: boolean,
+    isRecord: boolean;
+    secondsElapsed: number;
+    startTime?: number;
+    endTime?: number;
+    mediaUrl?: string;
 };
 export type WhiteboardRecordProps = {
-    setStartTime: (time: number) => void;
-    setStopTime: (time: number) => void;
-    setMediaSource: (source: string) => void;
     channelName: string;
     isMediaRun?: boolean;
+    recordDataCallback?: (data: RecordDataType) => void;
 };
 
-class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
+export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
 
-
+    private interval: any;
     public constructor(props: WhiteboardRecordProps) {
         super(props);
         this.state = {
             isRecord: false,
+            secondsElapsed: 0,
         };
     }
 
+    private tick = (): void => {
+        this.setState(({
+            secondsElapsed: this.state.secondsElapsed + 1,
+        }));
+    }
+
+
+    private startClock = (): void => {
+        this.interval = setInterval(() => this.tick(), 1000);
+    }
+    private stopClock = (): void => {
+        clearInterval(this.interval);
+    }
     public record = (): void => {
         if (this.state.isRecord) {
             message.info("结束录制");
             const time =  new Date();
-            this.props.setStopTime(time.getTime());
+            const timeStamp = time.getTime();
             this.setState({isRecord: false});
+            if (this.props.recordDataCallback) {
+                this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime});
+            }
+            this.stopClock();
         } else {
             message.success("开始录制");
             const time =  new Date();
-            this.props.setStartTime(time.getTime());
-            this.setState({isRecord: true });
+            const timeStamp = time.getTime();
+            if (this.props.recordDataCallback) {
+                this.props.recordDataCallback({startTime: timeStamp});
+            }
+            this.setState({isRecord: true, startTime: timeStamp});
+            this.startClock();
         }
+    }
+    public componentWillUnmount(): void {
+        clearInterval(this.interval);
     }
     public render(): React.ReactNode {
         return (
@@ -46,12 +75,9 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                     }
                 </div>
                 <div className="record-time">
-                    00:00
+                    {displayWatch(this.state.secondsElapsed)}
                 </div>
             </div>
         );
     }
 }
-
-export default WhiteboardRecord;
-

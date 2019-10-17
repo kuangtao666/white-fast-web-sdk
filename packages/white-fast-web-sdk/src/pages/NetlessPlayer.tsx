@@ -30,6 +30,8 @@ export type PlayerPageProps = {
     isChatOpen?: boolean;
     logoUrl?: string;
     playerCallback?: (player: Player) => void;
+    clickLogoCallback?: () => void;
+    roomName?: string;
 };
 
 
@@ -335,6 +337,8 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             <div id="netless-player" className="player-out-box">
                 {this.renderLoading()}
                 <WhiteboardTopLeft
+                    clickLogoCallback={this.props.clickLogoCallback}
+                    roomName={this.props.roomName}
                     logoUrl={this.props.logoUrl}/>
                 <div className="player-board">
                     {this.renderMedia()}

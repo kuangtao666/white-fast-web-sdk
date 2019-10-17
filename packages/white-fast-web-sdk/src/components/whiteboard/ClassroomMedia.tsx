@@ -1,20 +1,20 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
 import {Room, RoomMember, ViewMode} from "white-react-sdk";
-import AgoraRTC, {Client, Stream} from "agora-rtc-sdk";
 import {Button, Radio, Tooltip} from "antd";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import ClassroomMediaHostCell from "./ClassroomMediaHostCell";
 import {CSSProperties} from "react";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
-// import * as camera from "../../assets/image/camera.svg";
 import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
+import * as menu_in from "../../assets/image/menu_in.svg";
 import * as close_white from "../../assets/image/close_white.svg";
 import {RtcType} from "../../pages/NetlessRoom";
+import Identicon from "react-identicons";
 export type NetlessStream = {
     state: {isVideoOpen: boolean, isAudioOpen: boolean},
-} & Stream;
+} & any;
 
 export enum IdentityType {
     host = "host",
@@ -34,19 +34,15 @@ export type ClassroomMediaProps = {
     userId: number;
     channelId: string;
     room: Room;
-    agoraAppId: string;
     identity?: IdentityType;
     setMediaState: (state: boolean) => void;
     handleManagerState: () => void;
-    rtc?: {
-        type: RtcType,
-        client: any,
-    };
+    rtc?: RtcType;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
 
-    private agoraClient: Client;
+    private agoraClient: any;
 
     public constructor(props: ClassroomMediaProps) {
         super(props);
@@ -214,14 +210,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     <div className="manager-box-btn-right">
                         <Tooltip placement={"left"} title={"隐藏侧边栏"}>
                             <div onClick={() => handleManagerState()} className="manager-box-btn-right-inner">
-                                <img src={close_white}/>
+                                <img src={menu_in}/>
                             </div>
                         </Tooltip>
                     </div>
                     <div className="manager-box-image">
-                        <img src={hostInfo.avatar}/>
+                        {hostInfo.avatar ? <img src={hostInfo.avatar}/> :
+                            <Identicon
+                                size={60}
+                                string={hostInfo.userId}/>
+                        }
                     </div>
-                    <div className="manager-box-text">老师：{hostInfo.name}</div>
+                    {hostInfo.name ? <div className="manager-box-text">老师：{hostInfo.name}</div> : <div className="manager-box-text"/>}
                     {this.renderHostController(hostInfo)}
                 </div>
             );
@@ -330,8 +330,11 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private startRtc = (userId: number, channelId: string): void => {
+        const {rtc} = this.props;
+        const AgoraRTC = rtc!.rtcObj;
+        const agoraAppId = rtc!.token;
         this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
-        this.agoraClient.init(this.props.agoraAppId, () => {
+        this.agoraClient.init(agoraAppId, () => {
             console.log("AgoraRTC client initialized");
         }, (err: any) => {
             console.log("AgoraRTC client init failed", err);
@@ -349,7 +352,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             };
             this.setState({localStream: netlessLocalStream});
             netlessLocalStream.play("rtc_local_stream");
-            this.agoraClient.join(this.props.agoraAppId, channelId, userId, (uid: string) => {
+            this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
                 this.props.setMediaState(true);
                 console.log("User " + uid + " join channel successfully");
                 this.agoraClient.publish(localStream, (err: any) => {

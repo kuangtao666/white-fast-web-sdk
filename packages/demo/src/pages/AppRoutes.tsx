@@ -22,7 +22,7 @@ export class AppRoutes extends React.Component<{}, {}> {
                 {path: "/", component: Homepage},
                 {path: "/whiteboard/:identityType/:uuid?/", component: WhiteboardCreatorPage},
                 {path: "/whiteboard/:identityType/:uuid/:userId/", component: WhiteboardPage},
-                {path: "/replay/:uuid/:userId/", component: ReplayPage},
+                {path: "/replay/:uuid/:userId/:startTime?/:endTime?/:mediaUrl?/", component: ReplayPage},
             ]}/>
         );
     }

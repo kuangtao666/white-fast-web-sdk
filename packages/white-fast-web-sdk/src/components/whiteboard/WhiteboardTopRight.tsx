@@ -2,6 +2,8 @@ import * as React from "react";
 import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
 import QRCode from "qrcode.react";
 import set_icon from "../../assets/image/set_icon.svg";
+import menu_in from "../../assets/image/menu_in.svg";
+import menu_out from "../../assets/image/menu_out.svg";
 import set_black_icon from "../../assets/image/set_black_icon.svg";
 import stop_icon from "../../assets/image/stop_icon.svg";
 import replay_video_cover from "../../assets/image/replay_video_cover.svg";
@@ -104,16 +106,10 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         this.setState({isCloseTipsVisible: true});
     }
     public render(): React.ReactNode {
-        const  {userAvatarUrl} = this.props;
+        const  {userAvatarUrl, isManagerOpen} = this.props;
         const isHost = this.props.identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
-                {isHost &&
-                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                        <img style={{width: 16}} src={set_icon}/>
-                    </div>
-                </Badge>}
                 <div
                     className="whiteboard-top-right-cell" onClick={this.handleInvite}>
                     <img style={{width: 18}} src={add}/>
@@ -128,6 +124,12 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         </div>
                     }
                 </div>
+                {(isHost && !isManagerOpen) &&
+                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                        <img style={{width: 16}} src={menu_out}/>
+                    </div>
+                </Badge>}
                 <Modal
                     visible={this.state.isInviteVisible}
                     footer={null}

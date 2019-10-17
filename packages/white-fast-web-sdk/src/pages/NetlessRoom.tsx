@@ -57,7 +57,7 @@ export enum UploadDocumentEnum {
     dynamic_conversion = "dynamic_conversion",
 }
 
-export enum RtcType {
+export enum RtcEnum {
     agora = "agora",
     zego = "zego",
     qiniu = "qiniu",
@@ -70,6 +70,13 @@ export type UploadToolBoxType = {
     title?: string,
     script?: string,
 };
+
+export type RtcType = {
+    type: RtcEnum,
+    rtcObj: any,
+    token: string,
+};
+export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export type RealTimeProps = {
     uuid: string;
     roomToken: string;
@@ -94,12 +101,10 @@ export type RealTimeProps = {
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
-    rtc?: {
-        type: RtcType,
-        client: any,
-    };
+    rtc?: RtcType;
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
+    recordDataCallback?: (data: RecordDataType) => void;
     isManagerOpen?: boolean;
 };
 
@@ -137,9 +142,6 @@ export type RealTimeStates = {
     isManagerOpen: boolean;
     deviceType: DeviceType;
     mode?: ModeType,
-    mediaSource?: string;
-    startRecordTime?: number;
-    stopRecordTime?: number;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
@@ -257,10 +259,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-    public componentWillUnmount(): void {
+    public async componentWillUnmount(): Promise<void> {
+        alert(1);
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
+            await this.state.room.disconnect();
         }
         if (this.roomManager) {
             this.roomManager.stop();
@@ -392,16 +396,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return true;
         }
     }
-    private setMediaSource = (source: string): void => {
-        this.setState({mediaSource: source});
-    }
-    private setStartTime = (time: number): void => {
-        this.setState({startRecordTime: time});
-    }
-    private setStopTime = (time: number): void => {
-        this.setState({stopRecordTime: time});
-    }
-
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -510,9 +504,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 room={room}/>
                             {this.props.identity === IdentityType.host &&
                             <WhiteboardRecord
-                                setStartTime={this.setStartTime}
-                                setStopTime={this.setStopTime}
-                                setMediaSource={this.setMediaSource}
+                                recordDataCallback={this.props.recordDataCallback}
                                 channelName={this.props.uuid}/>}
                             <ToolBox
                                 isReadOnly={isReadOnly}

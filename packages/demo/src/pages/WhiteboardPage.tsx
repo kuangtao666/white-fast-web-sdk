@@ -12,11 +12,15 @@ export type WhiteboardPageProps = RouteComponentProps<{
 }>;
 
 export type WhiteboardPageState = {
+    recordData: RecordDataType | null;
 };
-
+export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
     public constructor(props: WhiteboardPageProps) {
         super(props);
+        this.state = {
+            recordData: null,
+        };
     }
 
     private getRoomToken = async (uuid: string): Promise<string | null> => {
@@ -32,15 +36,14 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
     private startJoinRoom = async (): Promise<void> => {
         const {userId, uuid, identityType} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
-        const agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
         if (roomToken) {
             WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
                 roomToken: roomToken,
                 userId: userId,
-                userName: "伍双",
-                roomName: "伍双的房间",
-                userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
+                // userName: "伍双",
+                // roomName: "伍双的房间",
+                // userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
                 logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
                 loadingSvgUrl: "",
                 clickLogoCallback: () => {
@@ -49,15 +52,33 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                 exitRoomCallback: () => {
                     this.props.history.push("/");
                 },
-                recordDataCallback: (data: any) => {
-                    console.log();
+                recordDataCallback: (data: RecordDataType) => {
+                    this.setState({recordData: data});
                 },
                 replayCallback: () => {
-                   this.props.history.push(`/replay/${uuid}/${userId}/`);
+                    const {recordData} = this.state;
+                    if (recordData) {
+                        if (recordData.startTime) {
+                            if (recordData.endTime) {
+                                if (recordData.mediaUrl) {
+                                    this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/${recordData.endTime}/${recordData.mediaUrl}/`);
+                                } else {
+                                    this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/${recordData.endTime}/`);
+                                }
+                            } else {
+                                this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/`);
+                            }
+                        } else {
+                            this.props.history.push(`/replay/${uuid}/${userId}/`);
+                        }
+                    } else {
+                        this.props.history.push(`/replay/${uuid}/${userId}/`);
+                    }
                 },
                 rtc: {
                     type: "agora",
-                    client: agoraClient,
+                    rtcObj: AgoraRTC,
+                    token: "8595fd46955f427db44b4e9ba90f015d",
                 },
                 identity: identityType,
                 language: "Chinese",
@@ -86,6 +107,9 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                         script: "",
                     },
                 ],
+                roomCallback: (room: any) => {
+                    (window as any).room = room;
+                },
                 pagePreviewPosition: "right",
                 boardBackgroundColor: "#F2F2F2",
                 isReadOnly: false,

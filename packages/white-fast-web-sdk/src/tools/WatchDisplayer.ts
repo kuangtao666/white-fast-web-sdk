@@ -6,9 +6,17 @@ export function displayWatch(seconds: number): string {
         const displayMinutes = minutes % 60;
         const hours = (minutes - displayMinutes) / 60;
 
-        return `${hours} : ${displayMinutes} : ${displaySeconds}`;
+        return `${updateNumber(hours)} : ${updateNumber(displayMinutes)} : ${updateNumber(displaySeconds)}`;
 
     } else {
-        return `${minutes} : ${displaySeconds}`;
+        return `${updateNumber(minutes)} : ${updateNumber(displaySeconds)}`;
+    }
+}
+
+function updateNumber(time: number): string {
+    if (time <= 9) {
+        return `0${time}`;
+    } else {
+        return `${time}`;
     }
 }
