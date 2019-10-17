@@ -2,6 +2,7 @@
   "name": "white-plugin-scaffold",
   "version": "1.0.0",
   "description": "",
+  "private": true,
   "main": "dist/index.js",
   "scripts": {
     "type-gen": "tsc --emitDeclarationOnly",
