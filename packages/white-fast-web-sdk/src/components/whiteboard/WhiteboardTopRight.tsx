@@ -104,14 +104,14 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         this.setState({isCloseTipsVisible: true});
     }
     public render(): React.ReactNode {
-        const  {userAvatarUrl, isManagerOpen} = this.props;
+        const  {userAvatarUrl} = this.props;
         const isHost = this.props.identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
                 {isHost &&
                 <Badge offset={[-5, 7]} dot={this.handleDotState()}>
                     <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                        {isManagerOpen ? <img style={{width: 16}} src={set_black_icon}/> : <img style={{width: 16}} src={set_icon}/>}
+                        <img style={{width: 16}} src={set_icon}/>
                     </div>
                 </Badge>}
                 <div
