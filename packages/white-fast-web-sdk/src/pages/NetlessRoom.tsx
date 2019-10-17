@@ -38,6 +38,7 @@ import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
+import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -136,6 +137,9 @@ export type RealTimeStates = {
     isManagerOpen: boolean;
     deviceType: DeviceType;
     mode?: ModeType,
+    mediaSource?: string;
+    startRecordTime?: number;
+    stopRecordTime?: number;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
@@ -388,6 +392,16 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return true;
         }
     }
+    private setMediaSource = (source: string): void => {
+        this.setState({mediaSource: source});
+    }
+    private setStartTime = (time: number): void => {
+        this.setState({startRecordTime: time});
+    }
+    private setStopTime = (time: number): void => {
+        this.setState({stopRecordTime: time});
+    }
+
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -494,6 +508,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
+                            {this.props.identity === IdentityType.host &&
+                            <WhiteboardRecord
+                                setStartTime={this.setStartTime}
+                                setStopTime={this.setStopTime}
+                                setMediaSource={this.setMediaSource}
+                                channelName={this.props.uuid}/>}
                             <ToolBox
                                 isReadOnly={isReadOnly}
                                 language={this.props.language}

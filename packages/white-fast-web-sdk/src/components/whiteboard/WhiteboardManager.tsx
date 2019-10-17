@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Badge, Tabs, Icon} from "antd";
+import {Badge, Tabs, Icon, message} from "antd";
 const { TabPane } = Tabs;
 import "./WhiteboardManager.less";
 import {Room, Player} from "white-web-sdk";

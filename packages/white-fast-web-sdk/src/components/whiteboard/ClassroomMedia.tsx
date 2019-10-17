@@ -9,7 +9,7 @@ import {CSSProperties} from "react";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 // import * as camera from "../../assets/image/camera.svg";
 import * as set_video from "../../assets/image/set_video.svg";
-// import * as close_white from "../../assets/image/close_white.svg";
+import * as hangUp from "../../assets/image/hangUp.svg";
 import * as close_white from "../../assets/image/close_white.svg";
 import {RtcType} from "../../pages/NetlessRoom";
 export type NetlessStream = {
@@ -171,8 +171,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         room.setGlobalState({hostInfo: {...hostInfo, mode: evt.target.value}});
                     }}>
                         <Radio.Button value={ModeType.lecture}>讲课模式</Radio.Button>
-                        <Radio.Button value={ModeType.handUp}>举手问答</Radio.Button>
-                        <Radio.Button value={ModeType.discuss}>自由讨论</Radio.Button>
+                        <Radio.Button value={ModeType.handUp}>举手参与</Radio.Button>
+                        <Radio.Button value={ModeType.discuss}>自由互动</Radio.Button>
                     </Radio.Group>
                 );
             } else {
@@ -249,7 +249,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        <div className="manager-box-inner-host2">
                            <div className="manager-box-btn">
                                <Tooltip placement={"right"} title={"关闭视频"}>
-                                   <Button onClick={() => this.stopLocal()} style={{fontSize: 16}} type="danger" shape="circle" icon="video-camera"/>
+                                   <div className="manager-box-btn-hang" onClick={() => this.stopLocal()}>
+                                       <img src={hangUp}/>
+                                   </div>
                                </Tooltip>
                            </div>
                            <div className="manager-box-image">
@@ -257,6 +259,20 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                            </div>
                            <div className="manager-box-text">老师：{hostInfo.name}</div>
                            {this.renderHostController(hostInfo)}
+                           {/*<div className="manager-box-controller">*/}
+                               {/*<Tooltip placement={"bottom"} title={"声音"}>*/}
+                                   {/*<div className="manager-box-cell">*/}
+                                   {/*</div>*/}
+                               {/*</Tooltip>*/}
+                               {/*<Tooltip placement={"bottom"} title={"视频"}>*/}
+                                   {/*<div className="manager-box-cell">*/}
+                                   {/*</div>*/}
+                               {/*</Tooltip>*/}
+                               {/*<Tooltip placement={"bottom"} title={"最大化"}>*/}
+                                   {/*<div className="manager-box-cell">*/}
+                                   {/*</div>*/}
+                               {/*</Tooltip>*/}
+                           {/*</div>*/}
                        </div>
                    </div>}
                    {this.renderRemoteHostBox()}

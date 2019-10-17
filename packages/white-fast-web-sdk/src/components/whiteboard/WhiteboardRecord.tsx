@@ -1,7 +1,6 @@
 import * as React from "react";
 import "./WhiteboardRecord.less";
 import {message} from "antd";
-import {isMobile} from "react-device-detect";
 
 export type WhiteboardRecordState = {
     isRecord: boolean,
@@ -38,25 +37,19 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
         }
     }
     public render(): React.ReactNode {
-        if (isMobile) {
-            return (
-                <div onClick={this.record} className="record-box-mb">
-                    {this.state.isRecord ?
-                        <div className="record-box-inner-rect-mb"/> :
-                        <div className="record-box-inner-mb"/>
-                    }
-                </div>
-            );
-        } else {
-            return (
-                <div onClick={this.record} className="record-box">
+        return (
+            <div onClick={this.record} className="record-out-box">
+                <div className="record-box">
                     {this.state.isRecord ?
                         <div className="record-box-inner-rect"/> :
                         <div className="record-box-inner"/>
                     }
                 </div>
-            );
-        }
+                <div className="record-time">
+                    00:00
+                </div>
+            </div>
+        );
     }
 }
 

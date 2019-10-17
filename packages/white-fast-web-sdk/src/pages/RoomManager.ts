@@ -23,6 +23,7 @@ export type HostUserType = {
     identity: IdentityType,
     avatar?: string,
     name?: string,
+    isVideoFullScreen?: boolean,
     mode: ModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
@@ -44,6 +45,14 @@ export class RoomManager {
     this.mode = mode;
   }
 
+  private detectIsReadyOnly = (): boolean => {
+      const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
+      if (hostInfo) {
+          return hostInfo.mode !== ModeType.discuss;
+      } else {
+          return this.mode !== ModeType.discuss;
+      }
+  }
   public start = async (): Promise<void> => {
       if (this.identity === IdentityType.host) {
           const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
@@ -82,7 +91,7 @@ export class RoomManager {
           this.room.disableCameraTransform = true;
           await this.room.setWritable(false);
       } else {
-          const isReadOnly = this.mode !== ModeType.discuss;
+          const isReadOnly = this.detectIsReadyOnly();
           const globalGuestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
           if (globalGuestUsers === undefined) {
               const guestUser: GuestUserType = {
