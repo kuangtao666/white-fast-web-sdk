@@ -19,7 +19,8 @@ import "video.js/dist/video-js.css";
 import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
-import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
+import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
@@ -30,7 +31,6 @@ export type PlayerPageProps = {
     duration?: number;
     beginTimestamp?: number,
     mediaUrl?: string,
-    isChatOpen?: boolean;
     logoUrl?: string;
     playerCallback?: (player: Player) => void;
     clickLogoCallback?: () => void;
@@ -68,7 +68,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             isPlayerSeeking: false,
             messages: [],
             seenMessagesLength: 0,
-            isChatOpen: this.props.isChatOpen !== undefined ? this.props.isChatOpen : false,
+            isChatOpen: false,
             isVisible: false,
             isFullScreen: false,
             replayFail: false,
@@ -77,7 +77,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
     }
 
     public componentWillReceiveProps(nextProps: PlayerPageProps): void {
-        if (this.props.isChatOpen !== nextProps.isChatOpen && nextProps.isChatOpen === false) {
+        if (this.props.isManagerOpen !== nextProps.isManagerOpen && nextProps.isManagerOpen === false) {
             this.setState({seenMessagesLength: this.state.messages.length});
         }
     }
@@ -286,7 +286,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             }} className="player-controller">
                                 {this.renderScale()}
                             </div>
-                            <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isChatOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                            <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                                 <div onClick={this.handleChatState} className="player-controller">
                                     <img src={chat_white}/>
                                 </div>
@@ -300,8 +300,24 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
     }
 
-    private handleChatState = (): void => {
-        this.setState({isChatOpen: !this.state.isChatOpen});
+
+    private handleChatState = async (): Promise<void> => {
+        if (!this.state.isManagerOpen) {
+            this.setState({isChatOpen: true, isManagerOpen: true});
+            await timeout(100);
+            this.onWindowResize();
+        } else {
+            this.setState({isChatOpen: true});
+        }
+    }
+    private handleManagerState = async (): Promise<void> => {
+        if (this.state.isManagerOpen) {
+            this.setState({isManagerOpen: false, isChatOpen: false});
+        } else {
+            this.setState({isManagerOpen: true});
+        }
+        await timeout(100);
+        this.onWindowResize();
     }
 
     private renderMedia = (): React.ReactNode => {
@@ -333,23 +349,26 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
     }
 
-    private handleManagerState = (): void  => {
-
-    }
     public render(): React.ReactNode {
         const {player} = this.state;
-        const {userId, userAvatarUrl, userName, boardBackgroundColor, uuid} = this.props;
+        const {userId, boardBackgroundColor, uuid} = this.props;
         if (this.state.replayFail) {
             return <PageError/>;
         }
         return (
             <div id="netless-player" className="player-out-box">
                 {this.renderLoading()}
-                <WhiteboardTopLeft
-                    clickLogoCallback={this.props.clickLogoCallback}
-                    roomName={this.props.roomName}
-                    logoUrl={this.props.logoUrl}/>
                 <div className="player-board">
+                    <WhiteboardTopLeft
+                        clickLogoCallback={this.props.clickLogoCallback}
+                        roomName={this.props.roomName}
+                        logoUrl={this.props.logoUrl}/>
+                    {player && <PlayerTopRight
+                        userId={userId}
+                        player={player}
+                        isFirstScreenReady={this.state.isFirstScreenReady}
+                        handleManagerState={this.handleManagerState}
+                        isManagerOpen={this.state.isManagerOpen}/>}
                     {this.renderMedia()}
                     {this.renderScheduleView()}
                     <div
@@ -373,8 +392,10 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     </div>
                 </div>
                 <PlayerManager
-                    player={player}
-                    userId={userId} messages={this.state.messages}
+                    player={player} isChatOpen={this.state.isChatOpen}
+                    userId={userId}
+                    isFirstScreenReady={this.state.isFirstScreenReady}
+                    messages={this.state.messages}
                     handleManagerState={this.handleManagerState}
                     isManagerOpen={this.state.isManagerOpen}
                     uuid={uuid}/>

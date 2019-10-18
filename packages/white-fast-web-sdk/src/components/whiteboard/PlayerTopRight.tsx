@@ -1,37 +1,25 @@
 import * as React from "react";
-import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
-import QRCode from "qrcode.react";
-import set_icon from "../../assets/image/set_icon.svg";
-import menu_in from "../../assets/image/menu_in.svg";
+import {ViewMode, Player, RoomState, Scene, DeviceType} from "white-react-sdk";
 import menu_out from "../../assets/image/menu_out.svg";
-import set_black_icon from "../../assets/image/set_black_icon.svg";
-import stop_icon from "../../assets/image/stop_icon.svg";
-import replay_video_cover from "../../assets/image/replay_video_cover.svg";
-import * as add from "../../assets/image/add.svg";
-import {Badge, Button, message, Modal, Input} from "antd";
-import Clipboard from "react-clipboard.js";
+import {Badge} from "antd";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
+import Identicon from "react-identicons";
 
-export type WhiteboardTopRightProps = {
+export type PlayerTopRightProps = {
     userId: string;
-    room: Room;
-    roomState: RoomState;
-    whiteboardLayerDownRef: HTMLDivElement;
+    player: Player;
     handleManagerState: () => void;
-    deviceType: DeviceType;
     userAvatarUrl?: string;
     userName?: string;
-    identity?: IdentityType;
     isReadOnly?: boolean;
     language?: LanguageEnum;
     isManagerOpen: boolean;
-    exitRoomCallback?: () => void;
-    replayCallback?: () => void;
+    isFirstScreenReady: boolean;
 };
 
-export type WhiteboardTopRightStates = {
+export type PlayerTopRightStates = {
     isVisible: boolean;
     isLoading: boolean;
     canvas: any;
@@ -43,15 +31,10 @@ export type WhiteboardTopRightStates = {
     url: string;
 };
 
-export enum IdentityType {
-    host = "host",
-    guest = "guest",
-    listener = "listener",
-}
 
-export default class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightStates> {
+export default class PlayerTopRight extends React.Component<PlayerTopRightProps, PlayerTopRightStates> {
 
-    public constructor(props: WhiteboardTopRightProps) {
+    public constructor(props: PlayerTopRightProps) {
         super(props);
         this.state = {
             isVisible: false,
@@ -67,8 +50,8 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     private handleDotState = (): boolean => {
-        if (!this.props.isManagerOpen) {
-            const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
+        if (!this.props.isManagerOpen && this.props.isFirstScreenReady) {
+            const guestUsers: GuestUserType[] = this.props.player.state.globalState.guestUsers;
             if (guestUsers && guestUsers.length > 0) {
                 const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
                 return handUpGuestUsers && handUpGuestUsers.length > 0;
@@ -80,51 +63,36 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         }
     }
 
-    private handleUrl = (url: string): string => {
-        let classUrl;
-        if (this.props.identity === IdentityType.host) {
-            classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+    private handleUserAvatar = (): React.ReactNode => {
+        const  {userAvatarUrl, userId} = this.props;
+        if (userAvatarUrl) {
+            return (
+                <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
+                    <img src={userAvatarUrl}/>
+                </div>
+            );
         } else {
-            classUrl = url;
+            return (
+                <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
+                    <div className="whiteboard-top-right-avatar">
+                        <Identicon
+                            className={`avatar-${userId}`}
+                            size={22}
+                            string={userId}
+                        />
+                    </div>
+                </div>
+            );
         }
-        if (this.props.isReadOnly) {
-            classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
-        }
-        const regex = /[\w]+\/$/gm;
-        const match = regex.exec(classUrl);
-        if (match) {
-            return classUrl.substring(0, match.index);
-        } else {
-            return classUrl;
-        }
-    }
-    private handleInvite = (): void => {
-        this.setState({isInviteVisible: true});
-    }
-
-    private handleClose = (): void => {
-        this.setState({isCloseTipsVisible: true});
     }
     public render(): React.ReactNode {
-        const  {userAvatarUrl, isManagerOpen} = this.props;
-        const isHost = this.props.identity === IdentityType.host;
+        const  {isManagerOpen} = this.props;
         return (
             <div className="whiteboard-top-right-box">
-                <div
-                    className="whiteboard-top-right-cell" onClick={this.handleInvite}>
-                    <img style={{width: 18}} src={add}/>
-                </div>
                 <div className="whiteboard-top-user-box">
-                    {isHost ?
-                        <div onClick={this.handleClose} className="whiteboard-top-right-user">
-                            <img src={stop_icon}/>
-                        </div> :
-                        <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
-                            <img src={userAvatarUrl}/>
-                        </div>
-                    }
+                    {this.handleUserAvatar()}
                 </div>
-                {(isHost && !isManagerOpen) &&
+                {!isManagerOpen &&
                 <Badge offset={[-5, 7]} dot={this.handleDotState()}>
                     <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={menu_out}/>

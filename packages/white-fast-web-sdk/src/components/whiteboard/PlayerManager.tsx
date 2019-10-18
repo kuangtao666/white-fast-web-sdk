@@ -1,14 +1,19 @@
 import * as React from "react";
-import {Badge, Tabs, Icon, message} from "antd";
+import {Badge, Tabs, Icon, message, Tooltip} from "antd";
 import "./WhiteboardManager.less";
 import {Player} from "white-web-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
+const { TabPane } = Tabs;
 import {IdentityType} from "./WhiteboardTopRight";
 import {RoomMember, ViewMode} from "white-react-sdk";
 import Identicon from "react-identicons";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
+import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
+import user_empty from "../../assets/image/user_empty.svg";
+import menu_in from "../../assets/image/menu_in.svg";
+import teacher from "../../assets/image/teacher.svg";
 
 export type PlayerManagerProps = {
     player?: Player;
@@ -20,12 +25,15 @@ export type PlayerManagerProps = {
     userAvatarUrl?: string;
     language?: LanguageEnum;
     messages: MessageType[];
+    isFirstScreenReady: boolean;
+    isChatOpen: boolean;
 };
 
 export type PlayerManagerStates = {
-    isLandscape: boolean;
+    isLandscape: boolean,
     isRtcReady: boolean,
     isManagerOpen: boolean,
+    activeKey: string,
 };
 
 
@@ -38,21 +46,155 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
             isLandscape: false,
             isRtcReady: false,
             isManagerOpen: this.props.isManagerOpen !== undefined ? this.props.isManagerOpen : false,
+            activeKey: "1",
         };
+    }
+    private detectLandscape = (): void => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const isLandscape = (width / height) >= 1;
+        this.setState({isLandscape: isLandscape});
+    }
+    public componentDidMount(): void {
+        this.detectLandscape();
+        window.addEventListener("resize", this.detectLandscape);
+    }
+    public componentWillReceiveProps(nextProps: PlayerManagerProps): void {
+        if (this.props.isChatOpen !== nextProps.isChatOpen) {
+            if (nextProps.isChatOpen) {
+                this.setState({activeKey: "2"});
+            } else {
+                this.setState({activeKey: "1"});
+            }
+        }
+    }
+
+    public componentWillUnmount(): void {
+        window.removeEventListener("resize", this.detectLandscape);
+    }
+    private handleTabsChange = (evt: any): void => {
+        if (evt === "1") {
+            this.setState({activeKey: evt});
+        } else {
+            this.setState({activeKey: evt});
+        }
+    }
+
+    private renderGuest = (): React.ReactNode => {
+        const {player, isFirstScreenReady} = this.props;
+        if (player && isFirstScreenReady) {
+            const globalGuestUsers: GuestUserType[] = player.state.globalState.guestUsers;
+            if (globalGuestUsers) {
+                const guestNodes = globalGuestUsers.map((guestUser: GuestUserType, index: number) => {
+                    return (
+                        <div className="room-member-cell" key={`${index}`}>
+                            <div className="room-member-cell-inner">
+                                {guestUser.avatar ?
+                                    <div className="manager-avatar-box">
+                                        <img className="room-member-avatar"  src={guestUser.avatar}/>
+                                    </div>
+                                    :
+                                    <div className="manager-avatar-box">
+                                        <Identicon
+                                            className={`avatar-${guestUser.userId}`}
+                                            size={24}
+                                            string={guestUser.userId}/>
+                                    </div>
+                                }
+                                <div className="control-box-name">{guestUser.name}</div>
+                            </div>
+                        </div>
+                    );
+                });
+                return (
+                    <div>
+                        {guestNodes}
+                    </div>
+                );
+            } else {
+                return <div className="room-member-empty">
+                    <img src={user_empty}/>
+                    <div>尚且无学生加入</div>
+                </div>;
+            }
+        } else {
+            return null;
+        }
+    }
+    private handleManagerStyle = (): string => {
+        if (this.props.isManagerOpen) {
+            if (this.state.isLandscape) {
+                return "manager-box";
+            } else {
+                return "manager-box-mask";
+            }
+        } else {
+            return "manager-box-mask-close";
+        }
+    }
+
+    private renderHostInf = (): React.ReactNode => {
+        const {player, isFirstScreenReady} = this.props;
+        if (player && isFirstScreenReady && player.state.globalState.hostInfo !== undefined) {
+            const hostInfo: HostUserType = player.state.globalState.hostInfo;
+            return (
+                <div className="replay-video-box">
+                    <div className="manager-box-btn-right">
+                        <Tooltip placement={"left"} title={"隐藏侧边栏"}>
+                            <div onClick={() => this.props.handleManagerState()} className="manager-box-btn-right-inner">
+                                <img src={menu_in}/>
+                            </div>
+                        </Tooltip>
+                    </div>
+                    <div className="manager-box-image">
+                        {hostInfo.avatar ? <img src={hostInfo.avatar}/> :
+                            <Identicon
+                                className={`avatar-${hostInfo.userId}`}
+                                size={60}
+                                string={hostInfo.userId}/>
+                        }
+                    </div>
+                    <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
+                </div>
+            );
+        } else {
+            return (
+                <div className="replay-video-box">
+                    <div className="manager-box-btn-right">
+                        <Tooltip placement={"left"} title={"隐藏侧边栏"}>
+                            <div onClick={() => this.props.handleManagerState()} className="manager-box-btn-right-inner">
+                                <img src={menu_in}/>
+                            </div>
+                        </Tooltip>
+                    </div>
+                    <div className="manager-box-image">
+                        <img style={{width: 42}} src={teacher}/>
+                    </div>
+                </div>
+            );
+        }
     }
     public render(): React.ReactNode {
         return (
-            <div className="manager-box">
-                <div className="replay-video-box">
-                </div>
+            <div className={this.handleManagerStyle()}>
+                {this.renderHostInf()}
                 <div className="chat-box-switch">
-                    <WhiteboardChat
-                        language={this.props.language}
-                        messages={this.props.messages}
-                        userAvatarUrl={this.props.userAvatarUrl}
-                        userId={this.props.userId}
-                        userName={this.props.userName}
-                        player={this.props.player}/>
+                    <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
+                        <TabPane tab={"用户列表"} key="1">
+                            <div className="guest-box">
+                                {this.renderGuest()}
+                            </div>
+                        </TabPane>
+                        <TabPane tab={"聊天群组"} key="2">
+                            <WhiteboardChat
+                                language={this.props.language}
+                                messages={this.props.messages}
+                                userAvatarUrl={this.props.userAvatarUrl}
+                                userId={this.props.userId}
+                                userName={this.props.userName}
+                                player={this.props.player}/>
+                        </TabPane>
+                    </Tabs>
                 </div>
             </div>
         );

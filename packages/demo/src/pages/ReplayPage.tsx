@@ -59,6 +59,7 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
                 beginTimestamp: startTime && parseInt(startTime),
                 duration: this.getDuration(),
                 mediaUrl: mediaUrl,
+                isManagerOpen: true,
                 // isChatOpen:
             });
         }
