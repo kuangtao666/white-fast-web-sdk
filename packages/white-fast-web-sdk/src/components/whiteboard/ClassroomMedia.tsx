@@ -217,11 +217,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     <div className="manager-box-image">
                         {hostInfo.avatar ? <img src={hostInfo.avatar}/> :
                             <Identicon
+                                className={`avatar-${hostInfo.userId}`}
                                 size={60}
                                 string={hostInfo.userId}/>
                         }
                     </div>
-                    {hostInfo.name ? <div className="manager-box-text">老师：{hostInfo.name}</div> : <div className="manager-box-text"/>}
+                    <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
                     {this.renderHostController(hostInfo)}
                 </div>
             );
@@ -255,24 +256,15 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                </Tooltip>
                            </div>
                            <div className="manager-box-image">
-                               <img src={hostInfo.avatar}/>
+                               {hostInfo.avatar ? <img src={hostInfo.avatar}/> :
+                                   <Identicon
+                                       className={`avatar-${hostInfo.userId}`}
+                                       size={60}
+                                       string={hostInfo.userId}/>
+                               }
                            </div>
-                           <div className="manager-box-text">老师：{hostInfo.name}</div>
+                           <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
                            {this.renderHostController(hostInfo)}
-                           {/*<div className="manager-box-controller">*/}
-                               {/*<Tooltip placement={"bottom"} title={"声音"}>*/}
-                                   {/*<div className="manager-box-cell">*/}
-                                   {/*</div>*/}
-                               {/*</Tooltip>*/}
-                               {/*<Tooltip placement={"bottom"} title={"视频"}>*/}
-                                   {/*<div className="manager-box-cell">*/}
-                                   {/*</div>*/}
-                               {/*</Tooltip>*/}
-                               {/*<Tooltip placement={"bottom"} title={"最大化"}>*/}
-                                   {/*<div className="manager-box-cell">*/}
-                                   {/*</div>*/}
-                               {/*</Tooltip>*/}
-                           {/*</div>*/}
                        </div>
                    </div>}
                    {this.renderRemoteHostBox()}

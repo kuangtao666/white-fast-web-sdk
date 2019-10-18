@@ -13,7 +13,6 @@ import Clipboard from "react-clipboard.js";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
-import Identicon from "react-identicons";
 
 export type WhiteboardTopRightProps = {
     userId: string;
@@ -106,39 +105,8 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     private handleClose = (): void => {
         this.setState({isCloseTipsVisible: true});
     }
-    private handleUserAvatar = (): React.ReactNode => {
-        const  {userAvatarUrl, userId} = this.props;
-        const isHost = this.props.identity === IdentityType.host;
-        if (isHost) {
-            return (
-                <div onClick={this.handleClose} className="whiteboard-top-right-user">
-                    <img src={stop_icon}/>
-                </div>
-            );
-        } else {
-            if (userAvatarUrl) {
-                return (
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
-                        <img src={userAvatarUrl}/>
-                    </div>
-                );
-            } else {
-                return (
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
-                        <div className="whiteboard-top-right-avatar">
-                            <Identicon
-                                className={`avatar-${userId}`}
-                                size={22}
-                                string={userId}
-                            />
-                        </div>
-                    </div>
-                );
-            }
-        }
-    }
     public render(): React.ReactNode {
-        const  {isManagerOpen} = this.props;
+        const  {userAvatarUrl, isManagerOpen} = this.props;
         const isHost = this.props.identity === IdentityType.host;
         return (
             <div className="whiteboard-top-right-box">
@@ -147,7 +115,14 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                     <img style={{width: 18}} src={add}/>
                 </div>
                 <div className="whiteboard-top-user-box">
-                    {this.handleUserAvatar()}
+                    {isHost ?
+                        <div onClick={this.handleClose} className="whiteboard-top-right-user">
+                            <img src={stop_icon}/>
+                        </div> :
+                        <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
+                            <img src={userAvatarUrl}/>
+                        </div>
+                    }
                 </div>
                 {(isHost && !isManagerOpen) &&
                 <Badge offset={[-5, 7]} dot={this.handleDotState()}>
@@ -155,60 +130,6 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <img style={{width: 16}} src={menu_out}/>
                     </div>
                 </Badge>}
-                <Modal
-                    visible={this.state.isInviteVisible}
-                    footer={null}
-                    title="邀请"
-                    onCancel={() => this.setState({isInviteVisible: false})}
-                >
-                    <div className="whiteboard-share-box">
-                        <QRCode value={`${this.handleUrl(this.state.url)}`} />
-                        <div className="whiteboard-share-text-box">
-                            <Input readOnly size="large" value={`${this.handleUrl(this.state.url)}`}/>
-                            <Clipboard
-                                data-clipboard-text={`${this.handleUrl(this.state.url)}`}
-                                component="div"
-                                onSuccess={() => {
-                                    message.success("Copy already copied address to clipboard");
-                                    this.setState({isInviteVisible: false});
-                                }}
-                            >
-                                <Button style={{marginTop: 16, width: 240}} size="large" type="primary">复制链接</Button>
-                            </Clipboard>
-                        </div>
-                    </div>
-                </Modal>
-                <Modal
-                    visible={this.state.isCloseTipsVisible}
-                    footer={null}
-                    title="退出教室"
-                    onCancel={() => this.setState({isCloseTipsVisible: false})}
-                >
-                    <div className="whiteboard-share-box">
-                        <div className="whiteboard-share-text-box">
-                            {/*<Button style={{marginTop: 16, width: 240}} size="large" type="primary">观看回放</Button>*/}
-                            <div onClick={() => {
-                                if (this.props.replayCallback) {
-                                    this.props.replayCallback();
-                                    this.setState({isCloseTipsVisible: false});
-                                }
-                            }} className="replay-video-cover">
-                                <img src={replay_video_cover}/>
-                            </div>
-                            <Button
-                                    onClick={() => {
-                                        if (this.props.exitRoomCallback) {
-                                            this.props.exitRoomCallback();
-                                            this.setState({isCloseTipsVisible: false});
-                                        }
-                                    }}
-                                    style={{marginTop: 16, width: 240}}
-                                    size="large">
-                                确认退出
-                            </Button>
-                        </div>
-                    </div>
-                </Modal>
             </div>
         );
 

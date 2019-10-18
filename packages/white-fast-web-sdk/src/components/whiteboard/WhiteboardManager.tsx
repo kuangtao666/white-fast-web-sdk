@@ -222,6 +222,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                 :
                                 <div className="manager-avatar-box">
                                     <Identicon
+                                        className={`avatar-${guestUser.userId}`}
                                         size={24}
                                         string={guestUser.userId}/>
                                 </div>

@@ -15,6 +15,7 @@ import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
+import Identicon from "react-identicons";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
@@ -69,10 +70,15 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         window.addEventListener("resize", this.detectLandscape);
         await timeout(0);
         this.scrollToBottom();
-        const canvasArray: any = document.getElementsByClassName("identicon").item(0);
+
+    }
+
+    private getAvatarUrl = (id: any): string | null => {
+        const canvasArray: any = document.getElementsByClassName(`avatar-${id}`).item(0);
         if (canvasArray) {
-            const url = canvasArray.toDataURL();
-            this.setState({url: url});
+            return canvasArray.toDataURL();
+        } else {
+            return null;
         }
     }
 
@@ -116,7 +122,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                 return (
                     <MessageGroup
                         key={`${index}`}
-                        avatar={data.avatar ? data.avatar : this.state.url}
+                        avatar={data.avatar ? data.avatar : this.getAvatarUrl(data.id)}
                         isOwn={this.props.userId === data.id}
                         onlyFirstWithMeta
                     >

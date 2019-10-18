@@ -11,12 +11,15 @@ import * as full_screen from "../assets/image/full_screen.svg";
 import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
-import {MessageType, WhiteboardBottomRightProps} from "../components/whiteboard/WhiteboardBottomRight";
-import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
+import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
 import Draggable from "react-draggable";
 import "video.js/dist/video-js.css";
+import {Iframe} from "../components/Iframe";
+import {Editor} from "../components/Editor";
+import PlayerManager from "../components/whiteboard/PlayerManager";
+import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
@@ -32,21 +35,23 @@ export type PlayerPageProps = {
     playerCallback?: (player: Player) => void;
     clickLogoCallback?: () => void;
     roomName?: string;
+    isManagerOpen?: boolean;
 };
 
 
 export type PlayerPageStates = {
-    player: Player | null;
+    player?: Player;
     phase: PlayerPhase;
     currentTime: number;
     isFirstScreenReady: boolean;
     isPlayerSeeking: boolean;
     messages: MessageType[];
     seenMessagesLength: number;
-    isChatOpen?: boolean;
+    isChatOpen: boolean;
     isVisible: boolean;
     isFullScreen: boolean;
     replayFail: boolean;
+    isManagerOpen: boolean;
 };
 
 export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> {
@@ -60,14 +65,14 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             currentTime: 0,
             phase: PlayerPhase.Pause,
             isFirstScreenReady: false,
-            player: null,
             isPlayerSeeking: false,
             messages: [],
             seenMessagesLength: 0,
-            isChatOpen: this.props.isChatOpen,
+            isChatOpen: this.props.isChatOpen !== undefined ? this.props.isChatOpen : false,
             isVisible: false,
             isFullScreen: false,
             replayFail: false,
+            isManagerOpen: this.props.isManagerOpen !== undefined ? this.props.isManagerOpen : false,
         };
     }
 
@@ -86,7 +91,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
         const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk();
+            const whiteWebSdk = new WhiteWebSdk({plugins: [Iframe, Editor]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,
@@ -327,9 +332,13 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             </div>;
         }
     }
+
+    private handleManagerState = (): void  => {
+
+    }
     public render(): React.ReactNode {
         const {player} = this.state;
-        const {userId, userAvatarUrl, userName, boardBackgroundColor} = this.props;
+        const {userId, userAvatarUrl, userName, boardBackgroundColor, uuid} = this.props;
         if (this.state.replayFail) {
             return <PageError/>;
         }
@@ -363,6 +372,12 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             player={player}/>}
                     </div>
                 </div>
+                <PlayerManager
+                    player={player}
+                    userId={userId} messages={this.state.messages}
+                    handleManagerState={this.handleManagerState}
+                    isManagerOpen={this.state.isManagerOpen}
+                    uuid={uuid}/>
             </div>
         );
     }
