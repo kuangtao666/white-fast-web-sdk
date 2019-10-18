@@ -259,12 +259,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-    public async componentWillUnmount(): Promise<void> {
-        alert(1);
+    public componentWillUnmount(): void {
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
-            await this.state.room.disconnect();
+            this.state.room.disconnect();
         }
         if (this.roomManager) {
             this.roomManager.stop();

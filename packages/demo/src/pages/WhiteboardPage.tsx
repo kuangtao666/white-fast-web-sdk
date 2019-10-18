@@ -32,6 +32,27 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         }
     }
 
+    private handleReplayUrl = (): void => {
+        const {userId, uuid} = this.props.match.params;
+        const {recordData} = this.state;
+        if (recordData) {
+            if (recordData.startTime) {
+                if (recordData.endTime) {
+                    if (recordData.mediaUrl) {
+                        this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/${recordData.endTime}/${recordData.mediaUrl}/`);
+                    } else {
+                        this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/${recordData.endTime}/`);
+                    }
+                } else {
+                    this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/`);
+                }
+            } else {
+                this.props.history.push(`/replay/${uuid}/${userId}/`);
+            }
+        } else {
+            this.props.history.push(`/replay/${uuid}/${userId}/`);
+        }
+    }
 
     private startJoinRoom = async (): Promise<void> => {
         const {userId, uuid, identityType} = this.props.match.params;
@@ -56,24 +77,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                     this.setState({recordData: data});
                 },
                 replayCallback: () => {
-                    const {recordData} = this.state;
-                    if (recordData) {
-                        if (recordData.startTime) {
-                            if (recordData.endTime) {
-                                if (recordData.mediaUrl) {
-                                    this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/${recordData.endTime}/${recordData.mediaUrl}/`);
-                                } else {
-                                    this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/${recordData.endTime}/`);
-                                }
-                            } else {
-                                this.props.history.push(`/replay/${uuid}/${userId}/${recordData.startTime}/`);
-                            }
-                        } else {
-                            this.props.history.push(`/replay/${uuid}/${userId}/`);
-                        }
-                    } else {
-                        this.props.history.push(`/replay/${uuid}/${userId}/`);
-                    }
+                    this.handleReplayUrl();
                 },
                 rtc: {
                     type: "agora",
@@ -137,9 +141,14 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         await this.startJoinRoom();
     }
 
+    public componentWillUnmount(): void {
+        // alert(1);
+    }
+
     public render(): React.ReactNode {
         return (
-            <div id="whiteboard" className="whiteboard-box"/>
+            <div id="whiteboard" className="whiteboard-box">
+            </div>
         );
     }
 }
