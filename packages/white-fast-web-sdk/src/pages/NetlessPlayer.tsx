@@ -14,12 +14,12 @@ import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
-import Draggable from "react-draggable";
 import "video.js/dist/video-js.css";
 import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
+import Draggable from "react-draggable";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
@@ -90,6 +90,9 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             });
         }
         const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
+        if (mediaUrl && this.props.isManagerOpen === undefined) {
+            this.setState({isManagerOpen: true});
+        }
         if (uuid && roomToken) {
             const whiteWebSdk = new WhiteWebSdk({plugins: [Iframe, Editor]});
             const player = await whiteWebSdk.replayRoom(
@@ -320,23 +323,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         this.onWindowResize();
     }
 
-    private renderMedia = (): React.ReactNode => {
-        const {mediaUrl} = this.props;
-        if (mediaUrl) {
-            return (
-                <Draggable bounds="parent">
-                    <div className="player-video-out">
-                        <video
-                            poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
-                            className="video-js video-layout"
-                            id="white-sdk-video-js"/>
-                    </div>
-                </Draggable>
-            );
-        } else {
-            return null;
-        }
-    }
 
     private renderLoading = (): React.ReactNode => {
         const {player} = this.state;
@@ -369,7 +355,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         isFirstScreenReady={this.state.isFirstScreenReady}
                         handleManagerState={this.handleManagerState}
                         isManagerOpen={this.state.isManagerOpen}/>}
-                    {this.renderMedia()}
                     {this.renderScheduleView()}
                     <div
                         className="player-board-inner"
@@ -392,7 +377,8 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     </div>
                 </div>
                 <PlayerManager
-                    player={player} isChatOpen={this.state.isChatOpen}
+                    player={player} mediaUrl={this.props.mediaUrl}
+                    isChatOpen={this.state.isChatOpen}
                     userId={userId}
                     isFirstScreenReady={this.state.isFirstScreenReady}
                     messages={this.state.messages}

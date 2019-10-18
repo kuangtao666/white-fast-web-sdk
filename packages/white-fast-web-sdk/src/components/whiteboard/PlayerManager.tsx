@@ -14,6 +14,7 @@ import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import user_empty from "../../assets/image/user_empty.svg";
 import menu_in from "../../assets/image/menu_in.svg";
 import teacher from "../../assets/image/teacher.svg";
+import Draggable from "react-draggable";
 
 export type PlayerManagerProps = {
     player?: Player;
@@ -27,6 +28,7 @@ export type PlayerManagerProps = {
     messages: MessageType[];
     isFirstScreenReady: boolean;
     isChatOpen: boolean;
+    mediaUrl?: string;
 };
 
 export type PlayerManagerStates = {
@@ -118,18 +120,53 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                 </div>;
             }
         } else {
-            return null;
+            return <div className="room-member-empty">
+                <img src={user_empty}/>
+                <div>尚且无学生加入</div>
+            </div>;
         }
     }
     private handleManagerStyle = (): string => {
         if (this.props.isManagerOpen) {
-            if (this.state.isLandscape) {
-                return "manager-box";
-            } else {
-                return "manager-box-mask";
-            }
+            // if (this.state.isLandscape) {
+            //     return "manager-box";
+            // } else {
+            //     return "manager-box-mask";
+            // }
+            return "manager-box";
         } else {
             return "manager-box-mask-close";
+        }
+    }
+
+    private renderMedia = (): React.ReactNode => {
+        const {mediaUrl} = this.props;
+        if (mediaUrl) {
+            return (
+                <Draggable bounds="parent">
+                    <div className="player-video-out-side">
+                        <video
+                            poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
+                            className="video-js video-layout"
+                            id="white-sdk-video-js"/>
+                    </div>
+                </Draggable>
+            );
+        } else {
+            return null;
+        }
+    }
+    private handleModeText = (mode: ModeType) => {
+        switch (mode) {
+            case ModeType.discuss: {
+                return "自由讨论";
+            }
+            case ModeType.lecture: {
+                return "讲课模式";
+            }
+            default: {
+                return "举手问答";
+            }
         }
     }
 
@@ -139,6 +176,7 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
             const hostInfo: HostUserType = player.state.globalState.hostInfo;
             return (
                 <div className="replay-video-box">
+                    {this.renderMedia()}
                     <div className="manager-box-btn-right">
                         <Tooltip placement={"left"} title={"隐藏侧边栏"}>
                             <div onClick={() => this.props.handleManagerState()} className="manager-box-btn-right-inner">
@@ -155,11 +193,13 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                         }
                     </div>
                     <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
+                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.mode)}</div>
                 </div>
             );
         } else {
             return (
                 <div className="replay-video-box">
+                    {this.renderMedia()}
                     <div className="manager-box-btn-right">
                         <Tooltip placement={"left"} title={"隐藏侧边栏"}>
                             <div onClick={() => this.props.handleManagerState()} className="manager-box-btn-right-inner">
@@ -185,7 +225,7 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                                 {this.renderGuest()}
                             </div>
                         </TabPane>
-                        <TabPane tab={"聊天群组"} key="2">
+                        <TabPane  tab={"聊天群组"} key="2">
                             <WhiteboardChat
                                 language={this.props.language}
                                 messages={this.props.messages}

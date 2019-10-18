@@ -294,11 +294,12 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
 
     private handleManagerStyle = (): string => {
         if (this.props.isManagerOpen) {
-            if (this.state.isLandscape) {
-                return "manager-box";
-            } else {
-                return "manager-box-mask";
-            }
+            // if (this.state.isLandscape) {
+            //     return "manager-box";
+            // } else {
+            //     return "manager-box-mask";
+            // }
+            return "manager-box";
         } else {
             return "manager-box-mask-close";
         }
