@@ -2,7 +2,7 @@ import * as React from "react";
 import {RouteComponentProps, withRouter} from "react-router";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
-import WhiteFastSDK from "white-fast-web-sdk";
+import WhiteFastSDK from "@netless/white-fast-web-sdk";
 export type ReplayPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;

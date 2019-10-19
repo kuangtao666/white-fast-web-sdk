@@ -3,7 +3,7 @@ import {RouteComponentProps, withRouter} from "react-router";
 import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
-import WhiteFastSDK from "white-fast-web-sdk";
+import WhiteFastSDK from "@netless/white-fast-web-sdk";
 import {IdentityType} from "./WhiteboardCreatorPage";
 export type WhiteboardPageProps = RouteComponentProps<{
     uuid: string;
@@ -152,5 +152,4 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         );
     }
 }
-
 export default withRouter(WhiteboardPage);

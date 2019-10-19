@@ -178,7 +178,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [Iframe, Editor]});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [Iframe, Editor]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -259,11 +259,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-    public componentWillUnmount(): void {
+    public async componentWillUnmount(): Promise<void> {
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
-            this.state.room.disconnect();
+            await this.state.room.disconnect();
         }
         if (this.roomManager) {
             this.roomManager.stop();
