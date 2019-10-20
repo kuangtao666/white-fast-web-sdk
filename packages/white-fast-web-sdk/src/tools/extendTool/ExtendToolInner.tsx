@@ -67,7 +67,7 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                 <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
                     <TabPane tab="插件教具" key="1">
                         <div>
-                            <div onClick={() => this.props.room.insertPlugin({protocal: "test", centerX: 0, centerY: 0, width: 300, height: 300})}>
+                            <div onClick={() => this.props.room.insertPlugin({ protocal: "scaffold", centerX: 0, centerY: 0, width: 300, height: 300})}>
                                 <div></div>
                                 网页
                             </div>

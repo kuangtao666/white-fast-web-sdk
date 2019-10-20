@@ -7,7 +7,7 @@ export type CounterComponentProps = PluginComponentProps & {
 
 export default class CounterComponent extends React.Component<CounterComponentProps> {
 
-    public static readonly protocol: string = "test";
+    public static readonly protocol: string = "scaffold";
     public static readonly backgroundProps: Partial<CounterComponentProps> = { count: 0 };
 
     public static willInterruptEvent(props: any, event: any): boolean {
