@@ -1,9 +1,6 @@
 {
   "name": "root",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
     "lerna": "^3.16.5"
   },
@@ -11,6 +8,10 @@
     "global": "^4.4.0"
   },
   "scripts": {
-    "dev": "lerna run --parallel dev"
-  }
+    "dev": "lerna run --parallel dev",
+    "boot": "lerna bootstrap"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
