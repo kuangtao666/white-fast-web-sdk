@@ -1,8 +1,7 @@
 import * as React from "react";
-import {Badge, Icon, Popover} from "antd";
-import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player, Room} from "white-react-sdk";
+import {Badge, Icon} from "antd";
+import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
-import "./NetlessPlayer.less";
 import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
@@ -11,12 +10,16 @@ import * as full_screen from "../assets/image/full_screen.svg";
 import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
-import {MessageType, WhiteboardBottomRightProps} from "../components/whiteboard/WhiteboardBottomRight";
-import WhiteboardChat from "../components/whiteboard/WhiteboardChat";
+import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
-import Draggable from "react-draggable";
 import "video.js/dist/video-js.css";
+import {Iframe} from "../components/Iframe";
+import {Editor} from "../components/Editor";
+import PlayerManager from "../components/whiteboard/PlayerManager";
+import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
+import "./NetlessPlayer.less";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
@@ -27,24 +30,27 @@ export type PlayerPageProps = {
     duration?: number;
     beginTimestamp?: number,
     mediaUrl?: string,
-    isChatOpen?: boolean;
     logoUrl?: string;
     playerCallback?: (player: Player) => void;
+    clickLogoCallback?: () => void;
+    roomName?: string;
+    isManagerOpen?: boolean;
 };
 
 
 export type PlayerPageStates = {
-    player: Player | null;
+    player?: Player;
     phase: PlayerPhase;
     currentTime: number;
     isFirstScreenReady: boolean;
     isPlayerSeeking: boolean;
     messages: MessageType[];
     seenMessagesLength: number;
-    isChatOpen?: boolean;
+    isChatOpen: boolean;
     isVisible: boolean;
     isFullScreen: boolean;
     replayFail: boolean;
+    isManagerOpen: boolean;
 };
 
 export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> {
@@ -58,19 +64,19 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             currentTime: 0,
             phase: PlayerPhase.Pause,
             isFirstScreenReady: false,
-            player: null,
             isPlayerSeeking: false,
             messages: [],
             seenMessagesLength: 0,
-            isChatOpen: this.props.isChatOpen,
+            isChatOpen: false,
             isVisible: false,
             isFullScreen: false,
             replayFail: false,
+            isManagerOpen: this.props.isManagerOpen !== undefined ? this.props.isManagerOpen : false,
         };
     }
 
     public componentWillReceiveProps(nextProps: PlayerPageProps): void {
-        if (this.props.isChatOpen !== nextProps.isChatOpen && nextProps.isChatOpen === false) {
+        if (this.props.isManagerOpen !== nextProps.isManagerOpen && nextProps.isManagerOpen === false) {
             this.setState({seenMessagesLength: this.state.messages.length});
         }
     }
@@ -83,8 +89,11 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             });
         }
         const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
+        if (mediaUrl && this.props.isManagerOpen === undefined) {
+            this.setState({isManagerOpen: true});
+        }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk();
+            const whiteWebSdk = new WhiteWebSdk({plugins: [Iframe, Editor]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,
@@ -279,7 +288,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             }} className="player-controller">
                                 {this.renderScale()}
                             </div>
-                            <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isChatOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                            <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                                 <div onClick={this.handleChatState} className="player-controller">
                                     <img src={chat_white}/>
                                 </div>
@@ -293,27 +302,26 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
     }
 
-    private handleChatState = (): void => {
-        this.setState({isChatOpen: !this.state.isChatOpen});
-    }
 
-    private renderMedia = (): React.ReactNode => {
-        const {mediaUrl} = this.props;
-        if (mediaUrl) {
-            return (
-                <Draggable bounds="parent">
-                    <div className="player-video-out">
-                        <video
-                            poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
-                            className="video-js video-layout"
-                            id="white-sdk-video-js"/>
-                    </div>
-                </Draggable>
-            );
+    private handleChatState = async (): Promise<void> => {
+        if (!this.state.isManagerOpen) {
+            this.setState({isChatOpen: true, isManagerOpen: true});
+            await timeout(100);
+            this.onWindowResize();
         } else {
-            return null;
+            this.setState({isChatOpen: true});
         }
     }
+    private handleManagerState = async (): Promise<void> => {
+        if (this.state.isManagerOpen) {
+            this.setState({isManagerOpen: false, isChatOpen: false});
+        } else {
+            this.setState({isManagerOpen: true});
+        }
+        await timeout(100);
+        this.onWindowResize();
+    }
+
 
     private renderLoading = (): React.ReactNode => {
         const {player} = this.state;
@@ -325,19 +333,27 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             </div>;
         }
     }
+
     public render(): React.ReactNode {
         const {player} = this.state;
-        const {userId, userAvatarUrl, userName, boardBackgroundColor} = this.props;
+        const {userId, boardBackgroundColor, uuid} = this.props;
         if (this.state.replayFail) {
             return <PageError/>;
         }
         return (
             <div id="netless-player" className="player-out-box">
                 {this.renderLoading()}
-                <WhiteboardTopLeft
-                    logoUrl={this.props.logoUrl}/>
                 <div className="player-board">
-                    {this.renderMedia()}
+                    <WhiteboardTopLeft
+                        clickLogoCallback={this.props.clickLogoCallback}
+                        roomName={this.props.roomName}
+                        logoUrl={this.props.logoUrl}/>
+                    {player && <PlayerTopRight
+                        userId={userId}
+                        player={player}
+                        isFirstScreenReady={this.state.isFirstScreenReady}
+                        handleManagerState={this.handleManagerState}
+                        isManagerOpen={this.state.isManagerOpen}/>}
                     {this.renderScheduleView()}
                     <div
                         className="player-board-inner"
@@ -359,13 +375,15 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             player={player}/>}
                     </div>
                 </div>
-                {player &&
-                <WhiteboardChat
-                    messages={this.state.messages}
-                    player={player}
+                <PlayerManager
+                    player={player} mediaUrl={this.props.mediaUrl}
+                    isChatOpen={this.state.isChatOpen}
                     userId={userId}
-                    userName={userName}
-                    userAvatarUrl={userAvatarUrl}/>}
+                    isFirstScreenReady={this.state.isFirstScreenReady}
+                    messages={this.state.messages}
+                    handleManagerState={this.handleManagerState}
+                    isManagerOpen={this.state.isManagerOpen}
+                    uuid={uuid}/>
             </div>
         );
     }

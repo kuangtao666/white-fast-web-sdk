@@ -1,14 +1,13 @@
 import * as React from "react";
-import "./WhiteboardTopLeft.less";
+import {Button, Input, Popover} from "antd";
 import * as down from "../../assets/image/down.svg";
 import {IdentityType} from "./WhiteboardTopRight";
-import {Button, Input, Popover} from "antd";
-
+import "./WhiteboardTopLeft.less";
 export type WhiteboardTopLeftProps = {
     logoUrl?: string;
     clickLogoCallback?: () => void;
-    roomRenameCallback?: (name: string) => void;
     roomName?: string;
+    roomRenameCallback?: (name: string) => void;
     identity?: IdentityType;
 };
 

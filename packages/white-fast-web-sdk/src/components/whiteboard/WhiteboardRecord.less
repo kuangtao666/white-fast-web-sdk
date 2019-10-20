@@ -1,19 +1,37 @@
+@import "../../../theme";
 .record-box {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 2px solid #FF756E;
     box-sizing: border-box;
-    position: absolute;
-    z-index: 12;
-    bottom: 28px;
     cursor: pointer;
-    left: 50%;
-    margin-left: -16px;
     display: flex;
+    margin-left: 2px;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 2px 0 rgba(0,0,0,0.72);
+}
+
+.record-time {
+    color: @gray;
+    padding-left: 8px;
+    padding-right: 12px;
+}
+
+.record-out-box {
+    min-width: 80px;
+    height: 32px;
+    background-color: white;
+    position: absolute;
+    z-index: 12;
+    left: 50%;
+    margin-left: -40px;
+    bottom: 8px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    cursor: pointer;
 }
 
 .record-box-inner-rect {
@@ -24,39 +42,8 @@
 }
 
 .record-box-inner {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     background-color: #FF756E;
-    border-radius: 11px;
-}
-
-.record-box-mb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 2px solid #FF756E;
-    box-sizing: border-box;
-    position: absolute;
-    z-index: 12;
-    top: 12px;
-    cursor: pointer;
-    left: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 2px 0 rgba(0,0,0,0.72);
-}
-
-.record-box-inner-rect-mb {
-    width: 10px;
-    height: 10px;
-    background-color: #FF756E;
-    border-radius: 2px;
-}
-
-.record-box-inner-mb {
-    width: 16px;
-    height: 16px;
-    background-color: #FF756E;
-    border-radius: 11px;
+    border-radius: 9px;
 }

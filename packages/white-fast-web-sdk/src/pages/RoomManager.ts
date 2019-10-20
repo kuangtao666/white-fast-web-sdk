@@ -2,7 +2,7 @@ import {Room, ViewMode} from "white-react-sdk";
 import {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import {message} from "antd";
 
-export enum ModeType {
+export enum ClassModeType {
     lecture = "lecture",
     handUp = "handUp",
     discuss = "discuss",
@@ -23,7 +23,8 @@ export type HostUserType = {
     identity: IdentityType,
     avatar?: string,
     name?: string,
-    mode: ModeType,
+    isVideoFullScreen?: boolean,
+    classMode: ClassModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
 };
@@ -34,16 +35,24 @@ export class RoomManager {
   private readonly name?: string;
   private readonly userId: string;
   private readonly room: Room;
-  private readonly mode?: ModeType;
-  public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string, mode?: ModeType) {
+  private readonly classMode?: ClassModeType;
+  public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string, classMode?: ClassModeType) {
     this.room = room;
     this.identity = identity ? identity : IdentityType.guest;
     this.userId = userId;
     this.userAvatarUrl = userAvatarUrl;
     this.name = name;
-    this.mode = mode;
+    this.classMode = classMode;
   }
 
+  private detectIsReadyOnly = (): boolean => {
+      const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
+      if (hostInfo) {
+          return hostInfo.classMode !== ClassModeType.discuss;
+      } else {
+          return this.classMode !== ClassModeType.discuss;
+      }
+  }
   public start = async (): Promise<void> => {
       if (this.identity === IdentityType.host) {
           const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
@@ -55,7 +64,7 @@ export class RoomManager {
                       identity: this.identity,
                       avatar: this.userAvatarUrl,
                       name: this.name,
-                      mode: this.mode ? this.mode : ModeType.discuss,
+                      classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                       cameraState: ViewMode.Broadcaster,
                       disableCameraTransform: false,
                   };
@@ -69,7 +78,7 @@ export class RoomManager {
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
                   name: this.name,
-                  mode: this.mode ? this.mode : ModeType.discuss,
+                  classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                   cameraState: ViewMode.Broadcaster,
                   disableCameraTransform: false,
               };
@@ -82,6 +91,7 @@ export class RoomManager {
           this.room.disableCameraTransform = true;
           await this.room.setWritable(false);
       } else {
+          const isReadOnly = this.detectIsReadyOnly();
           const globalGuestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
           if (globalGuestUsers === undefined) {
               const guestUser: GuestUserType = {
@@ -89,7 +99,7 @@ export class RoomManager {
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
                   name: this.name,
-                  isReadOnly: true,
+                  isReadOnly: isReadOnly,
                   isHandUp: false,
                   cameraState: ViewMode.Follower,
                   disableCameraTransform: true,
@@ -109,7 +119,7 @@ export class RoomManager {
                       identity: this.identity,
                       avatar: this.userAvatarUrl,
                       name: this.name,
-                      isReadOnly: true,
+                      isReadOnly: isReadOnly,
                       isHandUp: false,
                       cameraState: ViewMode.Follower,
                       disableCameraTransform: true,

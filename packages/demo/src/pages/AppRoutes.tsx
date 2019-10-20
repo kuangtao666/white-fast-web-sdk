@@ -5,6 +5,7 @@ import {message} from "antd";
 import WhiteboardCreatorPage from "./WhiteboardCreatorPage";
 import WhiteboardPage from "./WhiteboardPage";
 import Homepage from "./Homepage";
+import ReplayPage from "./ReplayPage";
 export class AppRoutes extends React.Component<{}, {}> {
 
     public constructor(props: {}) {
@@ -21,6 +22,7 @@ export class AppRoutes extends React.Component<{}, {}> {
                 {path: "/", component: Homepage},
                 {path: "/whiteboard/:identityType/:uuid?/", component: WhiteboardCreatorPage},
                 {path: "/whiteboard/:identityType/:uuid/:userId/", component: WhiteboardPage},
+                {path: "/replay/:uuid/:userId/:startTime?/:endTime?/:mediaUrl?/", component: ReplayPage},
             ]}/>
         );
     }

@@ -4,6 +4,7 @@ import add_icon from "../../assets/image/add_icon.svg";
 import TweenOne from "rc-tween-one";
 import {Room, RoomState, Scene} from "white-react-sdk";
 import "./MenuAnnexBox.less";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 
 export type MenuAnnexBoxState = {
     isFocus: boolean,
@@ -15,6 +16,7 @@ export type MenuAnnexBoxProps = {
     roomState: RoomState;
     handleAnnexBoxMenuState: () => void;
     isPreviewMenuOpen: boolean;
+    language?: LanguageEnum;
 };
 
 class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState> {
@@ -84,8 +86,9 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
     }
 
     public render(): React.ReactNode {
-        const {roomState} = this.props;
-        const scenes = roomState.sceneState.scenes;
+        const {roomState, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
+        const scenes = this.props.room.state.sceneState.scenes;
         const sceneDir = roomState.sceneState.scenePath.split("/");
         sceneDir.pop();
         const activeIndex = roomState.sceneState.index;
@@ -126,7 +129,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                 ref={ref => this.ref = ref} className="menu-annex-box">
                 <div className="menu-title-line">
                     <div className="menu-title-text-box">
-                        预览
+                        {isEnglish ? "Preview" : "预览"}
                     </div>
                     <div className="menu-close-btn" onClick={this.props.handleAnnexBoxMenuState}>
                         <img className="menu-title-close-icon" src={close}/>
@@ -149,7 +152,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                     >
                         <img src={add_icon}/>
                         <div>
-                            加一页
+                            {isEnglish ? "Add a page" : "加一页"}
                         </div>
                     </div>
                 </div>

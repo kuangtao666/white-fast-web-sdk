@@ -69,10 +69,15 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         window.addEventListener("resize", this.detectLandscape);
         await timeout(0);
         this.scrollToBottom();
-        const canvasArray: any = document.getElementsByClassName("identicon").item(0);
+
+    }
+
+    private getAvatarUrl = (id: any): string | null => {
+        const canvasArray: any = document.getElementsByClassName(`avatar-${id}`).item(0);
         if (canvasArray) {
-            const url = canvasArray.toDataURL();
-            this.setState({url: url});
+            return canvasArray.toDataURL();
+        } else {
+            return null;
         }
     }
 
@@ -92,7 +97,6 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
             for (let i = 1; i < messages.length; ++ i) {
                 const message = messages[i];
                 if (previousName === message.name && previousId === message.id) {
-                    console.log(messages);
                     messages[i - 1].messageInner.push(...message.messageInner);
                     messages.splice(i, 1);
                     i --;
@@ -116,7 +120,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                 return (
                     <MessageGroup
                         key={`${index}`}
-                        avatar={data.avatar}
+                        avatar={data.avatar ? data.avatar : this.getAvatarUrl(data.id)}
                         isOwn={this.props.userId === data.id}
                         onlyFirstWithMeta
                     >
@@ -182,7 +186,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                             }}
                         >
                             <Row align="center">
-                                <TextInput placeholder={"输入聊天内容~"} fill="true"/>
+                                <TextInput placeholder={isEnglish ? "Enter chat content..." : "输入聊天内容..."} fill="true"/>
                                 <SendButton fit />
                             </Row>
                         </TextComposer>

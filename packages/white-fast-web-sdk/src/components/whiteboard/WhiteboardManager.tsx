@@ -1,19 +1,19 @@
 import * as React from "react";
-import {Badge, Tabs} from "antd";
-const { TabPane } = Tabs;
+import {Badge, Tabs, Icon} from "antd";
 import "./WhiteboardManager.less";
-import {Room, Player} from "white-web-sdk";
-import * as close from "../../assets/image/close.svg";
-import {LanguageEnum} from "../../pages/NetlessRoom";
+import {Room} from "white-web-sdk";
+import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
-import {RoomMember, ViewMode} from "white-react-sdk";
-import {Icon, message, Radio} from "antd";
+import {ViewMode} from "white-react-sdk";
 import Identicon from "react-identicons";
-import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
+import user_empty from "../../assets/image/user_empty.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
+import ClassroomMedia from "./ClassroomMedia";
+const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {
     room: Room;
@@ -21,20 +21,21 @@ export type WhiteboardManagerProps = {
     handleManagerState: () => void;
     isManagerOpen: boolean;
     isChatOpen: boolean;
+    uuid: string;
     cameraState?: ViewMode;
     disableCameraTransform?: boolean;
     identity?: IdentityType;
     userName?: string;
     userAvatarUrl?: string;
     language?: LanguageEnum;
-    agoraClient?: any;
+    rtc?: RtcType;
 };
 
 export type WhiteboardManagerStates = {
-    isLandscape: boolean;
     activeKey: string;
     messages: MessageType[];
     seenMessagesLength: number,
+    isRtcReady: boolean,
 };
 
 
@@ -44,29 +45,18 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     public constructor(props: WhiteboardManagerProps) {
         super(props);
         this.state = {
-            isLandscape: false,
             activeKey: "1",
             messages: [],
             seenMessagesLength: 0,
+            isRtcReady: false,
         };
     }
-    private detectLandscape = (): void => {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const isLandscape = (width / height) >= 1;
-        this.setState({isLandscape: isLandscape});
-    }
 
-    public componentWillUnmount(): void {
-        window.removeEventListener("resize", this.detectLandscape);
-    }
 
     public componentDidMount(): void {
-        this.detectLandscape();
         this.props.room.addMagixEventListener("message",  (event: any) => {
             this.setState({messages: [...this.state.messages, event.payload]});
         });
-        window.addEventListener("resize", this.detectLandscape);
     }
     public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
         if (this.props.cameraState !== undefined && this.props.disableCameraTransform !== undefined && nextProps.cameraState !== undefined && nextProps.disableCameraTransform !== undefined) {
@@ -84,99 +74,22 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
-        const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-        const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (userId) {
-            if (mode === ModeType.handUp && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: GuestUserType) => {
-                    if (user.userId === this.props.userId) {
-                        user.isHandUp = !user.isHandUp;
-                    }
-                    return user;
-                });
-                room.setGlobalState({guestUsers: users});
-            }
-        } else {
-            if (mode !== ModeType.discuss && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: GuestUserType) => {
-                    user.isHandUp = false;
-                    user.isReadOnly = true;
-                    user.cameraState = ViewMode.Follower;
-                    user.disableCameraTransform = true;
-                    return user;
-                });
-                selfHostInfo.cameraState = ViewMode.Broadcaster;
-                selfHostInfo.disableCameraTransform = false;
-                room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            } else if (mode === ModeType.discuss && globalGuestUsers) {
-                const users = globalGuestUsers.map((user: GuestUserType) => {
-                    user.isHandUp = false;
-                    user.isReadOnly = false;
-                    user.cameraState = ViewMode.Freedom;
-                    user.disableCameraTransform = false;
-                    return user;
-                });
-                selfHostInfo.cameraState = ViewMode.Freedom;
-                selfHostInfo.disableCameraTransform = false;
-                room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            }
-        }
-    }
-
-    private handleModeText = (mode: ModeType) => {
-        switch (mode) {
-            case ModeType.discuss: {
-                return "自由讨论";
-            }
-            case ModeType.lecture: {
-                return "讲课模式";
-            }
-            default: {
-                return "举手问答";
-            }
-        }
-    }
-    private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
-        const {room} = this.props;
-        if (hostInfo.mode) {
-            if (this.props.identity === IdentityType.host) {
-                return (
-                    <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.mode} onChange={evt => {
-                        this.handleHandup(evt.target.value, room);
-                        room.setGlobalState({hostInfo: {...hostInfo, mode: evt.target.value}});
-                    }}>
-                        <Radio.Button value={ModeType.lecture}>讲课模式</Radio.Button>
-                        <Radio.Button value={ModeType.handUp}>举手问答</Radio.Button>
-                        <Radio.Button value={ModeType.discuss}>自由讨论</Radio.Button>
-                    </Radio.Group>
-                );
-            } else {
-                return (
-                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.mode)}</div>
-                );
-            }
-        } else {
-            return null;
-        }
+    private setMediaState = (state: boolean): void => {
+        console.log(state);
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        if (hostInfo) {
-            return (
-                <div className="manager-box-inner-host">
-                    <div className="manager-box-image">
-                        <img src={hostInfo.avatar}/>
-                    </div>
-                    <div className="manager-box-text">老师：{hostInfo.name}</div>
-                    {this.renderHostController(hostInfo)}
-                </div>
-            );
-        } else {
-            return null;
-        }
+        return (
+            <ClassroomMedia
+                language={this.props.language}
+                rtc={this.props.rtc}
+                userId={parseInt(this.props.userId)}
+                handleManagerState={this.props.handleManagerState}
+                identity={this.props.identity}
+                room={this.props.room}
+                setMediaState={this.setMediaState}
+                channelId={this.props.uuid}/>
+        );
     }
 
     private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
@@ -228,7 +141,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const {room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isHost = this.props.identity === IdentityType.host;
-        if (hostInfo.mode === ModeType.handUp) {
+        if (hostInfo.classMode === ClassModeType.handUp) {
             if (guestUser.isHandUp) {
                 if (guestUser.isReadOnly) {
                     return (
@@ -282,7 +195,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
     private renderGuest = (): React.ReactNode => {
-        const {room} = this.props;
+        const {room, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
 
         if (globalGuestUsers) {
@@ -297,6 +211,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                 :
                                 <div className="manager-avatar-box">
                                     <Identicon
+                                        className={`avatar-${guestUser.userId}`}
                                         size={24}
                                         string={guestUser.userId}/>
                                 </div>
@@ -313,7 +228,10 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 </div>
             );
         } else {
-            return null;
+            return <div className="room-member-empty">
+                <img src={user_empty}/>
+                <div>{isEnglish ? "No students have joined" : "尚且无学生加入"}</div>
+            </div>;
         }
     }
 
@@ -336,12 +254,12 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         if (this.props.identity === IdentityType.host) {
             return (
                 <Badge dot={this.handleDotState()} overflowCount={99} offset={[8, -2]}>
-                    <div>用户列表</div>
+                    <div>Users List</div>
                 </Badge>
             );
         } else {
             return (
-                <div>用户列表</div>
+                <div>Users List</div>
             );
         }
     }
@@ -350,7 +268,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const isActive = this.state.activeKey === "2";
         return (
             <Badge overflowCount={99} offset={[8, -2]} count={isActive ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                <div>聊天群组</div>
+                <div>Live Chat</div>
             </Badge>
         );
     }
@@ -362,31 +280,37 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
         }
     }
-    public render(): React.ReactNode {
+
+    private handleManagerStyle = (): string => {
         if (this.props.isManagerOpen) {
-            return (
-                <div className={this.state.isLandscape ? "manager-box" : "manager-box-mask"}>
-                    {this.renderHost()}
-                    <div className="chat-box-switch">
-                        <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                            <TabPane tab={this.renderUserListTitle()} key="1">
-                                {this.renderGuest()}
-                            </TabPane>
-                            <TabPane tab={this.renderChatListTitle()} key="2">
-                                <WhiteboardChat
-                                    language={this.props.language}
-                                    messages={this.state.messages}
-                                    userAvatarUrl={this.props.userAvatarUrl}
-                                    userId={this.props.userId}
-                                    userName={this.props.userName}
-                                    room={this.props.room}/>
-                            </TabPane>
-                        </Tabs>
-                    </div>
-                </div>
-            );
+            return "manager-box";
         } else {
-            return null;
+            return "manager-box-mask-close";
         }
+    }
+    public render(): React.ReactNode {
+        return (
+            <div className={this.handleManagerStyle()}>
+                {this.renderHost()}
+                <div className="chat-box-switch">
+                    <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
+                        <TabPane tab={this.renderUserListTitle()} key="1">
+                            <div className="guest-box">
+                                {this.renderGuest()}
+                            </div>
+                        </TabPane>
+                        <TabPane tab={this.renderChatListTitle()} key="2">
+                            <WhiteboardChat
+                                language={this.props.language}
+                                messages={this.state.messages}
+                                userAvatarUrl={this.props.userAvatarUrl}
+                                userId={this.props.userId}
+                                userName={this.props.userName}
+                                room={this.props.room}/>
+                        </TabPane>
+                    </Tabs>
+                </div>
+            </div>
+        );
     }
 }

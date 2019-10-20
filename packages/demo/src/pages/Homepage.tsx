@@ -27,20 +27,7 @@ class Homepage extends React.Component<HomepageProps, HomepageStates> {
         };
     }
     private handleWhiteboardClickBtn = (): void => {
-        if (this.state.name) {
-            netlessWhiteboardApi.user.updateUserInf(this.state.name, uuidv4(), "1");
-        } else {
-            netlessWhiteboardApi.user.updateUserInf("Netless user", uuidv4(), "1");
-        }
         this.props.history.push(`/whiteboard/${IdentityType.host}`);
-    }
-    private handleClassroomClickBtn = (): void => {
-        if (this.state.name) {
-            netlessWhiteboardApi.user.updateUserInf(this.state.name, uuidv4(), "1");
-        } else {
-            netlessWhiteboardApi.user.updateUserInf("Netless user", uuidv4(), "1");
-        }
-        this.props.history.push(`/classroom/${IdentityType.host}`);
     }
     private handleClickBtnUrl = (): void => {
         const isUrl = this.state.url.substring(0, 4) === "http";
@@ -78,13 +65,7 @@ class Homepage extends React.Component<HomepageProps, HomepageStates> {
                                 <div className="page-input-left-inner-box">
                                     <Input className="page-input" onChange={e => this.setState({name: e.target.value})} size={"large"} placeholder={"输入用户名"}/>
                                     <Button
-                                        size="large"
                                         type="primary"
-                                        onClick={this.handleClassroomClickBtn}
-                                        className="name-button">
-                                        创建在线教室
-                                    </Button>
-                                    <Button
                                         size="large"
                                         onClick={this.handleWhiteboardClickBtn}
                                         className="name-button">

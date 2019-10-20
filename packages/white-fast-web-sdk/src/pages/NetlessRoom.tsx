@@ -16,7 +16,6 @@ import {
     DeviceType,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
-import "./NetlessRoom.less";
 import PageError from "../components/PageError";
 import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
@@ -33,10 +32,14 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
-import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
+import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
-import ScaffoldComponent from "white-plugin-scaffold";
+import {Iframe} from "../components/Iframe";
+import {Editor} from "../components/Editor";
+import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
+import "./NetlessRoom.less";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -54,6 +57,12 @@ export enum UploadDocumentEnum {
     dynamic_conversion = "dynamic_conversion",
 }
 
+export enum RtcEnum {
+    agora = "agora",
+    zego = "zego",
+    qiniu = "qiniu",
+}
+
 export type UploadToolBoxType = {
     enable: boolean,
     type: UploadDocumentEnum,
@@ -61,11 +70,18 @@ export type UploadToolBoxType = {
     title?: string,
     script?: string,
 };
+
+export type RtcType = {
+    type: RtcEnum,
+    rtcObj: any,
+    token: string,
+};
+export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export type RealTimeProps = {
     uuid: string;
     roomToken: string;
     userId: string;
-    mode?: ModeType,
+    classMode?: ClassModeType,
     userName?: string;
     roomName?: string;
     userAvatarUrl?: string;
@@ -85,7 +101,11 @@ export type RealTimeProps = {
     language?: LanguageEnum;
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
-    agoraClient?: any;
+    rtc?: RtcType;
+    exitRoomCallback?: () => void;
+    replayCallback?: () => void;
+    recordDataCallback?: (data: RecordDataType) => void;
+    isManagerOpen?: boolean;
 };
 
 export enum ToolBarPositionEnum {
@@ -121,6 +141,7 @@ export type RealTimeStates = {
     whiteboardLayerDownRef?: HTMLDivElement;
     isManagerOpen: boolean;
     deviceType: DeviceType;
+    classMode?: ClassModeType,
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
@@ -143,19 +164,21 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isChatOpen: false,
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
-            isManagerOpen: false,
+            isManagerOpen: this.props.isManagerOpen ? this.props.isManagerOpen : false,
+            classMode: this.props.classMode ? this.props.classMode : ClassModeType.discuss,
         };
         this.cursor = new UserCursor();
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity, mode} = this.props;
+        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity} = this.props;
+        const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: ScaffoldComponent});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, plugins: [Iframe, Editor]});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: ScaffoldComponent});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [Iframe, Editor]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -199,7 +222,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 height: 675,
                 animationMode: "immediately",
             });
-            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, mode);
+            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
             await this.roomManager.start();
             if (roomCallback) {
                 roomCallback(room);
@@ -230,15 +253,17 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
 
     public async componentDidMount(): Promise<void> {
         await this.startJoinRoom();
+        this.onWindowResize();
         if (this.state.room && this.state.room.state.roomMembers) {
             this.cursor.setColorAndAppliance(this.state.room.state.roomMembers);
         }
     }
 
-    public componentWillUnmount(): void {
+    public async componentWillUnmount(): Promise<void> {
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
+            await this.state.room.disconnect();
         }
         if (this.roomManager) {
             this.roomManager.stop();
@@ -252,6 +277,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     isPreviewMenuOpen={this.state.isPreviewMenuOpen}
                     room={this.state.room!}
                     roomState={this.state.roomState!}
+                    language={this.props.language}
                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}/>;
             default:
                 return null;
@@ -323,19 +349,23 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.state.room!.setMemberState(modifyState);
     }
 
-    private handleChatState = (): void => {
+    private handleChatState = async (): Promise<void> => {
         if (!this.state.isManagerOpen) {
             this.setState({isChatOpen: true, isManagerOpen: true});
+            await timeout(100);
+            this.onWindowResize();
         } else {
             this.setState({isChatOpen: true});
         }
     }
-    private handleManagerState = (): void => {
+    private handleManagerState = async (): Promise<void> => {
         if (this.state.isManagerOpen) {
             this.setState({isManagerOpen: false, isChatOpen: false});
         } else {
             this.setState({isManagerOpen: true});
         }
+        await timeout(100);
+        this.onWindowResize();
     }
     private handleFileState = (): void => {
         this.setState({isFileOpen: !this.state.isFileOpen});
@@ -443,6 +473,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
                                 isManagerOpen={this.state.isManagerOpen}
+                                exitRoomCallback={this.props.exitRoomCallback}
                                 handleManagerState={this.handleManagerState}
                                 whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState} deviceType={this.state.deviceType}
@@ -450,6 +481,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 userName={this.props.userName}
                                 userId={this.props.userId}
                                 room={room}
+                                replayCallback={this.props.replayCallback}
                                 language={this.props.language}
                                 isReadOnly={isReadOnly}
                                 userAvatarUrl={this.props.userAvatarUrl}/>}
@@ -470,6 +502,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
+                            {this.props.identity === IdentityType.host &&
+                            <WhiteboardRecord
+                                recordDataCallback={this.props.recordDataCallback}
+                                channelName={this.props.uuid}/>}
                             <ToolBox
                                 isReadOnly={isReadOnly}
                                 language={this.props.language}
@@ -496,11 +532,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             </div>
                         </Dropzone>
                         <WhiteboardManager
+                            language={this.props.language}
+                            uuid={this.props.uuid}
                             userAvatarUrl={this.props.userAvatarUrl}
                             userName={this.props.userName}
                             userId={this.props.userId}
                             isChatOpen={this.state.isChatOpen}
-                            agoraClient={this.props.agoraClient}
+                            rtc={this.props.rtc}
                             identity={this.props.identity}
                             isManagerOpen={this.state.isManagerOpen}
                             handleManagerState={this.handleManagerState}
