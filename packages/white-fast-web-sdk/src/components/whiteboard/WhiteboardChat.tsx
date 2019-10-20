@@ -186,7 +186,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                             }}
                         >
                             <Row align="center">
-                                <TextInput placeholder={"输入聊天内容~"} fill="true"/>
+                                <TextInput placeholder={isEnglish ? "Enter chat content..." : "输入聊天内容..."} fill="true"/>
                                 <SendButton fit />
                             </Row>
                         </TextComposer>

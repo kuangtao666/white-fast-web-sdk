@@ -32,7 +32,6 @@ export type WhiteboardManagerProps = {
 };
 
 export type WhiteboardManagerStates = {
-    isLandscape: boolean;
     activeKey: string;
     messages: MessageType[];
     seenMessagesLength: number,
@@ -46,30 +45,18 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     public constructor(props: WhiteboardManagerProps) {
         super(props);
         this.state = {
-            isLandscape: false,
             activeKey: "1",
             messages: [],
             seenMessagesLength: 0,
             isRtcReady: false,
         };
     }
-    private detectLandscape = (): void => {
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const isLandscape = (width / height) >= 1;
-        this.setState({isLandscape: isLandscape});
-    }
 
-    public componentWillUnmount(): void {
-        window.removeEventListener("resize", this.detectLandscape);
-    }
 
     public componentDidMount(): void {
-        this.detectLandscape();
         this.props.room.addMagixEventListener("message",  (event: any) => {
             this.setState({messages: [...this.state.messages, event.payload]});
         });
-        window.addEventListener("resize", this.detectLandscape);
     }
     public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
         if (this.props.cameraState !== undefined && this.props.disableCameraTransform !== undefined && nextProps.cameraState !== undefined && nextProps.disableCameraTransform !== undefined) {
@@ -94,6 +81,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     private renderHost = (): React.ReactNode => {
         return (
             <ClassroomMedia
+                language={this.props.language}
                 rtc={this.props.rtc}
                 userId={parseInt(this.props.userId)}
                 handleManagerState={this.props.handleManagerState}
@@ -207,7 +195,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
     private renderGuest = (): React.ReactNode => {
-        const {room} = this.props;
+        const {room, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
 
         if (globalGuestUsers) {
@@ -241,7 +230,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         } else {
             return <div className="room-member-empty">
                 <img src={user_empty}/>
-                <div>尚且无学生加入</div>
+                <div>{isEnglish ? "No students have joined" : "尚且无学生加入"}</div>
             </div>;
         }
     }
@@ -265,12 +254,12 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         if (this.props.identity === IdentityType.host) {
             return (
                 <Badge dot={this.handleDotState()} overflowCount={99} offset={[8, -2]}>
-                    <div>用户列表</div>
+                    <div>Users List</div>
                 </Badge>
             );
         } else {
             return (
-                <div>用户列表</div>
+                <div>Users List</div>
             );
         }
     }
@@ -279,7 +268,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const isActive = this.state.activeKey === "2";
         return (
             <Badge overflowCount={99} offset={[8, -2]} count={isActive ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                <div>聊天群组</div>
+                <div>Live Chat</div>
             </Badge>
         );
     }
@@ -294,11 +283,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
 
     private handleManagerStyle = (): string => {
         if (this.props.isManagerOpen) {
-            // if (this.state.isLandscape) {
-            //     return "manager-box";
-            // } else {
-            //     return "manager-box-mask";
-            // }
             return "manager-box";
         } else {
             return "manager-box-mask-close";

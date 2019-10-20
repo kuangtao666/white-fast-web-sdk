@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 module.exports = {
@@ -92,17 +92,17 @@ module.exports = {
             /zh-cn/,
         ),
         new LodashModuleReplacementPlugin,
-        // new BundleAnalyzerPlugin({
-        //     analyzerMode: 'server',
-        //     analyzerHost: '127.0.0.1',
-        //     analyzerPort: 8889,
-        //     reportFilename: 'report.html',
-        //     defaultSizes: 'parsed',
-        //     openAnalyzer: true,
-        //     generateStatsFile: false,
-        //     statsFilename: 'stats.json',
-        //     statsOptions: null,
-        //     logLevel: 'info',
-        // }),
+        new BundleAnalyzerPlugin({
+            analyzerMode: 'server',
+            analyzerHost: '127.0.0.1',
+            analyzerPort: 8889,
+            reportFilename: 'report.html',
+            defaultSizes: 'parsed',
+            openAnalyzer: true,
+            generateStatsFile: false,
+            statsFilename: 'stats.json',
+            statsOptions: null,
+            logLevel: 'info',
+        }),
     ]
 };

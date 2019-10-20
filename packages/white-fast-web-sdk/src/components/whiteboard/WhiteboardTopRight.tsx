@@ -135,8 +135,9 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         }
     }
     public render(): React.ReactNode {
-        const  {isManagerOpen} = this.props;
+        const  {isManagerOpen, language} = this.props;
         const isHost = this.props.identity === IdentityType.host;
+        const isEnglish = this.props.language === language;
         return (
             <div className="whiteboard-top-right-box">
                 <div
@@ -155,7 +156,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <Modal
                     visible={this.state.isInviteVisible}
                     footer={null}
-                    title="邀请"
+                    title={isEnglish ? "Invite" : "邀请"}
                     onCancel={() => this.setState({isInviteVisible: false})}
                 >
                     <div className="whiteboard-share-box">
@@ -166,11 +167,17 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                                 data-clipboard-text={`${this.handleUrl(this.state.url)}`}
                                 component="div"
                                 onSuccess={() => {
-                                    message.success("Copy already copied address to clipboard");
+                                    if (isEnglish) {
+                                        message.success("Copy already copied address to clipboard");
+                                    } else {
+                                        message.success("已经将链接复制到剪贴板");
+                                    }
                                     this.setState({isInviteVisible: false});
                                 }}
                             >
-                                <Button style={{marginTop: 16, width: 240}} size="large" type="primary">复制链接</Button>
+                                <Button style={{marginTop: 16, width: 240}} size="large" type="primary">
+                                    {isEnglish ? "Copy Link" : "复制链接"}
+                                </Button>
                             </Clipboard>
                         </div>
                     </div>
@@ -178,12 +185,11 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <Modal
                     visible={this.state.isCloseTipsVisible}
                     footer={null}
-                    title="退出教室"
+                    title={isEnglish ? "Exit classroom" : "退出教室"}
                     onCancel={() => this.setState({isCloseTipsVisible: false})}
                 >
                     <div className="whiteboard-share-box">
                         <div className="whiteboard-share-text-box">
-                            {/*<Button style={{marginTop: 16, width: 240}} size="large" type="primary">观看回放</Button>*/}
                             <div onClick={() => {
                                 if (this.props.replayCallback) {
                                     this.props.replayCallback();
@@ -201,7 +207,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                                     }}
                                     style={{marginTop: 16, width: 240}}
                                     size="large">
-                                确认退出
+                                {isEnglish ? "Confirm exit" : "确认退出"}
                             </Button>
                         </div>
                     </div>

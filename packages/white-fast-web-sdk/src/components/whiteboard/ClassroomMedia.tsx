@@ -10,7 +10,7 @@ import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
 import * as menu_in from "../../assets/image/menu_in.svg";
 import * as close_white from "../../assets/image/close_white.svg";
-import {RtcType} from "../../pages/NetlessRoom";
+import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import Identicon from "react-identicons";
 export type NetlessStream = {
     state: {isVideoOpen: boolean, isAudioOpen: boolean},
@@ -38,6 +38,7 @@ export type ClassroomMediaProps = {
     setMediaState: (state: boolean) => void;
     handleManagerState: () => void;
     rtc?: RtcType;
+    language?: LanguageEnum;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -117,11 +118,11 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private handleHandup = (mode: ClassModeType, room: Room, userId?: string): void => {
+    private handleHandup = (classMode: ClassModeType, room: Room, userId?: string): void => {
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
-            if (mode === ClassModeType.handUp && globalGuestUsers) {
+            if (classMode === ClassModeType.handUp && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     if (parseInt(user.userId) === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
@@ -131,7 +132,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 room.setGlobalState({guestUsers: users});
             }
         } else {
-            if (mode !== ClassModeType.discuss && globalGuestUsers) {
+            if (classMode !== ClassModeType.discuss && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = true;
@@ -142,7 +143,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 selfHostInfo.cameraState = ViewMode.Broadcaster;
                 selfHostInfo.disableCameraTransform = false;
                 room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            } else if (mode === ClassModeType.discuss && globalGuestUsers) {
+            } else if (classMode === ClassModeType.discuss && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = false;
@@ -158,17 +159,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
-        const {room} = this.props;
+        const {room, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         if (hostInfo.classMode) {
             if (this.props.identity === IdentityType.host) {
                 return (
                     <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.classMode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
-                        room.setGlobalState({hostInfo: {...hostInfo, mode: evt.target.value}});
+                        room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}});
                     }}>
-                        <Radio.Button value={ClassModeType.lecture}>讲课模式</Radio.Button>
-                        <Radio.Button value={ClassModeType.handUp}>举手参与</Radio.Button>
-                        <Radio.Button value={ClassModeType.discuss}>自由互动</Radio.Button>
+                        <Radio.Button value={ClassModeType.lecture}>{isEnglish ? "Lecture" : "讲课模式"}</Radio.Button>
+                        <Radio.Button value={ClassModeType.handUp}>{isEnglish ? "Hand Up" : "举手参与"}</Radio.Button>
+                        <Radio.Button value={ClassModeType.discuss}>{isEnglish ? "Interactive" : "自由互动"}</Radio.Button>
                     </Radio.Group>
                 );
             } else {
@@ -181,34 +183,49 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private handleModeText = (mode: ClassModeType) => {
-        switch (mode) {
+    private handleModeText = (classMode: ClassModeType) => {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
+        switch (classMode) {
             case ClassModeType.discuss: {
-                return "自由讨论";
+                if (isEnglish) {
+                    return "Lecture";
+                } else {
+                    return "自由讨论";
+                }
             }
             case ClassModeType.lecture: {
-                return "讲课模式";
+                if (isEnglish) {
+                    return "Hand Up";
+                } else {
+                    return "讲课模式";
+                }
             }
             default: {
-                return "举手问答";
+                if (isEnglish) {
+                    return "Interactive";
+                } else {
+                    return "举手问答";
+                }
             }
         }
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room, handleManagerState, rtc, userId, channelId} = this.props;
+        const {room, handleManagerState, rtc, userId, channelId, language} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const isEnglish = language === LanguageEnum.English;
         if (hostInfo) {
             return (
                 <div className="manager-box-inner-host">
                     {rtc &&
                     <div className="manager-box-btn">
-                        <Tooltip placement={"right"} title={"开启音视频通信"}>
+                        <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
                             <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
                         </Tooltip>
                     </div>}
                     <div className="manager-box-btn-right">
-                        <Tooltip placement={"left"} title={"隐藏侧边栏"}>
+                        <Tooltip placement={"left"} title={isEnglish ? "Hide sidebar" : "隐藏侧边栏"}>
                             <div onClick={() => handleManagerState()} className="manager-box-btn-right-inner">
                                 <img src={menu_in}/>
                             </div>
@@ -222,7 +239,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                 string={hostInfo.userId}/>
                         }
                     </div>
-                    <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
+                    {isEnglish ?
+                        <div className="manager-box-text">Teacher: {hostInfo.name ? hostInfo.name : hostInfo.userId}</div> :
+                        <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
+                    }
                     {this.renderHostController(hostInfo)}
                 </div>
             );
@@ -231,8 +251,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
     public render(): React.ReactNode {
-        const {room} = this.props;
+        const {room, language} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        const isEnglish = language === LanguageEnum.English;
         return (
             <div className="netless-video-out-box">
                {!this.state.localStream &&
@@ -249,7 +270,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                    <div className="classroom-box-video-mask">
                        <div className="manager-box-inner-host2">
                            <div className="manager-box-btn">
-                               <Tooltip placement={"right"} title={"关闭视频"}>
+                               <Tooltip placement={"right"} title={isEnglish ? "Close video call" : "关闭视频"}>
                                    <div className="manager-box-btn-hang" onClick={() => this.stopLocal()}>
                                        <img src={hangUp}/>
                                    </div>
@@ -263,7 +284,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                        string={hostInfo.userId}/>
                                }
                            </div>
-                           <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
+                           {isEnglish ?
+                               <div className="manager-box-text">Teacher: {hostInfo.name ? hostInfo.name : hostInfo.userId}</div> :
+                               <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
+                           }
                            {this.renderHostController(hostInfo)}
                        </div>
                    </div>}

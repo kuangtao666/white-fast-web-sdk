@@ -162,6 +162,8 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         }
     }
     private handleHandup = (mode: ClassModeType, room: Room, userId?: string): void => {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
@@ -170,9 +172,17 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                     if (user.userId === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
                         if (user.isHandUp) {
-                            message.info("您已举手，请等待批准。");
+                            if (isEnglish) {
+                                message.info("You have raised your hand, please wait for approval.");
+                            } else {
+                                message.info("您已举手，请等待批准。");
+                            }
                         } else {
-                            message.info("您已取消举手。");
+                            if (isEnglish) {
+                                message.info("You have cancelled your raise.");
+                            } else {
+                                message.info("您已取消举手。");
+                            }
                         }
                     }
                     return user;

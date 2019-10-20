@@ -277,6 +277,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     isPreviewMenuOpen={this.state.isPreviewMenuOpen}
                     room={this.state.room!}
                     roomState={this.state.roomState!}
+                    language={this.props.language}
                     handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}/>;
             default:
                 return null;
@@ -531,6 +532,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             </div>
                         </Dropzone>
                         <WhiteboardManager
+                            language={this.props.language}
                             uuid={this.props.uuid}
                             userAvatarUrl={this.props.userAvatarUrl}
                             userName={this.props.userName}
