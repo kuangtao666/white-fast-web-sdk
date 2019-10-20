@@ -174,9 +174,15 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     </Radio.Group>
                 );
             } else {
-                return (
-                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.classMode)}</div>
-                );
+                if (isEnglish) {
+                    return (
+                        <div style={{marginTop: 6, color: "white"}}>Class mode: {this.handleModeText(hostInfo.classMode)}</div>
+                    );
+                } else {
+                    return (
+                        <div style={{marginTop: 6, color: "white"}}>模式：{this.handleModeText(hostInfo.classMode)}</div>
+                    );
+                }
             }
         } else {
             return null;
@@ -189,21 +195,21 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         switch (classMode) {
             case ClassModeType.discuss: {
                 if (isEnglish) {
-                    return "Lecture";
+                    return "Interactive";
                 } else {
                     return "自由讨论";
                 }
             }
             case ClassModeType.lecture: {
                 if (isEnglish) {
-                    return "Hand Up";
+                    return "Lecture";
                 } else {
                     return "讲课模式";
                 }
             }
             default: {
                 if (isEnglish) {
-                    return "Interactive";
+                    return "Hand Up";
                 } else {
                     return "举手问答";
                 }

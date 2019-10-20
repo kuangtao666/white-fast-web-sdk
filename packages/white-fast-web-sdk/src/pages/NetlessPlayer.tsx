@@ -50,7 +50,6 @@ export type PlayerPageStates = {
     seenMessagesLength: number;
     isChatOpen: boolean;
     isVisible: boolean;
-    isFullScreen: boolean;
     replayFail: boolean;
     isManagerOpen: boolean;
 };
@@ -71,7 +70,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             seenMessagesLength: 0,
             isChatOpen: false,
             isVisible: false,
-            isFullScreen: false,
             replayFail: false,
             isManagerOpen: this.props.isManagerOpen !== undefined ? this.props.isManagerOpen : false,
         };
@@ -227,18 +225,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             }
         }
     }
-
-    private renderScale = (): React.ReactNode => {
-        if (this.state.isFullScreen) {
-            return (
-                <img src={exit_full_screen}/>
-            );
-        } else {
-            return (
-                <img src={full_screen}/>
-            );
-        }
-    }
     private renderScheduleView(): React.ReactNode {
         if (this.state.player && this.state.isVisible) {
             return (
@@ -272,24 +258,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             </div>
                         </div>
                         <div className="player-controller-left">
-                            <div onClick={async () => {
-                                const  element = document.getElementById("netless-player");
-                                if (this.state.isFullScreen) {
-                                    if (document.exitFullscreen) {
-                                        await  document.exitFullscreen();
-                                        this.setState({isFullScreen: false});
-                                    }
-                                } else {
-                                    if (element) {
-                                        if (element.requestFullscreen) {
-                                            await element.requestFullscreen();
-                                            this.setState({isFullScreen: true});
-                                        }
-                                    }
-                                }
-                            }} className="player-controller">
-                                {this.renderScale()}
-                            </div>
                             <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                                 <div onClick={this.handleChatState} className="player-controller">
                                     <img src={chat_white}/>
@@ -343,7 +311,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             return <PageError/>;
         }
         return (
-            <div id="netless-player" className="player-out-box">
+            <div className="player-out-box">
                 {this.renderLoading()}
                 <div className="player-board">
                     <WhiteboardTopLeft
