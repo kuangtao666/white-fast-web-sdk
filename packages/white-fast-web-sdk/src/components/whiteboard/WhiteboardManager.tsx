@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Badge, Tabs, Icon} from "antd";
+import {Badge, Tabs, Icon, message} from "antd";
 import "./WhiteboardManager.less";
 import {Room} from "white-web-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
@@ -22,6 +22,7 @@ export type WhiteboardManagerProps = {
     isManagerOpen: boolean;
     isChatOpen: boolean;
     uuid: string;
+    hostInfo?: HostUserType,
     cameraState?: ViewMode;
     disableCameraTransform?: boolean;
     identity?: IdentityType;
@@ -72,10 +73,21 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 this.setState({activeKey: "1"});
             }
         }
+        if (this.props.hostInfo !== undefined && this.props.hostInfo.isHostVideoStart !== undefined && nextProps.hostInfo !== undefined && nextProps.hostInfo.isHostVideoStart !== undefined) {
+            if (this.props.hostInfo.isHostVideoStart !== nextProps.hostInfo.isHostVideoStart) {
+                    if (nextProps.hostInfo.isHostVideoStart) {
+                        message.success("333");
+                    }
+               }
+        }
     }
 
     private setMediaState = (state: boolean): void => {
-        console.log(state);
+        const {room} = this.props;
+        room.setGlobalState({hostInfo: {
+                ...room.state.globalState.hostInfo,
+                isHostVideoStart: state,
+            }});
     }
 
     private renderHost = (): React.ReactNode => {
@@ -301,6 +313,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         </TabPane>
                         <TabPane tab={this.renderChatListTitle()} key="2">
                             <WhiteboardChat
+                                identity={this.props.identity}
                                 language={this.props.language}
                                 messages={this.state.messages}
                                 userAvatarUrl={this.props.userAvatarUrl}
