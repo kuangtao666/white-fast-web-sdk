@@ -6,6 +6,7 @@ import Identicon from "react-identicons";
 import QRCode from "qrcode.react";
 import menu_out from "../../assets/image/menu_out.svg";
 import stop_icon from "../../assets/image/stop_icon.svg";
+import replay_video_cover_en from "../../assets/image/replay_video_cover_en.svg";
 import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
@@ -196,7 +197,10 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                                     this.setState({isCloseTipsVisible: false});
                                 }
                             }} className="replay-video-cover">
-                                <img src={replay_video_cover}/>
+                                {isEnglish ?
+                                    <img src={replay_video_cover_en}/> :
+                                    <img src={replay_video_cover}/>
+                                }
                             </div>
                             <Button
                                     onClick={() => {
