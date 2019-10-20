@@ -16,7 +16,6 @@ import {
     DeviceType,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
-import "./NetlessRoom.less";
 import PageError from "../components/PageError";
 import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
@@ -33,13 +32,14 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
-import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
+import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
+import "./NetlessRoom.less";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -81,7 +81,7 @@ export type RealTimeProps = {
     uuid: string;
     roomToken: string;
     userId: string;
-    mode?: ModeType,
+    classMode?: ClassModeType,
     userName?: string;
     roomName?: string;
     userAvatarUrl?: string;
@@ -141,7 +141,7 @@ export type RealTimeStates = {
     whiteboardLayerDownRef?: HTMLDivElement;
     isManagerOpen: boolean;
     deviceType: DeviceType;
-    mode?: ModeType,
+    classMode?: ClassModeType,
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
@@ -165,14 +165,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
             isManagerOpen: this.props.isManagerOpen ? this.props.isManagerOpen : false,
-            mode: this.props.mode ? this.props.mode : ModeType.discuss,
+            classMode: this.props.classMode ? this.props.classMode : ClassModeType.discuss,
         };
         this.cursor = new UserCursor();
     }
 
     private startJoinRoom = async (): Promise<void> => {
         const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity} = this.props;
-        const {mode} = this.state;
+        const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
@@ -222,7 +222,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 height: 675,
                 animationMode: "immediately",
             });
-            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, mode);
+            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
             await this.roomManager.start();
             if (roomCallback) {
                 roomCallback(room);

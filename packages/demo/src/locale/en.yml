@@ -171,8 +171,8 @@ pages:
     doc-member: Member
     online: Online
     in-lecture: You are lecturing
-    out-lecture: Exit the lecture mode, others no longer follow your perspective
-    go-to-lecture: Enter the lecture mode, others will follow your perspective
+    out-lecture: Exit the lecture classMode, others no longer follow your perspective
+    go-to-lecture: Enter the lecture classMode, others will follow your perspective
     freedom-perspective: Currently a free perspective
     current-speaker: Current speaker is
     follow-perspective: You will be more with your perspective
@@ -220,8 +220,8 @@ pages:
     doc-member: Member
     online: Online
     in-lecture: You are lecturing
-    out-lecture: Exit the lecture mode, others no longer follow your perspective
-    go-to-lecture: Enter the lecture mode, others will follow your perspective
+    out-lecture: Exit the lecture classMode, others no longer follow your perspective
+    go-to-lecture: Enter the lecture classMode, others will follow your perspective
     freedom-perspective: Currently a free perspective
     current-speaker: Current speaker is
     follow-perspective: You will be more with your perspective

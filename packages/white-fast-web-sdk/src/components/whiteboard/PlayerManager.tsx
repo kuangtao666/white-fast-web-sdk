@@ -6,7 +6,7 @@ import {Player} from "white-web-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
-import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import user_empty from "../../assets/image/user_empty.svg";
 import menu_in from "../../assets/image/menu_in.svg";
 import teacher from "../../assets/image/teacher.svg";
@@ -151,12 +151,12 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
             return null;
         }
     }
-    private handleModeText = (mode: ModeType) => {
+    private handleModeText = (mode: ClassModeType) => {
         switch (mode) {
-            case ModeType.discuss: {
+            case ClassModeType.discuss: {
                 return "自由讨论";
             }
-            case ModeType.lecture: {
+            case ClassModeType.lecture: {
                 return "讲课模式";
             }
             default: {
@@ -188,7 +188,7 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                         }
                     </div>
                     <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
-                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.mode)}</div>
+                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.classMode)}</div>
                 </div>
             );
         } else {

@@ -5,7 +5,7 @@ import {Button, Radio, Tooltip} from "antd";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import ClassroomMediaHostCell from "./ClassroomMediaHostCell";
 import {CSSProperties} from "react";
-import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
 import * as menu_in from "../../assets/image/menu_in.svg";
@@ -117,11 +117,11 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
+    private handleHandup = (mode: ClassModeType, room: Room, userId?: string): void => {
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
-            if (mode === ModeType.handUp && globalGuestUsers) {
+            if (mode === ClassModeType.handUp && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     if (parseInt(user.userId) === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
@@ -131,7 +131,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 room.setGlobalState({guestUsers: users});
             }
         } else {
-            if (mode !== ModeType.discuss && globalGuestUsers) {
+            if (mode !== ClassModeType.discuss && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = true;
@@ -142,7 +142,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 selfHostInfo.cameraState = ViewMode.Broadcaster;
                 selfHostInfo.disableCameraTransform = false;
                 room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            } else if (mode === ModeType.discuss && globalGuestUsers) {
+            } else if (mode === ClassModeType.discuss && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = false;
@@ -159,21 +159,21 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
     private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
         const {room} = this.props;
-        if (hostInfo.mode) {
+        if (hostInfo.classMode) {
             if (this.props.identity === IdentityType.host) {
                 return (
-                    <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.mode} onChange={evt => {
+                    <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.classMode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
                         room.setGlobalState({hostInfo: {...hostInfo, mode: evt.target.value}});
                     }}>
-                        <Radio.Button value={ModeType.lecture}>讲课模式</Radio.Button>
-                        <Radio.Button value={ModeType.handUp}>举手参与</Radio.Button>
-                        <Radio.Button value={ModeType.discuss}>自由互动</Radio.Button>
+                        <Radio.Button value={ClassModeType.lecture}>讲课模式</Radio.Button>
+                        <Radio.Button value={ClassModeType.handUp}>举手参与</Radio.Button>
+                        <Radio.Button value={ClassModeType.discuss}>自由互动</Radio.Button>
                     </Radio.Group>
                 );
             } else {
                 return (
-                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.mode)}</div>
+                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.classMode)}</div>
                 );
             }
         } else {
@@ -181,12 +181,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private handleModeText = (mode: ModeType) => {
+    private handleModeText = (mode: ClassModeType) => {
         switch (mode) {
-            case ModeType.discuss: {
+            case ClassModeType.discuss: {
                 return "自由讨论";
             }
-            case ModeType.lecture: {
+            case ClassModeType.lecture: {
                 return "讲课模式";
             }
             default: {

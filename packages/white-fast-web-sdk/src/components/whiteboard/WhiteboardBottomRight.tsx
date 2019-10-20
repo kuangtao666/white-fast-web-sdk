@@ -10,7 +10,7 @@ import {Badge, message, Tooltip} from "antd";
 import {Room, Scene, RoomState} from "white-web-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {DeviceType, ViewMode} from "white-react-sdk";
-import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 
 export type MessageType = {
     name: string,
@@ -161,11 +161,11 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             return null;
         }
     }
-    private handleHandup = (mode: ModeType, room: Room, userId?: string): void => {
+    private handleHandup = (mode: ClassModeType, room: Room, userId?: string): void => {
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
-            if (mode === ModeType.handUp && globalGuestUsers) {
+            if (mode === ClassModeType.handUp && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     if (user.userId === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
@@ -180,7 +180,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                 room.setGlobalState({guestUsers: users});
             }
         } else {
-            if (mode !== ModeType.discuss && globalGuestUsers) {
+            if (mode !== ClassModeType.discuss && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = true;
@@ -191,7 +191,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                 selfHostInfo.cameraState = ViewMode.Broadcaster;
                 selfHostInfo.disableCameraTransform = false;
                 room.setGlobalState({guestUsers: users, hostInfo: selfHostInfo});
-            } else if (mode === ModeType.discuss && globalGuestUsers) {
+            } else if (mode === ClassModeType.discuss && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     user.isHandUp = false;
                     user.isReadOnly = false;
@@ -209,11 +209,11 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     private renderHandUpBtn = (): React.ReactNode => {
         const {room} = this.props;
         const hostInfo = room.state.globalState.hostInfo;
-        if (hostInfo && hostInfo.mode === ModeType.handUp) {
+        if (hostInfo && hostInfo.classMode === ClassModeType.handUp) {
             const user = this.getSelfUserInfo();
             if (user) {
                 if (user.isReadOnly) {
-                    return <div onClick={() => this.handleHandup(hostInfo.mode, room, this.props.userId)}
+                    return <div onClick={() => this.handleHandup(hostInfo.classMode, room, this.props.userId)}
                                 className="manager-under-btn">
                         <img src={user.isHandUp ? handup_black : handup}/>
                     </div>;

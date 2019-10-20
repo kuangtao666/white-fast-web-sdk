@@ -2,7 +2,7 @@ import {Room, ViewMode} from "white-react-sdk";
 import {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import {message} from "antd";
 
-export enum ModeType {
+export enum ClassModeType {
     lecture = "lecture",
     handUp = "handUp",
     discuss = "discuss",
@@ -24,7 +24,7 @@ export type HostUserType = {
     avatar?: string,
     name?: string,
     isVideoFullScreen?: boolean,
-    mode: ModeType,
+    classMode: ClassModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
 };
@@ -35,22 +35,22 @@ export class RoomManager {
   private readonly name?: string;
   private readonly userId: string;
   private readonly room: Room;
-  private readonly mode?: ModeType;
-  public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string, mode?: ModeType) {
+  private readonly classMode?: ClassModeType;
+  public constructor(userId: string, room: Room, userAvatarUrl?: string, identity?: IdentityType, name?: string, classMode?: ClassModeType) {
     this.room = room;
     this.identity = identity ? identity : IdentityType.guest;
     this.userId = userId;
     this.userAvatarUrl = userAvatarUrl;
     this.name = name;
-    this.mode = mode;
+    this.classMode = classMode;
   }
 
   private detectIsReadyOnly = (): boolean => {
       const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
       if (hostInfo) {
-          return hostInfo.mode !== ModeType.discuss;
+          return hostInfo.classMode !== ClassModeType.discuss;
       } else {
-          return this.mode !== ModeType.discuss;
+          return this.classMode !== ClassModeType.discuss;
       }
   }
   public start = async (): Promise<void> => {
@@ -64,7 +64,7 @@ export class RoomManager {
                       identity: this.identity,
                       avatar: this.userAvatarUrl,
                       name: this.name,
-                      mode: this.mode ? this.mode : ModeType.discuss,
+                      classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                       cameraState: ViewMode.Broadcaster,
                       disableCameraTransform: false,
                   };
@@ -78,7 +78,7 @@ export class RoomManager {
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
                   name: this.name,
-                  mode: this.mode ? this.mode : ModeType.discuss,
+                  classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                   cameraState: ViewMode.Broadcaster,
                   disableCameraTransform: false,
               };

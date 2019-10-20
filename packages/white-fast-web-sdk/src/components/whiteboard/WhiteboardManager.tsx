@@ -6,7 +6,7 @@ import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {ViewMode} from "white-react-sdk";
 import Identicon from "react-identicons";
-import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import user_empty from "../../assets/image/user_empty.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
@@ -153,7 +153,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const {room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isHost = this.props.identity === IdentityType.host;
-        if (hostInfo.mode === ModeType.handUp) {
+        if (hostInfo.classMode === ClassModeType.handUp) {
             if (guestUser.isHandUp) {
                 if (guestUser.isReadOnly) {
                     return (
