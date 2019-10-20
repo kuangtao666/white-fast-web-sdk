@@ -1,5 +1,3 @@
-
-
 export class IframeController {
 
     private readonly setGlobalState: (netlessState: any) => void;

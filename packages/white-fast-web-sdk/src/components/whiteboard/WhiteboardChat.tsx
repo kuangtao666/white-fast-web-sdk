@@ -15,7 +15,6 @@ import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
-import Identicon from "react-identicons";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 

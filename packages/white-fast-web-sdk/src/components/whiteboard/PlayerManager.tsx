@@ -1,20 +1,17 @@
 import * as React from "react";
-import {Badge, Tabs, Icon, message, Tooltip} from "antd";
-import "./WhiteboardManager.less";
-import {Player} from "white-web-sdk";
-import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
-const { TabPane } = Tabs;
-import {IdentityType} from "./WhiteboardTopRight";
-import {RoomMember, ViewMode} from "white-react-sdk";
+import {Tabs, Tooltip} from "antd";
+import {ViewMode} from "white-react-sdk";
 import Identicon from "react-identicons";
+import {Player} from "white-web-sdk";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
-import ClassroomMedia from "./ClassroomMedia";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import user_empty from "../../assets/image/user_empty.svg";
 import menu_in from "../../assets/image/menu_in.svg";
 import teacher from "../../assets/image/teacher.svg";
-import Draggable from "react-draggable";
+import "./PlayerManager.less";
+const { TabPane } = Tabs;
 
 export type PlayerManagerProps = {
     player?: Player;
@@ -143,14 +140,12 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
         const {mediaUrl} = this.props;
         if (mediaUrl) {
             return (
-                <Draggable bounds="parent">
-                    <div className="player-video-out-side">
-                        <video
-                            poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
-                            className="video-js video-layout"
-                            id="white-sdk-video-js"/>
-                    </div>
-                </Draggable>
+                <div className="player-video-out-side">
+                    <video
+                        poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
+                        className="video-js video-layout"
+                        id="white-sdk-video-js"/>
+                </div>
             );
         } else {
             return null;

@@ -1,11 +1,10 @@
 import * as React from "react";
-import {Badge, Tabs, Icon, message} from "antd";
-const { TabPane } = Tabs;
+import {Badge, Tabs, Icon} from "antd";
 import "./WhiteboardManager.less";
-import {Room, Player} from "white-web-sdk";
+import {Room} from "white-web-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
-import {RoomMember, ViewMode} from "white-react-sdk";
+import {ViewMode} from "white-react-sdk";
 import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
@@ -14,6 +13,7 @@ import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
+const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {
     room: Room;

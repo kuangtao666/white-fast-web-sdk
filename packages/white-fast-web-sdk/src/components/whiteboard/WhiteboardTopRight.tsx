@@ -1,19 +1,16 @@
 import * as React from "react";
 import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
+import {Badge, Button, message, Modal, Input} from "antd";
+import Clipboard from "react-clipboard.js";
+import Identicon from "react-identicons";
 import QRCode from "qrcode.react";
-import set_icon from "../../assets/image/set_icon.svg";
-import menu_in from "../../assets/image/menu_in.svg";
 import menu_out from "../../assets/image/menu_out.svg";
-import set_black_icon from "../../assets/image/set_black_icon.svg";
 import stop_icon from "../../assets/image/stop_icon.svg";
 import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
-import {Badge, Button, message, Modal, Input} from "antd";
-import Clipboard from "react-clipboard.js";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
-import Identicon from "react-identicons";
 
 export type WhiteboardTopRightProps = {
     userId: string;

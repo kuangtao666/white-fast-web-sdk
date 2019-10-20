@@ -13249,14 +13249,6 @@ react-draggable@^3.3.0:
     classnames "^2.2.5"
     prop-types "^15.6.0"
 
-react-draggable@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.npm.taobao.org/react-draggable/download/react-draggable-4.0.3.tgz#6b9f76f66431c47b9070e9b805bbc520df8ca481"
-  integrity sha1-a5929mQxxHuQcOm4BbvFIN+MpIE=
-  dependencies:
-    classnames "^2.2.5"
-    prop-types "^15.6.0"
-
 react-dropzone@4.2.10:
   version "4.2.10"
   resolved "https://registry.npm.taobao.org/react-dropzone/download/react-dropzone-4.2.10.tgz#49de76346f5f56bc3e76aeab5604f4cddd0e87fb"

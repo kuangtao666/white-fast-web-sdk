@@ -1,6 +1,6 @@
 import * as React from "react";
-import {Badge, Icon, Popover} from "antd";
-import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player, Room} from "white-react-sdk";
+import {Badge, Icon} from "antd";
+import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import "./NetlessPlayer.less";
 import SeekSlider from "@netless/react-seek-slider";
@@ -19,7 +19,6 @@ import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
-import Draggable from "react-draggable";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;

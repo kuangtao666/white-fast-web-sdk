@@ -85,7 +85,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
 
     public render(): React.ReactNode {
         const {roomState} = this.props;
-        const scenes = roomState.sceneState.scenes;
+        const scenes = this.props.room.state.sceneState.scenes;
         const sceneDir = roomState.sceneState.scenePath.split("/");
         sceneDir.pop();
         const activeIndex = roomState.sceneState.index;

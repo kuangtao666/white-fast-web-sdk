@@ -1,11 +1,11 @@
 import * as React from "react";
-import {ViewMode, Player, RoomState, Scene, DeviceType} from "white-react-sdk";
-import menu_out from "../../assets/image/menu_out.svg";
+import {ViewMode, Player, Scene, DeviceType} from "white-react-sdk";
 import {Badge} from "antd";
+import Identicon from "react-identicons";
+import menu_out from "../../assets/image/menu_out.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
-import Identicon from "react-identicons";
 
 export type PlayerTopRightProps = {
     userId: string;

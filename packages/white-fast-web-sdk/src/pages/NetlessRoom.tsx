@@ -176,7 +176,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, plugins: [Iframe, Editor]});
             } else {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [Iframe, Editor]});
             }

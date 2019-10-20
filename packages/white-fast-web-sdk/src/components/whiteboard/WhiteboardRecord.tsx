@@ -1,6 +1,6 @@
 import * as React from "react";
-import "./WhiteboardRecord.less";
 import {message} from "antd";
+import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordDataType} from "../../pages/NetlessRoom";
 
