@@ -5,7 +5,7 @@ import "./Editor.less";
 import "braft-editor/dist/index.css";
 
 export type EditorProps = PluginComponentProps & {
-    editorState: EditorState;
+    editorState: string;
 };
 
 export type EditorStates = {
