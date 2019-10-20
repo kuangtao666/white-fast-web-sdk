@@ -46,6 +46,7 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
                 roomToken: roomToken,
                 userId: userId,
                 userName: "伍双",
+                language: "English",
                 userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
                 logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
                 boardBackgroundColor: "#F2F2F2",
@@ -55,7 +56,7 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
                 clickLogoCallback: () => {
                     this.props.history.push("/");
                 },
-                roomName: "伍双的教室",
+                // roomName: "伍双的教室",
                 beginTimestamp: startTime && parseInt(startTime),
                 duration: this.getDuration(),
                 // mediaUrl: mediaUrl,

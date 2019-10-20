@@ -80,7 +80,8 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
     }
 
     private renderGuest = (): React.ReactNode => {
-        const {player, isFirstScreenReady} = this.props;
+        const {player, isFirstScreenReady, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         if (player && isFirstScreenReady) {
             const globalGuestUsers: GuestUserType[] = player.state.globalState.guestUsers;
             if (globalGuestUsers) {
@@ -113,13 +114,13 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
             } else {
                 return <div className="room-member-empty">
                     <img src={user_empty}/>
-                    <div>尚且无学生加入</div>
+                    {isEnglish ? <div>No students have joined</div> : <div>尚且无学生加入</div>}
                 </div>;
             }
         } else {
             return <div className="room-member-empty">
                 <img src={user_empty}/>
-                <div>尚且无学生加入</div>
+                {isEnglish ? <div>No students have joined</div> : <div>尚且无学生加入</div>}
             </div>;
         }
     }
@@ -166,14 +167,15 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
     }
 
     private renderHostInf = (): React.ReactNode => {
-        const {player, isFirstScreenReady} = this.props;
+        const {player, isFirstScreenReady, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         if (player && isFirstScreenReady && player.state.globalState.hostInfo !== undefined) {
             const hostInfo: HostUserType = player.state.globalState.hostInfo;
             return (
                 <div className="replay-video-box">
                     {this.renderMedia()}
                     <div className="manager-box-btn-right">
-                        <Tooltip placement={"left"} title={"隐藏侧边栏"}>
+                        <Tooltip placement={"left"} title={isEnglish ? "Hide sidebar" : "隐藏侧边栏"}>
                             <div onClick={() => this.props.handleManagerState()} className="manager-box-btn-right-inner">
                                 <img src={menu_in}/>
                             </div>
@@ -210,17 +212,19 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
         }
     }
     public render(): React.ReactNode {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         return (
             <div className={this.handleManagerStyle()}>
                 {this.renderHostInf()}
                 <div className="chat-box-switch">
                     <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                        <TabPane tab={"用户列表"} key="1">
+                        <TabPane tab={isEnglish ? "Users list" : "用户列表"} key="1">
                             <div className="guest-box">
                                 {this.renderGuest()}
                             </div>
                         </TabPane>
-                        <TabPane  tab={"聊天群组"} key="2">
+                        <TabPane  tab={isEnglish ? "Live chat" : "聊天群组"} key="2">
                             <WhiteboardChat
                                 language={this.props.language}
                                 messages={this.props.messages}
