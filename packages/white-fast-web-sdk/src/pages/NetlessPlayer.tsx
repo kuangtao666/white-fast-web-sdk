@@ -19,6 +19,7 @@ import {Editor} from "../components/Editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import "./NetlessPlayer.less";
+import {LanguageEnum} from "./NetlessRoom";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
@@ -34,6 +35,7 @@ export type PlayerPageProps = {
     playerCallback?: (player: Player) => void;
     clickLogoCallback?: () => void;
     roomName?: string;
+    language?: LanguageEnum;
     isManagerOpen?: boolean;
 };
 
@@ -376,7 +378,9 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     </div>
                 </div>
                 <PlayerManager
-                    player={player} mediaUrl={this.props.mediaUrl}
+                    player={player}
+                    mediaUrl={this.props.mediaUrl}
+                    language={this.props.language}
                     isChatOpen={this.state.isChatOpen}
                     userId={userId}
                     isFirstScreenReady={this.state.isFirstScreenReady}
