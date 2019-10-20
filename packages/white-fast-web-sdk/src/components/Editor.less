@@ -7,15 +7,20 @@
   width: 100%;
   height: 100%;
 }
-.editor-box-active * {
-  pointer-events: auto;
+.editor-box-active {
+  .bf-controlbar * {
+    pointer-events: auto;
+  }
+  .bf-content * {
+    pointer-events: auto;
+    cursor: text;
+  }
 }
 
 .editor-box * {
-  pointer-events: none;
+  pointer-events: auto;
 }
 
-.editor-out-box * {
+.editor-out-box {
   background-color: white;
-  pointer-events: auto;
 }

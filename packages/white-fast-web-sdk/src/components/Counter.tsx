@@ -15,24 +15,27 @@ export class CounterComponent extends React.Component<CounterComponentProps> {
     }
 
     public render(): React.ReactNode {
+        const {width, height} = this.props;
         return (
             <CNode kind={CNodeKind.HTML}>
-                <div>count: {this.props.count}</div>
-                <div style={{pointerEvents: "auto"}}>
-                    <button style={{pointerEvents: "auto"}} onClick={() => {
-                        this.props.setProps(this.props.uuid, {
-                            count: this.props.count + 1,
-                        });
-                    }}>
-                        increment
-                    </button>
-                    <button style={{pointerEvents: "auto"}} onClick={() => {
-                        this.props.setProps(this.props.uuid, {
-                            count: this.props.count - 1,
-                        });
-                    }}>
-                        decrement
-                    </button>
+                <div style={{width: width, height: height}} className="editor-out-box">
+                    <div>count: {this.props.count}</div>
+                    <div style={{pointerEvents: "auto"}}>
+                        <button style={{pointerEvents: "auto"}} onClick={() => {
+                            this.props.setProps(this.props.uuid, {
+                                count: this.props.count + 1,
+                            });
+                        }}>
+                            increment
+                        </button>
+                        <button style={{pointerEvents: "auto"}} onClick={() => {
+                            this.props.setProps(this.props.uuid, {
+                                count: this.props.count - 1,
+                            });
+                        }}>
+                            decrement
+                        </button>
+                    </div>
                 </div>
             </CNode>
         );
