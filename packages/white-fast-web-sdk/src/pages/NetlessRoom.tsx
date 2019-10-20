@@ -36,7 +36,7 @@ import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
-import CounterComponent from "white-plugin-scaffold";
+import ScaffoldComponent from "white-plugin-scaffold";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -153,9 +153,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: CounterComponent});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: ScaffoldComponent});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: CounterComponent});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: ScaffoldComponent});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});

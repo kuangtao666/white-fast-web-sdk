@@ -8,6 +8,10 @@
     "global": "^4.4.0"
   },
   "scripts": {
-    "dev": "lerna run --parallel dev"
-  }
+    "dev": "lerna run --parallel dev",
+    "boot": "lerna bootstrap"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
