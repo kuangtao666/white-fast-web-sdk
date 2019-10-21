@@ -28,6 +28,7 @@ export type ClassroomMediaStates = {
     isFullScreen: boolean;
     remoteMediaStreams: NetlessStream[];
     localStream: NetlessStream | null;
+    isRtcLoading: boolean;
 };
 
 export type ClassroomMediaProps = {
@@ -53,6 +54,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             isFullScreen: false,
             remoteMediaStreams: [],
             localStream: null,
+            isRtcLoading: false,
         };
     }
 
@@ -223,9 +225,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         if (rtc) {
             return (
                 <div className="manager-box-btn">
-                    <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
-                        <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
-                    </Tooltip>
+                    {this.state.isRtcLoading ?
+                        <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                        :
+                        <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                            <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                        </Tooltip>
+                    }
                 </div>
             );
         } else {
@@ -366,6 +372,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const {rtc, identity} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
+        this.setState({isRtcLoading: true});
         this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
         this.agoraClient.init(agoraAppId, () => {
             console.log("AgoraRTC client initialized");
@@ -383,7 +390,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 ...localStream,
                 state: {isVideoOpen: true, isAudioOpen: true},
             };
-            this.setState({localStream: netlessLocalStream});
+            this.setState({localStream: netlessLocalStream, isRtcLoading: false});
             netlessLocalStream.play("rtc_local_stream");
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
                 this.props.setMediaState(true);
