@@ -397,6 +397,17 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return true;
         }
     }
+    private renderRecordComponent = (): React.ReactNode => {
+        if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
+            return (
+                <WhiteboardRecord
+                    recordDataCallback={this.props.recordDataCallback}
+                    channelName={this.props.uuid}/>
+            );
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -503,10 +514,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
-                            {this.props.identity === IdentityType.host &&
-                            <WhiteboardRecord
-                                recordDataCallback={this.props.recordDataCallback}
-                                channelName={this.props.uuid}/>}
+                            {this.renderRecordComponent()}
                             <ToolBox
                                 isReadOnly={isReadOnly}
                                 language={this.props.language}
