@@ -255,14 +255,18 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     public render(): React.ReactNode {
         const {isReadOnly} = this.props;
         if (isReadOnly) {
-            return (
-                <div className="whiteboard-box-bottom-right">
-                    <div className="whiteboard-box-bottom-right-mid">
-                        {this.renderHandUpBtn()}
-                        {this.renderChatIcon()}
+            if (this.renderHandUpBtn() !== null || this.renderChatIcon() !== null) {
+                return (
+                    <div className="whiteboard-box-bottom-right">
+                        <div className="whiteboard-box-bottom-right-mid">
+                            {this.renderHandUpBtn()}
+                            {this.renderChatIcon()}
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            } else {
+                return null;
+            }
         } else {
             return (
                 <div className="whiteboard-box-bottom-right">

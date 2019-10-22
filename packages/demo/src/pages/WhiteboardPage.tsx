@@ -13,6 +13,7 @@ export type WhiteboardPageProps = RouteComponentProps<{
 
 export type WhiteboardPageState = {
     recordData: RecordDataType | null;
+    room: any;
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
@@ -20,6 +21,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         super(props);
         this.state = {
             recordData: null,
+            room: null,
         };
     }
 
@@ -112,7 +114,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                     },
                 ],
                 roomCallback: (room: any) => {
-                    (window as any).room = room;
+                    this.setState({room: room});
                 },
                 pagePreviewPosition: "right",
                 boardBackgroundColor: "#F2F2F2",
@@ -142,47 +144,10 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
     }
 
     public componentWillUnmount(): void {
-        // alert(1);
+        if (this.state.room) {
+            this.state.room.disconnect();
+        }
     }
-    // private changeOrientation = (ref: HTMLDivElement): void => {
-    //     const width = document.documentElement.clientWidth;
-    //     const height =  document.documentElement.clientHeight;
-    //     if ( width < height ) {
-    //         ref.style.width = `${height}px`;
-    //         ref.style.height = `${width}px`;
-    //         ref.style.top = `${(height - width) / 2}px`;
-    //         ref.style.left = `${ 0 - (height - width) / 2}px`;
-    //         ref.style.transform = "rotate(90deg)";
-    //         ref.style.transformOrigin = "50% 50%";
-    //     }
-    //
-    //     const evt = "onorientationchange" in window ? "orientationchange" : "resize";
-    //
-    //     window.addEventListener(evt, () => {
-    //
-    //         setTimeout(() => {
-    //             const width = document.documentElement.clientWidth;
-    //             const height =  document.documentElement.clientHeight;
-    //
-    //             if ( width > height ) {
-    //                 ref.style.width = `${width}px`;
-    //                 ref.style.height = `${height}px`;
-    //                 ref.style.top = "0px";
-    //                 ref.style.left = "0px";
-    //                 ref.style.transform = "none";
-    //                 ref.style.transformOrigin = "50% 50%";
-    //             }
-    //             else {
-    //                 ref.style.width = `${height}px`;
-    //                 ref.style.height = `${width}px`;
-    //                 ref.style.top = `${(height - width) / 2}px`;
-    //                 ref.style.left = `${0 - (height - width) / 2}px`;
-    //                 ref.style.transform = "rotate(90deg)";
-    //                 ref.style.transformOrigin = "50% 50%";
-    //             }
-    //         }, 300);
-    //     }, false);
-    // }
 
     public render(): React.ReactNode {
         return (
