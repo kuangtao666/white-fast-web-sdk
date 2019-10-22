@@ -94,7 +94,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private renderRemoteHostBox = (): React.ReactNode => {
         const {remoteMediaStreams} = this.state;
         const {room} = this.props;
-        const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
+        const hostRoomMember = room.state.roomMembers.find((roomMember: any) => {
+            if (roomMember.payload && roomMember.payload.identity !== undefined) {
+                if (roomMember.payload.identity === IdentityType.host) {
+                    return roomMember;
+                }
+            }
+        });
         if (hostRoomMember) {
             const hostStream = remoteMediaStreams.find((stream: NetlessStream) => stream.getId() === hostRoomMember.payload.userId);
             if (hostStream) {

@@ -39,11 +39,15 @@ export class Editor extends React.Component<EditorProps, EditorStates> {
     public componentWillReceiveProps(nextProps: EditorProps): void {
         const selfEditorStateData = this.state.selfEditorState.toRAW();
         if (nextProps.editorState !== this.props.editorState) {
-            console.log(selfEditorStateData);
             if (nextProps.editorState !== selfEditorStateData) {
                 this.setState({selfEditorState: BraftEditor.createEditorState(nextProps.editorState)});
             }
         }
+    }
+
+    public componentDidMount(): void {
+        const selfEditorState = this.props.editorState;
+        this.setState({selfEditorState: BraftEditor.createEditorState(selfEditorState)});
     }
 
     private handleChange = async (editorState: EditorState): Promise<void> => {

@@ -13,6 +13,7 @@ export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
     room: Room;
     language?: LanguageEnum;
+    userId: string;
 };
 
 enum ExtendToolType {
@@ -64,6 +65,9 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
             centerY: 0,
             width: 600,
             height: 600,
+            props: {
+                userId: this.props.userId,
+            },
         });
     }
     public render(): React.ReactNode {

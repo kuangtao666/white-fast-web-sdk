@@ -38,7 +38,7 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         }
         return (
             <div className="whiteboard-box-bottom-left">
-                {this.props.identity === IdentityType.host && <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart">
+                {this.props.identity === IdentityType.host && <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart-2">
                     <img src={file}/>
                 </div>}
                 <ScaleController

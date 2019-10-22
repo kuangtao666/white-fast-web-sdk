@@ -411,7 +411,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private renderExtendTool = (): React.ReactNode => {
         if (!isMobile) {
             return (
-                <ExtendTool
+                <ExtendTool userId={this.props.userId}
                     language={this.props.language}
                     toolBarPosition={this.props.toolBarPosition}/>
             );

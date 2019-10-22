@@ -34,7 +34,7 @@ export class Iframe extends React.Component<IframeComponentProps, IframeComponen
     }
     private iframeController: IframeController;
     public static willInterruptEvent(props: any, event: any): boolean {
-        return false;
+        return true;
     }
 
     public componentWillReceiveProps(nextProps: IframeComponentProps): void {
@@ -81,6 +81,10 @@ export class Iframe extends React.Component<IframeComponentProps, IframeComponen
             submitUrl: this.state.url,
         });
     }
+
+    private handleInputFocus = (evt: any): void => {
+        console.log(evt);
+    }
     public render(): React.ReactNode {
         const {width, height} = this.props;
         const {isClickDisable} = this.state;
@@ -88,8 +92,6 @@ export class Iframe extends React.Component<IframeComponentProps, IframeComponen
             <CNode kind={CNodeKind.HTML}>
                 <div className="iframe-box" style={{width: width, height: height}}>
                     <div className="iframe-box-nav">
-                        {/*<button style={{pointerEvents: "auto"}}  className="iframe-controller" onClick={() => this.setState({isClickDisable: true})}>允许点击</button>*/}
-                        {/*<button style={{pointerEvents: "auto", left: 100}}  className="iframe-controller" onClick={() => this.setState({isClickDisable: false})}>禁止点击</button>*/}
                         <div className="iframe-box-nav-left">
                             <div className="iframe-box-nav-close">
                                 <img style={{width: 7.2}} src={iframe_close}/>
@@ -101,7 +103,10 @@ export class Iframe extends React.Component<IframeComponentProps, IframeComponen
                                 <img  style={{width: 6}} src={iframe_max}/>
                             </div>
                         </div>
-                        <input className="iframe-box-search" style={{pointerEvents: "auto"}} value={this.state.url} onChange={this.handleUrlChange}/>
+                        <input className="iframe-box-search"
+                               style={{pointerEvents: "auto"}}
+                               value={this.state.url} onFocus={this.handleInputFocus}
+                               onChange={this.handleUrlChange}/>
                         <div className="iframe-box-nav-right">
                             <div className="iframe-box-nav-right-btn">
                                 <img src={fix_icon}/>
