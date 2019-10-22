@@ -1,6 +1,6 @@
 import * as React from "react";
 import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
-import {Badge, Button, message, Modal, Input} from "antd";
+import {Badge, Button, message, Modal, Input, Radio} from "antd";
 import Clipboard from "react-clipboard.js";
 import Identicon from "react-identicons";
 import QRCode from "qrcode.react";
@@ -10,7 +10,7 @@ import replay_video_cover_en from "../../assets/image/replay_video_cover_en.svg"
 import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
-import {GuestUserType} from "../../pages/RoomManager";
+import {ClassModeType, GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 
 export type WhiteboardTopRightProps = {
@@ -30,6 +30,11 @@ export type WhiteboardTopRightProps = {
     replayCallback?: () => void;
 };
 
+export enum ShareUrlType {
+    readOnly = "readOnly",
+    interactive = "interactive",
+}
+
 export type WhiteboardTopRightStates = {
     isVisible: boolean;
     isLoading: boolean;
@@ -40,6 +45,7 @@ export type WhiteboardTopRightStates = {
     isInviteVisible: boolean;
     isCloseTipsVisible: boolean;
     url: string;
+    shareUrl: ShareUrlType;
 };
 
 export enum IdentityType {
@@ -62,6 +68,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             isInviteVisible: false,
             isCloseTipsVisible: false,
             url: location.href,
+            shareUrl: ShareUrlType.interactive,
         };
     }
 
@@ -82,9 +89,13 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     private handleUrl = (url: string): string => {
         let classUrl;
         if (this.props.identity === IdentityType.host) {
-            classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+            if (this.state.shareUrl === ShareUrlType.readOnly) {
+                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
+            } else {
+                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+            }
         } else {
-            classUrl = url;
+            classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
         }
         if (this.props.isReadOnly) {
             classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
@@ -99,6 +110,14 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
     private handleInvite = (): void => {
         this.setState({isInviteVisible: true});
+    }
+    public componentDidMount(): void {
+        const {identity} = this.props;
+        if (identity === IdentityType.host) {
+            this.setState({shareUrl: ShareUrlType.interactive});
+        } else {
+            this.setState({shareUrl: ShareUrlType.readOnly});
+        }
     }
 
     private handleClose = (): void => {
@@ -135,9 +154,43 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             }
         }
     }
-    public render(): React.ReactNode {
-        const  {isManagerOpen, language} = this.props;
+
+    private handleShareUrl = (evt: any): void => {
+        this.setState({shareUrl: evt.target.value});
+    }
+
+    private handleSwitchDisable = (shareUrl: ShareUrlType): boolean => {
+        const  {identity} = this.props;
+        if (shareUrl === ShareUrlType.readOnly) {
+            return false;
+        } else {
+            if (identity === IdentityType.host) {
+                return false;
+            } else if (identity === IdentityType.guest) {
+                return true;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    private renderSideMenu = (): React.ReactNode => {
+        const  {isManagerOpen} = this.props;
         const isHost = this.props.identity === IdentityType.host;
+        if (isHost && !isManagerOpen) {
+            return (
+                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                        <img style={{width: 16}} src={menu_out}/>
+                    </div>
+                </Badge>
+            );
+        } else {
+            return null;
+        }
+    }
+    public render(): React.ReactNode {
+        const  {language} = this.props;
         const isEnglish = this.props.language === language;
         return (
             <div className="whiteboard-top-right-box">
@@ -148,12 +201,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <div className="whiteboard-top-user-box">
                     {this.handleUserAvatar()}
                 </div>
-                {(isHost && !isManagerOpen) &&
-                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                        <img style={{width: 16}} src={menu_out}/>
-                    </div>
-                </Badge>}
+                {this.renderSideMenu()}
                 <Modal
                     visible={this.state.isInviteVisible}
                     footer={null}
@@ -164,6 +212,17 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <QRCode value={`${this.handleUrl(this.state.url)}`} />
                         <div className="whiteboard-share-text-box">
                             <Input readOnly size="large" value={`${this.handleUrl(this.state.url)}`}/>
+                            <Radio.Group
+                                value={this.state.shareUrl}
+                                onChange={this.handleShareUrl}
+                                className="whiteboard-switch">
+                                <Radio.Button
+                                    disabled={this.handleSwitchDisable(ShareUrlType.readOnly)}
+                                    value={ShareUrlType.readOnly}>{isEnglish ? "Read Only" : "只能观看"}</Radio.Button>
+                                <Radio.Button
+                                    disabled={this.handleSwitchDisable(ShareUrlType.interactive)}
+                                    value={ShareUrlType.interactive}>{isEnglish ? "Interactive" : "允许互动"}</Radio.Button>
+                            </Radio.Group>
                             <Clipboard
                                 data-clipboard-text={`${this.handleUrl(this.state.url)}`}
                                 component="div"

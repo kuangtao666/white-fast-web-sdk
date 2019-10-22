@@ -1,15 +1,3 @@
-.editor-box-active * {
-  pointer-events: auto;
-}
-
-.editor-box * {
-  pointer-events: none;
-}
-
-.editor-out-box {
-  background-color: white;
-}
-
 .editor-box-active {
   width: 100%;
   height: 100%;
@@ -18,4 +6,21 @@
 .editor-box {
   width: 100%;
   height: 100%;
+}
+.editor-box-active {
+  .bf-controlbar * {
+    pointer-events: auto;
+  }
+  .bf-content * {
+    pointer-events: auto;
+    cursor: text;
+  }
+}
+
+.editor-box * {
+  pointer-events: auto;
+}
+
+.editor-out-box {
+  background-color: white;
 }

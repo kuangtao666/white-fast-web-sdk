@@ -15,6 +15,7 @@ import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
+import {IdentityType} from "./WhiteboardTopRight";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
@@ -26,6 +27,7 @@ export type WhiteboardChatProps = {
     room?: Room;
     player?: Player;
     language?: LanguageEnum;
+    identity?: IdentityType;
 };
 
 export type WhiteboardChatStates = {
@@ -84,6 +86,36 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
     public async componentWillReceiveProps(): Promise<void> {
         await timeout(0);
         this.scrollToBottom();
+    }
+
+    private renderTextComposer = (): React.ReactNode => {
+        const {room, identity, language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
+        if (room && identity !== IdentityType.listener) {
+            return (
+                <div className="chat-box-input">
+                    <TextComposer
+                        onSend={(event: any) => {
+                            if (this.props.room) {
+                                this.props.room.dispatchMagixEvent("message", {
+                                    name: this.props.userName,
+                                    avatar: this.props.userAvatarUrl,
+                                    id: this.props.userId,
+                                    messageInner: [event],
+                                });
+                            }
+                        }}
+                    >
+                        <Row align="center">
+                            <TextInput placeholder={isEnglish ? "Enter chat content..." : "输入聊天内容..."} fill="true"/>
+                            <SendButton fit />
+                        </Row>
+                    </TextComposer>
+                </div>
+            );
+        } else {
+            return null;
+        }
     }
 
     public render(): React.ReactNode {
@@ -171,26 +203,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                             </div>
                         </div>}
                     </div>
-                    {this.props.room &&
-                    <div className="chat-box-input">
-                        <TextComposer
-                            onSend={(event: any) => {
-                                if (this.props.room) {
-                                    this.props.room.dispatchMagixEvent("message", {
-                                        name: this.props.userName,
-                                        avatar: this.props.userAvatarUrl,
-                                        id: this.props.userId,
-                                        messageInner: [event],
-                                    });
-                                }
-                            }}
-                        >
-                            <Row align="center">
-                                <TextInput placeholder={isEnglish ? "Enter chat content..." : "输入聊天内容..."} fill="true"/>
-                                <SendButton fit />
-                            </Row>
-                        </TextComposer>
-                    </div>}
+                    {this.renderTextComposer()}
                 </div>
             </ThemeProvider>
         );

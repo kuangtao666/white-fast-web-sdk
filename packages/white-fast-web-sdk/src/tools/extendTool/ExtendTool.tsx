@@ -4,7 +4,7 @@ import "./ExtendTool.less";
 import {ExtendToolIcon} from "./ExtendToolIcon";
 import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../pages/RoomContext";
-import {ToolBarPositionEnum} from "../../pages/NetlessRoom";
+import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 
 export type ExtendToolStates = {
@@ -13,10 +13,12 @@ export type ExtendToolStates = {
 
 export type ExtendToolProps = {
     toolBarPosition?: ToolBarPositionEnum;
+    language?: LanguageEnum;
+    userId: string;
 };
 
 export default class ExtendTool extends React.Component<ExtendToolProps, ExtendToolStates> {
-    public constructor(props: {}) {
+    public constructor(props: ExtendToolProps) {
         super(props);
         this.state = {
             toolBoxColor: "#A2A7AD",
@@ -45,7 +47,7 @@ export default class ExtendTool extends React.Component<ExtendToolProps, ExtendT
         const {toolBarPosition} = this.props;
         return (
             <RoomContextConsumer key={"add"} children={context => (
-                <Popover trigger="click" placement={this.handlePlacement()} content={<ExtendToolInner room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
+                <Popover trigger="click" placement={this.handlePlacement()} content={<ExtendToolInner userId={this.props.userId} language={this.props.language} room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
                     <div
                         onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                         onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

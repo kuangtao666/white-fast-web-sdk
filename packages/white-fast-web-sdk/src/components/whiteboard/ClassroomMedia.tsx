@@ -28,6 +28,7 @@ export type ClassroomMediaStates = {
     isFullScreen: boolean;
     remoteMediaStreams: NetlessStream[];
     localStream: NetlessStream | null;
+    isRtcLoading: boolean;
 };
 
 export type ClassroomMediaProps = {
@@ -53,6 +54,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             isFullScreen: false,
             remoteMediaStreams: [],
             localStream: null,
+            isRtcLoading: false,
         };
     }
 
@@ -92,7 +94,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private renderRemoteHostBox = (): React.ReactNode => {
         const {remoteMediaStreams} = this.state;
         const {room} = this.props;
-        const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
+        const hostRoomMember = room.state.roomMembers.find((roomMember: any) => {
+            if (roomMember.payload && roomMember.payload.identity !== undefined) {
+                if (roomMember.payload.identity === IdentityType.host) {
+                    return roomMember;
+                }
+            }
+        });
         if (hostRoomMember) {
             const hostStream = remoteMediaStreams.find((stream: NetlessStream) => stream.getId() === hostRoomMember.payload.userId);
             if (hostStream) {
@@ -174,9 +182,15 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     </Radio.Group>
                 );
             } else {
-                return (
-                    <div style={{marginTop: 6, color: "white"}}>模式: {this.handleModeText(hostInfo.classMode)}</div>
-                );
+                if (isEnglish) {
+                    return (
+                        <div style={{marginTop: 6, color: "white"}}>Class mode: {this.handleModeText(hostInfo.classMode)}</div>
+                    );
+                } else {
+                    return (
+                        <div style={{marginTop: 6, color: "white"}}>模式：{this.handleModeText(hostInfo.classMode)}</div>
+                    );
+                }
             }
         } else {
             return null;
@@ -189,21 +203,21 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         switch (classMode) {
             case ClassModeType.discuss: {
                 if (isEnglish) {
-                    return "Lecture";
+                    return "Interactive";
                 } else {
                     return "自由讨论";
                 }
             }
             case ClassModeType.lecture: {
                 if (isEnglish) {
-                    return "Hand Up";
+                    return "Lecture";
                 } else {
                     return "讲课模式";
                 }
             }
             default: {
                 if (isEnglish) {
-                    return "Interactive";
+                    return "Hand Up";
                 } else {
                     return "举手问答";
                 }
@@ -211,19 +225,34 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
+    private renderRtcBtn = (): React.ReactNode => {
+        const {userId, channelId, language, rtc} = this.props;
+        const isEnglish = language === LanguageEnum.English;
+        if (rtc) {
+            return (
+                <div className="manager-box-btn">
+                    {this.state.isRtcLoading ?
+                        <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                        :
+                        <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                            <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                        </Tooltip>
+                    }
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
+
     private renderHost = (): React.ReactNode => {
-        const {room, handleManagerState, rtc, userId, channelId, language} = this.props;
+        const {room, handleManagerState, language} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isEnglish = language === LanguageEnum.English;
         if (hostInfo) {
             return (
                 <div className="manager-box-inner-host">
-                    {rtc &&
-                    <div className="manager-box-btn">
-                        <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
-                            <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
-                        </Tooltip>
-                    </div>}
+                    {this.renderRtcBtn()}
                     <div className="manager-box-btn-right">
                         <Tooltip placement={"left"} title={isEnglish ? "Hide sidebar" : "隐藏侧边栏"}>
                             <div onClick={() => handleManagerState()} className="manager-box-btn-right-inner">
@@ -346,9 +375,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private startRtc = (userId: number, channelId: string): void => {
-        const {rtc} = this.props;
+        const {rtc, identity} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
+        this.setState({isRtcLoading: true});
         this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
         this.agoraClient.init(agoraAppId, () => {
             console.log("AgoraRTC client initialized");
@@ -366,14 +396,16 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 ...localStream,
                 state: {isVideoOpen: true, isAudioOpen: true},
             };
-            this.setState({localStream: netlessLocalStream});
+            this.setState({localStream: netlessLocalStream, isRtcLoading: false});
             netlessLocalStream.play("rtc_local_stream");
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
                 this.props.setMediaState(true);
                 console.log("User " + uid + " join channel successfully");
-                this.agoraClient.publish(localStream, (err: any) => {
-                    console.log("Publish local stream error: " + err);
-                });
+                if (identity !== IdentityType.listener) {
+                    this.agoraClient.publish(localStream, (err: any) => {
+                        console.log("Publish local stream error: " + err);
+                    });
+                }
             }, (err: any) => {
                 console.log(err);
             });

@@ -40,6 +40,7 @@ import {Editor} from "../components/Editor";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 import "./NetlessRoom.less";
+import {CounterComponent} from "../components/Counter";
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -176,9 +177,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, plugins: [Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, plugins: [Iframe, Editor, CounterComponent]});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [Iframe, Editor, CounterComponent]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -283,7 +284,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 return null;
         }
     }
-
 
     private setWhiteboardLayerDownRef = (whiteboardLayerDownRef: HTMLDivElement): void => {
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
@@ -396,6 +396,29 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return true;
         }
     }
+    private renderRecordComponent = (): React.ReactNode => {
+        if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
+            return (
+                <WhiteboardRecord
+                    recordDataCallback={this.props.recordDataCallback}
+                    channelName={this.props.uuid}/>
+            );
+        } else {
+            return null;
+        }
+    }
+
+    private renderExtendTool = (): React.ReactNode => {
+        if (!isMobile) {
+            return (
+                <ExtendTool userId={this.props.userId}
+                    language={this.props.language}
+                    toolBarPosition={this.props.toolBarPosition}/>
+            );
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -502,10 +525,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 handleChatState={this.handleChatState}
                                 handleAnnexBoxMenuState={this.handleAnnexBoxMenuState}
                                 room={room}/>
-                            {this.props.identity === IdentityType.host &&
-                            <WhiteboardRecord
-                                recordDataCallback={this.props.recordDataCallback}
-                                channelName={this.props.uuid}/>}
+                            {this.renderRecordComponent()}
                             <ToolBox
                                 isReadOnly={isReadOnly}
                                 language={this.props.language}
@@ -524,13 +544,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
-                                    <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
+                                    this.renderExtendTool(),
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
+                        {!isMobile &&
                         <WhiteboardManager
                             language={this.props.language}
                             uuid={this.props.uuid}
@@ -544,7 +565,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             handleManagerState={this.handleManagerState}
                             cameraState={cameraState}
                             disableCameraTransform={disableCameraTransform}
-                            room={room}/>
+                            room={room}/>}
                         {isReadOnly &&
                         <div onClick={() => message.warning("老师正在讲课，屏幕被锁定。")} className="lock-icon">
                             <Icon type="lock"/>
