@@ -13,6 +13,7 @@ import {
 import "./ToolBox.less";
 import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
+import {isMobile} from "react-device-detect";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -156,7 +157,13 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         for (const applianceName in ToolBox.descriptions) {
             const description = ToolBox.descriptions[applianceName];
             const node = this.renderApplianceButton(applianceName, description);
-            nodes.push(node);
+            if (isMobile) {
+                if (applianceName !== "ellipse" && applianceName !== "text") {
+                    nodes.push(node);
+                }
+            } else {
+                nodes.push(node);
+            }
         }
         switch (toolBarPosition) {
             case ToolBarPositionEnum.top: {

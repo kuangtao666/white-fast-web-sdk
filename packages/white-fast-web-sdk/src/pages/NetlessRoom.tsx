@@ -285,7 +285,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-
     private setWhiteboardLayerDownRef = (whiteboardLayerDownRef: HTMLDivElement): void => {
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
     }
@@ -403,6 +402,18 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 <WhiteboardRecord
                     recordDataCallback={this.props.recordDataCallback}
                     channelName={this.props.uuid}/>
+            );
+        } else {
+            return null;
+        }
+    }
+
+    private renderExtendTool = (): React.ReactNode => {
+        if (!isMobile) {
+            return (
+                <ExtendTool
+                    language={this.props.language}
+                    toolBarPosition={this.props.toolBarPosition}/>
             );
         } else {
             return null;
@@ -533,13 +544,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
-                                    <ExtendTool toolBarPosition={this.props.toolBarPosition}/>,
+                                    this.renderExtendTool(),
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
+                        {!isMobile &&
                         <WhiteboardManager
                             language={this.props.language}
                             uuid={this.props.uuid}
@@ -553,7 +565,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             handleManagerState={this.handleManagerState}
                             cameraState={cameraState}
                             disableCameraTransform={disableCameraTransform}
-                            room={room}/>
+                            room={room}/>}
                         {isReadOnly &&
                         <div onClick={() => message.warning("老师正在讲课，屏幕被锁定。")} className="lock-icon">
                             <Icon type="lock"/>

@@ -173,9 +173,24 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             }
         }
     }
-    public render(): React.ReactNode {
-        const  {isManagerOpen, language} = this.props;
+
+    private renderSideMenu = (): React.ReactNode => {
+        const  {isManagerOpen} = this.props;
         const isHost = this.props.identity === IdentityType.host;
+        if (isHost && !isManagerOpen) {
+            return (
+                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                        <img style={{width: 16}} src={menu_out}/>
+                    </div>
+                </Badge>
+            );
+        } else {
+            return null;
+        }
+    }
+    public render(): React.ReactNode {
+        const  {language} = this.props;
         const isEnglish = this.props.language === language;
         return (
             <div className="whiteboard-top-right-box">
@@ -186,12 +201,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <div className="whiteboard-top-user-box">
                     {this.handleUserAvatar()}
                 </div>
-                {(isHost && !isManagerOpen) &&
-                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                        <img style={{width: 16}} src={menu_out}/>
-                    </div>
-                </Badge>}
+                {this.renderSideMenu()}
                 <Modal
                     visible={this.state.isInviteVisible}
                     footer={null}

@@ -7,10 +7,12 @@ import {
 import {Tabs, Tooltip} from "antd";
 import web_plugin from "../../assets/image/web_plugin.svg";
 import editor_plugin from "../../assets/image/editor_plugin.svg";
+import {LanguageEnum} from "../../pages/NetlessRoom";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
     room: Room;
+    language?: LanguageEnum;
 };
 
 enum ExtendToolType {
@@ -65,35 +67,37 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         });
     }
     public render(): React.ReactNode {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         return (
             <div className="extend-inner-box">
                 <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                    <TabPane tab="插件教具" key="1">
+                    <TabPane tab={isEnglish ? "Plugins" : "插件教具"} key="1">
                         <div className="extend-icon-out-box">
                             <div className="extend-icon-box">
-                                <Tooltip placement="bottom" title="H5 课件">
+                                <Tooltip placement="bottom" title={isEnglish ? "Web page" : "H5 课件"}>
                                     <div onClick={() => this.insertPlugin("iframe")} className="extend-inner-icon">
                                         <img src={web_plugin}/>
                                     </div>
                                 </Tooltip>
                             </div>
                             <div className="extend-icon-box">
-                                <Tooltip placement="bottom" title="文本编辑器">
+                                <Tooltip placement="bottom" title={isEnglish ? "Editor" : "文本编辑器"}>
                                     <div onClick={() => this.insertPlugin("editor")} className="extend-inner-icon">
                                         <img src={editor_plugin}/>
                                     </div>
                                 </Tooltip>
                             </div>
-                            <div className="extend-icon-box">
-                                <Tooltip placement="bottom" title="test">
-                                    <div onClick={() => this.insertPlugin("test")} className="extend-inner-icon">
-                                        <img src={editor_plugin}/>
-                                    </div>
-                                </Tooltip>
-                            </div>
+                            {/*<div className="extend-icon-box">*/}
+                                {/*<Tooltip placement="bottom" title={"test"}>*/}
+                                    {/*<div onClick={() => this.insertPlugin("test")} className="extend-inner-icon">*/}
+                                        {/*<img src={editor_plugin}/>*/}
+                                    {/*</div>*/}
+                                {/*</Tooltip>*/}
+                            {/*</div>*/}
                         </div>
                     </TabPane>
-                    <TabPane tab="常用图形" key="2">
+                    <TabPane tab={isEnglish ? "Graph" : "常用图形"} key="2">
                     </TabPane>
                 </Tabs>
             </div>

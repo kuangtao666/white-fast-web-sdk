@@ -11,6 +11,7 @@ import {Room, Scene, RoomState} from "white-web-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {DeviceType, ViewMode} from "white-react-sdk";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
+import {isMobile} from "react-device-detect";
 
 export type MessageType = {
     name: string,
@@ -237,6 +238,20 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             return null;
         }
     }
+
+    private renderChatIcon = (): React.ReactNode => {
+        if (!isMobile) {
+            return (
+                <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
+                    <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
+                        <img src={chat}/>
+                    </div>
+                </Badge>
+            );
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         const {isReadOnly} = this.props;
         if (isReadOnly) {
@@ -244,11 +259,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                 <div className="whiteboard-box-bottom-right">
                     <div className="whiteboard-box-bottom-right-mid">
                         {this.renderHandUpBtn()}
-                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                            <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
-                                <img src={chat}/>
-                            </div>
-                        </Badge>
+                        {this.renderChatIcon()}
                     </div>
                 </div>
             );
@@ -257,11 +268,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
                 <div className="whiteboard-box-bottom-right">
                     <div className="whiteboard-box-bottom-right-mid">
                         {this.renderAnnexBox()}
-                        <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                            <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">
-                                <img src={chat}/>
-                            </div>
-                        </Badge>
+                        {this.renderChatIcon()}
                     </div>
                 </div>
             );
