@@ -92,13 +92,13 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                                     </div>
                                 </Tooltip>
                             </div>
-                            {/*<div className="extend-icon-box">*/}
-                                {/*<Tooltip placement="bottom" title={"test"}>*/}
-                                    {/*<div onClick={() => this.insertPlugin("test")} className="extend-inner-icon">*/}
-                                        {/*<img src={editor_plugin}/>*/}
-                                    {/*</div>*/}
-                                {/*</Tooltip>*/}
-                            {/*</div>*/}
+                            <div className="extend-icon-box">
+                                <Tooltip placement="bottom" title={"test"}>
+                                    <div onClick={() => this.insertPlugin("test")} className="extend-inner-icon">
+                                        <img src={editor_plugin}/>
+                                    </div>
+                                </Tooltip>
+                            </div>
                         </div>
                     </TabPane>
                     <TabPane tab={isEnglish ? "Graph" : "常用图形"} key="2">

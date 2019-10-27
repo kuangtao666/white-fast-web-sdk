@@ -135,7 +135,6 @@ export default class ToolBoxPaletteBox extends React.Component<ToolBoxPaletteBox
                 <StrokeWidth
                     className="palette-stroke-under-layer"
                     color={`rgb(${r},${g},${b})`}/>
-
                 <div className="palette-stroke-slider-mask">
                     <input className="palette-stroke-slider"
                            type="range"
