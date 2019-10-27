@@ -87,7 +87,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                     token: "8595fd46955f427db44b4e9ba90f015d",
                 },
                 identity: identityType,
-                language: "English",
+                language: "Chinese",
                 toolBarPosition: "left",
                 isManagerOpen: true,
                 uploadToolBox: [

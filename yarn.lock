@@ -13231,8 +13231,8 @@ react-dom@^16.3.2, react-dom@^16.8.0:
 
 react-dom@~16.8.0:
   version "16.8.6"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
-  integrity sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA==
+  resolved "https://registry.npm.taobao.org/react-dom/download/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
+  integrity sha1-cdYwP2MeiwCX9WFl72CPBR/24Q8=
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -13385,6 +13385,13 @@ react-textarea-autosize@^7.1.0:
     "@babel/runtime" "^7.1.2"
     prop-types "^15.6.0"
 
+react-tiny-virtual-list@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npm.taobao.org/react-tiny-virtual-list/download/react-tiny-virtual-list-2.2.0.tgz#eafb6fcf764e4ed41150ff9752cdaad8b35edf4a"
+  integrity sha1-6vtvz3ZOTtQRUP+XUs2q2LNe30o=
+  dependencies:
+    prop-types "^15.5.7"
+
 react-toggled@^1.2.7:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/react-toggled/-/react-toggled-1.2.7.tgz#be1b72058358dd1ffe11811e4427e5c9cf140c10"
@@ -13411,8 +13418,8 @@ react@^16.3.2, react@^16.8.0:
 
 react@~16.8.0:
   version "16.8.6"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
-  integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==
+  resolved "https://registry.npm.taobao.org/react/download/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
+  integrity sha1-rWw6lhT9Ok6e9REX9U2IjaAfK74=
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -14086,8 +14093,8 @@ sax@>=0.6.0, sax@^1.2.4, sax@~1.2.1, sax@~1.2.4:
 
 scheduler@^0.13.6:
   version "0.13.6"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.6.tgz#466a4ec332467b31a91b9bf74e5347072e4cd889"
-  integrity sha512-IWnObHt413ucAYKsD9J1QShUKkbKLQQHdxRyw73sw4FN26iWr3DY/H34xGPe4nmL1DwXyWmSWmMrA9TfQbE/XQ==
+  resolved "https://registry.npm.taobao.org/scheduler/download/scheduler-0.13.6.tgz?cache=0&sync_timestamp=1571779538561&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fscheduler%2Fdownload%2Fscheduler-0.13.6.tgz#466a4ec332467b31a91b9bf74e5347072e4cd889"
+  integrity sha1-RmpOwzJGezGpG5v3TlNHBy5M2Ik=
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -16457,16 +16464,35 @@ which@1, which@^1.2.12, which@^1.2.14, which@^1.2.9, which@^1.3.0, which@^1.3.1:
   dependencies:
     isexe "^2.0.0"
 
-white-react-sdk@^2.3.8:
-  version "2.3.8"
-  resolved "https://registry.npm.taobao.org/white-react-sdk/download/white-react-sdk-2.3.8.tgz#3498162a3a545d435b89669a57c12d7ae634be04"
-  integrity sha1-NJgWKjpUXUNbiWaaV8EteuY0vgQ=
+white-react-sdk@^2.3.9:
+  version "2.3.9"
+  resolved "https://registry.npm.taobao.org/white-react-sdk/download/white-react-sdk-2.3.9.tgz#a7e0427fa1d468ddc1d4546ed0d2dcb30fe27272"
+  integrity sha1-p+BCf6HUaN3B1FRu0NLcsw/icnI=
   dependencies:
     react "~16.8.0"
     react-dom "~16.8.0"
-    white-web-sdk "2.3.8"
+    white-web-sdk "2.3.9"
 
-white-web-sdk@2.3.8, white-web-sdk@^2.3.7:
+white-web-sdk@2.3.9:
+  version "2.3.9"
+  resolved "https://registry.npm.taobao.org/white-web-sdk/download/white-web-sdk-2.3.9.tgz#7c3a7870721ef6c4ff4a0cddc332f415202b974e"
+  integrity sha1-fDp4cHIe9sT/SgzdwzL0FSArl04=
+  dependencies:
+    bezier-js "^2.4.0"
+    color "^3.1.2"
+    mathjs "6.2.2"
+    mobx "^4.9.3"
+    mobx-react "^5.4.3"
+    query-string "5"
+    react "^16.8.0"
+    react-dom "^16.8.0"
+    spark-md5 "^3.0.0"
+    url-parse "^1.4.6"
+    uuid "^3.3.2"
+    video.js "^7.4.1"
+    xml-js "^1.6.11"
+
+white-web-sdk@^2.3.7:
   version "2.3.8"
   resolved "https://registry.yarnpkg.com/white-web-sdk/-/white-web-sdk-2.3.8.tgz#e397431a5da3b2f8b3d1aec4fc3973a2d0f1f0d6"
   integrity sha512-qBn+dc+2+c8fCexJZOWSgWnpm9FBMPE7/212SXK3cZXUuTbZwQScDTXW1WXVQLgXBlcwtoTNvE4CDN7Rs95sNg==
