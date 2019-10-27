@@ -191,7 +191,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
     public render(): React.ReactNode {
         const  {language} = this.props;
-        const isEnglish = this.props.language === language;
+        const isEnglish = this.props.language === LanguageEnum.English;
         return (
             <div className="whiteboard-top-right-box">
                 <div
