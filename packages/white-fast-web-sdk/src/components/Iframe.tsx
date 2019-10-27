@@ -37,7 +37,7 @@ export class Iframe extends React.Component<IframeComponentProps, IframeComponen
         return true;
     }
 
-    public componentWillReceiveProps(nextProps: IframeComponentProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: IframeComponentProps): void {
         if (nextProps.netlessState !== this.props.nenetlessState) {
             this.iframeController.setIframeState(nextProps.netlessState);
             if (nextProps.netlessState.submitUrl) {

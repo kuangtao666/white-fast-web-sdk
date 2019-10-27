@@ -83,7 +83,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         }
     }
 
-    public async componentWillReceiveProps(): Promise<void> {
+    public async UNSAFE_componentWillReceiveProps(): Promise<void> {
         await timeout(0);
         this.scrollToBottom();
     }

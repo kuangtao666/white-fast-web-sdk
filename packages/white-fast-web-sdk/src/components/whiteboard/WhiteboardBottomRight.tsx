@@ -58,7 +58,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         });
     }
 
-    public componentWillReceiveProps(nextProps: WhiteboardBottomRightProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: WhiteboardBottomRightProps): void {
         if (this.props.isManagerOpen !== nextProps.isManagerOpen && !nextProps.isManagerOpen) {
             this.setState({seenMessagesLength: this.state.messages.length});
         }

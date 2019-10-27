@@ -173,7 +173,7 @@ class PageImage extends React.Component<PageImageProps, {}> {
     public constructor(props: any) {
         super(props);
     }
-    public componentWillReceiveProps(nextProps: PageImageProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: PageImageProps): void {
         const ref = this.ref;
         if (nextProps.isMenuOpen !== this.props.isMenuOpen && nextProps.isMenuOpen && ref) {
             this.props.room.scenePreview(this.props.path, ref, 192, 112.5);

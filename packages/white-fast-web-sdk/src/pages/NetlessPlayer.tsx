@@ -6,8 +6,6 @@ import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
-import * as full_screen from "../assets/image/full_screen.svg";
-import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
@@ -75,13 +73,15 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         };
     }
 
-    public componentWillReceiveProps(nextProps: PlayerPageProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: PlayerPageProps): void {
         if (this.props.isManagerOpen !== nextProps.isManagerOpen && nextProps.isManagerOpen === false) {
             this.setState({seenMessagesLength: this.state.messages.length});
         }
     }
 
     public async componentDidMount(): Promise<void> {
+        window.addEventListener("resize", this.onWindowResize);
+        window.addEventListener("keydown", this.handleSpaceKey);
         const {player} = this.state;
         if (player) {
             player.addMagixEventListener("message",  event => {
@@ -149,11 +149,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             this.onClickOperationButton(this.state.player!);
         }
     }
-    public componentWillMount(): void {
-        window.addEventListener("resize", this.onWindowResize);
-        window.addEventListener("keydown", this.handleSpaceKey);
-    }
-
 
     public componentWillUnmount(): void {
         window.removeEventListener("resize", this.onWindowResize);

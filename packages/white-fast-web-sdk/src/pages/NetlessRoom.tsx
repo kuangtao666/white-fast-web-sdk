@@ -38,9 +38,9 @@ import ExtendTool from "../tools/extendTool/ExtendTool";
 import {Iframe} from "../components/Iframe";
 import {Editor} from "../components/Editor";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
-const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 import "./NetlessRoom.less";
 import {CounterComponent} from "../components/Counter";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -149,6 +149,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
+    private menuChild: React.Component;
     public constructor(props: RealTimeProps) {
         super(props);
         this.state = {
@@ -239,20 +240,17 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             this.state.room.refreshViewSize();
         }
     }
-    public componentWillMount(): void {
+    public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
-           if (isMobile) {
-               this.setState({deviceType: DeviceType.Touch});
-           } else {
-               this.setState({deviceType: DeviceType.Desktop});
-           }
+            if (isMobile) {
+                this.setState({deviceType: DeviceType.Touch});
+            } else {
+                this.setState({deviceType: DeviceType.Desktop});
+            }
         }
-    }
-
-    public async componentDidMount(): Promise<void> {
         await this.startJoinRoom();
         this.onWindowResize();
         if (this.state.room && this.state.room.state.roomMembers) {
@@ -289,11 +287,22 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
     }
 
-    private handleAnnexBoxMenuState = (): void => {
-        this.setState({
-            isMenuVisible: !this.state.isMenuVisible,
-            menuInnerState: MenuInnerType.AnnexBox,
-        });
+    private handleAnnexBoxMenuState = async (): Promise<void> => {
+        if (this.state.isMenuVisible) {
+            if (this.menuChild) {
+                this.menuChild.setState({isMenuOpen: false});
+            }
+            await timeout(200);
+            this.setState({
+                isMenuVisible: !this.state.isMenuVisible,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        } else {
+            this.setState({
+                isMenuVisible: !this.state.isMenuVisible,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        }
     }
 
     private isImageType = (type: string): boolean => {
@@ -338,6 +347,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 break;
             }
         }
+    }
+    private onRef = (ref: React.Component) => {
+        this.menuChild = ref;
     }
     private setPreviewMenuState = (state: boolean) => {
         this.setState({isPreviewMenuOpen: state});
@@ -460,7 +472,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     room: room,
                 }}>
                     <div className="realtime-box">
-                        <MenuBox
+                        <MenuBox language={this.props.language} onRef={this.onRef}
+                            isSidePreview={this.state.menuInnerState === MenuInnerType.AnnexBox}
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setPreviewMenuState}
                             isVisible={this.state.isMenuVisible}
@@ -551,6 +564,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
+                        <div>
+                            <CounterComponent count={9}/>
+                        </div>
                         {!isMobile &&
                         <WhiteboardManager
                             language={this.props.language}

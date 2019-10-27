@@ -36,7 +36,7 @@ export class Editor extends React.Component<EditorProps, EditorStates> {
             isClickDisable: false,
         };
     }
-    public componentWillReceiveProps(nextProps: EditorProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: EditorProps): void {
         const selfEditorStateData = this.state.selfEditorState.toRAW();
         if (nextProps.editorState !== this.props.editorState) {
             if (nextProps.editorState !== selfEditorStateData) {

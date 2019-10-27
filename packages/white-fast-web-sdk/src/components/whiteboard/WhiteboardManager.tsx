@@ -59,7 +59,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             this.setState({messages: [...this.state.messages, event.payload]});
         });
     }
-    public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
         if (this.props.cameraState !== undefined && this.props.disableCameraTransform !== undefined && nextProps.cameraState !== undefined && nextProps.disableCameraTransform !== undefined) {
            if (this.props.cameraState !== nextProps.cameraState) {
                this.props.room.setViewMode(nextProps.cameraState);
