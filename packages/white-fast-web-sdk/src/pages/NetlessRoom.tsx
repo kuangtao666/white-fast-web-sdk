@@ -14,6 +14,7 @@ import {
     MemberState,
     ViewMode,
     DeviceType,
+    PluginComponentClass,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
@@ -107,6 +108,7 @@ export type RealTimeProps = {
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
     isManagerOpen?: boolean;
+    plugins?: PluginComponentClass | ReadonlyArray<PluginComponentClass>;
 };
 
 export enum ToolBarPositionEnum {
@@ -178,9 +180,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [Iframe, Editor, CounterComponent]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: this.props.plugins});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [Iframe, Editor, CounterComponent]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: this.props.plugins});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});

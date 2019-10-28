@@ -12,11 +12,15 @@ export type ReplayPageProps = RouteComponentProps<{
 }>;
 
 export type WhiteboardPageState = {
+    player: any;
 };
 
-class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
+export default class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
     public constructor(props: ReplayPageProps) {
         super(props);
+        this.state = {
+            player: null,
+        };
     }
 
     private getRoomToken = async (uuid: string): Promise<string | null> => {
@@ -46,12 +50,11 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
                 roomToken: roomToken,
                 userId: userId,
                 userName: "伍双",
-                language: "English",
                 userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
                 boardBackgroundColor: "#F2F2F2",
                 playerCallback: (player: any) => {
-                    console.log(player);
+                    this.setState({player: player});
                 },
                 clickLogoCallback: () => {
                     this.props.history.push("/");
@@ -59,7 +62,7 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
                 // roomName: "伍双的教室",
                 beginTimestamp: startTime && parseInt(startTime),
                 duration: this.getDuration(),
-                mediaUrl: mediaUrl,
+                // mediaUrl: mediaUrl,
                 // isManagerOpen: true,
                 // mediaUrl: "https://netless-media.oss-cn-hangzhou.aliyuncs.com/ad5ce237124d7210e24ca5838d79f509_b9fc17d5d017466ab446c3094c87b1b3.m3u8",
                 // isChatOpen:
@@ -71,12 +74,9 @@ class ReplayPage extends React.Component<ReplayPageProps, WhiteboardPageState> {
     public async componentDidMount(): Promise<void> {
         await this.startReplay();
     }
-
     public render(): React.ReactNode {
         return (
             <div id="netless-replay" className="whiteboard-box"/>
         );
     }
 }
-
-export default withRouter(ReplayPage);

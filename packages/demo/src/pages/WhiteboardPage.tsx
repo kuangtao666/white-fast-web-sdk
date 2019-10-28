@@ -1,5 +1,5 @@
 import * as React from "react";
-import {RouteComponentProps, withRouter} from "react-router";
+import {RouteComponentProps} from "react-router";
 import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
@@ -13,10 +13,10 @@ export type WhiteboardPageProps = RouteComponentProps<{
 
 export type WhiteboardPageState = {
     recordData: RecordDataType | null;
-    room: any;
+    room: any,
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
-class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
+export default class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
     public constructor(props: WhiteboardPageProps) {
         super(props);
         this.state = {
@@ -67,7 +67,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                 // userName: "伍双",
                 // roomName: "伍双的房间",
                 // userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
                 loadingSvgUrl: "",
                 clickLogoCallback: () => {
                     // this.props.history.push("/");
@@ -156,4 +156,3 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         );
     }
 }
-export default withRouter(WhiteboardPage);

@@ -89,42 +89,6 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
                     <div className="page-box-inner-index-delete-box">
                     </div>
                 </div>
-                <div className="page-out-box">
-                    <div className="page-box-inner-index-left">2</div>
-                    <div className="page-mid-box">
-                        <div className="page-box">
-                        </div>
-                    </div>
-                    <div className="page-box-inner-index-delete-box">
-                    </div>
-                </div>
-                <div className="page-out-box">
-                    <div className="page-box-inner-index-left">3</div>
-                    <div className="page-mid-box">
-                        <div className="page-box">
-                        </div>
-                    </div>
-                    <div className="page-box-inner-index-delete-box">
-                    </div>
-                </div>
-                <div className="page-out-box">
-                    <div className="page-box-inner-index-left">4</div>
-                    <div className="page-mid-box">
-                        <div className="page-box">
-                        </div>
-                    </div>
-                    <div className="page-box-inner-index-delete-box">
-                    </div>
-                </div>
-                <div className="page-out-box">
-                    <div className="page-box-inner-index-left">5</div>
-                    <div className="page-mid-box">
-                        <div className="page-box">
-                        </div>
-                    </div>
-                    <div className="page-box-inner-index-delete-box">
-                    </div>
-                </div>
                 <div style={{height: 42}}/>
                 <div className="menu-under-btn">
                     <div

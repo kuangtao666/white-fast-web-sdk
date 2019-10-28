@@ -38,7 +38,7 @@ export default class WhiteboardCreatorPage extends React.Component<WhiteboardCre
             return null;
         }
     }
-    public async componentDidMount(): Promise<void> {
+    public async componentWillMount(): Promise<void> {
         try {
             let uuid: string | null;
             if (this.props.match.params.uuid) {
@@ -58,6 +58,7 @@ export default class WhiteboardCreatorPage extends React.Component<WhiteboardCre
             throw error;
         }
     }
+
     public render(): React.ReactNode {
         const identityType = this.props.match.params.identityType;
         if (this.state.foundError) {
