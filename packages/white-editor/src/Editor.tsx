@@ -1,12 +1,12 @@
 import * as React from "react";
 import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
 import BraftEditor, {EditorState} from "braft-editor";
-import iframe_close from "../assets/image/iframe_close.svg";
-import iframe_min from "../assets/image/iframe_min.svg";
-import iframe_max from "../assets/image/iframe_max.svg";
-import fix_icon from "../assets/image/fix_icon.svg";
-import editor_icon from "../assets/image/editor_icon.svg";
-import uneditor_icon from "../assets/image/uneditor_icon.svg";
+import iframe_close from "./image/iframe_close.svg";
+import iframe_min from "./image/iframe_min.svg";
+import iframe_max from "./image/iframe_max.svg";
+import fix_icon from "./image/fix_icon.svg";
+import editor_icon from "./image/editor_icon.svg";
+import uneditor_icon from "./image/uneditor_icon.svg";
 import "./Editor.less";
 import "braft-editor/dist/index.css";
 

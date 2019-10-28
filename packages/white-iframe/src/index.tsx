@@ -1,14 +1,14 @@
 import * as React from "react";
 import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
-import "./Iframe.less";
+import "./index.less";
 import {IframeController} from "./IframeController";
-import iframe_close from "../assets/image/iframe_close.svg";
-import iframe_min from "../assets/image/iframe_min.svg";
-import iframe_max from "../assets/image/iframe_max.svg";
-import fix_icon from "../assets/image/fix_icon.svg";
-import editor_icon from "../assets/image/editor_icon.svg";
-import uneditor_icon from "../assets/image/uneditor_icon.svg";
-import netless_gray from "../assets/image/netless_gray.svg";
+import iframe_close from "./image/iframe_close.svg";
+import iframe_min from "./image/iframe_min.svg";
+import iframe_max from "./image/iframe_max.svg";
+import fix_icon from "./image/fix_icon.svg";
+import editor_icon from "./image/editor_icon.svg";
+import uneditor_icon from "./image/uneditor_icon.svg";
+import netless_gray from "./image/netless_gray.svg";
 
 export type IframeComponentProps = PluginComponentProps & {
     readonly netlessState: any;

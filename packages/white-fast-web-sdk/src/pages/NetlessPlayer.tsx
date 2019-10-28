@@ -12,12 +12,12 @@ import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
 import "video.js/dist/video-js.css";
-import {Iframe} from "../components/Iframe";
-import {Editor} from "../components/Editor";
+import {Editor} from "white-editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
+import {Iframe} from "white-iframe";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;

@@ -24,12 +24,12 @@ export default class VideoPlugin extends React.Component<VideoPluginProps> {
                 <Video
                     onPlayed={(play: boolean) => {
                         this.props.setProps(this.props.uuid, {
-                            play
+                            play,
                         });
                     }}
                     onSeeked={(seek: number) => {
                         this.props.setProps(this.props.uuid, {
-                            seek
+                            seek,
                         });
                     }}
                     videoURL={this.props.videoURL}
