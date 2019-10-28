@@ -36,11 +36,9 @@ import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
-import {Iframe} from "../components/Iframe";
-import {Editor} from "../components/Editor";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
-import {CounterComponent} from "../components/Counter";
+import CounterComponent from "white-plugin-scaffold";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -108,7 +106,7 @@ export type RealTimeProps = {
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
     isManagerOpen?: boolean;
-    plugins?: PluginComponentClass | ReadonlyArray<PluginComponentClass>;
+    getRemoveFunction: (func: () => void) => void;
 };
 
 export enum ToolBarPositionEnum {
@@ -180,9 +178,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: this.props.plugins});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: CounterComponent});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: this.props.plugins});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: CounterComponent});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -244,6 +242,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
+        this.props.getRemoveFunction(this.remove);
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
@@ -260,11 +259,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-    public async componentWillUnmount(): Promise<void> {
+    private remove = (): void => {
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
-            await this.state.room.disconnect();
+            this.state.room.disconnect();
         }
         if (this.roomManager) {
             this.roomManager.stop();
@@ -425,7 +424,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private renderExtendTool = (): React.ReactNode => {
         if (!isMobile) {
             return (
-                <ExtendTool userId={this.props.userId}
+                <ExtendTool
+                    userId={this.props.userId}
                     language={this.props.language}
                     toolBarPosition={this.props.toolBarPosition}/>
             );
@@ -566,9 +566,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 {this.renderWhiteboard()}
                             </div>
                         </Dropzone>
-                        <div>
-                            <CounterComponent count={9}/>
-                        </div>
                         {!isMobile &&
                         <WhiteboardManager
                             language={this.props.language}

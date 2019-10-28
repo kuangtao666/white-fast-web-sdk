@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Badge, Tabs, Icon, message} from "antd";
 import "./WhiteboardManager.less";
-import {Room} from "white-web-sdk";
+import {Room} from "white-react-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {ViewMode} from "white-react-sdk";

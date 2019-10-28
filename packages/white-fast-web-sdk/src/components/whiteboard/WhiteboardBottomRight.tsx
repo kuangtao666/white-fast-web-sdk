@@ -7,7 +7,7 @@ import * as handup from "../../assets/image/handup.svg";
 import * as handup_black from "../../assets/image/handup_black.svg";
 import "./WhiteboardBottomRight.less";
 import {Badge, message, Tooltip} from "antd";
-import {Room, Scene, RoomState} from "white-web-sdk";
+import {Room, Scene, RoomState} from "white-react-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {DeviceType, ViewMode} from "white-react-sdk";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";

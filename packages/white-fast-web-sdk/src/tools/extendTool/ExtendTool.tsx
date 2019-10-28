@@ -6,6 +6,7 @@ import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../pages/RoomContext";
 import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
+import {PluginComponentClass} from "white-react-sdk";
 
 export type ExtendToolStates = {
     toolBoxColor: string;
@@ -15,6 +16,7 @@ export type ExtendToolProps = {
     toolBarPosition?: ToolBarPositionEnum;
     language?: LanguageEnum;
     userId: string;
+    plugins?: PluginComponentClass | ReadonlyArray<PluginComponentClass>;
 };
 
 export default class ExtendTool extends React.Component<ExtendToolProps, ExtendToolStates> {

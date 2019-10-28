@@ -2,18 +2,40 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import NetlessPlayer from "../pages/NetlessPlayer";
 import NetlessRoom from "../pages/NetlessRoom";
+import {NetlessType} from "./index";
 
-export const RoomFacade = (element: string, config: any): void => {
+
+export const RoomFacade = (element: string, config: any): NetlessType | undefined => {
+    let releaseFuc: (() => void) | undefined = undefined;
     ReactDOM.render(
-        <NetlessRoom {...config}/>,
+        <NetlessRoom getRemoveFunction={(func: () => void) => {
+            releaseFuc = func;
+        }} {...config}/>,
         document.getElementById(element),
     );
+    if (releaseFuc) {
+        return {
+            release: releaseFuc,
+        };
+    } else {
+        return undefined;
+    }
 };
 
-export const PlayerFacade = (element: string, config: any): void => {
+export const PlayerFacade = (element: string, config: any): NetlessType | undefined => {
+    let releaseFuc: (() => void) | undefined = undefined;
     ReactDOM.render(
-        <NetlessPlayer {...config}/>,
+        <NetlessPlayer getRemoveFunction={(func: () => void) => {
+            releaseFuc = func;
+        }} {...config}/>,
         document.getElementById(element),
     );
+    if (releaseFuc) {
+        return {
+            release: releaseFuc,
+        };
+    } else {
+        return undefined;
+    }
 };
 

@@ -26,11 +26,12 @@
     "@netless/fetch-middleware": "^1.0.4",
     "@netless/i18n-react-router": "^1.0.5",
     "@netless/white-fast-web-sdk": "^1.1.8",
+    "white-plugin-scaffold": "^1.0.0",
     "agora-rtc-sdk": "^2.9.0",
     "ali-oss": "^6.1.1",
     "antd": "^3.10.4",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
+    "react": "~16.8.0",
+    "react-dom": "~16.8.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {

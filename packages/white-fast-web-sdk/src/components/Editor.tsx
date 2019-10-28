@@ -1,5 +1,5 @@
 import * as React from "react";
-import {CNode, CNodeKind, PluginComponentProps} from "white-web-sdk";
+import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
 import BraftEditor, {EditorState} from "braft-editor";
 import iframe_close from "../assets/image/iframe_close.svg";
 import iframe_min from "../assets/image/iframe_min.svg";

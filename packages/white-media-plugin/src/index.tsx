@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CNode, CNodeKind, PluginComponentProps } from "white-web-sdk";
+import { CNode, CNodeKind, PluginComponentProps } from "white-react-sdk";
 import Video from "./Video";
 
 export type VideoPluginProps = PluginComponentProps & {

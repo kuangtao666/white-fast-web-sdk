@@ -17,6 +17,7 @@ export type WhiteboardPageState = {
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export default class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
+    private netlessRoom: any;
     public constructor(props: WhiteboardPageProps) {
         super(props);
         this.state = {
@@ -60,7 +61,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
         const {userId, uuid, identityType} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
         if (roomToken) {
-            WhiteFastSDK.Room("whiteboard", {
+           this.netlessRoom = WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
                 roomToken: roomToken,
                 userId: userId,
@@ -144,8 +145,8 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
     }
 
     public componentWillUnmount(): void {
-        if (this.state.room) {
-            this.state.room.disconnect();
+        if (this.netlessRoom) {
+            this.netlessRoom.release();
         }
     }
 

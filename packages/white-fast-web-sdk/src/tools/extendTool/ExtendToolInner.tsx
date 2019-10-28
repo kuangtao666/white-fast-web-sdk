@@ -3,6 +3,7 @@ import uuidv4 from "uuid/v4";
 import "./ExtendToolInner.less";
 import {
     Room,
+    PluginComponentClass,
 } from "white-react-sdk";
 import {Tabs, Tooltip} from "antd";
 import web_plugin from "../../assets/image/web_plugin.svg";
@@ -14,6 +15,7 @@ export type ExtendToolInnerProps = {
     room: Room;
     language?: LanguageEnum;
     userId: string;
+    plugins?: PluginComponentClass | ReadonlyArray<PluginComponentClass>;
 };
 
 enum ExtendToolType {
@@ -65,9 +67,6 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
             centerY: 0,
             width: 600,
             height: 600,
-            props: {
-                userId: this.props.userId,
-            },
         });
     }
     public render(): React.ReactNode {
@@ -94,7 +93,7 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                             </div>
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={"test"}>
-                                    <div onClick={() => this.insertPlugin("test")} className="extend-inner-icon">
+                                    <div onClick={() => this.insertPlugin("scaffold")} className="extend-inner-icon">
                                         <img src={editor_plugin}/>
                                     </div>
                                 </Tooltip>

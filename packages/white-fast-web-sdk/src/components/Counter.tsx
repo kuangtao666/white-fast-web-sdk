@@ -1,6 +1,6 @@
 import * as React from "react";
-import {CNode, CNodeKind, PluginComponentProps} from "white-web-sdk";
-
+import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
+// (window as any).CNode = CNode;
 export type CounterComponentProps = PluginComponentProps & {
     readonly count: number;
 };

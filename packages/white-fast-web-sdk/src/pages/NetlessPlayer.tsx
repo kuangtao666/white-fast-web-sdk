@@ -35,6 +35,7 @@ export type PlayerPageProps = {
     roomName?: string;
     language?: LanguageEnum;
     isManagerOpen?: boolean;
+    getRemoveFunction: (func: () => void) => void;
 };
 
 
@@ -80,6 +81,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
     }
 
     public async componentDidMount(): Promise<void> {
+        this.props.getRemoveFunction(this.remove);
         window.addEventListener("resize", this.onWindowResize);
         window.addEventListener("keydown", this.handleSpaceKey);
         const {player} = this.state;
@@ -150,7 +152,10 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
     }
 
-    public componentWillUnmount(): void {
+    public remove = (): void => {
+        if (this.state.player) {
+            this.state.player.stop();
+        }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("keydown", this.handleSpaceKey);
     }
