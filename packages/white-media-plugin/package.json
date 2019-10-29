@@ -4,8 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "type-gen": "tsc --emitDeclarationOnly",
-    "dev": "webpack --config webpack.config.js  --watch --progress --colors --mode=development"
+    "type-gen": "tsc --emitDeclarationOnly"
   },
   "types": "dist/index.d.ts",
   "author": "netless",

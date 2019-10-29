@@ -1,7 +1,6 @@
 import * as React from "react";
 import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
 import {Input, message} from "antd";
-const { Search } = Input;
 import "./index.less";
 import {IframeController} from "./IframeController";
 import iframe_close from "./image/iframe_close.svg";
@@ -11,7 +10,6 @@ import fix_icon from "./image/fix_icon.svg";
 import editor_icon from "./image/editor_icon.svg";
 import uneditor_icon from "./image/uneditor_icon.svg";
 import netless_gray from "./image/netless_gray.svg";
-import BraftEditor from "braft-editor";
 
 export type IframeComponentProps = PluginComponentProps & {
     readonly netlessState: any;
@@ -74,7 +72,7 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
         const {isClickDisable, submitUrl} = this.state;
         if (submitUrl) {
             return (
-                <iframe frameBorder="no" className="iframe-box-body" style={{pointerEvents: isClickDisable ? "auto" : "none"}} id="calculation" src={submitUrl}/>
+                <iframe frameBorder="no" className="iframe-box-body"  style={{pointerEvents: "auto"}} id="calculation" src={submitUrl}/>
             );
         } else {
             return (
