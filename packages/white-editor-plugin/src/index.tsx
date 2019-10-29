@@ -7,36 +7,36 @@ import iframe_max from "./image/iframe_max.svg";
 import fix_icon from "./image/fix_icon.svg";
 import editor_icon from "./image/editor_icon.svg";
 import uneditor_icon from "./image/uneditor_icon.svg";
-import "./Editor.less";
+import "./index.less";
 import "braft-editor/dist/index.css";
 
-export type EditorProps = PluginComponentProps & {
+export type WhiteEditorPluginProps = PluginComponentProps & {
     editorState: any;
 };
 
-export type EditorStates = {
+export type WhiteEditorPluginStates = {
     selfEditorState: EditorState;
     isClickDisable: boolean;
 };
 
 
-export class Editor extends React.Component<EditorProps, EditorStates> {
+export class WhiteEditorPlugin extends React.Component<WhiteEditorPluginProps, WhiteEditorPluginStates> {
 
-    public static readonly protocol: string = "editor";
-    public static readonly backgroundProps: Partial<EditorProps> = {editorState: "<p>Hello <b>World!</b></p>"};
+    public static readonly protocol: string = "white-editor-plugin";
+    public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {editorState: "<p>Hello <b>World!</b></p>"};
 
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;
     }
 
-    public constructor(props: EditorProps) {
+    public constructor(props: WhiteEditorPluginProps) {
         super(props);
         this.state = {
             selfEditorState: BraftEditor.createEditorState("<p>Hello <b>World!</b></p>"),
             isClickDisable: false,
         };
     }
-    public UNSAFE_componentWillReceiveProps(nextProps: EditorProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: WhiteEditorPluginProps): void {
         const selfEditorStateData = this.state.selfEditorState.toRAW();
         if (nextProps.editorState !== this.props.editorState) {
             if (nextProps.editorState !== selfEditorStateData) {

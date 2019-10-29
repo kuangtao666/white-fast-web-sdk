@@ -2,16 +2,16 @@ import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps } from "white-react-sdk";
 import Video from "./Video";
 
-export type VideoPluginProps = PluginComponentProps & {
+export type WhiteVideoPluginProps = PluginComponentProps & {
     readonly videoURL: string;
     readonly play: boolean;
     readonly seek: number;
 };
 
-export default class VideoPlugin extends React.Component<VideoPluginProps> {
+export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps> {
 
     public static readonly protocol: string = "media";
-    public static readonly backgroundProps: Partial<VideoPluginProps> = {};
+    public static readonly backgroundProps: Partial<WhiteVideoPluginProps> = {};
 
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;

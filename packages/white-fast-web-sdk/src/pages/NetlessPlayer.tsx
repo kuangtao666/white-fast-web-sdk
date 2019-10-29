@@ -12,12 +12,12 @@ import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
 import "video.js/dist/video-js.css";
-import {Editor} from "white-editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
-import {Iframe} from "white-iframe";
+import {WhiteIframePlugin} from "white-iframe-plugin";
+import {WhiteEditorPlugin} from "white-editor-plugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
@@ -95,7 +95,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             this.setState({isManagerOpen: true});
         }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk({plugins: [Iframe, Editor]});
+            const whiteWebSdk = new WhiteWebSdk({plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,

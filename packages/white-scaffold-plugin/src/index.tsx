@@ -1,13 +1,13 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps } from "white-react-sdk";
-export type CounterComponentProps = PluginComponentProps & {
+export type WhiteScaffoldPluginProps = PluginComponentProps & {
     readonly count: number;
 };
 
-export default class CounterComponent extends React.Component<CounterComponentProps> {
+export default class WhiteScaffoldPlugin extends React.Component<WhiteScaffoldPluginProps> {
 
-    public static readonly protocol: string = "scaffold";
-    public static readonly backgroundProps: Partial<CounterComponentProps> = { count: 0 };
+    public static readonly protocol: string = "white-scaffold-plugin";
+    public static readonly backgroundProps: Partial<WhiteScaffoldPluginProps> = { count: 0 };
 
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;

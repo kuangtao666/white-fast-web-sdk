@@ -38,8 +38,8 @@ import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
-import {Iframe} from "white-iframe";
-import {Editor} from "white-editor";
+import {WhiteIframePlugin} from "white-iframe-plugin";
+import {WhiteEditorPlugin} from "white-editor-plugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -179,9 +179,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [Iframe, Editor]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [Iframe]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});

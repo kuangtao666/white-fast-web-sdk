@@ -20,9 +20,9 @@ export type IframeComponentStates =  {
     submitUrl: string;
 };
 
-export class Iframe extends React.Component<IframeComponentProps, IframeComponentStates > {
+export class WhiteIframePlugin extends React.Component<IframeComponentProps, IframeComponentStates > {
 
-    public static readonly protocol: string = "iframe";
+    public static readonly protocol: string = "white-iframe-plugin";
     // public static readonly backgroundProps: Partial<IframeComponentProps> = {netlessState: string};
     public constructor(props: IframeComponentProps) {
         super(props);
