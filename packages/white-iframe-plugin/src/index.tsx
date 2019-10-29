@@ -1,5 +1,7 @@
 import * as React from "react";
 import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
+import {Input, message} from "antd";
+const { Search } = Input;
 import "./index.less";
 import {IframeController} from "./IframeController";
 import iframe_close from "./image/iframe_close.svg";
@@ -9,6 +11,7 @@ import fix_icon from "./image/fix_icon.svg";
 import editor_icon from "./image/editor_icon.svg";
 import uneditor_icon from "./image/uneditor_icon.svg";
 import netless_gray from "./image/netless_gray.svg";
+import BraftEditor from "braft-editor";
 
 export type IframeComponentProps = PluginComponentProps & {
     readonly netlessState: any;
@@ -48,18 +51,30 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
 
     public componentDidMount(): void {
         this.iframeController = new IframeController("calculation", this.setGlobalState);
+        const selfNetlessState = this.props.netlessState;
+        if (selfNetlessState && selfNetlessState.submitUrl) {
+            this.setState({url: selfNetlessState.submitUrl, submitUrl: selfNetlessState.submitUrl});
+        }
     }
     private setGlobalState = (netlessState: any) => {
         this.props.setProps(this.props.uuid, {
             netlessState: netlessState,
         });
     }
-
+    private validURL = (str: string): boolean => {
+        const pattern = new RegExp("^(https?:\\/\\/)?" + // protocol
+            "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+            "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+            "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+            "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+            "(\\#[-a-z\\d_]*)?$", "i"); // fragment locator
+        return pattern.test(str);
+    }
     private renderIframe = (): React.ReactNode => {
         const {isClickDisable, submitUrl} = this.state;
         if (submitUrl) {
             return (
-                <iframe frameBorder="no" className="iframe-box-body-" style={{pointerEvents: isClickDisable ? "auto" : "none"}} id="calculation" src={submitUrl}/>
+                <iframe frameBorder="no" className="iframe-box-body" style={{pointerEvents: isClickDisable ? "auto" : "none"}} id="calculation" src={submitUrl}/>
             );
         } else {
             return (
@@ -73,17 +88,17 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
         this.setState({url: evt.target.value});
     }
 
-    private submitUrl = (): void => {
-        this.setState({submitUrl: this.state.url});
-        this.iframeController.setIframeState({submitUrl: this.state.url});
-        this.setGlobalState({
-            ...this.iframeController.getIframeState,
-            submitUrl: this.state.url,
-        });
-    }
-
-    private handleInputFocus = (evt: any): void => {
-        console.log(evt);
+    private submitUrl = (evt: any): void => {
+        const url = evt.target.value;
+        if (this.validURL(url)) {
+            this.iframeController.setIframeState({submitUrl: evt.target.value});
+            this.setGlobalState({
+                ...this.iframeController.getIframeState,
+                submitUrl: evt.target.value,
+            });
+        } else {
+            message.warning("输入网址有误，请检查后重新输入");
+        }
     }
     public render(): React.ReactNode {
         const {width, height} = this.props;
@@ -103,10 +118,15 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
                                 <img  style={{width: 6}} src={iframe_max}/>
                             </div>
                         </div>
-                        <input className="iframe-box-search"
-                               style={{pointerEvents: "auto"}}
-                               value={this.state.url} onFocus={this.handleInputFocus}
-                               onChange={this.handleUrlChange}/>
+                        <div style={{pointerEvents: "auto"}} className="iframe-box-search">
+                            <Input
+                                onPressEnter={this.submitUrl}
+                                value={this.state.url}
+                                onChange={this.handleUrlChange}
+                                placeholder="输入网址"
+                                style={{pointerEvents: "auto"}}
+                            />
+                        </div>
                         <div className="iframe-box-nav-right">
                             <div className="iframe-box-nav-right-btn">
                                 <img src={fix_icon}/>

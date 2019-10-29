@@ -60,13 +60,13 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
             this.setState({activeKey: evt});
         }
     }
-    private insertPlugin = (protocal: string): void => {
+    private insertPlugin = (protocal: string, width: number, height: number): void => {
         this.props.room.insertPlugin({
             protocal: protocal,
             centerX: 0,
             centerY: 0,
-            width: 600,
-            height: 600,
+            width: width,
+            height: height,
         });
     }
     public render(): React.ReactNode {
@@ -79,14 +79,14 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                         <div className="extend-icon-out-box">
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Web page" : "H5 课件"}>
-                                    <div onClick={() => this.insertPlugin("white-iframe-plugin")} className="extend-inner-icon">
+                                    <div onClick={() => this.insertPlugin("white-iframe-plugin", 860, 600)} className="extend-inner-icon">
                                         <img src={web_plugin}/>
                                     </div>
                                 </Tooltip>
                             </div>
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Editor" : "文本编辑器"}>
-                                    <div onClick={() => this.insertPlugin("white-editor-plugin")} className="extend-inner-icon">
+                                    <div onClick={() => this.insertPlugin("white-editor-plugin", 720, 600)} className="extend-inner-icon">
                                         <img src={editor_plugin}/>
                                     </div>
                                 </Tooltip>
