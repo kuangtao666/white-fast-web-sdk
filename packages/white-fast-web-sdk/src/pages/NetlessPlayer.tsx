@@ -6,20 +6,18 @@ import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
-import * as full_screen from "../assets/image/full_screen.svg";
-import * as exit_full_screen from "../assets/image/exit_full_screen.svg";
 import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import PageError from "../components/PageError";
 import "video.js/dist/video-js.css";
-import {Iframe} from "../components/Iframe";
-import {Editor} from "../components/Editor";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
+import {WhiteIframePlugin} from "white-iframe-plugin";
+import {WhiteEditorPlugin} from "white-editor-plugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
@@ -37,6 +35,7 @@ export type PlayerPageProps = {
     roomName?: string;
     language?: LanguageEnum;
     isManagerOpen?: boolean;
+    getRemoveFunction: (func: () => void) => void;
 };
 
 
@@ -75,13 +74,16 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         };
     }
 
-    public componentWillReceiveProps(nextProps: PlayerPageProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: PlayerPageProps): void {
         if (this.props.isManagerOpen !== nextProps.isManagerOpen && nextProps.isManagerOpen === false) {
             this.setState({seenMessagesLength: this.state.messages.length});
         }
     }
 
     public async componentDidMount(): Promise<void> {
+        this.props.getRemoveFunction(this.remove);
+        window.addEventListener("resize", this.onWindowResize);
+        window.addEventListener("keydown", this.handleSpaceKey);
         const {player} = this.state;
         if (player) {
             player.addMagixEventListener("message",  event => {
@@ -93,7 +95,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             this.setState({isManagerOpen: true});
         }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk({plugins: [Iframe, Editor]});
+            const whiteWebSdk = new WhiteWebSdk({plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,
@@ -149,13 +151,11 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             this.onClickOperationButton(this.state.player!);
         }
     }
-    public componentWillMount(): void {
-        window.addEventListener("resize", this.onWindowResize);
-        window.addEventListener("keydown", this.handleSpaceKey);
-    }
 
-
-    public componentWillUnmount(): void {
+    public remove = (): void => {
+        if (this.state.player) {
+            this.state.player.stop();
+        }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("keydown", this.handleSpaceKey);
     }

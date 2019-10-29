@@ -11,7 +11,18 @@ declare module "*.png" {
     const content: string;
     export = content;
 }
-
+declare module "react-identicons" {
+    const Identicon: any;
+    export default Identicon;
+}
+declare module "react-draggable" {
+    const Draggable: any;
+    export default Draggable;
+}
+declare module "react-clipboard.js" {
+    const Clipboard: any;
+    export default Clipboard;
+}
 
 declare module "@livechat/ui-kit" {
     export const ThemeProvider: any;

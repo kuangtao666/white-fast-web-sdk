@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Badge, Tabs, Icon, message} from "antd";
 import "./WhiteboardManager.less";
-import {Room} from "white-web-sdk";
+import {Room} from "white-react-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {ViewMode} from "white-react-sdk";
@@ -59,7 +59,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             this.setState({messages: [...this.state.messages, event.payload]});
         });
     }
-    public componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
         if (this.props.cameraState !== undefined && this.props.disableCameraTransform !== undefined && nextProps.cameraState !== undefined && nextProps.disableCameraTransform !== undefined) {
            if (this.props.cameraState !== nextProps.cameraState) {
                this.props.room.setViewMode(nextProps.cameraState);
@@ -263,24 +263,28 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     private renderUserListTitle = (): React.ReactNode => {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         if (this.props.identity === IdentityType.host) {
             return (
                 <Badge dot={this.handleDotState()} overflowCount={99} offset={[8, -2]}>
-                    <div>Users List</div>
+                    <div>{isEnglish ? "Users List" : "用户列表"}</div>
                 </Badge>
             );
         } else {
             return (
-                <div>Users List</div>
+                <div>{isEnglish ? "Users List" : "用户列表"}</div>
             );
         }
     }
 
     private renderChatListTitle = (): React.ReactNode => {
+        const {language} = this.props;
+        const isEnglish = language === LanguageEnum.English;
         const isActive = this.state.activeKey === "2";
         return (
             <Badge overflowCount={99} offset={[8, -2]} count={isActive ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
-                <div>Live Chat</div>
+                <div>{isEnglish ? "Live Chat" : "聊天群组"}</div>
             </Badge>
         );
     }

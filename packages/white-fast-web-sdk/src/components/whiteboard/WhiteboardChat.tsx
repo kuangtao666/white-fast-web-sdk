@@ -11,7 +11,7 @@ import {
     TextInput,
     SendButton,
 } from "@livechat/ui-kit";
-import {Room, Player} from "white-web-sdk";
+import {Room, Player} from "white-react-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
@@ -83,7 +83,7 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         }
     }
 
-    public async componentWillReceiveProps(): Promise<void> {
+    public async UNSAFE_componentWillReceiveProps(): Promise<void> {
         await timeout(0);
         this.scrollToBottom();
     }

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {RouteComponentProps, withRouter} from "react-router";
+import {RouteComponentProps} from "react-router";
 import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
@@ -13,10 +13,11 @@ export type WhiteboardPageProps = RouteComponentProps<{
 
 export type WhiteboardPageState = {
     recordData: RecordDataType | null;
-    room: any;
+    room: any,
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
-class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
+export default class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
+    private netlessRoom: any;
     public constructor(props: WhiteboardPageProps) {
         super(props);
         this.state = {
@@ -60,14 +61,14 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         const {userId, uuid, identityType} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
         if (roomToken) {
-            WhiteFastSDK.Room("whiteboard", {
+           this.netlessRoom = WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
                 roomToken: roomToken,
                 userId: userId,
                 // userName: "伍双",
                 // roomName: "伍双的房间",
                 // userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black.svg",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
                 loadingSvgUrl: "",
                 clickLogoCallback: () => {
                     // this.props.history.push("/");
@@ -87,7 +88,7 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
                     token: "8595fd46955f427db44b4e9ba90f015d",
                 },
                 identity: identityType,
-                language: "English",
+                language: "Chinese",
                 toolBarPosition: "left",
                 isManagerOpen: true,
                 uploadToolBox: [
@@ -144,8 +145,8 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
     }
 
     public componentWillUnmount(): void {
-        if (this.state.room) {
-            this.state.room.disconnect();
+        if (this.netlessRoom) {
+            this.netlessRoom.release();
         }
     }
 
@@ -156,4 +157,3 @@ class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPage
         );
     }
 }
-export default withRouter(WhiteboardPage);

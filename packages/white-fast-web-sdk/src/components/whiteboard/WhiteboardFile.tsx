@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./WhiteboardFile.less";
-import {Room} from "white-web-sdk";
+import {Room} from "white-react-sdk";
 import * as close from "../../assets/image/close.svg";
 import * as default_cover from "../../assets/image/default_cover.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";

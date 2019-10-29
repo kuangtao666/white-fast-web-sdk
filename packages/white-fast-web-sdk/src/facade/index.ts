@@ -7,3 +7,4 @@ const FastSDK: FastSDK = {
 };
 (window as any).WhiteFastSDK = FastSDK;
 export default FastSDK;
+export type NetlessType = {release: () => void};

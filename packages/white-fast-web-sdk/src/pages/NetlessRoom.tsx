@@ -14,6 +14,7 @@ import {
     MemberState,
     ViewMode,
     DeviceType,
+    PluginComponentClass,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
@@ -35,12 +36,11 @@ import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
-import {Iframe} from "../components/Iframe";
-import {Editor} from "../components/Editor";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
-const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 import "./NetlessRoom.less";
-import {CounterComponent} from "../components/Counter";
+import {WhiteIframePlugin} from "white-iframe-plugin";
+import {WhiteEditorPlugin} from "white-editor-plugin";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
     AnnexBox = "AnnexBox",
@@ -107,6 +107,7 @@ export type RealTimeProps = {
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
     isManagerOpen?: boolean;
+    getRemoveFunction: (func: () => void) => void;
 };
 
 export enum ToolBarPositionEnum {
@@ -149,6 +150,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
+    private menuChild: React.Component;
     public constructor(props: RealTimeProps) {
         super(props);
         this.state = {
@@ -177,9 +179,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, plugins: [Iframe, Editor, CounterComponent]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [Iframe, Editor, CounterComponent]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -239,20 +241,18 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             this.state.room.refreshViewSize();
         }
     }
-    public componentWillMount(): void {
+    public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
+        this.props.getRemoveFunction(this.remove);
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
-           if (isMobile) {
-               this.setState({deviceType: DeviceType.Touch});
-           } else {
-               this.setState({deviceType: DeviceType.Desktop});
-           }
+            if (isMobile) {
+                this.setState({deviceType: DeviceType.Touch});
+            } else {
+                this.setState({deviceType: DeviceType.Desktop});
+            }
         }
-    }
-
-    public async componentDidMount(): Promise<void> {
         await this.startJoinRoom();
         this.onWindowResize();
         if (this.state.room && this.state.room.state.roomMembers) {
@@ -260,11 +260,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
-    public async componentWillUnmount(): Promise<void> {
+    private remove = (): void => {
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
-            await this.state.room.disconnect();
+            this.state.room.disconnect();
         }
         if (this.roomManager) {
             this.roomManager.stop();
@@ -289,11 +289,22 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({whiteboardLayerDownRef: whiteboardLayerDownRef});
     }
 
-    private handleAnnexBoxMenuState = (): void => {
-        this.setState({
-            isMenuVisible: !this.state.isMenuVisible,
-            menuInnerState: MenuInnerType.AnnexBox,
-        });
+    private handleAnnexBoxMenuState = async (): Promise<void> => {
+        if (this.state.isMenuVisible) {
+            if (this.menuChild) {
+                this.menuChild.setState({isMenuOpen: false});
+            }
+            await timeout(200);
+            this.setState({
+                isMenuVisible: !this.state.isMenuVisible,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        } else {
+            this.setState({
+                isMenuVisible: !this.state.isMenuVisible,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        }
     }
 
     private isImageType = (type: string): boolean => {
@@ -338,6 +349,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 break;
             }
         }
+    }
+    private onRef = (ref: React.Component) => {
+        this.menuChild = ref;
     }
     private setPreviewMenuState = (state: boolean) => {
         this.setState({isPreviewMenuOpen: state});
@@ -411,7 +425,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private renderExtendTool = (): React.ReactNode => {
         if (!isMobile) {
             return (
-                <ExtendTool userId={this.props.userId}
+                <ExtendTool
+                    userId={this.props.userId}
                     language={this.props.language}
                     toolBarPosition={this.props.toolBarPosition}/>
             );
@@ -460,7 +475,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     room: room,
                 }}>
                     <div className="realtime-box">
-                        <MenuBox
+                        <MenuBox language={this.props.language} onRef={this.onRef}
+                            isSidePreview={this.state.menuInnerState === MenuInnerType.AnnexBox}
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setPreviewMenuState}
                             isVisible={this.state.isMenuVisible}

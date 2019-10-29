@@ -109,10 +109,9 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         }
     }
 
-    public componentWillMount(): void {
+    public componentDidMount(): void {
         this.setState({extendsPanel: false, windowHeight: window.innerHeight});
     }
-
     private onVisibleChange = (visible: boolean): void => {
         if (!visible) {
             this.setState({extendsPanel: false});

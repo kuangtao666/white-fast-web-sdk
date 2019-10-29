@@ -5,6 +5,7 @@ import TweenOne from "rc-tween-one";
 import {Room, RoomState, Scene} from "white-react-sdk";
 import "./MenuAnnexBox.less";
 import {LanguageEnum} from "../../pages/NetlessRoom";
+import VirtualList, {ItemInfo} from "react-tiny-virtual-list";
 
 export type MenuAnnexBoxState = {
     isFocus: boolean,
@@ -92,38 +93,6 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
         const sceneDir = roomState.sceneState.scenePath.split("/");
         sceneDir.pop();
         const activeIndex = roomState.sceneState.index;
-        const renderPages = scenes.map((scene: Scene, index: number): React.ReactNode => {
-            const isActive = index === activeIndex;
-            return (
-                    <div
-                        key={`${scene.name}${index}`}
-                        className={isActive ? "page-out-box-active" : "page-out-box"}
-                        onMouseEnter={() => this.setState({hoverCellIndex: index})}
-                        onMouseLeave={() => this.setState({hoverCellIndex: null})}
-                        >
-                        <div className="page-box-inner-index-left">{index + 1}</div>
-                        <div
-                            onFocus={() => this.setState({isFocus: true})}
-                            onBlur={() => this.setState({isFocus: false})}
-                            onClick={() => {
-                            this.setScenePath(index);
-                        }} className="page-mid-box">
-                            <div className="page-box">
-                                <PageImage
-                                    isMenuOpen={this.props.isPreviewMenuOpen}
-                                    scene={scene}
-                                    room={this.props.room}
-                                    path={sceneDir.concat(scene.name).join("/")}/>
-                            </div>
-                        </div>
-                        <div className="page-box-inner-index-delete-box">
-                            {this.renderClose(index, isActive)}
-                        </div>
-                    </div>
-
-            );
-        });
-
         return (
             <div
                 ref={ref => this.ref = ref} className="menu-annex-box">
@@ -136,7 +105,41 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                     </div>
                 </div>
                 <div style={{height: 42}}/>
-                {renderPages}
+                <VirtualList
+                    height={"calc(100vh - 84px)"}
+                    itemCount={scenes.length}
+                    itemSize={157.5}
+                    renderItem={(itemInfo: ItemInfo) => {
+                        const cell = scenes[itemInfo.index];
+                        const isActive = itemInfo.index === activeIndex;
+                        return <div
+                            key={itemInfo.index}
+                            style={itemInfo.style}
+                            className={isActive ? "page-out-box-active" : "page-out-box"}
+                            onMouseEnter={() => this.setState({hoverCellIndex: itemInfo.index})}
+                            onMouseLeave={() => this.setState({hoverCellIndex: null})}
+                        >
+                            <div className="page-box-inner-index-left">{itemInfo.index + 1}</div>
+                            <div
+                                onFocus={() => this.setState({isFocus: true})}
+                                onBlur={() => this.setState({isFocus: false})}
+                                onClick={() => {
+                                    this.setScenePath(itemInfo.index);
+                                }} className="page-mid-box">
+                                <div className="page-box">
+                                    <PageImage
+                                        isMenuOpen={this.props.isPreviewMenuOpen}
+                                        scene={cell}
+                                        room={this.props.room}
+                                        path={sceneDir.concat(cell.name).join("/")}/>
+                                </div>
+                            </div>
+                            <div className="page-box-inner-index-delete-box">
+                                {this.renderClose(itemInfo.index, isActive)}
+                            </div>
+                        </div>;
+                    }}
+                />
                 <div style={{height: 42}}/>
                 <div className="menu-under-btn">
                     <div
@@ -170,7 +173,7 @@ class PageImage extends React.Component<PageImageProps, {}> {
     public constructor(props: any) {
         super(props);
     }
-    public componentWillReceiveProps(nextProps: PageImageProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: PageImageProps): void {
         const ref = this.ref;
         if (nextProps.isMenuOpen !== this.props.isMenuOpen && nextProps.isMenuOpen && ref) {
             this.props.room.scenePreview(this.props.path, ref, 192, 112.5);

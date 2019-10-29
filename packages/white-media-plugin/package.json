@@ -4,21 +4,20 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "type-gen": "tsc --emitDeclarationOnly",
-    "dev": "webpack --config webpack.config.js  --watch --progress --colors --mode=development"
+    "type-gen": "tsc --emitDeclarationOnly"
   },
   "types": "dist/index.d.ts",
   "author": "netless",
   "license": "MIT",
   "dependencies": {
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
-    "white-web-sdk": "^2.3.7"
+    "react": "~16.8.0",
+    "react-dom": "~16.8.0",
+    "white-react-sdk": "^2.3.10"
   },
   "peerDependencies": {
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
-    "white-web-sdk": "^2.3.7"
+    "react": "~16.8.0",
+    "react-dom": "~16.8.0",
+    "white-react-sdk": "^2.3.10"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
