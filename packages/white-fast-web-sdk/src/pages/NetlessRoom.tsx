@@ -23,7 +23,7 @@ import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft"
 import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRight";
 import MenuBox from "../components/menu/MenuBox";
 import MenuAnnexBox from "../components/menu/MenuAnnexBox";
-import {ossConfigObj} from "../appToken";
+import {ossConfigObj, OSSConfigObjType} from "../appToken";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox/index";
 import UploadBtn from "../tools/upload/UploadBtn";
@@ -38,8 +38,6 @@ import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
-import {WhiteIframePlugin} from "white-iframe-plugin";
-import {WhiteEditorPlugin} from "white-editor-plugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -109,6 +107,7 @@ export type RealTimeProps = {
     isManagerOpen?: boolean;
     getRemoveFunction: (func: () => void) => void;
     elementId: string;
+    ossConfigObj?: OSSConfigObjType;
 };
 
 export enum ToolBarPositionEnum {
@@ -145,6 +144,7 @@ export type RealTimeStates = {
     isManagerOpen: boolean;
     deviceType: DeviceType;
     classMode?: ClassModeType,
+    ossConfigObj: OSSConfigObjType,
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
@@ -170,6 +170,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             deviceType: DeviceType.Desktop,
             isManagerOpen: this.props.isManagerOpen ? this.props.isManagerOpen : false,
             classMode: this.props.classMode ? this.props.classMode : ClassModeType.discuss,
+            ossConfigObj: this.props.ossConfigObj ? this.props.ossConfigObj : ossConfigObj,
         };
         this.cursor = new UserCursor();
     }
@@ -180,9 +181,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch, plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " "});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -317,6 +318,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         rejectedFiles: File[],
         event: React.DragEvent<HTMLDivElement>): Promise<void> => {
         event.persist();
+        const {ossConfigObj} = this.state;
         try {
             const imageFiles = acceptedFiles.filter(file => this.isImageType(file.type));
             const client = new OSS({
@@ -553,7 +555,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                     <UploadBtn
                                         toolBarPosition={this.props.toolBarPosition}
                                         deviceType={this.state.deviceType}
-                                        oss={ossConfigObj}
+                                        oss={this.state.ossConfigObj}
                                         room={room}
                                         uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}
@@ -561,7 +563,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
-                                    this.renderExtendTool(),
+                                    // this.renderExtendTool(),
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>

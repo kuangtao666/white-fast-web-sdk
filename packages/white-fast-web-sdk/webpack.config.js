@@ -59,6 +59,7 @@ module.exports = {
                     {
                         loader: 'less-loader', // compiles Less to CSS
                         options: {
+                            modifyVars: require("./theme").antd,
                             javascriptEnabled: true,
                         }
                     },
