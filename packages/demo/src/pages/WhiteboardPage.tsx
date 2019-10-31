@@ -117,6 +117,14 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 roomCallback: (room: any) => {
                     this.setState({room: room});
                 },
+               ossConfigObj: {
+                   accessKeyId: "LTAIwHZFXsXh9yaG",
+                   accessKeySecret: "9FE19EMIG3pWzVElJn1iolz66XxPkO",
+                   bucket: "netless-agora-whiteboard",
+                   region: "oss-cn-hangzhou",
+                   folder: "ppt",
+                   prefix: "https://netless-agora-whiteboard.oss-cn-hangzhou.aliyuncs.com/",
+               },
                 pagePreviewPosition: "right",
                 boardBackgroundColor: "#F2F2F2",
                 isReadOnly: false,

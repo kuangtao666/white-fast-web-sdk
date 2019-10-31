@@ -1,7 +1,0 @@
-0 silly argv { _: [ 'bootstrap' ], lernaVersion: '3.16.5', '$0': 'lerna' }
-1 notice cli v3.16.5
-2 verbose rootPath /Users/wushuang/netless-open-source/whiteboard-designer
-3 error JSONError: Unexpected token } in JSON at position 1764 while parsing near '...b-sdk": "^1.1.1",  },  "devDependencie...' in packages/demo/package.json
-3 error     at module.exports (/Users/wushuang/netless-open-source/whiteboard-designer/node_modules/load-json-file/node_modules/parse-json/index.js:26:19)
-3 error     at parse (/Users/wushuang/netless-open-source/whiteboard-designer/node_modules/load-json-file/index.js:15:9)
-3 error     at pify.then.data (/Users/wushuang/netless-open-source/whiteboard-designer/node_modules/load-json-file/index.js:18:94)

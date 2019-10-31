@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "lerna run --parallel dev",
+    "build:lib": "lerna run --parallel build:lib",
     "boot": "lerna bootstrap"
   },
   "workspaces": [

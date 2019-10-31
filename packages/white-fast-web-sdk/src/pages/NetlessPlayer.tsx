@@ -16,8 +16,6 @@ import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
-import {WhiteIframePlugin} from "white-iframe-plugin";
-import {WhiteEditorPlugin} from "white-editor-plugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type PlayerPageProps = {
     uuid: string;
@@ -36,6 +34,7 @@ export type PlayerPageProps = {
     language?: LanguageEnum;
     isManagerOpen?: boolean;
     getRemoveFunction: (func: () => void) => void;
+    elementId: string;
 };
 
 
@@ -95,7 +94,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             this.setState({isManagerOpen: true});
         }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk({plugins: [WhiteIframePlugin, WhiteEditorPlugin]});
+            const whiteWebSdk = new WhiteWebSdk();
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,
@@ -346,6 +345,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     </div>
                 </div>
                 <PlayerManager
+                    elementId={this.props.elementId}
                     player={player}
                     mediaUrl={this.props.mediaUrl}
                     language={this.props.language}

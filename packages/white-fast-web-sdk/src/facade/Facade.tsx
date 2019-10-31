@@ -8,7 +8,7 @@ import {NetlessType} from "./index";
 export const RoomFacade = (element: string, config: any): NetlessType | undefined => {
     let releaseFuc: (() => void) | undefined = undefined;
     ReactDOM.render(
-        <NetlessRoom getRemoveFunction={(func: () => void) => {
+        <NetlessRoom elementId={element} getRemoveFunction={(func: () => void) => {
             releaseFuc = func;
         }} {...config}/>,
         document.getElementById(element),
@@ -25,7 +25,7 @@ export const RoomFacade = (element: string, config: any): NetlessType | undefine
 export const PlayerFacade = (element: string, config: any): NetlessType | undefined => {
     let releaseFuc: (() => void) | undefined = undefined;
     ReactDOM.render(
-        <NetlessPlayer getRemoveFunction={(func: () => void) => {
+        <NetlessPlayer elementId={element} getRemoveFunction={(func: () => void) => {
             releaseFuc = func;
         }} {...config}/>,
         document.getElementById(element),

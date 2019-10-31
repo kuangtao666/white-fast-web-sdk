@@ -6,7 +6,9 @@
   "main": "dist/index.js",
   "scripts": {
     "type-gen": "tsc --emitDeclarationOnly",
-    "predev": "yarn type-gen"
+    "predev": "yarn type-gen",
+    "dev": "webpack --config webpack.config.js  --watch --progress --colors --mode=development",
+    "build:lib": "webpack --config webpack.config.js"
   },
   "types": "dist/index.d.ts",
   "author": "netless",

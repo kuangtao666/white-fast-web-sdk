@@ -30,6 +30,7 @@ export type WhiteboardManagerProps = {
     userAvatarUrl?: string;
     language?: LanguageEnum;
     rtc?: RtcType;
+    elementId: string;
 };
 
 export type WhiteboardManagerStates = {
@@ -317,6 +318,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         </TabPane>
                         <TabPane tab={this.renderChatListTitle()} key="2">
                             <WhiteboardChat
+                                elementId={this.props.elementId}
                                 identity={this.props.identity}
                                 language={this.props.language}
                                 messages={this.state.messages}
