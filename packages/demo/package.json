@@ -4,7 +4,6 @@
   "main": "./main.js",
   "author": "Wushuang",
   "license": "MIT",
-  "theme": "./theme.js",
   "proxy": "http://localhost:3009/",
   "scripts": {
     "dev": "react-app-rewired start --scripts-version react-scripts-ts",
@@ -25,7 +24,7 @@
   "dependencies": {
     "@netless/fetch-middleware": "^1.0.4",
     "@netless/i18n-react-router": "^1.0.5",
-    "@netless/white-fast-web-sdk": "^1.1.9",
+    "@netless/white-fast-web-sdk": "^1.1.10",
     "white-plugin-scaffold": "^1.0.0",
     "agora-rtc-sdk": "^2.9.0",
     "ali-oss": "^6.1.1",

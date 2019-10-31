@@ -108,6 +108,7 @@ export type RealTimeProps = {
     recordDataCallback?: (data: RecordDataType) => void;
     isManagerOpen?: boolean;
     getRemoveFunction: (func: () => void) => void;
+    elementId: string;
 };
 
 export enum ToolBarPositionEnum {
@@ -569,6 +570,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager
+                            elementId={this.props.elementId}
                             language={this.props.language}
                             uuid={this.props.uuid}
                             userAvatarUrl={this.props.userAvatarUrl}

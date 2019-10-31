@@ -28,6 +28,7 @@ export type WhiteboardChatProps = {
     player?: Player;
     language?: LanguageEnum;
     identity?: IdentityType;
+    elementId: string;
 };
 
 export type WhiteboardChatStates = {
@@ -61,7 +62,15 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
         const isLandscape = (width / height) >= 1;
         this.setState({isLandscape: isLandscape});
     }
-
+    private getElementHeight = (): number => {
+        const {elementId} = this.props;
+        const documentDom = document.getElementById(elementId);
+        if (documentDom) {
+            return documentDom.clientHeight;
+        } else {
+            return window.innerHeight;
+        }
+    }
     public componentWillUnmount(): void {
         window.removeEventListener("resize", this.detectLandscape);
     }
@@ -192,8 +201,8 @@ export default class WhiteboardChat extends React.Component<WhiteboardChatProps,
                     },
                 }}
             >
-                <div className="chat-inner-box">
-                    <div className="chat-box-message">
+                <div style={{height: this.getElementHeight() - 360}} className="chat-inner-box">
+                    <div style={{height: this.getElementHeight() - 407}} className="chat-box-message">
                         {messageNodes !== null ? <MessageList>
                             {messageNodes}
                         </MessageList> : <div className="chat-box-message-empty">

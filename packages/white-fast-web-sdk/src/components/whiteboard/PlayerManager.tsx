@@ -26,6 +26,7 @@ export type PlayerManagerProps = {
     isFirstScreenReady: boolean;
     isChatOpen: boolean;
     mediaUrl?: string;
+    elementId: string;
 };
 
 export type PlayerManagerStates = {
@@ -226,6 +227,7 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                         </TabPane>
                         <TabPane  tab={isEnglish ? "Live chat" : "聊天群组"} key="2">
                             <WhiteboardChat
+                                elementId={this.props.elementId}
                                 language={this.props.language}
                                 messages={this.props.messages}
                                 userAvatarUrl={this.props.userAvatarUrl}

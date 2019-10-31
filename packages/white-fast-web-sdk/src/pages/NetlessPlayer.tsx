@@ -36,6 +36,7 @@ export type PlayerPageProps = {
     language?: LanguageEnum;
     isManagerOpen?: boolean;
     getRemoveFunction: (func: () => void) => void;
+    elementId: string;
 };
 
 
@@ -346,6 +347,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     </div>
                 </div>
                 <PlayerManager
+                    elementId={this.props.elementId}
                     player={player}
                     mediaUrl={this.props.mediaUrl}
                     language={this.props.language}
