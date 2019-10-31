@@ -27,7 +27,6 @@ module.exports = function override(config, env) {
         })
     };
     config = rewireLess.withLoaderOptions({
-        modifyVars: require("./theme").antd,
         javascriptEnabled: true,
     })(config, env);
 
