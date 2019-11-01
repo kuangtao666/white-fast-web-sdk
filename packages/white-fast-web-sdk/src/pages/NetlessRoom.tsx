@@ -108,6 +108,7 @@ export type RealTimeProps = {
     getRemoveFunction: (func: () => void) => void;
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
+    ossUploadCallback?: (state: boolean) => void;
 };
 
 export enum ToolBarPositionEnum {
