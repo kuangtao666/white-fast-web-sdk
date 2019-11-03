@@ -20,9 +20,9 @@
     <div id="app-root"></div>
     <script src="https://sdk.herewhite.com/fast-sdk/index.js"></script>
     <script type="text/javascript">
-        var userId = `${Math.floor(Math.random() * 100000)}`;
-        var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
-        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
+        var userId = `${Math.floor(Math.random() * 100000)}`; // 填写你们的用户 ID
+        var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd"; // 创建房间的时候，netless 返回
+        var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw"; // 创建房间的时候，netless 返回。
         
         WhiteFastSDK.Room("app-root",{
             uuid: uuid, // 必须，需要播放房间的 id
@@ -35,7 +35,37 @@
             pagePreviewPosition: "right", // 可选，预览侧边的位置
             boardBackgroundColor: "#F2F2F2", // 可选，白板背景颜色
             isReadOnly: false, // 可选，订阅者是否可以操作
-            identity: "host", // 可选，身份
+            identity: "host", // 可选，身份 host, guest, listener
+          	rtc: {
+              type: "agora",
+              rtcObj: AgoraRTC,
+              token: "8595fd46955f427db44b4e9ba90f015d",
+            }, // 可选，这里以声网为例
+    				language: "Chinese", // 启用英文为 "English"
+        		isManagerOpen: true, // 侧边控制栏目是否默认打开
+            uploadToolBox: [
+              {
+                enable: true, // true 为启用， false 为尽用
+                type: "image", // image（图片）、static_conversion（静态 ppt）、dynamic_conversion (动态 ppt)
+                icon: "", // 图片 icon
+                title: "", // 标题
+                script: "", // 描述
+              },
+              {
+                enable: true,
+                type: "static_conversion",
+                icon: "",
+                title: "",
+                script: "",
+              },
+              {
+                enable: true,
+                type: "dynamic_conversion",
+                icon: "",
+                title: "",
+                script: "",
+              },
+            ], // 侧边上传按钮是否启用
             defaultColorArray: [
                 "#E77345",
                 "#005BF6",
@@ -48,8 +78,31 @@
                 console.log(room);
             },  // 可选，底层 SDK Room 对象回调，Room 对象可以用来使用底层 SDK 能力深度使用白板功能。具体参见 https://developer.netless.link
             colorArrayStateCallback: (colorArray) => {
-                console.log(colorArray);
-            }, // 可选, 教具添加新颜色后回调
+               // 可选, 教具添加新颜色后回调
+            }, 
+          	clickLogoCallback: () => {
+               // 点击左上角 logo 触发的方法
+            },
+            exitRoomCallback: () => {
+              // 点击左上角弹出对话框后，选择退出房间的回调
+            },
+            recordDataCallback: (data) => {
+              // 结束录制后返回的数据 数据类型是 data: {startTime?: number, endTime?: number, mediaUrl?: string}
+            },
+            replayCallback: () => {
+              // 点击左上角弹出对话框后，选择进入回放后的回调
+            },
+          	ossConfigObj: {
+              accessKeyId: "xxx",
+              accessKeySecret: "xxx",
+              bucket: "xxx",
+              region: "xxx",
+              folder: "xxx",
+              prefix: "xxx",
+            },// 如果需要配置自己的云存储则，以上信息。如果不填写会启用 netless 的存储。
+          ossUploadCallback: (state: boolean, err: any) => {
+							// state 为 true 是成功， 为 false 是失败。err 是报错信息
+          },
         });
     </script>
 </body>
