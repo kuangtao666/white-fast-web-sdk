@@ -17,6 +17,10 @@ import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
+export enum LayoutType {
+    Suspension = "Suspension",
+    Side = "Side",
+}
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
@@ -35,6 +39,7 @@ export type PlayerPageProps = {
     isManagerOpen?: boolean;
     getRemoveFunction: (func: () => void) => void;
     elementId: string;
+    layoutType?: LayoutType;
 };
 
 
@@ -50,6 +55,7 @@ export type PlayerPageStates = {
     isVisible: boolean;
     replayFail: boolean;
     isManagerOpen: boolean;
+    layoutType: LayoutType;
 };
 
 export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> {
@@ -70,6 +76,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             isVisible: false,
             replayFail: false,
             isManagerOpen: this.props.isManagerOpen !== undefined ? this.props.isManagerOpen : false,
+            layoutType: this.props.layoutType !== undefined ? this.props.layoutType : LayoutType.Side,
         };
     }
 
@@ -319,6 +326,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         logoUrl={this.props.logoUrl}/>
                     {player && <PlayerTopRight
                         userId={userId}
+                        layoutType={this.state.layoutType}
                         player={player}
                         isFirstScreenReady={this.state.isFirstScreenReady}
                         handleManagerState={this.handleManagerState}
@@ -344,6 +352,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             player={player}/>}
                     </div>
                 </div>
+                {this.state.layoutType === LayoutType.Side &&
                 <PlayerManager
                     elementId={this.props.elementId}
                     player={player}
@@ -356,6 +365,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     handleManagerState={this.handleManagerState}
                     isManagerOpen={this.state.isManagerOpen}
                     uuid={uuid}/>
+                }
             </div>
         );
     }
