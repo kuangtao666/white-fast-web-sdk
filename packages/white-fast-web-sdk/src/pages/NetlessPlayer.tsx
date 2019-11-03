@@ -298,6 +298,24 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         this.onWindowResize();
     }
 
+    private renderMedia = (): React.ReactNode => {
+        const {mediaUrl} = this.props;
+        if (mediaUrl) {
+            return (
+                <Draggable bounds="parent">
+                    <div className="player-video-out">
+                        <video
+                            poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
+                            className="video-js video-layout"
+                            id="white-sdk-video-js"/>
+                    </div>
+                </Draggable>
+            );
+        } else {
+            return null;
+        }
+    }
+
 
     private renderLoading = (): React.ReactNode => {
         const {player} = this.state;
