@@ -73,11 +73,7 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
         window.removeEventListener("resize", this.detectLandscape);
     }
     private handleTabsChange = (evt: any): void => {
-        if (evt === "1") {
-            this.setState({activeKey: evt});
-        } else {
-            this.setState({activeKey: evt});
-        }
+        this.setState({activeKey: evt});
     }
 
     private renderGuest = (): React.ReactNode => {
@@ -127,11 +123,6 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
     }
     private handleManagerStyle = (): string => {
         if (this.props.isManagerOpen) {
-            // if (this.state.isLandscape) {
-            //     return "manager-box";
-            // } else {
-            //     return "manager-box-mask";
-            // }
             return "manager-box";
         } else {
             return "manager-box-mask-close";
@@ -220,12 +211,7 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                 {this.renderHostInf()}
                 <div className="chat-box-switch">
                     <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                        <TabPane tab={isEnglish ? "Users list" : "用户列表"} key="1">
-                            <div className="guest-box">
-                                {this.renderGuest()}
-                            </div>
-                        </TabPane>
-                        <TabPane  tab={isEnglish ? "Live chat" : "聊天群组"} key="2">
+                        <TabPane  tab={isEnglish ? "Live chat" : "聊天群组"} key="1">
                             <WhiteboardChat
                                 elementId={this.props.elementId}
                                 language={this.props.language}
@@ -234,6 +220,11 @@ export default class PlayerManager extends React.Component<PlayerManagerProps, P
                                 userId={this.props.userId}
                                 userName={this.props.userName}
                                 player={this.props.player}/>
+                        </TabPane>
+                        <TabPane tab={isEnglish ? "Users list" : "用户列表"} key="2">
+                            <div className="guest-box">
+                                {this.renderGuest()}
+                            </div>
                         </TabPane>
                     </Tabs>
                 </div>

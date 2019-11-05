@@ -108,6 +108,7 @@ export type RealTimeProps = {
     getRemoveFunction: (func: () => void) => void;
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
+    ossUploadCallback?: (res: any) => void;
 };
 
 export enum ToolBarPositionEnum {
@@ -555,7 +556,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                     <UploadBtn
                                         toolBarPosition={this.props.toolBarPosition}
                                         deviceType={this.state.deviceType}
-                                        oss={this.state.ossConfigObj}
+                                        oss={this.state.ossConfigObj} ossUploadCallback={this.props.ossUploadCallback}
                                         room={room}
                                         uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}

@@ -6,6 +6,7 @@ import menu_out from "../../assets/image/menu_out.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
+import {LayoutType} from "../../pages/NetlessPlayer";
 
 export type PlayerTopRightProps = {
     userId: string;
@@ -17,6 +18,7 @@ export type PlayerTopRightProps = {
     language?: LanguageEnum;
     isManagerOpen: boolean;
     isFirstScreenReady: boolean;
+    layoutType: LayoutType;
 };
 
 export type PlayerTopRightStates = {
@@ -85,19 +87,32 @@ export default class PlayerTopRight extends React.Component<PlayerTopRightProps,
             );
         }
     }
-    public render(): React.ReactNode {
+
+    private renderMenu = (): React.ReactNode => {
         const  {isManagerOpen} = this.props;
+        if (this.props.layoutType === LayoutType.Side) {
+            if (!isManagerOpen) {
+                return (
+                    <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+                        <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                            <img style={{width: 16}} src={menu_out}/>
+                        </div>
+                    </Badge>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+    public render(): React.ReactNode {
         return (
             <div className="whiteboard-top-right-box">
                 <div className="whiteboard-top-user-box">
                     {this.handleUserAvatar()}
                 </div>
-                {!isManagerOpen &&
-                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
-                        <img style={{width: 16}} src={menu_out}/>
-                    </div>
-                </Badge>}
+                {this.renderMenu()}
             </div>
         );
 

@@ -7,7 +7,6 @@
   "scripts": {
     "type-gen": "tsc --emitDeclarationOnly",
     "predev": "yarn type-gen",
-    "dev": "webpack --config webpack.config.js  --watch --progress --colors --mode=development",
     "build:lib": "webpack --config webpack.config.js"
   },
   "types": "dist/index.d.ts",
@@ -16,12 +15,12 @@
   "dependencies": {
     "react": "~16.8.0",
     "react-dom": "~16.8.0",
-    "white-react-sdk": "^2.3.10"
+    "white-react-sdk": "^2.3.12"
   },
   "peerDependencies": {
     "react": "~16.8.0",
     "react-dom": "~16.8.0",
-    "white-react-sdk": "^2.3.10"
+    "white-react-sdk": "^2.3.12"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

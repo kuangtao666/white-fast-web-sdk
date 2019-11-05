@@ -1,5 +1,5 @@
 import * as React from "react";
-import {RouteComponentProps, withRouter} from "react-router";
+import {RouteComponentProps} from "react-router";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
@@ -60,13 +60,11 @@ export default class ReplayPage extends React.Component<ReplayPageProps, Whitebo
                 clickLogoCallback: () => {
                     this.props.history.push("/");
                 },
-                // roomName: "伍双的教室",
                 beginTimestamp: startTime && parseInt(startTime),
                 duration: this.getDuration(),
-                mediaUrl: mediaUrl,
-                // isManagerOpen: true,
-                // mediaUrl: "https://netless-media.oss-cn-hangzhou.aliyuncs.com/ad5ce237124d7210e24ca5838d79f509_b9fc17d5d017466ab446c3094c87b1b3.m3u8",
-                // isChatOpen:
+                layoutType: "Suspension",
+                isManagerOpen: true,
+                mediaUrl: "https://netless-media.oss-cn-hangzhou.aliyuncs.com/ad5ce237124d7210e24ca5838d79f509_b9fc17d5d017466ab446c3094c87b1b3.m3u8",
             });
         }
     }

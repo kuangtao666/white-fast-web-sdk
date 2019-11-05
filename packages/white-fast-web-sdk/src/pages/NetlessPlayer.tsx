@@ -14,9 +14,14 @@ import PageError from "../components/PageError";
 import "video.js/dist/video-js.css";
 import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
+import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
+export enum LayoutType {
+    Suspension = "Suspension",
+    Side = "Side",
+}
 export type PlayerPageProps = {
     uuid: string;
     roomToken: string;
@@ -35,6 +40,7 @@ export type PlayerPageProps = {
     isManagerOpen?: boolean;
     getRemoveFunction: (func: () => void) => void;
     elementId: string;
+    layoutType?: LayoutType;
 };
 
 
@@ -50,6 +56,7 @@ export type PlayerPageStates = {
     isVisible: boolean;
     replayFail: boolean;
     isManagerOpen: boolean;
+    layoutType: LayoutType;
 };
 
 export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> {
@@ -70,6 +77,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             isVisible: false,
             replayFail: false,
             isManagerOpen: this.props.isManagerOpen !== undefined ? this.props.isManagerOpen : false,
+            layoutType: this.props.layoutType !== undefined ? this.props.layoutType : LayoutType.Side,
         };
     }
 
@@ -256,13 +264,14 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                                 {displayWatch(Math.floor(this.state.player.scheduleTime / 1000))} / {displayWatch(Math.floor(this.state.player.timeDuration / 1000))}
                             </div>
                         </div>
+                        {this.state.layoutType === LayoutType.Side &&
                         <div className="player-controller-left">
                             <Badge overflowCount={99} offset={[-3, 6]} count={this.state.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                                 <div onClick={this.handleChatState} className="player-controller">
                                     <img src={chat_white}/>
                                 </div>
                             </Badge>
-                        </div>
+                        </div>}
                     </div>
                 </div>
             );
@@ -289,6 +298,28 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
         await timeout(100);
         this.onWindowResize();
+    }
+
+    private renderMedia = (): React.ReactNode => {
+        const {mediaUrl, layoutType} = this.props;
+        if (mediaUrl) {
+            if (layoutType === LayoutType.Suspension) {
+                return (
+                    <Draggable bounds="parent">
+                        <div className="player-video-out">
+                            <video
+                                poster={"https://white-sdk.oss-cn-beijing.aliyuncs.com/icons/video_cover.svg"}
+                                className="video-js video-layout"
+                                id="white-sdk-video-js"/>
+                        </div>
+                    </Draggable>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
 
@@ -319,10 +350,12 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         logoUrl={this.props.logoUrl}/>
                     {player && <PlayerTopRight
                         userId={userId}
+                        layoutType={this.state.layoutType}
                         player={player}
                         isFirstScreenReady={this.state.isFirstScreenReady}
                         handleManagerState={this.handleManagerState}
                         isManagerOpen={this.state.isManagerOpen}/>}
+                    {this.renderMedia()}
                     {this.renderScheduleView()}
                     <div
                         className="player-board-inner"
@@ -344,6 +377,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                             player={player}/>}
                     </div>
                 </div>
+                {this.state.layoutType === LayoutType.Side &&
                 <PlayerManager
                     elementId={this.props.elementId}
                     player={player}
@@ -356,6 +390,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                     handleManagerState={this.handleManagerState}
                     isManagerOpen={this.state.isManagerOpen}
                     uuid={uuid}/>
+                }
             </div>
         );
     }

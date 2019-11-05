@@ -291,11 +291,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     private handleTabsChange = (evt: any): void => {
-        if (evt === "1") {
-            this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
-        } else {
-            this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
-        }
+        this.setState({activeKey: evt, seenMessagesLength: this.state.messages.length});
     }
 
     private handleManagerStyle = (): string => {
@@ -311,12 +307,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 {this.renderHost()}
                 <div className="chat-box-switch">
                     <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                        <TabPane tab={this.renderUserListTitle()} key="1">
-                            <div className="guest-box">
-                                {this.renderGuest()}
-                            </div>
-                        </TabPane>
-                        <TabPane tab={this.renderChatListTitle()} key="2">
+                        <TabPane tab={this.renderChatListTitle()} key="1">
                             <WhiteboardChat
                                 elementId={this.props.elementId}
                                 identity={this.props.identity}
@@ -326,6 +317,11 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                 userId={this.props.userId}
                                 userName={this.props.userName}
                                 room={this.props.room}/>
+                        </TabPane>
+                        <TabPane tab={this.renderUserListTitle()} key="2">
+                            <div className="guest-box">
+                                {this.renderGuest()}
+                            </div>
                         </TabPane>
                     </Tabs>
                 </div>

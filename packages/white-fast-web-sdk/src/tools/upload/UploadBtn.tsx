@@ -36,6 +36,7 @@ export type UploadBtnProps = {
     toolBarPosition?: ToolBarPositionEnum;
     uploadToolBox?: UploadToolBoxType[],
     language?: LanguageEnum;
+    ossUploadCallback?: (res: any) => void;
     deviceType: DeviceType;
 };
 
@@ -54,41 +55,42 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
         });
     }
 
-    private uploadStatic = (event: any) => {
-        const uploadManager = new UploadManager(this.client, this.props.room);
+    private uploadStatic = async (event: any): Promise<void> => {
+        const {ossUploadCallback} = this.props;
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
-        uploadManager.convertFile(
+        await uploadManager.convertFile(
             event.file,
             pptConverter,
             PptKind.Static,
-            this.props.onProgress).catch(error => alert("upload file error" + error));
+            this.props.onProgress);
     }
 
-    private uploadDynamic = (event: any) => {
-        const uploadManager = new UploadManager(this.client, this.props.room);
+    private uploadDynamic = async (event: any): Promise<void> => {
+        const {ossUploadCallback} = this.props;
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
-        uploadManager.convertFile(
+        await uploadManager.convertFile(
             event.file,
             pptConverter,
             PptKind.Dynamic,
-            this.props.onProgress).catch(error => alert("upload file error" + error));
+            this.props.onProgress);
     }
 
-    private uploadImage = (event: any) => {
+    private uploadImage = async (event: any): Promise<void> => {
+        const {ossUploadCallback} = this.props;
         const uploadFileArray: File[] = [];
         uploadFileArray.push(event.file);
-        const uploadManager = new UploadManager(this.client, this.props.room);
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         if (this.props.whiteboardRef) {
             const {clientWidth, clientHeight} = this.props.whiteboardRef;
-            uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress)
-                .catch(error => alert("upload file error" + error));
+            await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
         } else {
             const clientWidth = window.innerWidth;
             const clientHeight = window.innerHeight;
-            uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress)
-                .catch(error => alert("upload file error" + error));
+            await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
         }
     }
 
