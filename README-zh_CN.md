@@ -36,13 +36,21 @@
             boardBackgroundColor: "#F2F2F2", // 可选，白板背景颜色
             isReadOnly: false, // 可选，订阅者是否可以操作
             identity: "host", // 可选，身份 host, guest, listener
+            defaultColorArray: [
+                            "#E77345",
+                            "#005BF6",
+                            "#F5AD46",
+                            "#68AB5D",
+                            "#9E51B6",
+                            "#1E2023",
+                        ], // 可选，教具颜色列表，可通过界面进行添加新颜色，添加后 colorArrayStateCallback 会回调所有颜色列表
           	rtc: {
               type: "agora",
               rtcObj: AgoraRTC,
               token: "8595fd46955f427db44b4e9ba90f015d",
             }, // 可选，这里以声网为例
-    				language: "Chinese", // 启用英文为 "English"
-        		isManagerOpen: true, // 侧边控制栏目是否默认打开
+    		language: "Chinese", // 启用英文为 "English"
+        	isManagerOpen: true, // 侧边控制栏目是否默认打开
             uploadToolBox: [
               {
                 enable: true, // true 为启用， false 为尽用
@@ -66,14 +74,6 @@
                 script: "",
               },
             ], // 侧边上传按钮是否启用
-            defaultColorArray: [
-                "#E77345",
-                "#005BF6",
-                "#F5AD46",
-                "#68AB5D",
-                "#9E51B6",
-                "#1E2023",
-            ], // 可选，教具颜色列表，可通过界面进行添加新颜色，添加后 colorArrayStateCallback 会回调所有颜色列表
             roomCallback: (room) => {
                 console.log(room);
             },  // 可选，底层 SDK Room 对象回调，Room 对象可以用来使用底层 SDK 能力深度使用白板功能。具体参见 https://developer.netless.link
@@ -100,9 +100,9 @@
               folder: "xxx",
               prefix: "xxx",
             },// 如果需要配置自己的云存储则，以上信息。如果不填写会启用 netless 的存储。
-          ossUploadCallback: (state: boolean, err: any) => {
-							// state 为 true 是成功， 为 false 是失败。err 是报错信息
-          },
+              ossUploadCallback: (res) => {
+                    // 上传文件回调
+              },
         });
     </script>
 </body>
@@ -118,11 +118,25 @@
         var userId = `${Math.floor(Math.random() * 100000)}`;
         var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd";
         var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw";
-        
         WhiteFastSDK.Player("app-root",{
             uuid: uuid, // 必填，需要播放房间的 id
             roomToken: roomToken,  // 必填，进入房间的凭证
             userId: userId, // 必填，用户 id，用户身份的唯一识别标志
+            userName: "伍双", // 选填
+            userAvatarUrl: "https://XXXX.png", // 选填
+            logoUrl: "https://XXXX.svg", // 选填
+            boardBackgroundColor: "#F2F2F2", // 选填
+            playerCallback: (player) => {
+                // 选填
+            },
+            clickLogoCallback: () => {
+                // 选填
+            },
+            beginTimestamp: "XXX",  // 选填
+            duration: "XXX",  // 选填
+            layoutType: "Suspension",  // 选填
+            isManagerOpen: true,  // 选填
+            mediaUrl: "https:XXXX",   // 选填      
         });
     </script>
 </body>
@@ -246,16 +260,6 @@ defaultColorArray: [
 ];
 ```
 
-**roomCallback [(room: Room) => void] 可选**
-
-底层 SDK Room 对象回调，Room 对象可以用来使用底层 SDK 能力深度使用白板功能。具体参见 https://developer.netless.link
-
-```
-roomCallback: (room) => {
-                    console.log(room);
-                }
-```
-
 **colorArrayStateCallback [(colorArray: string[]) => void] 可选**
 
 教具添加新颜色后回调。
@@ -263,6 +267,16 @@ roomCallback: (room) => {
 ```
 colorArrayStateCallback: (colorArray) => {
                     console.log(colorArray);
+                }
+```
+
+**roomCallback [(room: Room) => void] 可选**
+
+底层 SDK Room 对象回调，Room 对象可以用来使用底层 SDK 能力深度使用白板功能。具体参见 https://developer.netless.link
+
+```
+roomCallback: (room) => {
+                    console.log(room);
                 }
 ```
 
@@ -347,7 +361,7 @@ duration: 94106
 mediaUrl: "https://path/to/media.m3u8"
 ```
 
-**isChatOpen [boolean] 可选**
+**isManagerOpen [boolean] 可选**
 
 是否显示聊天窗口
 

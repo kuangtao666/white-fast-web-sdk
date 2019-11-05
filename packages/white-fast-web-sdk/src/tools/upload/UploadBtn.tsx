@@ -36,7 +36,7 @@ export type UploadBtnProps = {
     toolBarPosition?: ToolBarPositionEnum;
     uploadToolBox?: UploadToolBoxType[],
     language?: LanguageEnum;
-    ossUploadCallback?: (state: boolean, error?: any) => void;
+    ossUploadCallback?: (res: any) => void;
     deviceType: DeviceType;
 };
 
@@ -57,76 +57,40 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
 
     private uploadStatic = async (event: any): Promise<void> => {
         const {ossUploadCallback} = this.props;
-        const uploadManager = new UploadManager(this.client, this.props.room);
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
-        try {
-            await uploadManager.convertFile(
-                event.file,
-                pptConverter,
-                PptKind.Static,
-                this.props.onProgress);
-            if (ossUploadCallback) {
-                ossUploadCallback(true);
-            }
-        } catch (err) {
-            if (ossUploadCallback) {
-                ossUploadCallback(false, err);
-            }
-        }
+        await uploadManager.convertFile(
+            event.file,
+            pptConverter,
+            PptKind.Static,
+            this.props.onProgress);
     }
 
     private uploadDynamic = async (event: any): Promise<void> => {
         const {ossUploadCallback} = this.props;
-        const uploadManager = new UploadManager(this.client, this.props.room);
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
-        try {
-            await uploadManager.convertFile(
-                event.file,
-                pptConverter,
-                PptKind.Dynamic,
-                this.props.onProgress);
-            if (ossUploadCallback) {
-                ossUploadCallback(true);
-            }
-        } catch (err) {
-            if (ossUploadCallback) {
-                ossUploadCallback(false, err);
-            }
-        }
+        await uploadManager.convertFile(
+            event.file,
+            pptConverter,
+            PptKind.Dynamic,
+            this.props.onProgress);
     }
 
     private uploadImage = async (event: any): Promise<void> => {
         const {ossUploadCallback} = this.props;
         const uploadFileArray: File[] = [];
         uploadFileArray.push(event.file);
-        const uploadManager = new UploadManager(this.client, this.props.room);
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         if (this.props.whiteboardRef) {
             const {clientWidth, clientHeight} = this.props.whiteboardRef;
-            try {
-                await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
-                if (ossUploadCallback) {
-                    ossUploadCallback(true);
-                }
-            } catch (err) {
-                if (ossUploadCallback) {
-                    ossUploadCallback(false, err);
-                }
-            }
+            await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
         } else {
             const clientWidth = window.innerWidth;
             const clientHeight = window.innerHeight;
-            try {
-                await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
-                if (ossUploadCallback) {
-                    ossUploadCallback(true);
-                }
-            } catch (err) {
-                if (ossUploadCallback) {
-                    ossUploadCallback(false, err);
-                }
-            }
+            await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
         }
     }
 

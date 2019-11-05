@@ -125,7 +125,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                    folder: "ppt",
                    prefix: "https://netless-agora-whiteboard.oss-cn-hangzhou.aliyuncs.com/",
                },
-               ossUploadCallback: (state: boolean, err: any) => {
+               ossUploadCallback: (res: any, err: any) => {
 
                },
                 pagePreviewPosition: "right",

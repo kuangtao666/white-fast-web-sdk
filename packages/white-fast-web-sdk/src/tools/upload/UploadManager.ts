@@ -28,9 +28,11 @@ export class UploadManager {
 
   private readonly ossClient: any;
   private readonly room: Room;
-  public constructor(ossClient: any, room: Room) {
+  private readonly ossUploadCallback?: (res: any) => void;
+  public constructor(ossClient: any, room: Room, ossUploadCallback?: (res: any) => void) {
     this.ossClient = ossClient;
     this.room = room;
+    this.ossUploadCallback = ossUploadCallback;
   }
 
   private createUUID = (): string => {
@@ -192,6 +194,9 @@ export class UploadManager {
             }
         },
       });
+      if (this.ossUploadCallback) {
+          this.ossUploadCallback(res);
+      }
     if (res.res.status === 200) {
       return this.getFile(path);
     } else {
