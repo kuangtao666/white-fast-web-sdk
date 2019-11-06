@@ -178,7 +178,61 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             });
             return Nodes;
         } else {
-            return null;
+            return [
+                <Upload
+                    key={`image`}
+                    accept={"image/*"}
+                    showUploadList={false}
+                    customRequest={this.uploadImage}>
+                    <div className="popover-section">
+                        <div className="popover-section-inner">
+                            <div className="popover-section-image">
+                                <img width={68} src={image_icon}/>
+                            </div>
+                            <div className="popover-section-script">
+                                <div className="popover-section-title">{isEnglish ? "upload image" : "上传图片"}</div>
+                                <div className="popover-section-text">{isEnglish ? "Support for common formats." : "支持常见格式，可以改变图片大小和位置。"}</div>
+                            </div>
+                        </div>
+                    </div>
+                </Upload>,
+                <Upload
+                    key={`dynamic`}
+                    disabled={!this.props.roomToken}
+                    accept={"application/vnd.openxmlformats-officedocument.presentationml.presentation"}
+                    showUploadList={false}
+                    customRequest={this.uploadDynamic}>
+                    <div className="popover-section">
+                        <div className="popover-section-inner">
+                            <div className="popover-section-image">
+                                <img width={72} src={web_transform}/>
+                            </div>
+                            <div className="popover-section-script">
+                                <div className="popover-section-title">{isEnglish ? "PPTX transfer web" : "资料转网页"}</div>
+                                <div className="popover-section-text">{isEnglish ? "Turn pptx into a web page for syncing." : "支持 pptx，如果是 ppt 格式文件，请手动转换。"}</div>
+                            </div>
+                        </div>
+                    </div>
+                </Upload>,
+                <Upload
+                    key={`static`}
+                    disabled={!this.props.roomToken}
+                    accept={FileUploadStatic}
+                    showUploadList={false}
+                    customRequest={this.uploadStatic}>
+                    <div className="popover-section">
+                        <div className="popover-section-inner">
+                            <div className="popover-section-image">
+                                <img width={72} src={image_transform}/>
+                            </div>
+                            <div className="popover-section-script">
+                                <div className="popover-section-title">{isEnglish ? "Docs transfer image" : "资料转图片"}</div>
+                                <div className="popover-section-text">{isEnglish ? "Support ppt、pptx、word and pdf." : "支持 ppt、pptx、word 以及 pdf。"}</div>
+                            </div>
+                        </div>
+                    </div>
+                </Upload>,
+            ];
         }
     }
 
@@ -193,7 +247,7 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             );
         } else {
             return (
-                <div className="popover-box">
+                <div style={{height: 118 * 3}} className="popover-box">
                     {this.renderUploadButton()}
                 </div>
             );
@@ -203,17 +257,18 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
     private handlePlacement = (): TooltipPlacement => {
         const {toolBarPosition} = this.props;
         switch (toolBarPosition) {
-            case ToolBarPositionEnum.left: {
-                return "left";
+            case ToolBarPositionEnum.top: {
+                return "top";
             }
             case ToolBarPositionEnum.bottom: {
                 return "bottom";
             }
-            case ToolBarPositionEnum.right: {
-                return "right";
+            case ToolBarPositionEnum.left
+            : {
+                return "left";
             }
             default: {
-                return "bottom";
+                return "right";
             }
         }
     }
@@ -233,7 +288,7 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
                 <div
                     onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                     onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}
-                    className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right) ?
+                    className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right || toolBarPosition === undefined) ?
                         "tool-box-cell-box-left" : "tool-box-cell-box"}>
                     <div className="tool-box-cell">
                         <ToolBoxUpload color={this.state.toolBoxColor}/>

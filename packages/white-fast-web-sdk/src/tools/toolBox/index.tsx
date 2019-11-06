@@ -203,8 +203,8 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             default: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box">
-                        <div className="tool-mid-box">
+                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-left">
+                        <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>
                     </div>
@@ -222,7 +222,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         const buttonColor = this.buttonColor(isSelected);
 
         const cellBox: React.ReactNode = (
-            <div className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right) ? "tool-box-cell-box-left" : "tool-box-cell-box"} key={applianceName}>
+            <div className={(toolBarPosition === ToolBarPositionEnum.left || toolBarPosition === ToolBarPositionEnum.right || toolBarPosition === undefined) ? "tool-box-cell-box-left" : "tool-box-cell-box"} key={applianceName}>
                 <div className="tool-box-cell"
                      onClick={() => this.clickAppliance(event, applianceName)}>
                     <ToolIcon color={buttonColor}/>

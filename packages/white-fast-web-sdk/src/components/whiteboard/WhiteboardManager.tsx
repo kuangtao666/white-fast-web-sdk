@@ -19,7 +19,7 @@ export type WhiteboardManagerProps = {
     room: Room;
     userId: string;
     handleManagerState: () => void;
-    isManagerOpen: boolean;
+    isManagerOpen: boolean | null;
     isChatOpen: boolean;
     uuid: string;
     hostInfo?: HostUserType,
@@ -154,7 +154,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const {room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isHost = this.props.identity === IdentityType.host;
-        if (hostInfo.classMode === ClassModeType.handUp) {
+        if (hostInfo && hostInfo.classMode === ClassModeType.handUp) {
             if (guestUser.isHandUp) {
                 if (guestUser.isReadOnly) {
                     return (
@@ -302,30 +302,34 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
     public render(): React.ReactNode {
-        return (
-            <div className={this.handleManagerStyle()}>
-                {this.renderHost()}
-                <div className="chat-box-switch">
-                    <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                        <TabPane tab={this.renderChatListTitle()} key="1">
-                            <WhiteboardChat
-                                elementId={this.props.elementId}
-                                identity={this.props.identity}
-                                language={this.props.language}
-                                messages={this.state.messages}
-                                userAvatarUrl={this.props.userAvatarUrl}
-                                userId={this.props.userId}
-                                userName={this.props.userName}
-                                room={this.props.room}/>
-                        </TabPane>
-                        <TabPane tab={this.renderUserListTitle()} key="2">
-                            <div className="guest-box">
-                                {this.renderGuest()}
-                            </div>
-                        </TabPane>
-                    </Tabs>
+        if (this.props.isManagerOpen === null) {
+            return null;
+        } else {
+            return (
+                <div className={this.handleManagerStyle()}>
+                    {this.renderHost()}
+                    <div className="chat-box-switch">
+                        <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
+                            <TabPane tab={this.renderChatListTitle()} key="1">
+                                <WhiteboardChat
+                                    elementId={this.props.elementId}
+                                    identity={this.props.identity}
+                                    language={this.props.language}
+                                    messages={this.state.messages}
+                                    userAvatarUrl={this.props.userAvatarUrl}
+                                    userId={this.props.userId}
+                                    userName={this.props.userName}
+                                    room={this.props.room}/>
+                            </TabPane>
+                            <TabPane tab={this.renderUserListTitle()} key="2">
+                                <div className="guest-box">
+                                    {this.renderGuest()}
+                                </div>
+                            </TabPane>
+                        </Tabs>
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        }
     }
 }
