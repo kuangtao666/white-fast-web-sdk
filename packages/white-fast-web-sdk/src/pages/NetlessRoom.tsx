@@ -104,7 +104,7 @@ export type RealTimeProps = {
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
-    isManagerOpen?: boolean;
+    isManagerOpen?: boolean | null;
     getRemoveFunction: (func: () => void) => void;
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
@@ -142,9 +142,9 @@ export type RealTimeStates = {
     progressDescription?: string,
     fileUrl?: string,
     whiteboardLayerDownRef?: HTMLDivElement;
-    isManagerOpen: boolean;
+    isManagerOpen: boolean | null;
     deviceType: DeviceType;
-    classMode?: ClassModeType,
+    classMode: ClassModeType,
     ossConfigObj: OSSConfigObjType,
 };
 
@@ -169,15 +169,23 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isChatOpen: false,
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
-            isManagerOpen: this.props.isManagerOpen ? this.props.isManagerOpen : false,
-            classMode: this.props.classMode ? this.props.classMode : ClassModeType.discuss,
-            ossConfigObj: this.props.ossConfigObj ? this.props.ossConfigObj : ossConfigObj,
+            isManagerOpen: this.handleManagerOpenState(),
+            classMode: this.props.classMode !== undefined ? this.props.classMode : ClassModeType.discuss,
+            ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
         };
         this.cursor = new UserCursor();
     }
 
+    private handleManagerOpenState = (): boolean | null => {
+        if (this.props.isManagerOpen !== undefined) {
+            return this.props.isManagerOpen;
+        } else {
+            return false;
+        }
+    }
+
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity} = this.props;
+        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
@@ -228,8 +236,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 height: 675,
                 animationMode: "immediately",
             });
-            this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
-            await this.roomManager.start();
+            if (isManagerOpen !== null) {
+                this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
+                await this.roomManager.start();
+            }
             if (roomCallback) {
                 roomCallback(room);
             }
@@ -368,30 +378,37 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private handleChatState = async (): Promise<void> => {
-        if (!this.state.isManagerOpen) {
-            this.setState({isChatOpen: true, isManagerOpen: true});
-            await timeout(100);
-            this.onWindowResize();
-        } else {
-            this.setState({isChatOpen: true});
+        if (this.props.isManagerOpen !== null) {
+            if (!this.state.isManagerOpen) {
+                this.setState({isChatOpen: true, isManagerOpen: true});
+                await timeout(100);
+                this.onWindowResize();
+            } else {
+                this.setState({isChatOpen: true});
+            }
         }
     }
     private handleManagerState = async (): Promise<void> => {
-        if (this.state.isManagerOpen) {
-            this.setState({isManagerOpen: false, isChatOpen: false});
-        } else {
-            this.setState({isManagerOpen: true});
+        if (this.props.isManagerOpen !== null) {
+            if (this.state.isManagerOpen) {
+                this.setState({isManagerOpen: false, isChatOpen: false});
+            } else {
+                this.setState({isManagerOpen: true});
+            }
+            await timeout(100);
+            this.onWindowResize();
         }
-        await timeout(100);
-        this.onWindowResize();
     }
     private handleFileState = (): void => {
         this.setState({isFileOpen: !this.state.isFileOpen});
     }
 
     private detectIsReadOnly = (): boolean => {
-        const {identity, userId} = this.props;
+        const {identity, userId, isManagerOpen} = this.props;
         const {room} = this.state;
+        if (isManagerOpen === null) {
+            return false;
+        }
         if (identity === IdentityType.listener) {
             return true;
         } else if (identity === IdentityType.host) {
@@ -600,7 +617,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100%", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "white"}}/>;
+                                   style={{width: "100%", height: "100%", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}/>;
         } else {
             return null;
         }

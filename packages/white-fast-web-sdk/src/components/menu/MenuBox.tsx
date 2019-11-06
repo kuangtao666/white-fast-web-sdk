@@ -114,9 +114,10 @@ export default class MenuBox extends React.Component<MenuBoxProps, MenuBoxStyleS
             return this.props.children;
         }
     }
+
     public render(): React.ReactNode {
         const {pagePreviewPosition, sideMenuWidth, setMenuState} = this.props;
-        const isRight = pagePreviewPosition === PagePreviewPositionEnum.right;
+        const isRight = pagePreviewPosition !== PagePreviewPositionEnum.left;
         const menuWidth = sideMenuWidth ? sideMenuWidth : 280;
         return (
             <Menu

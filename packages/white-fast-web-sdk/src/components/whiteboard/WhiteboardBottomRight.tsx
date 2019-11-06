@@ -36,7 +36,7 @@ export type WhiteboardBottomRightProps = {
     handleChatState: () => void;
     deviceType: DeviceType;
     isReadOnly?: boolean;
-    isManagerOpen: boolean;
+    isManagerOpen: boolean | null;
     language?: LanguageEnum;
 };
 
@@ -240,7 +240,8 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     }
 
     private renderChatIcon = (): React.ReactNode => {
-        if (!isMobile) {
+        const {isManagerOpen} = this.props;
+        if (!isMobile && isManagerOpen !== null) {
             return (
                 <Badge overflowCount={99} offset={[-3, 6]} count={this.props.isManagerOpen ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                     <div onClick={this.props.handleChatState} className="whiteboard-box-bottom-left-chart">

@@ -25,7 +25,7 @@ export type WhiteboardTopRightProps = {
     identity?: IdentityType;
     isReadOnly?: boolean;
     language?: LanguageEnum;
-    isManagerOpen: boolean;
+    isManagerOpen: boolean | null;
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
 };
@@ -87,25 +87,29 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     }
 
     private handleUrl = (url: string): string => {
-        let classUrl;
-        if (this.props.identity === IdentityType.host) {
-            if (this.state.shareUrl === ShareUrlType.readOnly) {
-                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
+        if (this.props.isManagerOpen === null) {
+            return url;
+        } else {
+            let classUrl;
+            if (this.props.identity === IdentityType.host) {
+                if (this.state.shareUrl === ShareUrlType.readOnly) {
+                    classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
+                } else {
+                    classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+                }
             } else {
-                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
             }
-        } else {
-            classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
-        }
-        if (this.props.isReadOnly) {
-            classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
-        }
-        const regex = /[\w]+\/$/gm;
-        const match = regex.exec(classUrl);
-        if (match) {
-            return classUrl.substring(0, match.index);
-        } else {
-            return classUrl;
+            if (this.props.isReadOnly) {
+                classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
+            }
+            const regex = /[\w]+\/$/gm;
+            const match = regex.exec(classUrl);
+            if (match) {
+                return classUrl.substring(0, match.index);
+            } else {
+                return classUrl;
+            }
         }
     }
     private handleInvite = (): void => {
@@ -190,7 +194,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         }
     }
     public render(): React.ReactNode {
-        const  {language} = this.props;
+        const  {isManagerOpen} = this.props;
         const isEnglish = this.props.language === LanguageEnum.English;
         return (
             <div className="whiteboard-top-right-box">
@@ -212,6 +216,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <QRCode value={`${this.handleUrl(this.state.url)}`} />
                         <div className="whiteboard-share-text-box">
                             <Input readOnly size="large" value={`${this.handleUrl(this.state.url)}`}/>
+                            {isManagerOpen !== null &&
                             <Radio.Group
                                 value={this.state.shareUrl}
                                 onChange={this.handleShareUrl}
@@ -222,7 +227,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                                 <Radio.Button
                                     disabled={this.handleSwitchDisable(ShareUrlType.interactive)}
                                     value={ShareUrlType.interactive}>{isEnglish ? "Interactive" : "允许互动"}</Radio.Button>
-                            </Radio.Group>
+                            </Radio.Group>}
                             <Clipboard
                                 data-clipboard-text={`${this.handleUrl(this.state.url)}`}
                                 component="div"
