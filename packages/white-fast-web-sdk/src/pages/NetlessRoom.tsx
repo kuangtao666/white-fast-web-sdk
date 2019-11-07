@@ -109,6 +109,7 @@ export type RealTimeProps = {
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
     ossUploadCallback?: (res: any) => void;
+    enableRecord?: boolean;
 };
 
 export enum ToolBarPositionEnum {
@@ -432,6 +433,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
     private renderRecordComponent = (): React.ReactNode => {
+        if (this.props.enableRecord === false) {
+          return null;
+        }
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
@@ -514,7 +518,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 handleFileState={this.handleFileState}
                                 isFileMenuOpen={this.state.isFileMenuOpen}
                                 language={this.props.language}
-                                documentArray={this.props.documentArray}
+                                documentArray={this.props.documentArray} uuid={this.props.uuid}
                                 room={room}/>
                         </MenuBox>
                         <Dropzone
@@ -547,6 +551,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 userAvatarUrl={this.props.userAvatarUrl}/>}
                             <WhiteboardBottomLeft
                                 handleFileState={this.handleFileState}
+                                isManagerOpen={this.state.isManagerOpen}
                                 isReadOnly={isReadOnly}
                                 identity={this.props.identity}
                                 deviceType={this.state.deviceType}
@@ -571,9 +576,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 setMemberState={this.setMemberState}
                                 customerComponent={[
                                     <UploadBtn
-                                        toolBarPosition={this.props.toolBarPosition}
+                                        toolBarPosition={this.props.toolBarPosition} uuid={this.props.uuid}
                                         deviceType={this.state.deviceType}
-                                        oss={this.state.ossConfigObj} ossUploadCallback={this.props.ossUploadCallback}
+                                        oss={this.state.ossConfigObj}
+                                        ossUploadCallback={this.props.ossUploadCallback}
                                         room={room}
                                         uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}

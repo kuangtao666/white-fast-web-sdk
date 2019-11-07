@@ -6,7 +6,7 @@ import * as default_cover from "../../assets/image/default_cover.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
 import PPTDatas from "../menu/PPTDatas";
 import {LanguageEnum} from "../../pages/NetlessRoom";
-
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type WhiteboardFileProps = {
     room: Room;
     handleFileState: () => void;
@@ -14,6 +14,7 @@ export type WhiteboardFileProps = {
     documentArray?: PPTDataType[];
     language?: LanguageEnum;
     isFileMenuOpen: boolean;
+    uuid: string;
 };
 
 export type WhiteboardFileStates = {
@@ -30,7 +31,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
             docs: [],
         };
     }
-    public componentDidMount(): void {
+    public async componentDidMount(): Promise<void> {
         let docs: PPTDataType[] = [];
         if (this.props.documentArray) {
             docs = this.props.documentArray.map((PPTData: PPTDataType) => {
@@ -96,14 +97,33 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
             });
         }
         this.setState({docs: docs});
+        await this.setUpDefaultDocs(docs);
+    }
+
+    private setUpDefaultDocs = async (docs: PPTDataType[]): Promise<void> => {
+        const activeDoc = docs.find(data => data.active);
+        if (activeDoc) {
+            await timeout(0);
+            this.selectDoc(activeDoc.id);
+        }
     }
 
     private selectDoc = (id: string) => {
-        const {room} = this.props;
-        const activeData = this.state.docs!.find(data => data.id === id)!;
+        const {room, uuid} = this.props;
+        const activeData = this.state.docs.find(data => data.id === id)!;
+        const activeIndex = room.state.sceneState.scenes.length - 1;
         this.setState({activeDocData: activeData});
-        room.putScenes(`/defaultPPT${activeData.id}`, activeData.data);
-        room.setScenePath(`/defaultPPT${activeData.id}/${activeData.data[0].name}`);
+        const pptData: any[] = activeData.data.map((docData: any, index: number) => {
+            if (activeIndex === 0) {
+                docData.name = `${parseInt(docData.name) + activeIndex}`;
+                return docData;
+            } else {
+                docData.name = `${parseInt(docData.name) + activeIndex + 1}`;
+                return docData;
+            }
+        });
+        room.putScenes(`/${uuid}`, pptData, activeIndex + 1);
+        room.setScenePath(`/${uuid}/${pptData[0].name}`);
         const docsArray = this.state.docs.map(data => {
             if (data.id === id) {
                 data.active = true;

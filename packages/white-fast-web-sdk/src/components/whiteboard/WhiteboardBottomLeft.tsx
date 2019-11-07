@@ -10,6 +10,7 @@ export type WhiteboardBottomLeftProps = {
     roomState: RoomState;
     handleFileState: (state: boolean) => void;
     deviceType: DeviceType;
+    isManagerOpen: boolean | null;
     identity?: IdentityType;
     isReadOnly?: boolean;
 };
@@ -26,8 +27,28 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         room.zoomChange(scale);
     }
 
+    private renderFileIcon = (): React.ReactNode => {
+        const {handleFileState, isManagerOpen} = this.props;
+        if (isManagerOpen === null) {
+            return (
+                <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart-2">
+                    <img src={file}/>
+                </div>
+            );
+        }
+        if (this.props.identity === IdentityType.host) {
+            return (
+                <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart-2">
+                    <img src={file}/>
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
+
     public render(): React.ReactNode {
-        const {roomState, isReadOnly, handleFileState} = this.props;
+        const {roomState, isReadOnly} = this.props;
         if (isReadOnly) {
             return <div className="whiteboard-box-bottom-left">
                 <ScaleController
@@ -38,9 +59,7 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         }
         return (
             <div className="whiteboard-box-bottom-left">
-                {this.props.identity === IdentityType.host && <div onClick={() => handleFileState(true)} className="whiteboard-box-bottom-left-chart-2">
-                    <img src={file}/>
-                </div>}
+                {this.renderFileIcon()}
                 <ScaleController
                     zoomScale={roomState.zoomScale}
                     deviceType={this.props.deviceType}

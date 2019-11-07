@@ -30,6 +30,7 @@ export type UploadBtnProps = {
         prefix: string,
     },
     room: Room,
+    uuid: string,
     roomToken: string | null,
     whiteboardRef?: HTMLDivElement,
     onProgress?: PPTProgressListener,
@@ -56,7 +57,7 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
     }
 
     private uploadStatic = async (event: any): Promise<void> => {
-        const {ossUploadCallback} = this.props;
+        const {ossUploadCallback, uuid} = this.props;
         const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
@@ -64,11 +65,13 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             event.file,
             pptConverter,
             PptKind.Static,
+            this.props.oss.folder,
+            uuid,
             this.props.onProgress);
     }
 
     private uploadDynamic = async (event: any): Promise<void> => {
-        const {ossUploadCallback} = this.props;
+        const {ossUploadCallback, uuid} = this.props;
         const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
@@ -76,7 +79,10 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             event.file,
             pptConverter,
             PptKind.Dynamic,
-            this.props.onProgress);
+            this.props.oss.folder,
+            uuid,
+            this.props.onProgress,
+            );
     }
 
     private uploadImage = async (event: any): Promise<void> => {
