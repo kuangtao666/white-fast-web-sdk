@@ -115,9 +115,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                //          script: "",
                //      },
                //  ],
-               //  roomCallback: (room: any) => {
-               //      this.setState({room: room});
-               //  },
                // ossConfigObj: {
                //     accessKeyId: "LTAIwHZFXsXh9yaG",
                //     accessKeySecret: "9FE19EMIG3pWzVElJn1iolz66XxPkO",

@@ -34,7 +34,6 @@ export type PlayerPageProps = {
     beginTimestamp?: number,
     mediaUrl?: string,
     logoUrl?: string;
-    playerCallback?: (player: Player) => void;
     clickLogoCallback?: () => void;
     roomName?: string;
     language?: LanguageEnum;
@@ -109,7 +108,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                 this.setState({messages: [...this.state.messages, event.payload]});
             });
         }
-        const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
+        const {uuid, roomToken, beginTimestamp, duration, mediaUrl} = this.props;
         if (mediaUrl && this.props.isManagerOpen === undefined) {
             this.setState({isManagerOpen: true});
         }
@@ -148,9 +147,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         this.setState({currentTime: scheduleTime});
                     },
                 });
-            if (playerCallback) {
-                playerCallback(player);
-            }
             this.setState({
                 player: player,
             });

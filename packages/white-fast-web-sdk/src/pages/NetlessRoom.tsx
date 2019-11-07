@@ -96,7 +96,6 @@ export type RealTimeProps = {
     colorArrayStateCallback?: (colorArray: string[]) => void;
     roomRenameCallback?: (name: string) => void;
     documentArray?: PPTDataType[];
-    roomCallback?: (room: Room) => void;
     logoUrl?: string;
     loadingSvgUrl?: string;
     language?: LanguageEnum;
@@ -187,7 +186,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, roomCallback, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
+        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
@@ -241,9 +240,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isManagerOpen !== null) {
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
-            }
-            if (roomCallback) {
-                roomCallback(room);
             }
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
