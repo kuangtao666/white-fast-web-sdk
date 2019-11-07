@@ -38,6 +38,7 @@ import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
+import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -80,6 +81,7 @@ export type RealTimeProps = {
     uuid: string;
     roomToken: string;
     userId: string;
+    roomFacadeSetter: RoomFacadeSetter;
     classMode?: ClassModeType,
     userName?: string;
     roomName?: string;
@@ -105,7 +107,6 @@ export type RealTimeProps = {
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
     isManagerOpen?: boolean | null;
-    getRemoveFunction: (func: () => void) => void;
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
     ossUploadCallback?: (res: any) => void;
@@ -149,7 +150,7 @@ export type RealTimeStates = {
     ossConfigObj: OSSConfigObjType,
 };
 
-export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> {
+export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
@@ -255,9 +256,25 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             this.state.room.refreshViewSize();
         }
     }
+    public componentWillMount (): void {
+        this.props.roomFacadeSetter(this);
+    }
+    public getRoom(): Room | undefined {
+        return this.state.room;
+    }
+    public release(): void {
+        this.didLeavePage = true;
+        if (this.state.room) {
+            this.state.room.removeMagixEventListener("handup");
+            this.state.room.disconnect();
+        }
+        if (this.roomManager) {
+            this.roomManager.stop();
+        }
+        window.removeEventListener("resize", this.onWindowResize);
+    }
     public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
-        this.props.getRemoveFunction(this.remove);
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
@@ -273,17 +290,15 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             this.cursor.setColorAndAppliance(this.state.room.state.roomMembers);
         }
     }
+    public componentWillUnmount(): void {
+        this.props.roomFacadeSetter(null);
+    }
 
-    private remove = (): void => {
-        this.didLeavePage = true;
-        if (this.state.room) {
-            this.state.room.removeMagixEventListener("handup");
-            this.state.room.disconnect();
-        }
-        if (this.roomManager) {
-            this.roomManager.stop();
-        }
-        window.removeEventListener("resize", this.onWindowResize);
+    public setPptPreviewShow(): void {
+        this.setPreviewMenuState(true);
+    }
+    public setPptPreviewHide(): void {
+        this.setPreviewMenuState(false);
     }
     private renderMenuInner = (): React.ReactNode => {
         switch (this.state.menuInnerState) {
