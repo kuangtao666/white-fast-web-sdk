@@ -290,11 +290,21 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.props.roomFacadeSetter(null);
     }
 
-    public setPptPreviewShow(): void {
-        this.setPreviewMenuState(true);
+    public async setPptPreviewShow(): Promise<void> {
+        this.setState({
+            isMenuVisible: true,
+            menuInnerState: MenuInnerType.AnnexBox,
+        });
     }
-    public setPptPreviewHide(): void {
-        this.setPreviewMenuState(false);
+    public async setPptPreviewHide(): Promise<void> {
+        if (this.menuChild) {
+            this.menuChild.setState({isMenuOpen: false});
+        }
+        await timeout(200);
+        this.setState({
+            isMenuVisible: false,
+            menuInnerState: MenuInnerType.AnnexBox,
+        });
     }
     private renderMenuInner = (): React.ReactNode => {
         switch (this.state.menuInnerState) {
