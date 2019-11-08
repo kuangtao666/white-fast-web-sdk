@@ -35,11 +35,6 @@ export class UploadManager {
     this.ossUploadCallback = ossUploadCallback;
   }
 
-  private createUUID = (): string => {
-    const uuid = uuidv4();
-    return uuid.replace(/-/g, "");
-  }
-
   private getFileType = (fileName: string): string => {
     const index1 = fileName.lastIndexOf(".");
     const index2 = fileName.length;
@@ -49,11 +44,12 @@ export class UploadManager {
     rawFile: File,
     pptConverter: PptConverter,
     kind: PptKind,
+    folder: string,
+    uuid: string,
     onProgress?: PPTProgressListener,
   ): Promise<void> {
-    const filename = this.createUUID();
     const fileType = this.getFileType(rawFile.name);
-    const path = `/ppt/${filename}${fileType}`;
+    const path = `/${folder}/${uuid}${fileType}`;
     const pptURL = await this.addFile(path, rawFile, onProgress);
     let res: Ppt;
     if (kind === PptKind.Static) {
@@ -78,11 +74,21 @@ export class UploadManager {
         });
     }
 
-      if (onProgress) {
-          onProgress(PPTProgressPhase.Converting, 1);
-      }
-    this.room.putScenes(`/${filename}`, res.scenes);
-    this.room.setScenePath(`/${filename}/${res.scenes[0].name}`);
+    if (onProgress) {
+        onProgress(PPTProgressPhase.Converting, 1);
+    }
+    const activeIndex = this.room.state.sceneState.scenes.length - 1;
+      const pptData: any[] = res.scenes.map((docData: any) => {
+          if (activeIndex === 0) {
+              docData.name = `${parseInt(docData.name) + activeIndex}`;
+              return docData;
+          } else {
+              docData.name = `${parseInt(docData.name) + activeIndex + 1}`;
+              return docData;
+          }
+      });
+    this.room.putScenes(`/${uuid}`, pptData, activeIndex + 1);
+    this.room.setScenePath(`/${uuid}/${pptData[0].name}`);
   }
   private getImageSize(imageInnerSize: imageSize): imageSize {
     const windowSize: imageSize = {width: window.innerWidth, height: window.innerHeight};

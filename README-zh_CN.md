@@ -24,7 +24,7 @@
         var uuid = "8c2ee602f11e4883a75a9be9dd51b4cd"; // 创建房间的时候，netless 返回
         var roomToken = "WHITEcGFydG5lcl9pZD0zZHlaZ1BwWUtwWVN2VDVmNGQ4UGI2M2djVGhncENIOXBBeTcmc2lnPWFhODIxMTQ5NjdhZDdmMmVlMzI1NmJhNjUwNmM2OTJmMzFkNGZiODg6YWRtaW5JZD0xNTgmcm9vbUlkPThjMmVlNjAyZjExZTQ4ODNhNzVhOWJlOWRkNTFiNGNkJnRlYW1JZD0yODMmcm9sZT1yb29tJmV4cGlyZV90aW1lPTE2MDA1MTI0OTYmYWs9M2R5WmdQcFlLcFlTdlQ1ZjRkOFBiNjNnY1RoZ3BDSDlwQXk3JmNyZWF0ZV90aW1lPTE1Njg5NTU1NDQmbm9uY2U9MTU2ODk1NTU0NDAwMjAw"; // 创建房间的时候，netless 返回。
         
-        WhiteFastSDK.Room("app-root",{
+        var netlessRoom = WhiteFastSDK.Room("app-root",{
             uuid: uuid, // 必须，需要播放房间的 id
             roomToken: roomToken, // 必须，进入房间的凭证
             userId: userId, // 必须，用户 id，用户身份的唯一识别标志
@@ -50,7 +50,7 @@
               token: "8595fd46955f427db44b4e9ba90f015d",
             }, // 可选，这里以声网为例
     		language: "Chinese", // 启用英文为 "English"
-        	isManagerOpen: true, // 侧边控制栏目是否默认打开
+        	isManagerOpen: true, // 侧边控制栏目是否默认打开，如果不想要此功能，请设置为 null;
             uploadToolBox: [
               {
                 enable: true, // true 为启用， false 为尽用
@@ -104,6 +104,13 @@
                     // 上传文件回调
               },
         });
+        
+        // SDK 提供的调用方法
+        netlessRoom.release() // 释放所有资源
+        netlessRoom.getRoom() // 获取房间对象，具体看 developer.netless.link
+        netlessRoom.setPptPreviewHide() // 隐藏预览
+        netlessRoom.setPptPreviewShow() // 打开侧边预览
+        
     </script>
 </body>
 ```

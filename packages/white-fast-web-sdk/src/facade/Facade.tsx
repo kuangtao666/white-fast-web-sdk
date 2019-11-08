@@ -2,40 +2,56 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import NetlessPlayer from "../pages/NetlessPlayer";
 import NetlessRoom from "../pages/NetlessRoom";
-import {NetlessType} from "./index";
+import {
+    Room,
+    Player,
+} from "white-react-sdk";
+
+export interface RoomFacadeObject {
+    release(): void;
+    getRoom(): Room | undefined;
+    setPptPreviewShow(): void;
+    setPptPreviewHide(): void;
+}
+
+export type RoomFacadeSetter = (delegate: RoomFacadeObject | null) => void;
 
 
-export const RoomFacade = (element: string, config: any): NetlessType | undefined => {
-    let releaseFuc: (() => void) | undefined = undefined;
+export const RoomFacade = (element: string, config: any): RoomFacadeObject => {
+    let delegate: RoomFacadeObject | null = null;
+    const roomFacadeSetter: RoomFacadeSetter = _delegate => delegate = _delegate;
     ReactDOM.render(
-        <NetlessRoom elementId={element} getRemoveFunction={(func: () => void) => {
-            releaseFuc = func;
-        }} {...config}/>,
+        <NetlessRoom elementId={element} roomFacadeSetter={roomFacadeSetter} {...config}/>,
         document.getElementById(element),
     );
-    if (releaseFuc) {
-        return {
-            release: releaseFuc,
-        };
-    } else {
-        return undefined;
-    }
+
+    const result: RoomFacadeObject = {
+        release: () => delegate!.release(),
+        getRoom: () => delegate!.getRoom(),
+        setPptPreviewShow: () => delegate!.setPptPreviewShow(),
+        setPptPreviewHide: () => delegate!.setPptPreviewHide(),
+    };
+    return result;
 };
 
-export const PlayerFacade = (element: string, config: any): NetlessType | undefined => {
-    let releaseFuc: (() => void) | undefined = undefined;
+export interface PlayerFacadeObject {
+    release(): void;
+    getPlayer(): Player | undefined;
+}
+
+export type PlayerFacadeSetter = (delegate: PlayerFacadeObject | null) => void;
+
+export const PlayerFacade = (element: string, config: any): PlayerFacadeObject => {
+    let delegate: PlayerFacadeObject | null = null;
+    const playerFacadeSetter: PlayerFacadeSetter = _delegate => delegate = _delegate;
     ReactDOM.render(
-        <NetlessPlayer elementId={element} getRemoveFunction={(func: () => void) => {
-            releaseFuc = func;
-        }} {...config}/>,
+        <NetlessPlayer elementId={element} playerFacadeSetter={playerFacadeSetter} {...config}/>,
         document.getElementById(element),
     );
-    if (releaseFuc) {
-        return {
-            release: releaseFuc,
-        };
-    } else {
-        return undefined;
-    }
+    const result: PlayerFacadeObject = {
+        release: () => delegate!.release(),
+        getPlayer: () => delegate!.getPlayer(),
+    };
+    return result;
 };
 

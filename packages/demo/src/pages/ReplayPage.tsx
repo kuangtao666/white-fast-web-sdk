@@ -54,9 +54,6 @@ export default class ReplayPage extends React.Component<ReplayPageProps, Whitebo
                 userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
                 logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
                 boardBackgroundColor: "#F2F2F2",
-                playerCallback: (player: any) => {
-                    this.setState({player: player});
-                },
                 clickLogoCallback: () => {
                     this.props.history.push("/");
                 },

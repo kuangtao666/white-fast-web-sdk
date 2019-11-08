@@ -17,6 +17,7 @@ import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
+import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum LayoutType {
     Suspension = "Suspension",
@@ -33,13 +34,12 @@ export type PlayerPageProps = {
     beginTimestamp?: number,
     mediaUrl?: string,
     logoUrl?: string;
-    playerCallback?: (player: Player) => void;
     clickLogoCallback?: () => void;
     roomName?: string;
     language?: LanguageEnum;
     isManagerOpen?: boolean;
-    getRemoveFunction: (func: () => void) => void;
     elementId: string;
+    playerFacadeSetter: PlayerFacadeSetter;
     layoutType?: LayoutType;
 };
 
@@ -59,7 +59,7 @@ export type PlayerPageStates = {
     layoutType: LayoutType;
 };
 
-export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> {
+export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> implements PlayerFacadeObject {
     private scheduleTime: number = 0;
     private readonly cursor: any;
 
@@ -87,8 +87,19 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
     }
 
+    public UNSAFE_componentWillMount(): void {
+        this.props.playerFacadeSetter(this);
+    }
+
+    public release(): void {
+        if (this.state.player) {
+            this.state.player.stop();
+        }
+        window.removeEventListener("resize", this.onWindowResize);
+        window.removeEventListener("keydown", this.handleSpaceKey);
+    }
+
     public async componentDidMount(): Promise<void> {
-        this.props.getRemoveFunction(this.remove);
         window.addEventListener("resize", this.onWindowResize);
         window.addEventListener("keydown", this.handleSpaceKey);
         const {player} = this.state;
@@ -97,7 +108,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                 this.setState({messages: [...this.state.messages, event.payload]});
             });
         }
-        const {uuid, roomToken, beginTimestamp, duration, mediaUrl, playerCallback} = this.props;
+        const {uuid, roomToken, beginTimestamp, duration, mediaUrl} = this.props;
         if (mediaUrl && this.props.isManagerOpen === undefined) {
             this.setState({isManagerOpen: true});
         }
@@ -136,9 +147,6 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         this.setState({currentTime: scheduleTime});
                     },
                 });
-            if (playerCallback) {
-                playerCallback(player);
-            }
             this.setState({
                 player: player,
             });
@@ -159,12 +167,8 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         }
     }
 
-    public remove = (): void => {
-        if (this.state.player) {
-            this.state.player.stop();
-        }
-        window.removeEventListener("resize", this.onWindowResize);
-        window.removeEventListener("keydown", this.handleSpaceKey);
+    public getPlayer(): Player | undefined {
+        return this.state.player;
     }
 
     private operationButton = (phase: PlayerPhase): React.ReactNode => {
