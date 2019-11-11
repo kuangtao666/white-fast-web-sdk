@@ -40,18 +40,29 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
         if (documentArray.length > 0) {
             const docs = documentArray.map((PPTData: PPTDataType) => {
                 const newDataArray = JSON.parse(PPTData.data);
-                const newDataObj = newDataArray.map((data: any) => {
-                    data.ppt.width = 1200;
-                    data.ppt.height = 675;
-                    return data;
-                });
-                return {
-                    active: PPTData.active,
-                    cover: PPTData.cover ? PPTData.cover : default_cover,
-                    id: PPTData.id,
-                    data: newDataObj,
-                    pptType: PPTData.pptType,
-                };
+                let newDataObj;
+                if (PPTData.pptType === PPTType.static) {
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: PPTData.data,
+                        pptType: PPTData.pptType,
+                    };
+                } else {
+                    newDataObj = newDataArray.map((data: any) => {
+                        data.ppt.width = 1200;
+                        data.ppt.height = 675;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                }
             });
             return docs;
         } else {
