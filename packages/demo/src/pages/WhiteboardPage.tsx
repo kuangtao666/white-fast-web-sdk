@@ -69,29 +69,29 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 // userName: "伍双",
                 // roomName: "伍双的房间",
                 // userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-               //  logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
                //  loadingSvgUrl: "",
-               //  clickLogoCallback: () => {
-               //      // this.props.history.push("/");
-               //  },
-               //  exitRoomCallback: () => {
-               //      this.props.history.push("/");
-               //  },
-               //  recordDataCallback: (data: RecordDataType) => {
-               //      this.setState({recordData: data});
-               //  },
-               //  replayCallback: () => {
-               //      this.handleReplayUrl();
-               //  },
-               //  rtc: {
-               //     type: "agora",
-               //     rtcObj: AgoraRTC,
-               //     token: "8595fd46955f427db44b4e9ba90f015d",
-               // },
-               //  identity: identityType,
-               //  language: "Chinese",
-               //  toolBarPosition: "left",
-                isManagerOpen: null,
+                clickLogoCallback: () => {
+                    // this.props.history.push("/");
+                },
+                exitRoomCallback: () => {
+                    this.props.history.push("/");
+                },
+                recordDataCallback: (data: RecordDataType) => {
+                    this.setState({recordData: data});
+                },
+                replayCallback: () => {
+                    this.handleReplayUrl();
+                },
+                rtc: {
+                   type: "agora",
+                   rtcObj: AgoraRTC,
+                   token: "8595fd46955f427db44b4e9ba90f015d",
+               },
+                identity: identityType,
+                language: "Chinese",
+                toolBarPosition: "left",
+               //  isManagerOpen: null,
                //  uploadToolBox: [
                //      {
                //          enable: true,

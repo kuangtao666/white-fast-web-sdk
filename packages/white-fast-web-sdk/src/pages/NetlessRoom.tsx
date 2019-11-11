@@ -30,7 +30,7 @@ import UploadBtn from "../tools/upload/UploadBtn";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
-import {PPTDataType} from "../components/menu/PPTDatas";
+import {PPTDataType, PPTType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
@@ -105,6 +105,7 @@ export type RealTimeProps = {
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
+    documentArrayCallback?: (data: PPTDataType[]) => void;
     isManagerOpen?: boolean | null;
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
@@ -141,12 +142,13 @@ export type RealTimeStates = {
     roomState?: RoomState;
     pptConverter?: PptConverter;
     progressDescription?: string,
-    fileUrl?: string,
+    fileUrl?: string;
     whiteboardLayerDownRef?: HTMLDivElement;
     isManagerOpen: boolean | null;
     deviceType: DeviceType;
-    classMode: ClassModeType,
-    ossConfigObj: OSSConfigObjType,
+    classMode: ClassModeType;
+    ossConfigObj: OSSConfigObjType;
+    documentArray: PPTDataType[];
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -173,6 +175,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isManagerOpen: this.handleManagerOpenState(),
             classMode: this.props.classMode !== undefined ? this.props.classMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
+            documentArray: this.props.documentArray !== undefined ? this.props.documentArray : [],
         };
         this.cursor = new UserCursor();
     }
@@ -468,6 +471,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 
+    private  documentFileCallback = (documentFile: PPTDataType): void => {
+        const {documentArrayCallback} = this.props;
+        this.setState({documentArray: [...this.state.documentArray, documentFile]});
+        if (documentArrayCallback) {
+            documentArrayCallback(this.state.documentArray);
+        }
+    }
+
     private renderExtendTool = (): React.ReactNode => {
         if (!isMobile) {
             return (
@@ -539,7 +550,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 handleFileState={this.handleFileState}
                                 isFileMenuOpen={this.state.isFileMenuOpen}
                                 language={this.props.language}
-                                documentArray={this.props.documentArray} uuid={this.props.uuid}
+                                documentArray={this.state.documentArray}
+                                uuid={this.props.uuid}
                                 room={room}/>
                         </MenuBox>
                         <Dropzone
@@ -597,11 +609,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 setMemberState={this.setMemberState}
                                 customerComponent={[
                                     <UploadBtn
-                                        toolBarPosition={this.props.toolBarPosition} uuid={this.props.uuid}
+                                        toolBarPosition={this.props.toolBarPosition}
+                                        uuid={this.props.uuid}
                                         deviceType={this.state.deviceType}
                                         oss={this.state.ossConfigObj}
                                         ossUploadCallback={this.props.ossUploadCallback}
                                         room={room}
+                                        documentFileCallback={this.documentFileCallback}
                                         uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}
                                         onProgress={this.progress}

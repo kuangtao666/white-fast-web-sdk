@@ -282,7 +282,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     private renderChatListTitle = (): React.ReactNode => {
         const {language} = this.props;
         const isEnglish = language === LanguageEnum.English;
-        const isActive = this.state.activeKey === "2";
+        const isActive = this.state.activeKey === "1";
         return (
             <Badge overflowCount={99} offset={[8, -2]} count={isActive ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                 <div>{isEnglish ? "Live Chat" : "聊天群组"}</div>

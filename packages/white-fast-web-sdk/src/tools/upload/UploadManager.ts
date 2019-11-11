@@ -1,6 +1,7 @@
 import {Room, PptConverter, PptKind, Ppt} from "white-react-sdk";
 import uuidv4 from "uuid/v4";
 import {MultipartUploadResult} from "ali-oss";
+import {PPTDataType, PPTType} from "../../components/menu/PPTDatas";
 export type imageSize = {
   width: number,
   height: number,
@@ -46,6 +47,7 @@ export class UploadManager {
     kind: PptKind,
     folder: string,
     uuid: string,
+    documentFileCallback: (data: PPTDataType) => void,
     onProgress?: PPTProgressListener,
   ): Promise<void> {
     const fileType = this.getFileType(rawFile.name);
@@ -62,6 +64,13 @@ export class UploadManager {
                 }
             },
         });
+        const documentFile: PPTDataType = {
+            active: false,
+            id: `${uuidv4()}`,
+            pptType: PPTType.static,
+            data: JSON.stringify(res.scenes),
+        };
+        documentFileCallback(documentFile);
     } else {
         res = await pptConverter.convert({
             url: pptURL,
@@ -72,8 +81,14 @@ export class UploadManager {
                 }
             },
         });
+        const documentFile: PPTDataType = {
+            active: false,
+            id: `${uuidv4()}`,
+            pptType: PPTType.dynamic,
+            data: JSON.stringify(res.scenes),
+        };
+        documentFileCallback(documentFile);
     }
-
     if (onProgress) {
         onProgress(PPTProgressPhase.Converting, 1);
     }

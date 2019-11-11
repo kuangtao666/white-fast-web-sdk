@@ -10,6 +10,7 @@ import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";
 import {LanguageEnum, ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
+import {PPTDataType} from "../../components/menu/PPTDatas";
 export type ToolBoxUploadBoxState = {
     toolBoxColor: string,
 };
@@ -38,6 +39,7 @@ export type UploadBtnProps = {
     uploadToolBox?: UploadToolBoxType[],
     language?: LanguageEnum;
     ossUploadCallback?: (res: any) => void;
+    documentFileCallback: (data: PPTDataType) => void;
     deviceType: DeviceType;
 };
 
@@ -57,7 +59,7 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
     }
 
     private uploadStatic = async (event: any): Promise<void> => {
-        const {ossUploadCallback, uuid} = this.props;
+        const {ossUploadCallback, uuid, documentFileCallback} = this.props;
         const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
@@ -67,11 +69,12 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             PptKind.Static,
             this.props.oss.folder,
             uuid,
+            documentFileCallback,
             this.props.onProgress);
     }
 
     private uploadDynamic = async (event: any): Promise<void> => {
-        const {ossUploadCallback, uuid} = this.props;
+        const {ossUploadCallback, uuid, documentFileCallback} = this.props;
         const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
         const whiteWebSdk = new WhiteWebSdk();
         const pptConverter = whiteWebSdk.pptConverter(this.props.roomToken!);
@@ -81,6 +84,7 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             PptKind.Dynamic,
             this.props.oss.folder,
             uuid,
+            documentFileCallback,
             this.props.onProgress,
             );
     }
