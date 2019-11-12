@@ -5,7 +5,6 @@ import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
 import {IdentityType} from "./WhiteboardCreatorPage";
-import {PPTType} from "../../../white-fast-web-sdk/src/components/menu/PPTDatas";
 export type WhiteboardPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;

@@ -39,6 +39,7 @@ import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
+import * as default_cover from "../assets/image/default_cover.svg";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -175,7 +176,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isManagerOpen: this.handleManagerOpenState(),
             classMode: this.props.classMode !== undefined ? this.props.classMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
-            documentArray: this.props.documentArray !== undefined ? this.props.documentArray : [],
+            documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
         };
         this.cursor = new UserCursor();
     }
@@ -244,14 +245,44 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
-            if (room.state.globalState.documentArray) {
-                room.setGlobalState({documentArray: [...this.state.documentArray, ...room.state.globalState.documentArray]});
-            } else {
-                room.setGlobalState({documentArray: [...this.state.documentArray]});
-            }
+            console.log(room.state.sceneState.scenePath);
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
+        }
+    }
+
+    private handleDocs = (documentArray: PPTDataType[]): PPTDataType[] => {
+        if (documentArray.length > 0) {
+            const docs = documentArray.map((PPTData: PPTDataType) => {
+                const newDataArray = JSON.parse(PPTData.data);
+                if (PPTData.pptType === PPTType.static) {
+                    const newDataObj = newDataArray.map((data: any) => {
+                        const proportion = data.ppt.width / data.ppt.height;
+                        data.ppt.width = 1024;
+                        data.ppt.height = 1024 / proportion;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                } else {
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataArray,
+                        pptType: PPTData.pptType,
+                    };
+                }
+            });
+            return docs;
+        } else {
+            return [];
         }
     }
 
@@ -478,12 +509,18 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
 
     private  documentFileCallback = (documentFile: PPTDataType): void => {
         const {documentArrayCallback} = this.props;
-        this.setState({documentArray: [...this.state.documentArray, documentFile]});
-        if (this.state.room) {
-            this.state.room.setGlobalState({documentArray: [...this.state.documentArray, documentFile]});
-        }
+        const documents = this.state.documentArray.map(data => {
+            data.active = false;
+            return data;
+        });
+        this.setState({documentArray: [...documents, documentFile]});
         if (documentArrayCallback) {
-            documentArrayCallback(this.state.documentArray);
+            const docs: PPTDataType[] = this.state.documentArray;
+            const documentArray = docs.map(doc => {
+                doc.data = JSON.stringify(doc.data);
+                return doc;
+            });
+            documentArrayCallback(documentArray);
         }
     }
 
@@ -498,6 +535,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         } else {
             return null;
         }
+    }
+
+    private handleDocumentArrayState = (state: PPTDataType[]): void => {
+        this.setState({documentArray: state});
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
@@ -557,9 +598,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <WhiteboardFile
                                 handleFileState={this.handleFileState}
                                 isFileMenuOpen={this.state.isFileMenuOpen}
-                                language={this.props.language}
-                                documentArray={this.state.documentArray}
-                                uuid={this.props.uuid}
+                                language={this.props.language} handleDocumentArrayState={this.handleDocumentArrayState}
+                                uuid={this.props.uuid} documentArray={this.state.documentArray}
                                 room={room}/>
                         </MenuBox>
                         <Dropzone

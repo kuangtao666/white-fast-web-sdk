@@ -2,6 +2,7 @@ import {Room, PptConverter, PptKind, Ppt} from "white-react-sdk";
 import uuidv4 from "uuid/v4";
 import {MultipartUploadResult} from "ali-oss";
 import {PPTDataType, PPTType} from "../../components/menu/PPTDatas";
+import * as default_cover from "../../assets/image/default_cover.svg";
 export type imageSize = {
   width: number,
   height: number,
@@ -65,11 +66,14 @@ export class UploadManager {
             },
         });
         const documentFile: PPTDataType = {
-            active: false,
+            active: true,
             id: `${uuidv4()}`,
             pptType: PPTType.static,
-            data: JSON.stringify(res.scenes),
+            data: res.scenes,
+            cover: default_cover,
         };
+        this.room.putScenes(`/${uuid}/${documentFile.id}`, res.scenes);
+        this.room.setScenePath(`/${uuid}/${documentFile.id}/${res.scenes[0].name}`);
         documentFileCallback(documentFile);
     } else {
         res = await pptConverter.convert({
@@ -82,28 +86,19 @@ export class UploadManager {
             },
         });
         const documentFile: PPTDataType = {
-            active: false,
+            active: true,
             id: `${uuidv4()}`,
             pptType: PPTType.dynamic,
-            data: JSON.stringify(res.scenes),
+            data: res.scenes,
+            cover: default_cover,
         };
+        this.room.putScenes(`/${uuid}/${documentFile.id}`, res.scenes);
+        this.room.setScenePath(`/${uuid}/${documentFile.id}/${res.scenes[0].name}`);
         documentFileCallback(documentFile);
     }
     if (onProgress) {
         onProgress(PPTProgressPhase.Converting, 1);
     }
-    const activeIndex = this.room.state.sceneState.scenes.length - 1;
-      const pptData: any[] = res.scenes.map((docData: any) => {
-          if (activeIndex === 0) {
-              docData.name = `${parseInt(docData.name) + activeIndex}`;
-              return docData;
-          } else {
-              docData.name = `${parseInt(docData.name) + activeIndex + 1}`;
-              return docData;
-          }
-      });
-    this.room.putScenes(`/${uuid}`, pptData, activeIndex + 1);
-    this.room.setScenePath(`/${uuid}/${pptData[0].name}`);
   }
   private getImageSize(imageInnerSize: imageSize): imageSize {
     const windowSize: imageSize = {width: window.innerWidth, height: window.innerHeight};
