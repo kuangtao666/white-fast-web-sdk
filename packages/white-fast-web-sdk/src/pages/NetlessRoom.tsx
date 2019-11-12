@@ -150,6 +150,7 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
+    isDefaultMenuVisible: boolean;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -165,6 +166,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             didSlaveConnected: false,
             menuInnerState: MenuInnerType.PPTBox,
             isMenuVisible: false,
+            isDefaultMenuVisible: false,
             roomToken: null,
             ossPercent: 0,
             converterPercent: 0,
@@ -245,7 +247,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
-            console.log(room.state.sceneState.scenePath);
+            if (this.state.isDefaultMenuVisible) {
+                this.setState({
+                    isMenuVisible: true,
+                    menuInnerState: MenuInnerType.AnnexBox,
+                });
+            }
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
@@ -331,8 +338,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
 
     public async setPptPreviewShow(): Promise<void> {
         this.setState({
-            isMenuVisible: true,
-            menuInnerState: MenuInnerType.AnnexBox,
+            isDefaultMenuVisible: true,
         });
     }
     public async setPptPreviewHide(): Promise<void> {
@@ -581,7 +587,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     room: room,
                 }}>
                     <div className="realtime-box">
-                        <MenuBox language={this.props.language} onRef={this.onRef}
+                        <MenuBox
+                            language={this.props.language}
+                            onRef={this.onRef}
                             isSidePreview={this.state.menuInnerState === MenuInnerType.AnnexBox}
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setPreviewMenuState}
