@@ -150,7 +150,6 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
-    isDefaultMenuVisible: boolean;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -166,7 +165,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             didSlaveConnected: false,
             menuInnerState: MenuInnerType.PPTBox,
             isMenuVisible: false,
-            isDefaultMenuVisible: false,
             roomToken: null,
             ossPercent: 0,
             converterPercent: 0,
@@ -247,12 +245,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
-            if (this.state.isDefaultMenuVisible) {
-                this.setState({
-                    isMenuVisible: true,
-                    menuInnerState: MenuInnerType.AnnexBox,
-                });
-            }
+            console.log(room.state.sceneState.scenePath);
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
@@ -337,9 +330,18 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     public async setPptPreviewShow(): Promise<void> {
-        this.setState({
-            isDefaultMenuVisible: true,
-        });
+        if (this.state.room) {
+            this.setState({
+                isMenuVisible: true,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        } else {
+            await timeout(1500);
+            this.setState({
+                isMenuVisible: true,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        }
     }
     public async setPptPreviewHide(): Promise<void> {
         if (this.menuChild) {
