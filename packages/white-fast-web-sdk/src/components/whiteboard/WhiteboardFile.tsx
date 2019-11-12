@@ -88,19 +88,19 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
     private selectDoc = (id: string) => {
         const {room, uuid} = this.props;
         const activeData = this.state.docs.find(data => data.id === id)!;
-        const activeIndex = room.state.sceneState.scenes.length - 1;
+        // const activeIndex = room.state.sceneState.scenes.length - 1;
         this.setState({activeDocData: activeData});
-        const pptData: any[] = activeData.data.map((docData: any, index: number) => {
-            if (activeIndex === 0) {
-                docData.name = `${parseInt(docData.name) + activeIndex}`;
-                return docData;
-            } else {
-                docData.name = `${parseInt(docData.name) + activeIndex + 1}`;
-                return docData;
-            }
-        });
-        room.putScenes(`/${uuid}`, pptData, activeIndex + 1);
-        room.setScenePath(`/${uuid}/${pptData[0].name}`);
+        // const pptData: any[] = activeData.data.map((docData: any, index: number) => {
+        //     if (activeIndex === 0) {
+        //         docData.name = `${parseInt(docData.name) + activeIndex}`;
+        //         return docData;
+        //     } else {
+        //         docData.name = `${parseInt(docData.name) + activeIndex + 1}`;
+        //         return docData;
+        //     }
+        // });
+        room.putScenes(`/${uuid}/${activeData.id}`, activeData.data);
+        room.setScenePath(`/${uuid}/${activeData.id}/1}`);
         const docsArray = this.state.docs.map(data => {
             if (data.id === id) {
                 data.active = true;
@@ -112,6 +112,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
         });
         this.setState({docs: docsArray});
         const proportion = window.innerWidth / window.innerHeight;
+        // TODO
         if (proportion > 1) {
             const zoomNumber = window.innerHeight / 675;
             room.moveCamera({scale: zoomNumber});

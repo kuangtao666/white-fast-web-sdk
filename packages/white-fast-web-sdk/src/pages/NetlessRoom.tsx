@@ -244,7 +244,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
-            room.setGlobalState({documentArray: []});
+            if (room.state.globalState.documentArray) {
+                room.setGlobalState({documentArray: [...this.state.documentArray, ...room.state.globalState.documentArray]});
+            } else {
+                room.setGlobalState({documentArray: [...this.state.documentArray]});
+            }
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
@@ -475,6 +479,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private  documentFileCallback = (documentFile: PPTDataType): void => {
         const {documentArrayCallback} = this.props;
         this.setState({documentArray: [...this.state.documentArray, documentFile]});
+        if (this.state.room) {
+            this.state.room.setGlobalState({documentArray: [...this.state.documentArray, documentFile]});
+        }
         if (documentArrayCallback) {
             documentArrayCallback(this.state.documentArray);
         }
