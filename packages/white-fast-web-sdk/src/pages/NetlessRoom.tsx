@@ -244,6 +244,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
+            room.setGlobalState({documentArray: []});
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
