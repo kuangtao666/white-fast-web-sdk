@@ -76,6 +76,8 @@ export type RtcType = {
     type: RtcEnum,
     rtcObj: any,
     token: string,
+    restId?: string,
+    restSecret?: string,
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export type RealTimeProps = {
@@ -103,6 +105,7 @@ export type RealTimeProps = {
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
     rtc?: RtcType;
+    roomCallback?: (room: Room) => void;
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
@@ -150,6 +153,7 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
+    mediaSource?: string;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -241,6 +245,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 height: 675,
                 animationMode: "immediately",
             });
+            if (this.props.roomCallback) {
+                this.props.roomCallback(room);
+            }
             if (isManagerOpen !== null) {
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
@@ -274,7 +281,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 });
                 room.setGlobalState({documentArrayState: documentArrayState});
             } else {
-                console.log(room.state.sceneState);
                 const newDocumentArray = [
                     {active: true,
                     pptType: PPTType.init,
@@ -341,6 +347,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount (): void {
         this.props.roomFacadeSetter(this);
+    }
+    private setMediaSource = (source: string): void => {
+        this.setState({mediaSource: source});
     }
     public getRoom(): Room | undefined {
         return this.state.room;
@@ -555,7 +564,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
+                    room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
+                    setMediaSource={this.setMediaSource} uuid={this.props.uuid} rtc={this.props.rtc}
                     channelName={this.props.uuid}/>
             );
         } else {
