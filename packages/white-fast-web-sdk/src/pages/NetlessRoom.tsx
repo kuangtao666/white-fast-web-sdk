@@ -672,6 +672,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             accept={"image/*"}
                             disableClick={true}
                             className="whiteboard-out-box"
+                            style={{width: this.state.isManagerOpen ? "calc(100% - 300px)" : "100%"}}
                             onDrop={this.onDropFiles}>
                             <TopLoadingBar loadingPercent={this.state.ossPercent}/>
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
