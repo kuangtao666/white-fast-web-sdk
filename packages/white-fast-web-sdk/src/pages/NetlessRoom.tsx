@@ -274,11 +274,27 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 });
                 room.setGlobalState({documentArrayState: documentArrayState});
             } else {
-                const documentArrayState: {id: string, isHaveScenes: boolean}[] = this.state.documentArray.map(data => {
-                    return {
-                        id: data.id,
-                        isHaveScenes: false,
-                    };
+                console.log(room.state.sceneState);
+                const newDocumentArray = [
+                    {active: true,
+                    pptType: PPTType.init,
+                    id: "init",
+                    data: [{componentsCount: 0,
+                        name: "init"}],
+                    }, ...this.state.documentArray];
+                this.setState({documentArray: newDocumentArray});
+                const documentArrayState: {id: string, isHaveScenes: boolean}[] = newDocumentArray.map(data => {
+                    if (data.pptType === PPTType.init && data.active) {
+                        return {
+                            id: data.id,
+                            isHaveScenes: true,
+                        };
+                    } else {
+                        return {
+                            id: data.id,
+                            isHaveScenes: false,
+                        };
+                    }
                 });
                 room.setGlobalState({documentArrayState: documentArrayState});
             }

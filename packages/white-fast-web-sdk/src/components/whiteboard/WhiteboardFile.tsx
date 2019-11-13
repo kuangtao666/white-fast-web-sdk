@@ -1,6 +1,7 @@
 import * as React from "react";
 import "./WhiteboardFile.less";
 import {Room} from "white-react-sdk";
+import * as default_cover_home from "../../assets/image/default_cover_home.svg";
 import * as close from "../../assets/image/close.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
 import {LanguageEnum} from "../../pages/NetlessRoom";
@@ -48,7 +49,11 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
             const activeDoc = documentArrayState.find(doc => doc.id === id);
             if (activeDoc) {
                 if (activeDoc.isHaveScenes) {
-                    room.setScenePath(`/${uuid}/${activeData.id}/1`);
+                    if (activeDoc.id === "init") {
+                        room.setScenePath(`/init`);
+                    } else {
+                        room.setScenePath(`/${uuid}/${activeData.id}/1`);
+                    }
                 } else {
                     room.putScenes(`/${uuid}/${activeData.id}`, activeData.data);
                     room.setScenePath(`/${uuid}/${activeData.id}/1`);
@@ -89,7 +94,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                             </svg>
                         </div>
                     </div>;
-                } else {
+                } else if (data.pptType === PPTType.dynamic) {
                     return <div
                         key={`${data.id}`}
                         onClick={() => this.selectDoc(data.id)}
@@ -101,6 +106,22 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                                 <img src={data.cover}/>
                                 <div>
                                     {isEnglish ? "Dynamic PPT" : "动态 PPT"}
+                                </div>
+                            </div>
+                        </div>
+                    </div>;
+                } else {
+                    return <div
+                        key={`${data.id}`}
+                        onClick={() => this.selectDoc(data.id)}
+                        className="menu-ppt-inner-cell">
+                        <div
+                            style={{backgroundColor: data.active ? "#f2f2f2" : "#ffffff"}}
+                            className="menu-ppt-image-box">
+                            <div className="menu-ppt-image-box-inner">
+                                <img src={default_cover_home}/>
+                                <div>
+                                    {isEnglish ? "Home Docs" : "主页文档"}
                                 </div>
                             </div>
                         </div>

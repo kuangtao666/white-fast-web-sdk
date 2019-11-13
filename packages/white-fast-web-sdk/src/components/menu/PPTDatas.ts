@@ -9,4 +9,5 @@ export type PPTDataType = {
 export enum PPTType {
     dynamic = "dynamic",
     static = "static",
+    init = "init",
 }
