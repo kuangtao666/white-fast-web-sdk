@@ -245,13 +245,24 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
-            console.log(room.state.sceneState.scenePath);
+            this.initDocumentState(room);
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
         }
     }
 
+    private initDocumentState = (room: Room): void => {
+        if (this.state.documentArray.length > 0 ) {
+            const documentArrayState: {id: string, isHaveScenes: boolean}[] = this.state.documentArray.map(data => {
+                return {
+                    id: data.id,
+                    isHaveScenes: false,
+                };
+            });
+            room.setGlobalState({documentArrayState: documentArrayState});
+        }
+    }
     private handleDocs = (documentArray: PPTDataType[]): PPTDataType[] => {
         if (documentArray.length > 0) {
             const docs = documentArray.map((PPTData: PPTDataType) => {
@@ -522,6 +533,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return data;
         });
         this.setState({documentArray: [...documents, documentFile]});
+        if (this.state.room) {
+            if (this.state.room.state.globalState.documentArrayState) {
+                const documentArrayState = this.state.room.state.globalState.documentArrayState;
+                this.state.room.setGlobalState({documentArrayState: [...documentArrayState, {id: documentFile.id, isHaveScenes: true}]});
+            } else {
+                this.state.room.setGlobalState({documentArrayState: [{id: documentFile.id, isHaveScenes: true}]});
+            }
+        }
         if (documentArrayCallback) {
             const docs: PPTDataType[] = this.state.documentArray;
             const documentArray = docs.map(doc => {
