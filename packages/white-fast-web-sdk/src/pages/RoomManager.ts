@@ -17,6 +17,7 @@ export type GuestUserType = {
     isHandUp: boolean,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
+    isReminded: boolean,
 };
 export type HostUserType = {
     userId: string,
@@ -24,10 +25,10 @@ export type HostUserType = {
     avatar?: string,
     name?: string,
     isVideoFullScreen?: boolean,
-    isHostVideoStart?: boolean,
     classMode: ClassModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
+    isVideoEnable: boolean,
 };
 
 export class RoomManager {
@@ -64,11 +65,11 @@ export class RoomManager {
                       userId: this.userId,
                       identity: this.identity,
                       avatar: this.userAvatarUrl,
-                      isHostVideoStart: false,
                       name: this.name,
                       classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                       cameraState: ViewMode.Broadcaster,
                       disableCameraTransform: false,
+                      isVideoEnable: false,
                   };
                   this.room.disableCameraTransform = false;
                   this.room.setGlobalState({hostInfo: myHostInfo});
@@ -80,10 +81,10 @@ export class RoomManager {
                   identity: this.identity,
                   avatar: this.userAvatarUrl,
                   name: this.name,
-                  isHostVideoStart: false,
                   classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                   cameraState: ViewMode.Broadcaster,
                   disableCameraTransform: false,
+                  isVideoEnable: false,
               };
               this.room.disableCameraTransform = false;
               this.room.setGlobalState({hostInfo: myHostInfo});
@@ -106,6 +107,7 @@ export class RoomManager {
                   isHandUp: false,
                   cameraState: ViewMode.Follower,
                   disableCameraTransform: true,
+                  isReminded: false,
               };
               this.room.disableCameraTransform = true;
               this.room.setGlobalState({guestUsers: [guestUser]});
@@ -126,6 +128,7 @@ export class RoomManager {
                       isHandUp: false,
                       cameraState: ViewMode.Follower,
                       disableCameraTransform: true,
+                      isReminded: false,
                   };
                   this.room.disableCameraTransform = true;
                   globalGuestUsers.push(guestUser);

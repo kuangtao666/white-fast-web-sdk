@@ -74,35 +74,36 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 this.setState({activeKey: "2"});
             }
         }
-        if (this.props.hostInfo !== undefined && this.props.hostInfo.isHostVideoStart !== undefined && nextProps.hostInfo !== undefined && nextProps.hostInfo.isHostVideoStart !== undefined) {
-            if (this.props.hostInfo.isHostVideoStart !== nextProps.hostInfo.isHostVideoStart) {
-                    if (nextProps.hostInfo.isHostVideoStart) {
-                        message.success("333");
-                    }
-               }
-        }
     }
 
     private setMediaState = (state: boolean): void => {
-        const {room} = this.props;
-        room.setGlobalState({hostInfo: {
-                ...room.state.globalState.hostInfo,
-                isHostVideoStart: state,
-            }});
+        const {room, identity} = this.props;
+        if (identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isVideoEnable: state,
+                }});
+        }
     }
 
     private renderHost = (): React.ReactNode => {
-        return (
-            <ClassroomMedia
-                language={this.props.language}
-                rtc={this.props.rtc}
-                userId={parseInt(this.props.userId)}
-                handleManagerState={this.props.handleManagerState}
-                identity={this.props.identity}
-                room={this.props.room}
-                setMediaState={this.setMediaState}
-                channelId={this.props.uuid}/>
-        );
+        const {room} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        if (hostInfo) {
+            return (
+                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                language={this.props.language}
+                                rtc={this.props.rtc}
+                                userId={parseInt(this.props.userId)}
+                                handleManagerState={this.props.handleManagerState}
+                                identity={this.props.identity}
+                                room={this.props.room}
+                                setMediaState={this.setMediaState}
+                                channelId={this.props.uuid}/>
+            );
+        } else {
+            return null;
+        }
     }
 
     private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {

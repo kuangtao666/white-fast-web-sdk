@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
 import {Room, RoomMember, ViewMode} from "white-react-sdk";
-import {Button, Radio, Tooltip} from "antd";
+import {Button, Radio, Tooltip, notification, Icon} from "antd";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import ClassroomMediaHostCell from "./ClassroomMediaHostCell";
 import {CSSProperties} from "react";
@@ -40,6 +40,7 @@ export type ClassroomMediaProps = {
     handleManagerState: () => void;
     rtc?: RtcType;
     language?: LanguageEnum;
+    isVideoEnable: boolean;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -56,6 +57,65 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             localStream: null,
             isRtcLoading: false,
         };
+    }
+
+    public componentDidMount(): void {
+        if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
+            const {userId} = this.props;
+            const key = `${Date.now()}`;
+            const btn = (
+                <Button type="primary" onClick={() => {
+                    notification.close(key);
+                }}>
+                    确认加入
+                </Button>
+            );
+            notification.open({
+                message: `你好！${userId}`,
+                duration: 8,
+                description:
+                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                btn,
+                key,
+                top: 64,
+            });
+        }
+    }
+
+    public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
+        if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
+            if (nextProps.isVideoEnable) {
+                this.videoJoinRemind();
+            }  else {
+                notification.close("notification");
+            }
+        }
+    }
+
+    private videoJoinRemind = (): void => {
+        const {userId, channelId} = this.props;
+        if (this.props.identity !== IdentityType.host) {
+            const key = `notification`;
+            const btn = (
+                <Button type="primary" onClick={() => {
+                    this.startRtc(userId, channelId);
+                    notification.close(key);
+                }}>
+                    确认加入
+                </Button>
+            );
+            notification.open({
+                message: `你好！${userId}`,
+                duration: 6,
+                description:
+                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                btn,
+                key,
+                top: 64,
+            });
+        }
     }
 
     private renderMediaBoxArray = (): React.ReactNode => {
@@ -508,6 +568,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.setState({remoteMediaStreams: [], localStream: null});
                 console.log("client leaves channel success");
                 this.setState({isMaskAppear: false});
+                this.props.setMediaState(false);
             }, (err: any) => {
                 console.log("channel leave failed");
                 console.error(err);
