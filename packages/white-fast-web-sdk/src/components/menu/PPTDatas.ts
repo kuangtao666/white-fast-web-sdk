@@ -4,7 +4,6 @@ export type PPTDataType = {
     id: string,
     data: any,
     cover?: string,
-    isHaveScenes?: boolean,
 };
 
 export enum PPTType {

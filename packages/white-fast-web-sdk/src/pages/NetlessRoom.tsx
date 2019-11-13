@@ -253,14 +253,35 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private initDocumentState = (room: Room): void => {
+        const {uuid} = this.props;
         if (this.state.documentArray.length > 0 ) {
-            const documentArrayState: {id: string, isHaveScenes: boolean}[] = this.state.documentArray.map(data => {
-                return {
-                    id: data.id,
-                    isHaveScenes: false,
-                };
-            });
-            room.setGlobalState({documentArrayState: documentArrayState});
+            const activeDoc = this.state.documentArray.find(data => data.active);
+            if (activeDoc) {
+                room.putScenes(`/${uuid}/${activeDoc.id}`, activeDoc.data);
+                room.setScenePath(`/${uuid}/${activeDoc.id}/1`);
+                const documentArrayState: {id: string, isHaveScenes: boolean}[] = this.state.documentArray.map(data => {
+                    if (data.id === activeDoc.id) {
+                        return {
+                            id: data.id,
+                            isHaveScenes: true,
+                        };
+                    } else {
+                        return {
+                            id: data.id,
+                            isHaveScenes: false,
+                        };
+                    }
+                });
+                room.setGlobalState({documentArrayState: documentArrayState});
+            } else {
+                const documentArrayState: {id: string, isHaveScenes: boolean}[] = this.state.documentArray.map(data => {
+                    return {
+                        id: data.id,
+                        isHaveScenes: false,
+                    };
+                });
+                room.setGlobalState({documentArrayState: documentArrayState});
+            }
         }
     }
     private handleDocs = (documentArray: PPTDataType[]): PPTDataType[] => {
