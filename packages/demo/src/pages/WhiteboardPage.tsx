@@ -150,7 +150,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                     },
                 ],
             });
-            this.netlessRoom.setPptPreviewShow();
         }
     }
 
