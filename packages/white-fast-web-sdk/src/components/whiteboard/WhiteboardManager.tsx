@@ -69,9 +69,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
         if (this.props.isChatOpen !== nextProps.isChatOpen) {
             if (nextProps.isChatOpen) {
-                this.setState({activeKey: "2"});
-            } else {
                 this.setState({activeKey: "1"});
+            } else {
+                this.setState({activeKey: "2"});
             }
         }
         if (this.props.hostInfo !== undefined && this.props.hostInfo.isHostVideoStart !== undefined && nextProps.hostInfo !== undefined && nextProps.hostInfo.isHostVideoStart !== undefined) {
