@@ -28,8 +28,27 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
         if (documentArray) {
             const documents: PPTDataType[] = documentArray;
             const activeData = documents.find(data => data.id === id)!;
-            room.putScenes(`/${uuid}/${activeData.id}`, activeData.data);
-            room.setScenePath(`/${uuid}/${activeData.id}/1`);
+            if (room.state.globalState.documentArrayState) {
+                const documentArrayState: {id: string, isHaveScenes: boolean}[] = room.state.globalState.documentArrayState;
+                const activeDoc = documentArrayState.find(doc => doc.id === id);
+                if (activeDoc) {
+                    if (activeDoc.isHaveScenes) {
+                        room.setScenePath(`/${uuid}/${activeData.id}/1`);
+                    } else {
+                        room.putScenes(`/${uuid}/${activeData.id}`, activeData.data);
+                        room.setScenePath(`/${uuid}/${activeData.id}/1`);
+                        const newDocumentArrayState = documentArrayState.map(newDoc => {
+                            if (newDoc.id === id) {
+                                newDoc.isHaveScenes = true;
+                                return newDoc;
+                            } else {
+                                return newDoc;
+                            }
+                        });
+                        room.setGlobalState({documentArrayState: newDocumentArrayState});
+                    }
+                }
+            }
             const docsArray = documents.map(data => {
                 if (data.id === id) {
                     data.active = true;
