@@ -18,7 +18,6 @@ export type WhiteboardRecordState = {
 export type WhiteboardRecordProps = {
     channelName: string;
     uuid: string;
-    setMediaSource: (source: string) => void;
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
@@ -96,13 +95,12 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     const resp = await this.recrod.query();
                     if (resp.serverResponse.fileList) {
                         const res = await this.recrod.stop();
-                        this.props.setMediaSource(res.serverResponse.fileList);
                         message.info("结束录制");
                         const time =  new Date();
                         const timeStamp = time.getTime();
                         this.setState({isRecord: false});
                         if (this.props.recordDataCallback) {
-                            this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime});
+                            this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime, mediaUrl: res.serverResponse.fileList});
                         }
                         this.stopClock();
                     } else {

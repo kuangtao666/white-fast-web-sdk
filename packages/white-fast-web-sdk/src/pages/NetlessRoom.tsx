@@ -154,7 +154,6 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
-    mediaSource?: string;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -349,9 +348,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount (): void {
         this.props.roomFacadeSetter(this);
-    }
-    private setMediaSource = (source: string): void => {
-        this.setState({mediaSource: source});
     }
     public getRoom(): Room | undefined {
         return this.state.room;
@@ -568,7 +564,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 <WhiteboardRecord
                     room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
-                    setMediaSource={this.setMediaSource} uuid={this.props.uuid} rtc={this.props.rtc}
+                    uuid={this.props.uuid} rtc={this.props.rtc}
                     channelName={this.props.uuid}/>
             );
         } else {

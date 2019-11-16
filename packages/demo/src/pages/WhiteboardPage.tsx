@@ -13,7 +13,8 @@ export type WhiteboardPageProps = RouteComponentProps<{
 
 export type WhiteboardPageState = {
     recordData: RecordDataType | null;
-    room: any,
+    room: any;
+    mediaSource?: string;
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export default class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {

@@ -59,9 +59,9 @@ export default class ReplayPage extends React.Component<ReplayPageProps, Whitebo
                 },
                 beginTimestamp: startTime && parseInt(startTime),
                 duration: this.getDuration(),
-                layoutType: "Suspension",
+                layoutType: "Side",
                 isManagerOpen: true,
-                mediaUrl: "https://netless-media.oss-cn-hangzhou.aliyuncs.com/ad5ce237124d7210e24ca5838d79f509_b9fc17d5d017466ab446c3094c87b1b3.m3u8",
+                mediaUrl: `https://netless-media.oss-cn-hangzhou.aliyuncs.com/${mediaUrl}`,
             });
         }
     }
