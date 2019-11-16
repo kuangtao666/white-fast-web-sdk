@@ -13,6 +13,7 @@ import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
+import {RoomContextConsumer} from "../../pages/RoomContext";
 const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {
@@ -42,8 +43,6 @@ export type WhiteboardManagerStates = {
 
 
 export default class WhiteboardManager extends React.Component<WhiteboardManagerProps, WhiteboardManagerStates> {
-
-
     public constructor(props: WhiteboardManagerProps) {
         super(props);
         this.state = {
@@ -91,15 +90,18 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (hostInfo) {
             return (
-                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                language={this.props.language}
-                                rtc={this.props.rtc}
-                                userId={parseInt(this.props.userId)}
-                                handleManagerState={this.props.handleManagerState}
-                                identity={this.props.identity}
-                                room={this.props.room}
-                                setMediaState={this.setMediaState}
-                                channelId={this.props.uuid}/>
+                <RoomContextConsumer children={context => (
+                    <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                    startRtcCallback={context.startRtcCallback}
+                                    language={this.props.language}
+                                    rtc={this.props.rtc}
+                                    userId={parseInt(this.props.userId)}
+                                    handleManagerState={this.props.handleManagerState}
+                                    identity={this.props.identity}
+                                    room={this.props.room}
+                                    setMediaState={this.setMediaState}
+                                    channelId={this.props.uuid}/>
+                )}/>
             );
         } else {
             return null;

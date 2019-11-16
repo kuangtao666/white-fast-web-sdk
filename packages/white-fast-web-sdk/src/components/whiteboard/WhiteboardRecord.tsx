@@ -1,5 +1,5 @@
 import * as React from "react";
-import {message} from "antd";
+import {message, Modal} from "antd";
 import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
@@ -7,6 +7,9 @@ import {RecordOperator} from "./RecordOperator";
 import {ossConfigObj} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
+import video_record from "../../assets/image/video_record.svg";
+import whiteboard_record from "../../assets/image/whiteboard_record.svg";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -14,6 +17,7 @@ export type WhiteboardRecordState = {
     startTime?: number;
     endTime?: number;
     mediaUrl?: string;
+    isRecordModalVisible: boolean;
 };
 export type WhiteboardRecordProps = {
     channelName: string;
@@ -21,6 +25,7 @@ export type WhiteboardRecordProps = {
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
+    startRtc?: () => void;
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
@@ -31,6 +36,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         this.state = {
             isRecord: false,
             secondsElapsed: 0,
+            isRecordModalVisible: false,
         };
     }
 
@@ -45,7 +51,9 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         this.interval = setInterval(() => this.tick(), 1000);
     }
     private stopClock = (): void => {
-        clearInterval(this.interval);
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
     }
     private getMediaState = (): boolean => {
         const {room} = this.props;
@@ -148,20 +156,85 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         }
     }
     public componentWillUnmount(): void {
-        clearInterval(this.interval);
+        this.stopClock();
+    }
+
+    private handleCancel = (): void => {
+        this.setState({isRecordModalVisible: false});
+    }
+
+    private renderRecordBtn = (): React.ReactNode => {
+        const isMediaRun = this.getMediaState();
+        if (isMediaRun) {
+            return (
+                <div onClick={this.record} className="record-out-box">
+                    <div className="record-box">
+                        {this.state.isRecord ?
+                            <div className="record-box-inner-rect"/> :
+                            <div className="record-box-inner"/>
+                        }
+                    </div>
+                    <div className="record-time">
+                        {displayWatch(this.state.secondsElapsed)}
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div onClick={() => this.setState({isRecordModalVisible: true})} className="record-out-box">
+                    <div className="record-box">
+                        {this.state.isRecord ?
+                            <div className="record-box-inner-rect"/> :
+                            <div className="record-box-inner"/>
+                        }
+                    </div>
+                    <div className="record-time">
+                        {displayWatch(this.state.secondsElapsed)}
+                    </div>
+                </div>
+            );
+        }
     }
     public render(): React.ReactNode {
         return (
-            <div onClick={this.record} className="record-out-box">
-                <div className="record-box">
-                    {this.state.isRecord ?
-                        <div className="record-box-inner-rect"/> :
-                        <div className="record-box-inner"/>
-                    }
-                </div>
-                <div className="record-time">
-                    {displayWatch(this.state.secondsElapsed)}
-                </div>
+            <div>
+                {this.renderRecordBtn()}
+                <Modal
+                    centered
+                    width={384}
+                    visible={this.state.isRecordModalVisible}
+                    footer={null}
+                    onCancel={this.handleCancel}
+                >
+                    <div className="record-select-box">
+                        <div onClick={async() => {
+                            if (this.props.startRtc) {
+                                this.props.startRtc();
+                                await timeout(2000);
+                                await this.record();
+                                this.setState({isRecordModalVisible: false});
+                            }
+                        }} className="record-select-cell">
+                            <div className="record-select-cell-icon">
+                                <img style={{width: 96}} src={video_record}/>
+                            </div>
+                            <div className="record-select-cell-text">
+                                开启视频并录制
+                            </div>
+                        </div>
+                        <div onClick={async() => {
+                            await this.record();
+                            this.setState({isRecordModalVisible: false});
+                        }} className="record-select-cell">
+                            <div className="record-select-cell-icon">
+                                <img style={{width: 85}} src={whiteboard_record}/>
+                            </div>
+                            <div className="record-select-cell-text">
+                                确认只录制白板
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         );
     }

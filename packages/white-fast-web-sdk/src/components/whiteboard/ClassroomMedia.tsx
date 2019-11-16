@@ -41,6 +41,7 @@ export type ClassroomMediaProps = {
     rtc?: RtcType;
     language?: LanguageEnum;
     isVideoEnable: boolean;
+    startRtcCallback: (startRtc: () => void) => void;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -81,6 +82,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 top: 64,
             });
         }
+        this.props.startRtcCallback(this.startRtc);
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
@@ -94,12 +96,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private videoJoinRemind = (): void => {
-        const {userId, channelId} = this.props;
+        const {userId} = this.props;
         if (this.props.identity !== IdentityType.host) {
             const key = `notification`;
             const btn = (
                 <Button type="primary" onClick={() => {
-                    this.startRtc(userId, channelId);
+                    this.startRtc();
                     notification.close(key);
                 }}>
                     确认加入
@@ -286,7 +288,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private renderRtcBtn = (): React.ReactNode => {
-        const {userId, channelId, language, rtc} = this.props;
+        const {language, rtc} = this.props;
         const isEnglish = language === LanguageEnum.English;
         if (rtc) {
             return (
@@ -295,7 +297,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
                         :
                         <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
-                            <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                            <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
                         </Tooltip>
                     }
                 </div>
@@ -434,8 +436,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private startRtc = (userId: number, channelId: string): void => {
-        const {rtc, identity} = this.props;
+    private startRtc = (): void => {
+        const {rtc, identity, userId, channelId} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
         this.setState({isRtcLoading: true});

@@ -154,6 +154,7 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
+    startRtc?: () => void;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -348,11 +349,27 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount (): void {
         this.props.roomFacadeSetter(this);
+        window.addEventListener("beforeunload", this.beforeunload);
     }
-    public getRoom(): Room | undefined {
-        return this.state.room;
+    private beforeunload = (): void => {
+        const {identity} = this.props;
+        const {room} = this.state;
+        if (room && identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isVideoEnable: false,
+                }});
+        }
     }
     public release(): void {
+        const {identity} = this.props;
+        const {room} = this.state;
+        if (room && identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isVideoEnable: false,
+                }});
+        }
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
@@ -382,6 +399,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillUnmount(): void {
         this.props.roomFacadeSetter(null);
+        window.removeEventListener("beforeunload", this.beforeunload);
     }
 
     public async setPptPreviewShow(): Promise<void> {
@@ -561,7 +579,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
-                <WhiteboardRecord
+                <WhiteboardRecord startRtc={this.state.startRtc}
                     room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
                     uuid={this.props.uuid} rtc={this.props.rtc}
@@ -613,6 +631,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     private handleDocumentArrayState = (state: PPTDataType[]): void => {
         this.setState({documentArray: state});
     }
+
+    private startRtcCallback = (func: () => void): void => {
+        this.setState({startRtc: func});
+    }
+
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -650,6 +673,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
+                    startRtcCallback: this.startRtcCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: room,
                 }}>
