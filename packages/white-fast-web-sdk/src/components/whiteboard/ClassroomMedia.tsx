@@ -91,7 +91,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             });
         }
         this.props.startRtcCallback(this.startRtc);
-        this.props.stopRtcCallback(this.stopLocal);
+        this.props.stopRtcCallback(this.stopRtc);
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
@@ -100,6 +100,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.videoJoinRemind();
             }  else {
                 notification.close("notification");
+                this.stopRtc();
             }
         }
     }
@@ -421,7 +422,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        <div className="manager-box-inner-host2">
                            <div className="manager-box-btn">
                                <Tooltip placement={"right"} title={isEnglish ? "Close video call" : "关闭视频"}>
-                                   <div className="manager-box-btn-hang" onClick={() => this.stopLocal()}>
+                                   <div className="manager-box-btn-hang" onClick={() => this.stopRtc()}>
                                        <img src={hangUp}/>
                                    </div>
                                </Tooltip>
@@ -575,7 +576,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
         this.agoraClient.on("peer-leave", (evt: any) => {
             const uid = evt.uid;
-            this.stop(uid);
+            this.stopStreams(uid);
             console.log("remote user left ", uid);
         });
         this.agoraClient.on("mute-video", (evt: any) => {
@@ -620,7 +621,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
     }
 
-    private stop = (streamId: number): void => {
+    private stopStreams = (streamId: number): void => {
         const mediaStreams = this.state.remoteMediaStreams;
         const stream = mediaStreams.find((stream: NetlessStream) => {
             return stream.getId() === streamId;
@@ -640,21 +641,34 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private stopLocal = (): void => {
+    private stopRtc = (): void => {
         const localStream = this.state.localStream;
-        if (localStream) {
-            this.agoraClient.leave(() => {
-                localStream.stop();
-                localStream.close();
-                this.setState({remoteMediaStreams: [], localStream: null});
-                console.log("client leaves channel success");
-                this.setState({isMaskAppear: false});
-                this.setMediaState(false);
-            }, (err: any) => {
-                console.log("channel leave failed");
-                console.error(err);
-                this.setState({isMaskAppear: false});
-            });
+        if (this.agoraClient) {
+            if (localStream) {
+                this.agoraClient.leave(() => {
+                    localStream.stop();
+                    localStream.close();
+                    this.setState({remoteMediaStreams: [], localStream: null});
+                    console.log("client leaves channel success");
+                    this.setState({isMaskAppear: false});
+                    this.setMediaState(false);
+                }, (err: any) => {
+                    console.log("channel leave failed");
+                    console.error(err);
+                    this.setState({isMaskAppear: false});
+                });
+            } else {
+                this.agoraClient.leave(() => {
+                    this.setState({remoteMediaStreams: [], localStream: null});
+                    console.log("client leaves channel success");
+                    this.setState({isMaskAppear: false});
+                    this.setMediaState(false);
+                }, (err: any) => {
+                    console.log("channel leave failed");
+                    console.error(err);
+                    this.setState({isMaskAppear: false});
+                });
+            }
         }
     }
 
