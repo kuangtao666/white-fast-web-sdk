@@ -66,6 +66,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             const key = `${Date.now()}`;
             const btn = (
                 <Button type="primary" onClick={() => {
+                    this.startRtc();
                     notification.close(key);
                 }}>
                     确认加入
