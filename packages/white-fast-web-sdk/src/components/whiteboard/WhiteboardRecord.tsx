@@ -9,7 +9,6 @@ import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
-const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -25,7 +24,7 @@ export type WhiteboardRecordProps = {
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
-    startRtc?: () => void;
+    startRtc?: (recordFunc?: () => void) => void;
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
@@ -207,11 +206,9 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     onCancel={this.handleCancel}
                 >
                     <div className="record-select-box">
-                        <div onClick={async() => {
+                        <div onClick={() => {
                             if (this.props.startRtc) {
-                                this.props.startRtc();
-                                await timeout(2000);
-                                await this.record();
+                                this.props.startRtc(this.record);
                                 this.setState({isRecordModalVisible: false});
                             }
                         }} className="record-select-cell">

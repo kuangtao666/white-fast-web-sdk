@@ -75,16 +75,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private setMediaState = (state: boolean): void => {
-        const {room, identity} = this.props;
-        if (identity === IdentityType.host) {
-            room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
-                    isVideoEnable: state,
-                }});
-        }
-    }
-
     private renderHost = (): React.ReactNode => {
         const {room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
@@ -99,7 +89,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                     handleManagerState={this.props.handleManagerState}
                                     identity={this.props.identity}
                                     room={this.props.room}
-                                    setMediaState={this.setMediaState}
                                     channelId={this.props.uuid}/>
                 )}/>
             );

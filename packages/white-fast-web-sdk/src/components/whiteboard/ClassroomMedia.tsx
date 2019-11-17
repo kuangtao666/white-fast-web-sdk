@@ -36,12 +36,11 @@ export type ClassroomMediaProps = {
     channelId: string;
     room: Room;
     identity?: IdentityType;
-    setMediaState: (state: boolean) => void;
     handleManagerState: () => void;
     rtc?: RtcType;
     language?: LanguageEnum;
     isVideoEnable: boolean;
-    startRtcCallback: (startRtc: () => void) => void;
+    startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -436,7 +435,16 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private startRtc = (): void => {
+    private setMediaState = (state: boolean): void => {
+        const {room, identity} = this.props;
+        if (identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isVideoEnable: state,
+                }});
+        }
+    }
+    private startRtc = (recordFunc?: () => void): void => {
         const {rtc, identity, userId, channelId} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
@@ -461,7 +469,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             this.setState({localStream: netlessLocalStream, isRtcLoading: false});
             netlessLocalStream.play("rtc_local_stream");
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
-                this.props.setMediaState(true);
+                this.setMediaState(true);
+                if (recordFunc) {
+                    recordFunc();
+                }
                 console.log("User " + uid + " join channel successfully");
                 if (identity !== IdentityType.listener) {
                     this.agoraClient.publish(localStream, (err: any) => {
@@ -570,7 +581,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.setState({remoteMediaStreams: [], localStream: null});
                 console.log("client leaves channel success");
                 this.setState({isMaskAppear: false});
-                this.props.setMediaState(false);
+                this.setMediaState(false);
             }, (err: any) => {
                 console.log("channel leave failed");
                 console.error(err);

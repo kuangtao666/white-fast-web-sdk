@@ -154,7 +154,7 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
-    startRtc?: () => void;
+    startRtc?: (recordFunc?: () => void) => void;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
