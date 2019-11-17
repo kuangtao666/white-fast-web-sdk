@@ -41,6 +41,7 @@ export type ClassroomMediaProps = {
     language?: LanguageEnum;
     isVideoEnable: boolean;
     startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
+    stopRtcCallback: (stopRtc: () => void) => void;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -82,6 +83,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             });
         }
         this.props.startRtcCallback(this.startRtc);
+        this.props.stopRtcCallback(this.stopLocal);
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {

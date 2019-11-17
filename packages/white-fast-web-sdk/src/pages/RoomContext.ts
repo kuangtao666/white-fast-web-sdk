@@ -4,6 +4,7 @@ export type RoomContext = {
     whiteboardLayerDownRef: HTMLDivElement;
     room: Room;
     startRtcCallback: (func: () => void) => void;
+    stopRtcCallback: (func: () => void) => void;
     onColorArrayChange?: (colorArray: string[]) => void;
 };
 

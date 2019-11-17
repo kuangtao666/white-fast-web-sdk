@@ -83,6 +83,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 <RoomContextConsumer children={context => (
                     <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
                                     startRtcCallback={context.startRtcCallback}
+                                    stopRtcCallback={context.stopRtcCallback}
                                     language={this.props.language}
                                     rtc={this.props.rtc}
                                     userId={parseInt(this.props.userId)}

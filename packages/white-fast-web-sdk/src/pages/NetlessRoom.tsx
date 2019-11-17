@@ -155,6 +155,7 @@ export type RealTimeStates = {
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
     startRtc?: (recordFunc?: () => void) => void;
+    stopRtc?: (stopFunc?: () => void) => void;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -352,16 +353,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         window.addEventListener("beforeunload", this.beforeunload);
     }
     private beforeunload = (): void => {
-        const {identity} = this.props;
-        const {room} = this.state;
-        if (room && identity === IdentityType.host) {
-            room.setGlobalState({hostInfo: {
-                    ...room.state.globalState.hostInfo,
-                    isVideoEnable: false,
-                }});
-        }
+        this.stopAll();
     }
-    public release(): void {
+
+    private stopAll = (): void => {
         const {identity} = this.props;
         const {room} = this.state;
         if (room && identity === IdentityType.host) {
@@ -378,7 +373,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.roomManager) {
             this.roomManager.stop();
         }
+        if (this.state.stopRtc) {
+            this.state.stopRtc();
+        }
         window.removeEventListener("resize", this.onWindowResize);
+        window.removeEventListener("beforeunload", this.beforeunload);
+    }
+    public release(): void {
+        this.stopAll();
     }
     public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
@@ -636,6 +638,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({startRtc: func});
     }
 
+    private stopRtcCallback = (func: () => void): void => {
+        this.setState({stopRtc: func});
+    }
+
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -674,6 +680,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
                     startRtcCallback: this.startRtcCallback,
+                    stopRtcCallback: this.stopRtcCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: room,
                 }}>
