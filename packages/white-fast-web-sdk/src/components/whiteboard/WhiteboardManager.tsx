@@ -85,7 +85,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                     startRtcCallback={context.startRtcCallback}
                                     stopRtcCallback={context.stopRtcCallback}
                                     language={this.props.language}
-                                    rtc={this.props.rtc}
+                                    rtc={this.props.rtc} classMode={hostInfo.classMode}
                                     userId={parseInt(this.props.userId)}
                                     handleManagerState={this.props.handleManagerState}
                                     identity={this.props.identity}
@@ -242,7 +242,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     private handleDotState = (): boolean => {
-        const isActive = this.state.activeKey === "1";
+        const isActive = this.state.activeKey === "2";
         if (this.props.isManagerOpen && !isActive) {
             const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
             if (guestUsers && guestUsers.length > 0) {

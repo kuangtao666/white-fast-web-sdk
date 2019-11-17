@@ -9,7 +9,7 @@ export type ClassroomMediaCellProps = {
     stream: NetlessStream;
     streamsLength: number;
     room: Room;
-    localStream: NetlessStream | null;
+    isLocalStreamPublish: boolean;
     identity?: IdentityType;
 };
 
@@ -38,7 +38,7 @@ export default class ClassroomMediaHostCell extends React.Component<ClassroomMed
                 if (streamsLength === 3) {
                     return {width: "100%", height: 225};
                 } else {
-                    if (streamsLength === 1 && this.props.localStream === null) {
+                    if (streamsLength === 1 && !this.props.isLocalStreamPublish) {
                         return {width: "100%", height: 300};
                     } else {
                         return {width: "100%", height: 150};

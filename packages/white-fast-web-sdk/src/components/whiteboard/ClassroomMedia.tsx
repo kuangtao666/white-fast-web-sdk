@@ -28,6 +28,7 @@ export type ClassroomMediaStates = {
     isFullScreen: boolean;
     remoteMediaStreams: NetlessStream[];
     localStream: NetlessStream | null;
+    isLocalStreamPublish: boolean;
     isRtcLoading: boolean;
 };
 
@@ -35,6 +36,7 @@ export type ClassroomMediaProps = {
     userId: number;
     channelId: string;
     room: Room;
+    classMode: ClassModeType;
     identity?: IdentityType;
     handleManagerState: () => void;
     rtc?: RtcType;
@@ -57,6 +59,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             remoteMediaStreams: [],
             localStream: null,
             isRtcLoading: false,
+            isLocalStreamPublish: false,
         };
     }
 
@@ -101,6 +104,14 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }  else {
                 notification.close("notification");
                 this.stopRtc();
+            }
+        }
+
+        if (this.props.classMode !== nextProps.classMode) {
+            if (nextProps.classMode !== ClassModeType.discuss && this.agoraClient !==  undefined) {
+                if (this.props.identity !== IdentityType.host && this.state.localStream) {
+                    this.agoraClient.unpublish(this.state.localStream);
+                }
             }
         }
     }
@@ -185,7 +196,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             if (hostStream) {
                 return <ClassroomMediaHostCell
                     streamsLength={remoteMediaStreams.length}
-                    localStream={this.state.localStream}
+                    isLocalStreamPublish={this.state.isLocalStreamPublish}
                     room={this.props.room}
                     identity={this.props.identity}
                     key={`${hostStream.getId()}`}
@@ -528,11 +539,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 ...localStream,
                 state: {isVideoOpen: true, isAudioOpen: true},
             };
-            this.setState({isRtcLoading: false, isRtcStart: true});
+            this.setState({isRtcLoading: false, isRtcStart: true, localStream: netlessLocalStream});
             if (isUnPublish) {
                 console.log("yes");
             } else {
-                this.setState({localStream: netlessLocalStream});
                 netlessLocalStream.play("rtc_local_stream");
             }
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
@@ -548,6 +558,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         this.agoraClient.publish(localStream, (err: any) => {
                             console.log("Publish local stream error: " + err);
                         });
+                        this.setState({isLocalStreamPublish: true})
                     }
                 }
             }, (err: any) => {
@@ -650,25 +661,22 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.agoraClient.leave(() => {
                     localStream.stop();
                     localStream.close();
-                    this.setState({remoteMediaStreams: [], localStream: null});
-                    console.log("client leaves channel success");
-                    this.setState({isMaskAppear: false, isRtcStart: false});
+                    this.setState({remoteMediaStreams: [], localStream: null, isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
                     this.setMediaState(false);
                 }, (err: any) => {
                     console.log("channel leave failed");
                     console.error(err);
-                    this.setState({isMaskAppear: false, isRtcStart: false});
+                    this.setState({isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
                 });
             } else {
                 this.agoraClient.leave(() => {
-                    this.setState({remoteMediaStreams: [], localStream: null});
+                    this.setState({remoteMediaStreams: [], localStream: null, isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
                     console.log("client leaves channel success");
-                    this.setState({isMaskAppear: false, isRtcStart: false});
                     this.setMediaState(false);
                 }, (err: any) => {
                     console.log("channel leave failed");
                     console.error(err);
-                    this.setState({isMaskAppear: false, isRtcStart: false});
+                    this.setState({isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
                 });
             }
         }
