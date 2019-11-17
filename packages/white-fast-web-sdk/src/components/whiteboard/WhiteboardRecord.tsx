@@ -9,6 +9,7 @@ import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
+import player_green from "../../assets/image/player_green.svg";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -17,6 +18,8 @@ export type WhiteboardRecordState = {
     endTime?: number;
     mediaUrl?: string;
     isRecordModalVisible: boolean;
+    isRecordWhiteboardOnly: boolean;
+    isRecordOver: boolean;
 };
 export type WhiteboardRecordProps = {
     channelName: string;
@@ -25,6 +28,7 @@ export type WhiteboardRecordProps = {
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
     startRtc?: (recordFunc?: () => void) => void;
+    replayCallback?: () => void;
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
@@ -36,6 +40,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
             isRecord: false,
             secondsElapsed: 0,
             isRecordModalVisible: false,
+            isRecordWhiteboardOnly: false,
+            isRecordOver: false,
         };
     }
 
@@ -108,6 +114,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                         this.setState({isRecord: false});
                         if (this.props.recordDataCallback) {
                             this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime, mediaUrl: res.serverResponse.fileList});
+                            this.setState({mediaUrl: res.serverResponse.fileList});
                         }
                         this.stopClock();
                     } else {
@@ -117,7 +124,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     message.info("结束录制");
                     const time =  new Date();
                     const timeStamp = time.getTime();
-                    this.setState({isRecord: false});
+                    this.setState({isRecord: false, isRecordOver: true});
                     if (this.props.recordDataCallback) {
                         this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime});
                     }
@@ -164,7 +171,21 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
 
     private renderRecordBtn = (): React.ReactNode => {
         const isMediaRun = this.getMediaState();
-        if (isMediaRun) {
+        if (this.state.mediaUrl || this.state.isRecordOver) {
+          return <div onClick={() => {
+              if (this.props.replayCallback) {
+                  this.props.replayCallback();
+              }
+          }} className="record-out-box">
+              <div className="record-box-play">
+                  <img src={player_green}/>
+              </div>
+              <div className="record-time">
+                  {displayWatch(this.state.secondsElapsed)}
+              </div>
+          </div>;
+        }
+        if (isMediaRun || this.state.isRecordWhiteboardOnly) {
             return (
                 <div onClick={this.record} className="record-out-box">
                     <div className="record-box">
@@ -221,7 +242,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                         </div>
                         <div onClick={async() => {
                             await this.record();
-                            this.setState({isRecordModalVisible: false});
+                            this.setState({isRecordModalVisible: false, isRecordWhiteboardOnly: true});
                         }} className="record-select-cell">
                             <div className="record-select-cell-icon">
                                 <img style={{width: 85}} src={whiteboard_record}/>
