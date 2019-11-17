@@ -62,11 +62,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
     public componentDidMount(): void {
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
-            const {userId} = this.props;
+            const {userId, room} = this.props;
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
             const key = `${Date.now()}`;
             const btn = (
                 <Button type="primary" onClick={() => {
-                    this.startRtc();
+                    if (hostInfo) {
+                        if (hostInfo.classMode === ClassModeType.discuss) {
+                            this.startRtc();
+                        } else {
+                            this.startRtc(undefined, true);
+                        }
+                    }
                     notification.close(key);
                 }}>
                     确认加入
@@ -98,12 +105,19 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private videoJoinRemind = (): void => {
-        const {userId} = this.props;
+        const {userId, room} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (this.props.identity !== IdentityType.host) {
             const key = `notification`;
             const btn = (
                 <Button type="primary" onClick={() => {
-                    this.startRtc();
+                    if (hostInfo) {
+                        if (hostInfo.classMode === ClassModeType.discuss) {
+                            this.startRtc();
+                        } else {
+                            this.startRtc(undefined, true);
+                        }
+                    }
                     notification.close(key);
                 }}>
                     确认加入
@@ -127,8 +141,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const {room, identity} = this.props;
         const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
         if (hostRoomMember) {
-            const mediaStreams = remoteMediaStreams.filter(data => data.getId() !== hostRoomMember.payload.userId);
-            const hasHost = !!remoteMediaStreams.find(data => data.getId() === hostRoomMember.payload.userId);
+            const mediaStreams = remoteMediaStreams.filter(data => `${data.getId()}` !== hostRoomMember.payload.userId);
+            const hasHost = !!remoteMediaStreams.find(data => `${data.getId()}` === hostRoomMember.payload.userId);
             const nodes = mediaStreams.map((data: NetlessStream, index: number) => {
                 return (
                     <ClassroomMediaCell
@@ -166,9 +180,14 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }
         });
         if (hostRoomMember) {
-            const hostStream = remoteMediaStreams.find((stream: NetlessStream) => stream.getId() === hostRoomMember.payload.userId);
+            const hostStream = remoteMediaStreams.find((stream: NetlessStream) => `${stream.getId()}` === hostRoomMember.payload.userId);
             if (hostStream) {
-                return <ClassroomMediaHostCell streamsLength={remoteMediaStreams.length} key={`${hostStream.getId()}`} stream={hostStream}/>;
+                return <ClassroomMediaHostCell
+                    streamsLength={remoteMediaStreams.length}
+                    room={this.props.room}
+                    identity={this.props.identity}
+                    key={`${hostStream.getId()}`}
+                    stream={hostStream}/>;
             } else {
                 return null;
             }
@@ -178,13 +197,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private renderSelfBox = (): React.ReactNode => {
+        const {room, identity} = this.props;
         const {localStream} = this.state;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (localStream) {
-            return (
-                <div style={this.handleLocalVideoBox()} id="rtc_local_stream">
-                </div>
-            );
-
+            if (hostInfo.classMode === ClassModeType.discuss || identity === IdentityType.host) {
+                return (
+                    <div style={this.handleLocalVideoBox()} id="rtc_local_stream">
+                    </div>
+                );
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -290,20 +314,53 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private renderRtcBtn = (): React.ReactNode => {
-        const {language, rtc} = this.props;
+        const {language, rtc, room, identity} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isEnglish = language === LanguageEnum.English;
         if (rtc) {
-            return (
-                <div className="manager-box-btn">
-                    {this.state.isRtcLoading ?
-                        <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
-                        :
-                        <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
-                            <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
-                        </Tooltip>
+            if (hostInfo.classMode === ClassModeType.discuss) {
+                return (
+                    <div className="manager-box-btn">
+                        {this.state.isRtcLoading ?
+                            <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                            :
+                            <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                                <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                            </Tooltip>
+                        }
+                    </div>
+                );
+            } else {
+                if (identity === IdentityType.host) {
+                    return (
+                        <div className="manager-box-btn">
+                            {this.state.isRtcLoading ?
+                                <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                                :
+                                <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                                    <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                                </Tooltip>
+                            }
+                        </div>
+                    );
+                } else {
+                    if (hostInfo.isVideoEnable) {
+                        return (
+                            <div className="manager-box-btn">
+                                {this.state.isRtcLoading ?
+                                    <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                                    :
+                                    <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                                        <Button onClick={() => this.startRtc(undefined, true)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                                    </Tooltip>
+                                }
+                            </div>
+                        );
+                    } else {
+                        return null;
                     }
-                </div>
-            );
+                }
+            }
         } else {
             return null;
         }
@@ -406,7 +463,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         } else {
             const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
             if (hostRoomMember) {
-                const hostStream = remoteMediaStreams.find((stream: NetlessStream) => stream.getId() === hostRoomMember.payload.userId);
+                const hostStream = remoteMediaStreams.find((stream: NetlessStream) => `${stream.getId()}` === hostRoomMember.payload.userId);
                 if (hostStream) {
                     if (remoteMediaStreams.length === 0) {
                         return {width: "100%", height: 300};
@@ -447,7 +504,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }});
         }
     }
-    private startRtc = (recordFunc?: () => void): void => {
+    private startRtc = (recordFunc?: () => void, isUnPublish?: boolean): void => {
         const {rtc, identity, userId, channelId} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
@@ -470,7 +527,11 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 state: {isVideoOpen: true, isAudioOpen: true},
             };
             this.setState({localStream: netlessLocalStream, isRtcLoading: false});
-            netlessLocalStream.play("rtc_local_stream");
+            if (isUnPublish) {
+                console.log("yes");
+            } else {
+                netlessLocalStream.play("rtc_local_stream");
+            }
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
                 this.setMediaState(true);
                 if (recordFunc) {
@@ -478,9 +539,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }
                 console.log("User " + uid + " join channel successfully");
                 if (identity !== IdentityType.listener) {
-                    this.agoraClient.publish(localStream, (err: any) => {
-                        console.log("Publish local stream error: " + err);
-                    });
+                    if (isUnPublish) {
+                        console.log("yes");
+                    } else {
+                        this.agoraClient.publish(localStream, (err: any) => {
+                            console.log("Publish local stream error: " + err);
+                        });
+                    }
                 }
             }, (err: any) => {
                 console.log(err);
