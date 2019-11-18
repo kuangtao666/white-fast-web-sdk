@@ -5,7 +5,6 @@ import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
 import {IdentityType} from "./WhiteboardCreatorPage";
-import {PPTType} from "../../../white-fast-web-sdk/src/components/menu/PPTDatas";
 export type WhiteboardPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;
@@ -14,7 +13,8 @@ export type WhiteboardPageProps = RouteComponentProps<{
 
 export type WhiteboardPageState = {
     recordData: RecordDataType | null;
-    room: any,
+    room: any;
+    mediaSource?: string;
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export default class WhiteboardPage extends React.Component<WhiteboardPageProps, WhiteboardPageState> {
@@ -69,29 +69,33 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 // userName: "伍双",
                 // roomName: "伍双的房间",
                 // userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",
-               //  logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
+                logoUrl: "https://white-sdk.oss-cn-beijing.aliyuncs.com/video/netless_black2.svg",
                //  loadingSvgUrl: "",
-               //  clickLogoCallback: () => {
-               //      // this.props.history.push("/");
-               //  },
-               //  exitRoomCallback: () => {
-               //      this.props.history.push("/");
-               //  },
-               //  recordDataCallback: (data: RecordDataType) => {
-               //      this.setState({recordData: data});
-               //  },
-               //  replayCallback: () => {
-               //      this.handleReplayUrl();
-               //  },
-               //  rtc: {
-               //     type: "agora",
-               //     rtcObj: AgoraRTC,
-               //     token: "8595fd46955f427db44b4e9ba90f015d",
-               // },
-               //  identity: identityType,
-               //  language: "Chinese",
-               //  toolBarPosition: "left",
-                isManagerOpen: null,
+                clickLogoCallback: () => {
+                    // this.props.history.push("/");
+                },
+                exitRoomCallback: () => {
+                    this.props.history.push("/");
+                },
+                recordDataCallback: (data: RecordDataType) => {
+                    this.setState({recordData: data});
+                },
+                replayCallback: () => {
+                    this.handleReplayUrl();
+                },
+                roomCallback: (room: any) => {
+                },
+                rtc: {
+                   type: "agora",
+                   rtcObj: AgoraRTC,
+                   token: "8595fd46955f427db44b4e9ba90f015d",
+                    restId: "b4e2bc22a89549b2a84969b844258fe3",
+                    restSecret: "594daac9c32b491795f8cbd27a7d5265",
+               },
+                identity: identityType,
+                language: "Chinese",
+                toolBarPosition: "left",
+                isManagerOpen: true,
                //  uploadToolBox: [
                //      {
                //          enable: true,
@@ -123,7 +127,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                //     folder: "ppt",
                //     prefix: "https://netless-agora-whiteboard.oss-cn-hangzhou.aliyuncs.com/",
                // },
-               enableRecord: false,
+               // enableRecord: false,
                //  pagePreviewPosition: "right",
                //  boardBackgroundColor: "#F2F2F2",
                //  isReadOnly: false,

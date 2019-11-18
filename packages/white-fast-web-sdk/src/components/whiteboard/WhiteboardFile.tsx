@@ -1,154 +1,82 @@
 import * as React from "react";
 import "./WhiteboardFile.less";
 import {Room} from "white-react-sdk";
+import * as default_cover_home from "../../assets/image/default_cover_home.svg";
 import * as close from "../../assets/image/close.svg";
-import * as default_cover from "../../assets/image/default_cover.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
-import PPTDatas from "../menu/PPTDatas";
 import {LanguageEnum} from "../../pages/NetlessRoom";
-const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type WhiteboardFileProps = {
     room: Room;
     handleFileState: () => void;
     isFileOpen?: boolean;
-    documentArray?: PPTDataType[];
     language?: LanguageEnum;
     isFileMenuOpen: boolean;
     uuid: string;
-};
-
-export type WhiteboardFileStates = {
-    docs: PPTDataType[];
-    activeDocData?: PPTDataType;
+    documentArray: PPTDataType[];
+    handleDocumentArrayState: (state: PPTDataType[]) => void;
 };
 
 
-export default class WhiteboardFile extends React.Component<WhiteboardFileProps, WhiteboardFileStates> {
+
+export default class WhiteboardFile extends React.Component<WhiteboardFileProps, {}> {
 
     public constructor(props: WhiteboardFileProps) {
         super(props);
-        this.state = {
-            docs: [],
-        };
-    }
-    public async componentDidMount(): Promise<void> {
-        let docs: PPTDataType[] = [];
-        if (this.props.documentArray) {
-            docs = this.props.documentArray.map((PPTData: PPTDataType) => {
-                const dataObj = JSON.parse(PPTData.data);
-                if (PPTData.pptType === PPTType.static) {
-                    const newDataObj = dataObj.map((data: any) => {
-                        data.ppt.width = 1200;
-                        data.ppt.height = 675;
-                        return data;
-                    });
-                    return {
-                        active: PPTData.active,
-                        cover: PPTData.cover ? PPTData.cover : default_cover,
-                        id: PPTData.id,
-                        data: newDataObj,
-                        pptType: PPTData.pptType,
-                    };
-                } else {
-                    const newDataObj = dataObj.map((data: any) => {
-                        data.ppt.width = 1200;
-                        data.ppt.height = 675;
-                        return data;
-                    });
-                    return {
-                        active: PPTData.active,
-                        cover: PPTData.cover ? PPTData.cover : default_cover,
-                        id: PPTData.id,
-                        data: newDataObj,
-                        pptType: PPTData.pptType,
-                    };
-                }
-            });
-        } else {
-            docs = PPTDatas.map((PPTData: PPTDataType) => {
-                const dataObj = JSON.parse(PPTData.data);
-                if (PPTData.pptType === PPTType.static) {
-                    const newDataObj = dataObj.map((data: any) => {
-                        data.ppt.width = 1200;
-                        data.ppt.height = 675;
-                        return data;
-                    });
-                    return {
-                        active: PPTData.active,
-                        cover: PPTData.cover ? PPTData.cover : default_cover,
-                        id: PPTData.id,
-                        data: newDataObj,
-                        pptType: PPTData.pptType,
-                    };
-                } else {
-                    const newDataObj = dataObj.map((data: any) => {
-                        data.ppt.width = 1200;
-                        data.ppt.height = 675;
-                        return data;
-                    });
-                    return {
-                        active: PPTData.active,
-                        cover: PPTData.cover ? PPTData.cover : default_cover,
-                        id: PPTData.id,
-                        data: newDataObj,
-                        pptType: PPTData.pptType,
-                    };
-                }
-            });
-        }
-        this.setState({docs: docs});
-        await this.setUpDefaultDocs(docs);
-    }
-
-    private setUpDefaultDocs = async (docs: PPTDataType[]): Promise<void> => {
-        const activeDoc = docs.find(data => data.active);
-        if (activeDoc) {
-            await timeout(0);
-            this.selectDoc(activeDoc.id);
-        }
     }
 
     private selectDoc = (id: string) => {
+        const {documentArray, handleDocumentArrayState} = this.props;
+        if (documentArray) {
+            this.handleUpdateDocsState(id, documentArray);
+            const docsArray = documentArray.map(data => {
+                if (data.id === id) {
+                    data.active = true;
+                    return data;
+                } else {
+                    data.active = false;
+                    return data;
+                }
+            });
+            handleDocumentArrayState(docsArray);
+        }
+    }
+
+    private handleUpdateDocsState = (id: string, documentArray: PPTDataType[]): void => {
         const {room, uuid} = this.props;
-        const activeData = this.state.docs.find(data => data.id === id)!;
-        const activeIndex = room.state.sceneState.scenes.length - 1;
-        this.setState({activeDocData: activeData});
-        const pptData: any[] = activeData.data.map((docData: any, index: number) => {
-            if (activeIndex === 0) {
-                docData.name = `${parseInt(docData.name) + activeIndex}`;
-                return docData;
-            } else {
-                docData.name = `${parseInt(docData.name) + activeIndex + 1}`;
-                return docData;
+        const activeData = documentArray.find(data => data.id === id)!;
+        if (room.state.globalState.documentArrayState) {
+            const documentArrayState: {id: string, isHaveScenes: boolean}[] = room.state.globalState.documentArrayState;
+            const activeDoc = documentArrayState.find(doc => doc.id === id);
+            if (activeDoc) {
+                if (activeDoc.isHaveScenes) {
+                    if (activeDoc.id === "init") {
+                        room.setScenePath(`/init`);
+                    } else {
+                        room.setScenePath(`/${uuid}/${activeData.id}/1`);
+                    }
+                } else {
+                    room.putScenes(`/${uuid}/${activeData.id}`, activeData.data);
+                    room.setScenePath(`/${uuid}/${activeData.id}/1`);
+                    const newDocumentArrayState = documentArrayState.map(newDoc => {
+                        if (newDoc.id === id) {
+                            newDoc.isHaveScenes = true;
+                            return newDoc;
+                        } else {
+                            return newDoc;
+                        }
+                    });
+                    room.setGlobalState({documentArrayState: newDocumentArrayState});
+                }
             }
-        });
-        room.putScenes(`/${uuid}`, pptData, activeIndex + 1);
-        room.setScenePath(`/${uuid}/${pptData[0].name}`);
-        const docsArray = this.state.docs.map(data => {
-            if (data.id === id) {
-                data.active = true;
-                return data;
-            } else {
-                data.active = false;
-                return data;
-            }
-        });
-        this.setState({docs: docsArray});
-        const proportion = window.innerWidth / window.innerHeight;
-        if (proportion > 1) {
-            const zoomNumber = window.innerHeight / 675;
-            room.moveCamera({scale: zoomNumber});
-        } else {
-            const zoomNumber = window.innerWidth / 1200;
-            room.moveCamera({scale: zoomNumber});
         }
     }
     public render(): React.ReactNode {
-        const {language, handleFileState} = this.props;
+        const {language, handleFileState, documentArray} = this.props;
         const isEnglish = language === LanguageEnum.English;
         let docCells: React.ReactNode;
-        if (this.state.docs.length > 0) {
-            docCells = this.state.docs.map(data => {
+        if (documentArray && documentArray.length > 0) {
+            const documents: PPTDataType[] = documentArray;
+            docCells = documents.map(data => {
                 if (data.pptType === PPTType.static) {
                     return <div
                         key={`${data.id}`}
@@ -166,7 +94,7 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                             </svg>
                         </div>
                     </div>;
-                } else {
+                } else if (data.pptType === PPTType.dynamic) {
                     return <div
                         key={`${data.id}`}
                         onClick={() => this.selectDoc(data.id)}
@@ -178,6 +106,22 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                                 <img src={data.cover}/>
                                 <div>
                                     {isEnglish ? "Dynamic PPT" : "动态 PPT"}
+                                </div>
+                            </div>
+                        </div>
+                    </div>;
+                } else {
+                    return <div
+                        key={`${data.id}`}
+                        onClick={() => this.selectDoc(data.id)}
+                        className="menu-ppt-inner-cell">
+                        <div
+                            style={{backgroundColor: data.active ? "#f2f2f2" : "#ffffff"}}
+                            className="menu-ppt-image-box">
+                            <div className="menu-ppt-image-box-inner">
+                                <img src={default_cover_home}/>
+                                <div>
+                                    {isEnglish ? "Home Docs" : "主页文档"}
                                 </div>
                             </div>
                         </div>

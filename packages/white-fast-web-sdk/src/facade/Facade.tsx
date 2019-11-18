@@ -9,7 +9,6 @@ import {
 
 export interface RoomFacadeObject {
     release(): void;
-    getRoom(): Room | undefined;
     setPptPreviewShow(): void;
     setPptPreviewHide(): void;
 }
@@ -27,7 +26,6 @@ export const RoomFacade = (element: string, config: any): RoomFacadeObject => {
 
     const result: RoomFacadeObject = {
         release: () => delegate!.release(),
-        getRoom: () => delegate!.getRoom(),
         setPptPreviewShow: () => delegate!.setPptPreviewShow(),
         setPptPreviewHide: () => delegate!.setPptPreviewHide(),
     };

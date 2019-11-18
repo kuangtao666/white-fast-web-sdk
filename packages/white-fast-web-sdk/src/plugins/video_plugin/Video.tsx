@@ -13,7 +13,7 @@ export type VideoProps = {
 };
 
 export default class Video extends React.Component<VideoProps> {
-    private player: React.RefObject<HTMLVideoElement>;
+    private readonly player: React.RefObject<HTMLVideoElement>;
     public constructor(props: VideoProps) {
         super(props);
         this.player = React.createRef();
@@ -42,12 +42,12 @@ export default class Video extends React.Component<VideoProps> {
     public componentDidMount(): void {
         if (this.player.current) {
             this.player.current.addEventListener("play", (event: any) => {
-                if (this.props.play === false) {
+                if (!this.props.play) {
                     this.props.onPlayed(true);
                 }
             });
             this.player.current.addEventListener("pause", (event: any) => {
-                if (this.props.play === true) {
+                if (this.props.play) {
                     this.props.onPlayed(false);
                 }
             });
@@ -65,14 +65,14 @@ export default class Video extends React.Component<VideoProps> {
     public render(): React.ReactNode {
         return (
             <video src={this.props.videoURL}
-                ref={this.player}
-                style={{
-                    width: this.props.width,
-                    height: this.props.height,
-                    pointerEvents: this.props.controls ? "auto" : "inherit"
-                }}
-                preload="auto"
-                controls={this.props.controls}
+                   ref={this.player}
+                   style={{
+                       width: this.props.width,
+                       height: this.props.height,
+                       pointerEvents: this.props.controls ? "auto" : "inherit",
+                   }}
+                   preload="auto"
+                   controls={this.props.controls}
             />
         );
     }

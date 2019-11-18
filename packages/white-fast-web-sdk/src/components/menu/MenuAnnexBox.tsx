@@ -109,6 +109,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                     height={"calc(100vh - 84px)"}
                     itemCount={scenes.length}
                     itemSize={157.5}
+                    overscanCount={6}
                     renderItem={(itemInfo: ItemInfo) => {
                         const cell = scenes[itemInfo.index];
                         const isActive = itemInfo.index === activeIndex;

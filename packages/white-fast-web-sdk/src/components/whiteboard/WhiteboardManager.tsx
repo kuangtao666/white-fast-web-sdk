@@ -13,6 +13,7 @@ import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
+import {RoomContextConsumer} from "../../pages/RoomContext";
 const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {
@@ -42,8 +43,6 @@ export type WhiteboardManagerStates = {
 
 
 export default class WhiteboardManager extends React.Component<WhiteboardManagerProps, WhiteboardManagerStates> {
-
-
     public constructor(props: WhiteboardManagerProps) {
         super(props);
         this.state = {
@@ -69,40 +68,34 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
         if (this.props.isChatOpen !== nextProps.isChatOpen) {
             if (nextProps.isChatOpen) {
-                this.setState({activeKey: "2"});
-            } else {
                 this.setState({activeKey: "1"});
+            } else {
+                this.setState({activeKey: "2"});
             }
         }
-        if (this.props.hostInfo !== undefined && this.props.hostInfo.isHostVideoStart !== undefined && nextProps.hostInfo !== undefined && nextProps.hostInfo.isHostVideoStart !== undefined) {
-            if (this.props.hostInfo.isHostVideoStart !== nextProps.hostInfo.isHostVideoStart) {
-                    if (nextProps.hostInfo.isHostVideoStart) {
-                        message.success("333");
-                    }
-               }
-        }
-    }
-
-    private setMediaState = (state: boolean): void => {
-        const {room} = this.props;
-        room.setGlobalState({hostInfo: {
-                ...room.state.globalState.hostInfo,
-                isHostVideoStart: state,
-            }});
     }
 
     private renderHost = (): React.ReactNode => {
-        return (
-            <ClassroomMedia
-                language={this.props.language}
-                rtc={this.props.rtc}
-                userId={parseInt(this.props.userId)}
-                handleManagerState={this.props.handleManagerState}
-                identity={this.props.identity}
-                room={this.props.room}
-                setMediaState={this.setMediaState}
-                channelId={this.props.uuid}/>
-        );
+        const {room} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        if (hostInfo) {
+            return (
+                <RoomContextConsumer children={context => (
+                    <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                    startRtcCallback={context.startRtcCallback}
+                                    stopRtcCallback={context.stopRtcCallback}
+                                    language={this.props.language}
+                                    rtc={this.props.rtc} classMode={hostInfo.classMode}
+                                    userId={parseInt(this.props.userId)}
+                                    handleManagerState={this.props.handleManagerState}
+                                    identity={this.props.identity}
+                                    room={this.props.room}
+                                    channelId={this.props.uuid}/>
+                )}/>
+            );
+        } else {
+            return null;
+        }
     }
 
     private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
@@ -249,7 +242,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     private handleDotState = (): boolean => {
-        const isActive = this.state.activeKey === "1";
+        const isActive = this.state.activeKey === "2";
         if (this.props.isManagerOpen && !isActive) {
             const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
             if (guestUsers && guestUsers.length > 0) {
@@ -282,7 +275,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     private renderChatListTitle = (): React.ReactNode => {
         const {language} = this.props;
         const isEnglish = language === LanguageEnum.English;
-        const isActive = this.state.activeKey === "2";
+        const isActive = this.state.activeKey === "1";
         return (
             <Badge overflowCount={99} offset={[8, -2]} count={isActive ? 0 : (this.state.messages.length - this.state.seenMessagesLength)}>
                 <div>{isEnglish ? "Live Chat" : "聊天群组"}</div>

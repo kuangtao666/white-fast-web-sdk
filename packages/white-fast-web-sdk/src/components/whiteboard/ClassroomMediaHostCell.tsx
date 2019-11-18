@@ -1,11 +1,16 @@
 import * as React from "react";
-import {NetlessStream} from "./ClassroomMedia";
+import {IdentityType, NetlessStream} from "./ClassroomMedia";
 import "./ClassroomMediaCell.less";
 import {CSSProperties} from "react";
+import {Room} from "white-react-sdk";
+import {ClassModeType, HostUserType} from "../../pages/RoomManager";
 
 export type ClassroomMediaCellProps = {
     stream: NetlessStream;
     streamsLength: number;
+    room: Room;
+    isLocalStreamPublish: boolean;
+    identity?: IdentityType;
 };
 
 export default class ClassroomMediaHostCell extends React.Component<ClassroomMediaCellProps, {}> {
@@ -22,11 +27,24 @@ export default class ClassroomMediaHostCell extends React.Component<ClassroomMed
     }
 
     private handleLocalVideoBox = (): CSSProperties => {
-        const {streamsLength} = this.props;
+        const {streamsLength, identity, room} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (streamsLength === 0) {
             return {width: "100%", height: 300};
         } else {
-            return {width: "100%", height: 150};
+            if (identity !== IdentityType.host && hostInfo.classMode !== ClassModeType.discuss) {
+                return {width: "100%", height: 300};
+            } else {
+                if (streamsLength === 3) {
+                    return {width: "100%", height: 225};
+                } else {
+                    if (streamsLength === 1 && !this.props.isLocalStreamPublish) {
+                        return {width: "100%", height: 300};
+                    } else {
+                        return {width: "100%", height: 150};
+                    }
+                }
+            }
         }
     }
 

@@ -1,19 +1,3 @@
-export enum SdkMessageType {
-    ON_PAGE_NUM = "onPagenum",
-    ON_LOAD_COMPLETE = "onLoadComplete",
-    ON_PAGE_CHANGE = "onJumpPage",
-    ON_CUSTOM_MSG = "onFileMessage",
-    ON_EXTEND_NOTICE = "ExtendedNotice",
-    ON_H5_MESSAGE = "h5Message",
-    CG_COCOS_MESSAGE = "CocosMessage",
-    // ------------------- 课件向端发消息
-    REQUEST_MASK_AUTHORIZE_PRIVILEGE = "requestMaskAuthorizePrivilege",
-    REQUEST_BASE_INFO = "requestBaseinfo",
-    CHANGE_PAGE_SUCCESS = "changPageSuccess",
-    ON_PAGE_CHANGE_SUCCESS = "ON_PAGE_CHANGE_SUCCESS",
-}
-
-
 export class IframeController {
 
     private readonly setGlobalState: (netlessState: any) => void;

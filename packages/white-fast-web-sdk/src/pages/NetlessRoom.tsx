@@ -30,7 +30,7 @@ import UploadBtn from "../tools/upload/UploadBtn";
 import {RoomContextProvider} from "./RoomContext";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
 import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
-import {PPTDataType} from "../components/menu/PPTDatas";
+import {PPTDataType, PPTType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
 import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
@@ -39,6 +39,8 @@ import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
+import * as default_cover from "../assets/image/default_cover.svg";
+import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -75,6 +77,8 @@ export type RtcType = {
     type: RtcEnum,
     rtcObj: any,
     token: string,
+    restId?: string,
+    restSecret?: string,
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export type RealTimeProps = {
@@ -102,9 +106,11 @@ export type RealTimeProps = {
     clickLogoCallback?: () => void;
     deviceType?: DeviceType;
     rtc?: RtcType;
+    roomCallback?: (room: Room) => void;
     exitRoomCallback?: () => void;
     replayCallback?: () => void;
     recordDataCallback?: (data: RecordDataType) => void;
+    documentArrayCallback?: (data: PPTDataType[]) => void;
     isManagerOpen?: boolean | null;
     elementId: string;
     ossConfigObj?: OSSConfigObjType;
@@ -141,12 +147,15 @@ export type RealTimeStates = {
     roomState?: RoomState;
     pptConverter?: PptConverter;
     progressDescription?: string,
-    fileUrl?: string,
+    fileUrl?: string;
     whiteboardLayerDownRef?: HTMLDivElement;
     isManagerOpen: boolean | null;
     deviceType: DeviceType;
-    classMode: ClassModeType,
-    ossConfigObj: OSSConfigObjType,
+    classMode: ClassModeType;
+    ossConfigObj: OSSConfigObjType;
+    documentArray: PPTDataType[];
+    startRtc?: (recordFunc?: () => void) => void;
+    stopRtc?: (stopFunc?: () => void) => void;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -173,6 +182,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isManagerOpen: this.handleManagerOpenState(),
             classMode: this.props.classMode !== undefined ? this.props.classMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
+            documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
         };
         this.cursor = new UserCursor();
     }
@@ -193,10 +203,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " "});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteVideoPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
+            (window as any).__userId = userId;
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
@@ -237,13 +248,98 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 height: 675,
                 animationMode: "immediately",
             });
+            if (this.props.roomCallback) {
+                this.props.roomCallback(room);
+            }
             if (isManagerOpen !== null) {
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
             }
+            this.initDocumentState(room);
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {
             message.error("join fail");
+        }
+    }
+
+    private initDocumentState = (room: Room): void => {
+        const {uuid} = this.props;
+        if (this.state.documentArray.length > 0 ) {
+            const activeDoc = this.state.documentArray.find(data => data.active);
+            if (activeDoc) {
+                room.putScenes(`/${uuid}/${activeDoc.id}`, activeDoc.data);
+                room.setScenePath(`/${uuid}/${activeDoc.id}/1`);
+                const documentArrayState: {id: string, isHaveScenes: boolean}[] = this.state.documentArray.map(data => {
+                    if (data.id === activeDoc.id) {
+                        return {
+                            id: data.id,
+                            isHaveScenes: true,
+                        };
+                    } else {
+                        return {
+                            id: data.id,
+                            isHaveScenes: false,
+                        };
+                    }
+                });
+                room.setGlobalState({documentArrayState: documentArrayState});
+            } else {
+                const newDocumentArray = [
+                    {active: true,
+                    pptType: PPTType.init,
+                    id: "init",
+                    data: [{componentsCount: 0,
+                        name: "init"}],
+                    }, ...this.state.documentArray];
+                this.setState({documentArray: newDocumentArray});
+                const documentArrayState: {id: string, isHaveScenes: boolean}[] = newDocumentArray.map(data => {
+                    if (data.pptType === PPTType.init && data.active) {
+                        return {
+                            id: data.id,
+                            isHaveScenes: true,
+                        };
+                    } else {
+                        return {
+                            id: data.id,
+                            isHaveScenes: false,
+                        };
+                    }
+                });
+                room.setGlobalState({documentArrayState: documentArrayState});
+            }
+        }
+    }
+    private handleDocs = (documentArray: PPTDataType[]): PPTDataType[] => {
+        if (documentArray.length > 0) {
+            const docs = documentArray.map((PPTData: PPTDataType) => {
+                const newDataArray = JSON.parse(PPTData.data);
+                if (PPTData.pptType === PPTType.static) {
+                    const newDataObj = newDataArray.map((data: any) => {
+                        const proportion = data.ppt.width / data.ppt.height;
+                        data.ppt.width = 1024;
+                        data.ppt.height = 1024 / proportion;
+                        return data;
+                    });
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataObj,
+                        pptType: PPTData.pptType,
+                    };
+                } else {
+                    return {
+                        active: PPTData.active,
+                        cover: PPTData.cover ? PPTData.cover : default_cover,
+                        id: PPTData.id,
+                        data: newDataArray,
+                        pptType: PPTData.pptType,
+                    };
+                }
+            });
+            return docs;
+        } else {
+            return [];
         }
     }
 
@@ -254,11 +350,21 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillMount (): void {
         this.props.roomFacadeSetter(this);
+        window.addEventListener("beforeunload", this.beforeunload);
     }
-    public getRoom(): Room | undefined {
-        return this.state.room;
+    private beforeunload = (): void => {
+        this.stopAll();
     }
-    public release(): void {
+
+    private stopAll = (): void => {
+        const {identity} = this.props;
+        const {room} = this.state;
+        if (room && identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isVideoEnable: false,
+                }});
+        }
         this.didLeavePage = true;
         if (this.state.room) {
             this.state.room.removeMagixEventListener("handup");
@@ -267,7 +373,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.roomManager) {
             this.roomManager.stop();
         }
+        if (this.state.stopRtc) {
+            this.state.stopRtc();
+        }
         window.removeEventListener("resize", this.onWindowResize);
+        window.removeEventListener("beforeunload", this.beforeunload);
+    }
+    public release(): void {
+        this.stopAll();
     }
     public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
@@ -288,13 +401,22 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public componentWillUnmount(): void {
         this.props.roomFacadeSetter(null);
+        window.removeEventListener("beforeunload", this.beforeunload);
     }
 
     public async setPptPreviewShow(): Promise<void> {
-        this.setState({
-            isMenuVisible: true,
-            menuInnerState: MenuInnerType.AnnexBox,
-        });
+        if (this.state.room) {
+            this.setState({
+                isMenuVisible: true,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        } else {
+            await timeout(1500);
+            this.setState({
+                isMenuVisible: true,
+                menuInnerState: MenuInnerType.AnnexBox,
+            });
+        }
     }
     public async setPptPreviewHide(): Promise<void> {
         if (this.menuChild) {
@@ -460,11 +582,40 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
+                    startRtc={this.state.startRtc}
+                    replayCallback={this.props.replayCallback}
+                    room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
+                    uuid={this.props.uuid} rtc={this.props.rtc}
                     channelName={this.props.uuid}/>
             );
         } else {
             return null;
+        }
+    }
+
+    private  documentFileCallback = (documentFile: PPTDataType): void => {
+        const {documentArrayCallback} = this.props;
+        const documents = this.state.documentArray.map(data => {
+            data.active = false;
+            return data;
+        });
+        this.setState({documentArray: [...documents, documentFile]});
+        if (this.state.room) {
+            if (this.state.room.state.globalState.documentArrayState) {
+                const documentArrayState = this.state.room.state.globalState.documentArrayState;
+                this.state.room.setGlobalState({documentArrayState: [...documentArrayState, {id: documentFile.id, isHaveScenes: true}]});
+            } else {
+                this.state.room.setGlobalState({documentArrayState: [{id: documentFile.id, isHaveScenes: true}]});
+            }
+        }
+        if (documentArrayCallback) {
+            const docs: PPTDataType[] = this.state.documentArray;
+            const documentArray = docs.map(doc => {
+                doc.data = JSON.stringify(doc.data);
+                return doc;
+            });
+            documentArrayCallback(documentArray);
         }
     }
 
@@ -480,6 +631,19 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return null;
         }
     }
+
+    private handleDocumentArrayState = (state: PPTDataType[]): void => {
+        this.setState({documentArray: state});
+    }
+
+    private startRtcCallback = (func: () => void): void => {
+        this.setState({startRtc: func});
+    }
+
+    private stopRtcCallback = (func: () => void): void => {
+        this.setState({stopRtc: func});
+    }
+
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -517,11 +681,15 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
+                    startRtcCallback: this.startRtcCallback,
+                    stopRtcCallback: this.stopRtcCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: room,
                 }}>
                     <div className="realtime-box">
-                        <MenuBox language={this.props.language} onRef={this.onRef}
+                        <MenuBox
+                            language={this.props.language}
+                            onRef={this.onRef}
                             isSidePreview={this.state.menuInnerState === MenuInnerType.AnnexBox}
                             pagePreviewPosition={this.props.pagePreviewPosition}
                             setMenuState={this.setPreviewMenuState}
@@ -538,14 +706,15 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <WhiteboardFile
                                 handleFileState={this.handleFileState}
                                 isFileMenuOpen={this.state.isFileMenuOpen}
-                                language={this.props.language}
-                                documentArray={this.props.documentArray} uuid={this.props.uuid}
+                                language={this.props.language} handleDocumentArrayState={this.handleDocumentArrayState}
+                                uuid={this.props.uuid} documentArray={this.state.documentArray}
                                 room={room}/>
                         </MenuBox>
                         <Dropzone
                             accept={"image/*"}
                             disableClick={true}
                             className="whiteboard-out-box"
+                            style={{width: this.state.isManagerOpen ? "calc(100% - 300px)" : "100%"}}
                             onDrop={this.onDropFiles}>
                             <TopLoadingBar loadingPercent={this.state.ossPercent}/>
                             <TopLoadingBar style={{backgroundColor: "red"}} loadingPercent={this.state.converterPercent}/>
@@ -597,18 +766,20 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 setMemberState={this.setMemberState}
                                 customerComponent={[
                                     <UploadBtn
-                                        toolBarPosition={this.props.toolBarPosition} uuid={this.props.uuid}
+                                        toolBarPosition={this.props.toolBarPosition}
+                                        uuid={this.props.uuid}
                                         deviceType={this.state.deviceType}
                                         oss={this.state.ossConfigObj}
                                         ossUploadCallback={this.props.ossUploadCallback}
                                         room={room}
+                                        documentFileCallback={this.documentFileCallback}
                                         uploadToolBox={this.props.uploadToolBox}
                                         roomToken={this.state.roomToken}
                                         onProgress={this.progress}
                                         language={this.props.language}
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
-                                    // this.renderExtendTool(),
+                                    this.renderExtendTool(),
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>

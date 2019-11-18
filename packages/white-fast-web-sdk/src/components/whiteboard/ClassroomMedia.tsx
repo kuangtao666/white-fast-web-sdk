@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
 import {Room, RoomMember, ViewMode} from "white-react-sdk";
-import {Button, Radio, Tooltip} from "antd";
+import {Button, Radio, Tooltip, notification, Icon} from "antd";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import ClassroomMediaHostCell from "./ClassroomMediaHostCell";
 import {CSSProperties} from "react";
@@ -28,6 +28,7 @@ export type ClassroomMediaStates = {
     isFullScreen: boolean;
     remoteMediaStreams: NetlessStream[];
     localStream: NetlessStream | null;
+    isLocalStreamPublish: boolean;
     isRtcLoading: boolean;
 };
 
@@ -35,11 +36,14 @@ export type ClassroomMediaProps = {
     userId: number;
     channelId: string;
     room: Room;
+    classMode: ClassModeType;
     identity?: IdentityType;
-    setMediaState: (state: boolean) => void;
     handleManagerState: () => void;
     rtc?: RtcType;
     language?: LanguageEnum;
+    isVideoEnable: boolean;
+    startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
+    stopRtcCallback: (stopRtc: () => void) => void;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -55,7 +59,93 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             remoteMediaStreams: [],
             localStream: null,
             isRtcLoading: false,
+            isLocalStreamPublish: false,
         };
+    }
+
+    public componentDidMount(): void {
+        if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
+            const {userId, room} = this.props;
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            const key = `${Date.now()}`;
+            const btn = (
+                <Button type="primary" onClick={() => {
+                    if (hostInfo) {
+                        if (hostInfo.classMode === ClassModeType.discuss) {
+                            this.startRtc();
+                        } else {
+                            this.startRtc(undefined, true);
+                        }
+                    }
+                    notification.close(key);
+                }}>
+                    确认加入
+                </Button>
+            );
+            notification.open({
+                message: `你好！${userId}`,
+                duration: 8,
+                description:
+                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                btn,
+                key,
+                top: 64,
+            });
+        }
+        this.props.startRtcCallback(this.startRtc);
+        this.props.stopRtcCallback(this.stopRtc);
+    }
+
+    public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
+        if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
+            if (nextProps.isVideoEnable) {
+                this.videoJoinRemind();
+            }  else {
+                notification.close("notification");
+                this.stopRtc();
+            }
+        }
+
+        if (this.props.classMode !== nextProps.classMode) {
+            if (nextProps.classMode !== ClassModeType.discuss && this.agoraClient !==  undefined) {
+                if (this.props.identity !== IdentityType.host && this.state.localStream) {
+                    this.agoraClient.unpublish(this.state.localStream);
+                }
+            }
+        }
+    }
+
+    private videoJoinRemind = (): void => {
+        const {userId, room} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        if (this.props.identity !== IdentityType.host) {
+            const key = `notification`;
+            const btn = (
+                <Button type="primary" onClick={() => {
+                    if (hostInfo) {
+                        if (hostInfo.classMode === ClassModeType.discuss) {
+                            this.startRtc();
+                        } else {
+                            this.startRtc(undefined, true);
+                        }
+                    }
+                    notification.close(key);
+                }}>
+                    确认加入
+                </Button>
+            );
+            notification.open({
+                message: `你好！${userId}`,
+                duration: 6,
+                description:
+                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                btn,
+                key,
+                top: 64,
+            });
+        }
     }
 
     private renderMediaBoxArray = (): React.ReactNode => {
@@ -63,8 +153,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const {room, identity} = this.props;
         const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
         if (hostRoomMember) {
-            const mediaStreams = remoteMediaStreams.filter(data => data.getId() !== hostRoomMember.payload.userId);
-            const hasHost = !!remoteMediaStreams.find(data => data.getId() === hostRoomMember.payload.userId);
+            const mediaStreams = remoteMediaStreams.filter(data => `${data.getId()}` !== hostRoomMember.payload.userId);
+            const hasHost = !!remoteMediaStreams.find(data => `${data.getId()}` === hostRoomMember.payload.userId);
             const nodes = mediaStreams.map((data: NetlessStream, index: number) => {
                 return (
                     <ClassroomMediaCell
@@ -102,9 +192,15 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }
         });
         if (hostRoomMember) {
-            const hostStream = remoteMediaStreams.find((stream: NetlessStream) => stream.getId() === hostRoomMember.payload.userId);
+            const hostStream = remoteMediaStreams.find((stream: NetlessStream) => `${stream.getId()}` === hostRoomMember.payload.userId);
             if (hostStream) {
-                return <ClassroomMediaHostCell streamsLength={remoteMediaStreams.length} key={`${hostStream.getId()}`} stream={hostStream}/>;
+                return <ClassroomMediaHostCell
+                    streamsLength={remoteMediaStreams.length}
+                    isLocalStreamPublish={this.state.isLocalStreamPublish}
+                    room={this.props.room}
+                    identity={this.props.identity}
+                    key={`${hostStream.getId()}`}
+                    stream={hostStream}/>;
             } else {
                 return null;
             }
@@ -114,13 +210,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private renderSelfBox = (): React.ReactNode => {
+        const {room, identity} = this.props;
         const {localStream} = this.state;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (localStream) {
-            return (
-                <div style={this.handleLocalVideoBox()} id="rtc_local_stream">
-                </div>
-            );
-
+            if (hostInfo.classMode === ClassModeType.discuss || identity === IdentityType.host) {
+                return (
+                    <div style={this.handleLocalVideoBox()} id="rtc_local_stream">
+                    </div>
+                );
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -226,20 +327,53 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private renderRtcBtn = (): React.ReactNode => {
-        const {userId, channelId, language, rtc} = this.props;
+        const {language, rtc, room, identity} = this.props;
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isEnglish = language === LanguageEnum.English;
         if (rtc) {
-            return (
-                <div className="manager-box-btn">
-                    {this.state.isRtcLoading ?
-                        <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
-                        :
-                        <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
-                            <Button onClick={() => this.startRtc(userId, channelId)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
-                        </Tooltip>
+            if (hostInfo.classMode === ClassModeType.discuss) {
+                return (
+                    <div className="manager-box-btn">
+                        {this.state.isRtcLoading ?
+                            <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                            :
+                            <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                                <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                            </Tooltip>
+                        }
+                    </div>
+                );
+            } else {
+                if (identity === IdentityType.host) {
+                    return (
+                        <div className="manager-box-btn">
+                            {this.state.isRtcLoading ?
+                                <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                                :
+                                <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                                    <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                                </Tooltip>
+                            }
+                        </div>
+                    );
+                } else {
+                    if (hostInfo.isVideoEnable) {
+                        return (
+                            <div className="manager-box-btn">
+                                {this.state.isRtcLoading ?
+                                    <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                                    :
+                                    <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
+                                        <Button onClick={() => this.startRtc(undefined, true)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                                    </Tooltip>
+                                }
+                            </div>
+                        );
+                    } else {
+                        return null;
                     }
-                </div>
-            );
+                }
+            }
         } else {
             return null;
         }
@@ -285,7 +419,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const isEnglish = language === LanguageEnum.English;
         return (
             <div className="netless-video-out-box">
-               {!this.state.localStream &&
+               {!this.state.isRtcStart &&
                <div className="netless-video-mask">
                    {this.renderHost()}
                </div>}
@@ -300,7 +434,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        <div className="manager-box-inner-host2">
                            <div className="manager-box-btn">
                                <Tooltip placement={"right"} title={isEnglish ? "Close video call" : "关闭视频"}>
-                                   <div className="manager-box-btn-hang" onClick={() => this.stopLocal()}>
+                                   <div className="manager-box-btn-hang" onClick={() => this.stopRtc()}>
                                        <img src={hangUp}/>
                                    </div>
                                </Tooltip>
@@ -342,7 +476,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         } else {
             const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
             if (hostRoomMember) {
-                const hostStream = remoteMediaStreams.find((stream: NetlessStream) => stream.getId() === hostRoomMember.payload.userId);
+                const hostStream = remoteMediaStreams.find((stream: NetlessStream) => `${stream.getId()}` === hostRoomMember.payload.userId);
                 if (hostStream) {
                     if (remoteMediaStreams.length === 0) {
                         return {width: "100%", height: 300};
@@ -374,8 +508,17 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private startRtc = (userId: number, channelId: string): void => {
-        const {rtc, identity} = this.props;
+    private setMediaState = (state: boolean): void => {
+        const {room, identity} = this.props;
+        if (identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isVideoEnable: state,
+                }});
+        }
+    }
+    private startRtc = (recordFunc?: () => void, isUnPublish?: boolean): void => {
+        const {rtc, identity, userId, channelId} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
         this.setState({isRtcLoading: true});
@@ -396,15 +539,27 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 ...localStream,
                 state: {isVideoOpen: true, isAudioOpen: true},
             };
-            this.setState({localStream: netlessLocalStream, isRtcLoading: false});
-            netlessLocalStream.play("rtc_local_stream");
+            this.setState({isRtcLoading: false, isRtcStart: true, localStream: netlessLocalStream});
+            if (isUnPublish) {
+                console.log("yes");
+            } else {
+                netlessLocalStream.play("rtc_local_stream");
+            }
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
-                this.props.setMediaState(true);
+                this.setMediaState(true);
+                if (recordFunc) {
+                    recordFunc();
+                }
                 console.log("User " + uid + " join channel successfully");
                 if (identity !== IdentityType.listener) {
-                    this.agoraClient.publish(localStream, (err: any) => {
-                        console.log("Publish local stream error: " + err);
-                    });
+                    if (isUnPublish) {
+                        console.log("yes");
+                    } else {
+                        this.agoraClient.publish(localStream, (err: any) => {
+                            console.log("Publish local stream error: " + err);
+                        });
+                        this.setState({isLocalStreamPublish: true})
+                    }
                 }
             }, (err: any) => {
                 console.log(err);
@@ -434,7 +589,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
         this.agoraClient.on("peer-leave", (evt: any) => {
             const uid = evt.uid;
-            this.stop(uid);
+            this.stopStreams(uid);
             console.log("remote user left ", uid);
         });
         this.agoraClient.on("mute-video", (evt: any) => {
@@ -479,7 +634,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
     }
 
-    private stop = (streamId: number): void => {
+    private stopStreams = (streamId: number): void => {
         const mediaStreams = this.state.remoteMediaStreams;
         const stream = mediaStreams.find((stream: NetlessStream) => {
             return stream.getId() === streamId;
@@ -499,20 +654,31 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private stopLocal = (): void => {
+    private stopRtc = (): void => {
         const localStream = this.state.localStream;
-        if (localStream) {
-            this.agoraClient.leave(() => {
-                localStream.stop();
-                localStream.close();
-                this.setState({remoteMediaStreams: [], localStream: null});
-                console.log("client leaves channel success");
-                this.setState({isMaskAppear: false});
-            }, (err: any) => {
-                console.log("channel leave failed");
-                console.error(err);
-                this.setState({isMaskAppear: false});
-            });
+        if (this.agoraClient) {
+            if (localStream) {
+                this.agoraClient.leave(() => {
+                    localStream.stop();
+                    localStream.close();
+                    this.setState({remoteMediaStreams: [], localStream: null, isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
+                    this.setMediaState(false);
+                }, (err: any) => {
+                    console.log("channel leave failed");
+                    console.error(err);
+                    this.setState({isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
+                });
+            } else {
+                this.agoraClient.leave(() => {
+                    this.setState({remoteMediaStreams: [], localStream: null, isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
+                    console.log("client leaves channel success");
+                    this.setMediaState(false);
+                }, (err: any) => {
+                    console.log("channel leave failed");
+                    console.error(err);
+                    this.setState({isMaskAppear: false, isRtcStart: false, isLocalStreamPublish: false});
+                });
+            }
         }
     }
 
