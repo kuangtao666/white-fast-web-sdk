@@ -12,6 +12,7 @@ import * as menu_in from "../../assets/image/menu_in.svg";
 import * as close_white from "../../assets/image/close_white.svg";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import Identicon from "react-identicons";
+import {number} from "prop-types";
 export type NetlessStream = {
     state: {isVideoOpen: boolean, isAudioOpen: boolean},
 } & any;
@@ -40,6 +41,7 @@ export type ClassroomMediaProps = {
     identity?: IdentityType;
     handleManagerState: () => void;
     rtc?: RtcType;
+    applyForRtc: boolean;
     language?: LanguageEnum;
     isVideoEnable: boolean;
     startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
@@ -112,6 +114,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 if (this.props.identity !== IdentityType.host && this.state.localStream) {
                     this.agoraClient.unpublish(this.state.localStream);
                 }
+            }
+        }
+
+        if (this.props.applyForRtc !== nextProps.applyForRtc) {
+            const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
+            if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc) {
+                this.publishRtc();
             }
         }
     }
@@ -194,7 +203,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         if (hostRoomMember) {
             const hostStream = remoteMediaStreams.find((stream: NetlessStream) => `${stream.getId()}` === hostRoomMember.payload.userId);
             if (hostStream) {
-                return <ClassroomMediaHostCell
+                return <ClassroomMediaHostCell applyForRtc={this.props.applyForRtc}
                     streamsLength={remoteMediaStreams.length}
                     isLocalStreamPublish={this.state.isLocalStreamPublish}
                     room={this.props.room}
@@ -270,12 +279,21 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private renderHostController = (hostInfo: HostUserType): React.ReactNode => {
         const {room, language} = this.props;
         const isEnglish = language === LanguageEnum.English;
+        const guestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         if (hostInfo.classMode) {
             if (this.props.identity === IdentityType.host) {
                 return (
                     <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.classMode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
-                        room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}});
+                        const users = guestUsers.map((user: GuestUserType) => {
+                            user.applyForRtc = false;
+                            return user;
+                        });
+                        if (hostInfo.classMode === ClassModeType.handUp) {
+                            room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}});
+                        } else {
+                            room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}, guestUsers: users});
+                        }
                     }}>
                         <Radio.Button value={ClassModeType.lecture}>{isEnglish ? "Lecture" : "讲课模式"}</Radio.Button>
                         <Radio.Button value={ClassModeType.handUp}>{isEnglish ? "Hand Up" : "举手参与"}</Radio.Button>
@@ -463,9 +481,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private handleLocalVideoBox = (): CSSProperties => {
-        const {remoteMediaStreams} = this.state;
+        const {remoteMediaStreams, isLocalStreamPublish} = this.state;
         const {identity, room} = this.props;
         if (identity === IdentityType.host) {
+            //  自己是老师
             if (remoteMediaStreams.length === 0) {
                 return {width: "100%", height: 300};
             } else if (remoteMediaStreams.length === 3) {
@@ -474,27 +493,29 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 return {width: "100%", height: 150};
             }
         } else {
+            //  自己是学生
             const hostRoomMember = room.state.roomMembers.find((roomMember: RoomMember) => roomMember.payload.identity === IdentityType.host);
             if (hostRoomMember) {
+                //  找到老师的流
                 const hostStream = remoteMediaStreams.find((stream: NetlessStream) => `${stream.getId()}` === hostRoomMember.payload.userId);
-                if (hostStream) {
-                    if (remoteMediaStreams.length === 0) {
-                        return {width: "100%", height: 300};
-                    } else if (remoteMediaStreams.length === 1) {
-                        return {width: "100%", height: 150};
-                    } else if (remoteMediaStreams.length === 2) {
-                        return {width: "50%", height: 150};
+                if (isLocalStreamPublish) {
+                    if (hostStream) {
+                        if (remoteMediaStreams.length === 3) {
+                            return {width: "100%", height: 225};
+                        } else {
+                            return {width: "100%", height: 150};
+                        }
                     } else {
-                        return {width: "33.33%", height: 75};
+                        if (remoteMediaStreams.length === 0) {
+                            return {width: "100%", height: 300};
+                        } else if (remoteMediaStreams.length === 3) {
+                            return {width: "100%", height: 225};
+                        } else {
+                            return {width: "100%", height: 150};
+                        }
                     }
                 } else {
-                    if (remoteMediaStreams.length === 0) {
-                        return {width: "100%", height: 300};
-                    } else if (remoteMediaStreams.length === 3) {
-                        return {width: "100%", height: 225};
-                    } else {
-                        return {width: "100%", height: 150};
-                    }
+                    return {width: "100%", height: 0};
                 }
             } else {
                 if (remoteMediaStreams.length === 0) {
@@ -515,6 +536,16 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     ...room.state.globalState.hostInfo,
                     isVideoEnable: state,
                 }});
+        }
+    }
+    private publishRtc = (): void => {
+        const {localStream} = this.state;
+        if (localStream && this.agoraClient) {
+            this.setState({isLocalStreamPublish: true});
+            // localStream.play("rtc_local_stream");
+            // this.agoraClient.publish(localStream, (err: any) => {
+            //     console.log("Publish local stream error: " + err);
+            // });
         }
     }
     private startRtc = (recordFunc?: () => void, isUnPublish?: boolean): void => {
@@ -558,7 +589,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         this.agoraClient.publish(localStream, (err: any) => {
                             console.log("Publish local stream error: " + err);
                         });
-                        this.setState({isLocalStreamPublish: true})
+                        this.setState({isLocalStreamPublish: true});
                     }
                 }
             }, (err: any) => {

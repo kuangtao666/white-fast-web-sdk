@@ -9,6 +9,7 @@ export type ClassroomMediaCellProps = {
     stream: NetlessStream;
     streamsLength: number;
     room: Room;
+    applyForRtc: boolean;
     isLocalStreamPublish: boolean;
     identity?: IdentityType;
 };
@@ -27,13 +28,25 @@ export default class ClassroomMediaHostCell extends React.Component<ClassroomMed
     }
 
     private handleLocalVideoBox = (): CSSProperties => {
-        const {streamsLength, identity, room} = this.props;
+        const {streamsLength, identity, room, applyForRtc} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (streamsLength === 0) {
             return {width: "100%", height: 300};
         } else {
             if (identity !== IdentityType.host && hostInfo.classMode !== ClassModeType.discuss) {
-                return {width: "100%", height: 300};
+                if (applyForRtc) {
+                    if (streamsLength === 3) {
+                        return {width: "100%", height: 225};
+                    } else {
+                        if (streamsLength === 1) {
+                            return {width: "100%", height: 300};
+                        } else {
+                            return {width: "100%", height: 150};
+                        }
+                    }
+                } else {
+                    return {width: "100%", height: 300};
+                }
             } else {
                 if (streamsLength === 3) {
                     return {width: "100%", height: 225};
