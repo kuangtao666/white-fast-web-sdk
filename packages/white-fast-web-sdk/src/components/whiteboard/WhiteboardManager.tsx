@@ -95,12 +95,49 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     )}/>
                 );
             } else {
-                const selfInfo: GuestUserType = room.state.globalState.guestUsers.find((guestUser: GuestUserType) => guestUser.userId === userId);
-                if (selfInfo) {
+                const thisGuestUsers = room.state.globalState.guestUsers;
+                if (thisGuestUsers) {
+                    const selfInfo: GuestUserType = thisGuestUsers.find((guestUser: GuestUserType) => guestUser.userId === userId);
+                    if (selfInfo) {
+                        return (
+                            <RoomContextConsumer children={context => (
+                                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                                applyForRtc={selfInfo.applyForRtc}
+                                                startRtcCallback={context.startRtcCallback}
+                                                stopRtcCallback={context.stopRtcCallback}
+                                                language={this.props.language}
+                                                rtc={this.props.rtc}
+                                                classMode={hostInfo.classMode}
+                                                userId={parseInt(this.props.userId)}
+                                                handleManagerState={this.props.handleManagerState}
+                                                identity={this.props.identity}
+                                                room={this.props.room}
+                                                channelId={this.props.uuid}/>
+                            )}/>
+                        );
+                    } else {
+                        return (
+                            <RoomContextConsumer children={context => (
+                                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                                applyForRtc={false}
+                                                startRtcCallback={context.startRtcCallback}
+                                                stopRtcCallback={context.stopRtcCallback}
+                                                language={this.props.language}
+                                                rtc={this.props.rtc}
+                                                classMode={hostInfo.classMode}
+                                                userId={parseInt(this.props.userId)}
+                                                handleManagerState={this.props.handleManagerState}
+                                                identity={this.props.identity}
+                                                room={this.props.room}
+                                                channelId={this.props.uuid}/>
+                            )}/>
+                        );
+                    }
+                } else {
                     return (
                         <RoomContextConsumer children={context => (
                             <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                            applyForRtc={selfInfo.applyForRtc}
+                                            applyForRtc={false}
                                             startRtcCallback={context.startRtcCallback}
                                             stopRtcCallback={context.stopRtcCallback}
                                             language={this.props.language}
@@ -113,8 +150,6 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                             channelId={this.props.uuid}/>
                         )}/>
                     );
-                } else {
-                    return null;
                 }
             }
         } else {

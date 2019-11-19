@@ -93,18 +93,15 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             let classUrl;
             if (this.props.identity === IdentityType.host) {
                 if (this.state.shareUrl === ShareUrlType.readOnly) {
-                    // classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
-                    classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+                    classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
                 } else {
                     classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
                 }
             } else {
-                // classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
-                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
+                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
             }
             if (this.props.isReadOnly) {
-                // classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
-                classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.guest}/`);
+                classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
             }
             const regex = /[\w]+\/$/gm;
             const match = regex.exec(classUrl);
