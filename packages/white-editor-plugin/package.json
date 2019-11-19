@@ -13,6 +13,7 @@
   "author": "netless",
   "license": "MIT",
   "dependencies": {
+    "braft-editor": "^2.3.8",
     "react": "~16.8.0",
     "react-dom": "~16.8.0",
     "white-react-sdk": "^2.3.15"

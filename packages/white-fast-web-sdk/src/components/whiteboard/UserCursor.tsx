@@ -81,7 +81,7 @@ export class UserCursor implements CursorAdapter {
     private readonly cursors: {[memberId: number]: Cursor} = {};
     private roomMembers: ReadonlyArray<RoomMember> = [];
 
-    public createCursor(memberId: number): CursorDescription {
+    public createCursor(): CursorDescription {
         return {x: 16, y: 16, width: 32, height: 32};
     }
 
