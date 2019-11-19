@@ -12,7 +12,6 @@ import * as menu_in from "../../assets/image/menu_in.svg";
 import * as close_white from "../../assets/image/close_white.svg";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import Identicon from "react-identicons";
-import {number} from "prop-types";
 export type NetlessStream = {
     state: {isVideoOpen: boolean, isAudioOpen: boolean},
 } & any;
