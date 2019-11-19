@@ -171,7 +171,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
             if (identity === IdentityType.host) {
                 return false;
             } else if (identity === IdentityType.guest) {
-                return true;
+                return false;
             } else {
                 return true;
             }
