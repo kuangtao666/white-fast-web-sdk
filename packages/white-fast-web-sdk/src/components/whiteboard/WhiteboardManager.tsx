@@ -76,40 +76,113 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
     }
 
     private renderHost = (): React.ReactNode => {
-        const {room} = this.props;
+        const {room, userId} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (hostInfo) {
-            return (
-                <RoomContextConsumer children={context => (
-                    <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                    startRtcCallback={context.startRtcCallback}
-                                    stopRtcCallback={context.stopRtcCallback}
-                                    language={this.props.language}
-                                    rtc={this.props.rtc} classMode={hostInfo.classMode}
-                                    userId={parseInt(this.props.userId)}
-                                    handleManagerState={this.props.handleManagerState}
-                                    identity={this.props.identity}
-                                    room={this.props.room}
-                                    channelId={this.props.uuid}/>
-                )}/>
-            );
+            if (userId === hostInfo.userId) {
+                return (
+                    <RoomContextConsumer children={context => (
+                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable} applyForRtc={false}
+                                        startRtcCallback={context.startRtcCallback}
+                                        stopRtcCallback={context.stopRtcCallback}
+                                        language={this.props.language}
+                                        rtc={this.props.rtc} classMode={hostInfo.classMode}
+                                        userId={parseInt(this.props.userId)}
+                                        handleManagerState={this.props.handleManagerState}
+                                        identity={this.props.identity}
+                                        room={this.props.room}
+                                        channelId={this.props.uuid}/>
+                    )}/>
+                );
+            } else {
+                const thisGuestUsers = room.state.globalState.guestUsers;
+                if (thisGuestUsers) {
+                    const selfInfo: GuestUserType = thisGuestUsers.find((guestUser: GuestUserType) => guestUser.userId === userId);
+                    if (selfInfo) {
+                        return (
+                            <RoomContextConsumer children={context => (
+                                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                                applyForRtc={selfInfo.applyForRtc}
+                                                startRtcCallback={context.startRtcCallback}
+                                                stopRtcCallback={context.stopRtcCallback}
+                                                language={this.props.language}
+                                                rtc={this.props.rtc}
+                                                classMode={hostInfo.classMode}
+                                                userId={parseInt(this.props.userId)}
+                                                handleManagerState={this.props.handleManagerState}
+                                                identity={this.props.identity}
+                                                room={this.props.room}
+                                                channelId={this.props.uuid}/>
+                            )}/>
+                        );
+                    } else {
+                        return (
+                            <RoomContextConsumer children={context => (
+                                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                                applyForRtc={false}
+                                                startRtcCallback={context.startRtcCallback}
+                                                stopRtcCallback={context.stopRtcCallback}
+                                                language={this.props.language}
+                                                rtc={this.props.rtc}
+                                                classMode={hostInfo.classMode}
+                                                userId={parseInt(this.props.userId)}
+                                                handleManagerState={this.props.handleManagerState}
+                                                identity={this.props.identity}
+                                                room={this.props.room}
+                                                channelId={this.props.uuid}/>
+                            )}/>
+                        );
+                    }
+                } else {
+                    return (
+                        <RoomContextConsumer children={context => (
+                            <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                            applyForRtc={false}
+                                            startRtcCallback={context.startRtcCallback}
+                                            stopRtcCallback={context.stopRtcCallback}
+                                            language={this.props.language}
+                                            rtc={this.props.rtc}
+                                            classMode={hostInfo.classMode}
+                                            userId={parseInt(this.props.userId)}
+                                            handleManagerState={this.props.handleManagerState}
+                                            identity={this.props.identity}
+                                            room={this.props.room}
+                                            channelId={this.props.uuid}/>
+                        )}/>
+                    );
+                }
+            }
         } else {
             return null;
         }
     }
 
     private handleAgree = (room: Room, guestUser: GuestUserType, guestUsers: GuestUserType[]): void => {
+        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (this.props.identity === IdentityType.host) {
-            if (guestUsers) {
-                const users = guestUsers.map((user: GuestUserType) => {
-                    if (user.userId === guestUser.userId) {
-                        user.isReadOnly = false;
-                        user.cameraState = ViewMode.Freedom;
-                        user.disableCameraTransform = false;
-                    }
-                    return user;
-                });
-                room.setGlobalState({guestUsers: users});
+            if (hostInfo && guestUsers) {
+                if (hostInfo.isVideoEnable) {
+                    const users = guestUsers.map((user: GuestUserType) => {
+                        if (user.userId === guestUser.userId) {
+                            user.isReadOnly = false;
+                            user.cameraState = ViewMode.Freedom;
+                            user.disableCameraTransform = false;
+                            user.applyForRtc = true;
+                        }
+                        return user;
+                    });
+                    room.setGlobalState({guestUsers: users});
+                } else {
+                    const users = guestUsers.map((user: GuestUserType) => {
+                        if (user.userId === guestUser.userId) {
+                            user.isReadOnly = false;
+                            user.cameraState = ViewMode.Freedom;
+                            user.disableCameraTransform = false;
+                        }
+                        return user;
+                    });
+                    room.setGlobalState({guestUsers: users});
+                }
             }
         }
     }
@@ -136,6 +209,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         user.cameraState = ViewMode.Follower;
                         user.isHandUp = false;
                         user.disableCameraTransform = true;
+                        user.applyForRtc = false;
                     }
                     return user;
                 });

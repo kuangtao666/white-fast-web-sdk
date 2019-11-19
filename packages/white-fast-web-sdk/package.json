@@ -1,6 +1,6 @@
 {
   "name": "@netless/white-fast-web-sdk",
-  "version": "1.1.17",
+  "version": "1.1.20",
   "main": "dist/bundle.js",
   "types": "dist/facade/index.d.ts",
   "author": "netless",
@@ -28,12 +28,8 @@
     "@netless/react-mb-tool-box": "^1.0.3",
     "@netless/react-scale-controller": "^1.0.2",
     "@netless/react-seek-slider": "^1.0.4",
-    "agora-rtc-sdk": "^2.8.0",
     "ali-oss": "^6.1.1",
     "antd": "^3.24.3",
-    "braft-editor": "^2.3.8",
-    "downloadjs": "^1.4.7",
-    "html2canvas": "^1.0.0-rc.3",
     "is-color": "^1.0.2",
     "is-touch-device": "^1.0.1",
     "qrcode.react": "^0.9.3",
@@ -51,7 +47,7 @@
     "react-identicons": "^1.1.7",
     "react-tiny-virtual-list": "^2.2.0",
     "uuid": "^3.3.2",
-    "white-react-sdk": "^2.3.12"
+    "white-react-sdk": "^2.3.15"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

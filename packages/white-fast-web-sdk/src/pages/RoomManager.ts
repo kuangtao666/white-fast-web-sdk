@@ -18,6 +18,7 @@ export type GuestUserType = {
     cameraState: ViewMode,
     disableCameraTransform: boolean,
     isReminded: boolean,
+    applyForRtc: boolean,
 };
 export type HostUserType = {
     userId: string,
@@ -108,6 +109,7 @@ export class RoomManager {
                   cameraState: ViewMode.Follower,
                   disableCameraTransform: true,
                   isReminded: false,
+                  applyForRtc: false,
               };
               this.room.disableCameraTransform = true;
               this.room.setGlobalState({guestUsers: [guestUser]});
@@ -129,6 +131,7 @@ export class RoomManager {
                       cameraState: ViewMode.Follower,
                       disableCameraTransform: true,
                       isReminded: false,
+                      applyForRtc: false,
                   };
                   this.room.disableCameraTransform = true;
                   globalGuestUsers.push(guestUser);
