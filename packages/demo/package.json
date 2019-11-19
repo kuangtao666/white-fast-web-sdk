@@ -30,8 +30,7 @@
     "antd": "^3.24.3",
     "react": "~16.8.0",
     "react-dom": "~16.8.0",
-    "uuid": "^3.3.2",
-    "white-plugin-scaffold": "^1.0.0"
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/agora-rtc-sdk": "^2.6.0",
