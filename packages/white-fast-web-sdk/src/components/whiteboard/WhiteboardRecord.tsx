@@ -4,7 +4,7 @@ import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
-import {ossConfigObj} from "../../appToken";
+import {ossConfigObj, OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
@@ -24,6 +24,8 @@ export type WhiteboardRecordState = {
 export type WhiteboardRecordProps = {
     channelName: string;
     uuid: string;
+    userId: string;
+    ossConfigObj?: OSSConfigObjType;
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
@@ -69,8 +71,53 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
             return false;
         }
     }
+
+    private handleRegion = (region: string): number => {
+        switch (region) {
+            case "CN_Hangzhou" || "oss-cn-hangzhou":
+                return 0;
+            case "CN_Shanghai" || "oss-cn-shanghai":
+                return 1;
+            case "CN_Qingdao" || "oss-cn-qingdao":
+                return 2;
+            case "CN_Beijin" || "oss-cn-beijing":
+                return 3;
+            case "CN_Zhangjiakou" || "oss-cn-zhangjiakou":
+                return 4;
+            case "CN_Huhehaote" || "oss-cn-huhehaote":
+                return 5;
+            case "CN_Shenzhen" || "oss-cn-shenzhen":
+                return 6;
+            case "CN_Hongkong" || "oss-cn-hongkong":
+                return 7;
+            case "US_West_1" || "oss-us-west-1":
+                return 8;
+            case "US_East_1" || "oss-us-east-1":
+                return 9;
+            case "AP_Southeast_1" || "oss-ap-southeast-1":
+                return 10;
+            case "AP_Southeast_2" || "oss-ap-southeast-2":
+                return 11;
+            case "AP_Southeast_3" || "oss-ap-southeast-3":
+                return 12;
+            case "AP_Southeast_5" || "oss-ap-southeast-5":
+                return 13;
+            case "AP_Northeast_1" || "oss-ap-northeast-1":
+                return 14;
+            case "AP_South_1" || "oss-ap-south-1":
+                return 15;
+            case "EU_Central_1" || "oss-eu-central-1":
+                return 16;
+            case "EU_West_1" || "oss-eu-west-1":
+                return 17;
+            case "EU_East_1" || "oss-me-east-1":
+                return 18;
+            default:
+                return 0;
+        }
+    }
     public record = async (): Promise<void> => {
-        const {rtc, uuid} = this.props;
+        const {rtc, uuid, userId} = this.props;
         const isMediaRun = this.getMediaState();
         if (rtc && rtc.restId !== undefined && rtc.restSecret !== undefined) {
             if (this.recrod) {
@@ -79,6 +126,24 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 }
             } else {
                 if (isMediaRun) {
+                    let storageConfig;
+                    if (this.props.ossConfigObj) {
+                        storageConfig = {
+                            vendor: 2,
+                            region: this.handleRegion(this.props.ossConfigObj.region),
+                            bucket: this.props.ossConfigObj.bucket,
+                            accessKey: this.props.ossConfigObj.accessKeyId,
+                            secretKey: this.props.ossConfigObj.accessKeySecret,
+                        };
+                    } else {
+                        storageConfig = {
+                            vendor: 2,
+                            region: 0,
+                            bucket: "netless-media",
+                            accessKey: ossConfigObj.accessKeyId,
+                            secretKey: ossConfigObj.accessKeySecret,
+                        };
+                    }
                     this.recrod = new RecordOperator(rtc.token, rtc.restId, rtc.restSecret, uuid,
                         {
                             audioProfile: 1,
@@ -91,13 +156,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                                 // "maxResolutionUid": "1",
                             },
                         },
-                        {
-                            vendor: 2,
-                            region: 0,
-                            bucket: "netless-media",
-                            accessKey: ossConfigObj.accessKeyId,
-                            secretKey: ossConfigObj.accessKeySecret,
-                        });
+                        storageConfig, userId);
                     await this.recrod.acquire();
                 }
             }
