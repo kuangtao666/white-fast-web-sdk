@@ -16,7 +16,7 @@ export class RecordOperator {
     public resourceId?: string;
     private readonly uid: string;
 
-    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, uid: string, mode: string = "mix") {
+    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string = "mix") {
         this.agoraAppId = agoraAppId;
         this.customerId = customerId;
         this.customerCertificate = customerCertificate;
@@ -24,7 +24,7 @@ export class RecordOperator {
         this.recordingConfig = recordingConfig;
         this.storageConfig = storageConfig;
         this.mode = mode;
-        this.uid = uid;
+        this.uid = `${Math.floor(Math.random() * 100000)}`;
     }
 
     public async acquire(): Promise<void> {

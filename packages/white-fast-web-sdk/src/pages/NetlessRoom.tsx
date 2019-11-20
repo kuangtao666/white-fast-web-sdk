@@ -585,7 +585,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             return (
                 <WhiteboardRecord
                     ossConfigObj={this.props.ossConfigObj}
-                    startRtc={this.state.startRtc} userId={this.props.userId}
+                    startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
                     room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}

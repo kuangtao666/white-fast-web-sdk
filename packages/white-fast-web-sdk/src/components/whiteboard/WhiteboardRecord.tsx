@@ -24,7 +24,6 @@ export type WhiteboardRecordState = {
 export type WhiteboardRecordProps = {
     channelName: string;
     uuid: string;
-    userId: string;
     ossConfigObj?: OSSConfigObjType;
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
@@ -117,7 +116,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         }
     }
     public record = async (): Promise<void> => {
-        const {rtc, uuid, userId} = this.props;
+        const {rtc, uuid} = this.props;
         const isMediaRun = this.getMediaState();
         if (rtc && rtc.restId !== undefined && rtc.restSecret !== undefined) {
             if (this.recrod) {
@@ -156,7 +155,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                                 // "maxResolutionUid": "1",
                             },
                         },
-                        storageConfig, userId);
+                        storageConfig);
                     await this.recrod.acquire();
                 }
             }
