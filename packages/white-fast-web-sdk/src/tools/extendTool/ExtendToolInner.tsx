@@ -8,6 +8,7 @@ import {
 import {Tabs, Tooltip} from "antd";
 import web_plugin from "../../assets/image/web_plugin.svg";
 import editor_plugin from "../../assets/image/editor_plugin.svg";
+import video_plugin from "../../assets/image/video_plugin.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
@@ -79,7 +80,7 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                         <div className="extend-icon-out-box">
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Web page" : "H5 课件"}>
-                                    <div onClick={() => this.insertPlugin("white-iframe-plugin", 860, 600)} className="extend-inner-icon">
+                                    <div onClick={() => this.insertPlugin("white-web-course-plugin", 860, 600)} className="extend-inner-icon">
                                         <img src={web_plugin}/>
                                     </div>
                                 </Tooltip>
@@ -94,7 +95,7 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传视频"}>
                                     <div onClick={() => this.insertPlugin("media", 720, 600)} className="extend-inner-icon">
-                                        <img src={editor_plugin}/>
+                                        <img style={{width: 26}} src={video_plugin}/>
                                     </div>
                                 </Tooltip>
                             </div>

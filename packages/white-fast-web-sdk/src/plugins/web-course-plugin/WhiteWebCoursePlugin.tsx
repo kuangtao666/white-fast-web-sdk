@@ -1,31 +1,32 @@
 import * as React from "react";
 import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
 import {Input, message} from "antd";
-import "./index.less";
-import {IframeController} from "./IframeController";
-import iframe_close from "./image/iframe_close.svg";
-import iframe_min from "./image/iframe_min.svg";
-import iframe_max from "./image/iframe_max.svg";
-import fix_icon from "./image/fix_icon.svg";
-import editor_icon from "./image/editor_icon.svg";
-import uneditor_icon from "./image/uneditor_icon.svg";
-import netless_gray from "./image/netless_gray.svg";
+import "../PluginStyle.less";
+import "./WhiteWebCoursePlugin.less";
+import {WebCourseController} from "./WebCourseController";
+import plugin_window_close from "../../assets/image/plugin_window_close.svg";
+import plugin_window_min from "../../assets/image/plugin_window_min.svg";
+import plugin_window_max from "../../assets/image/plugin_window_max.svg";
+import plugin_fix_icon from "../../assets/image/plugin_fix_icon.svg";
+import plugin_editor_icon from "../../assets/image/plugin_editor_icon.svg";
+import plugin_uneditor_icon from "../../assets/image/plugin_uneditor_icon.svg";
+import netless_gray from "../../assets/image/netless_gray.svg";
 
-export type IframeComponentProps = PluginComponentProps & {
+export type WhiteWebCoursePluginProps = PluginComponentProps & {
     readonly netlessState: any;
 };
 
-export type IframeComponentStates =  {
+export type WhiteWebCoursePluginStates =  {
     isClickDisable: boolean;
     url: string;
     submitUrl: string;
 };
 
-export class WhiteIframePlugin extends React.Component<IframeComponentProps, IframeComponentStates > {
+export default class WhiteWebCoursePlugin extends React.Component<WhiteWebCoursePluginProps, WhiteWebCoursePluginStates > {
 
-    public static readonly protocol: string = "white-iframe-plugin";
+    public static readonly protocol: string = "white-web-course-plugin";
     // public static readonly backgroundProps: Partial<IframeComponentProps> = {netlessState: string};
-    public constructor(props: IframeComponentProps) {
+    public constructor(props: WhiteWebCoursePluginProps) {
         super(props);
         this.state = {
             isClickDisable: false,
@@ -33,12 +34,12 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
             submitUrl: "",
         };
     }
-    private iframeController: IframeController;
+    private iframeController: WebCourseController;
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;
     }
 
-    public UNSAFE_componentWillReceiveProps(nextProps: IframeComponentProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: WhiteWebCoursePluginProps): void {
         if (nextProps.netlessState !== this.props.nenetlessState) {
             this.iframeController.setIframeState(nextProps.netlessState);
             if (nextProps.netlessState.submitUrl) {
@@ -48,14 +49,14 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
     }
 
     public componentDidMount(): void {
-        this.iframeController = new IframeController("calculation", this.setGlobalState);
+        this.iframeController = new WebCourseController("calculation", this.setGlobalState);
         const selfNetlessState = this.props.netlessState;
         if (selfNetlessState && selfNetlessState.submitUrl) {
             this.setState({url: selfNetlessState.submitUrl, submitUrl: selfNetlessState.submitUrl});
         }
     }
     private setGlobalState = (netlessState: any) => {
-        this.props.setProps(this.props.uuid, {
+        this.props.operator.setProps(this.props.uuid, {
             netlessState: netlessState,
         });
     }
@@ -72,7 +73,7 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
         const {isClickDisable, submitUrl} = this.state;
         if (submitUrl) {
             return (
-                <iframe frameBorder="no" className="iframe-box-body"  style={{pointerEvents: "auto"}} id="calculation" src={submitUrl}/>
+                <iframe frameBorder="no" className="plugin-box-body"  style={{pointerEvents: "auto"}} id="calculation" src={submitUrl}/>
             );
         } else {
             return (
@@ -103,20 +104,20 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
         const {isClickDisable} = this.state;
         return (
             <CNode kind={CNodeKind.HTML}>
-                <div className="iframe-box" style={{width: width, height: height}}>
-                    <div className="iframe-box-nav">
-                        <div className="iframe-box-nav-left">
-                            <div className="iframe-box-nav-close">
-                                <img style={{width: 7.2}} src={iframe_close}/>
+                <div className="plugin-box" style={{width: width, height: height}}>
+                    <div className="plugin-box-nav">
+                        <div className="plugin-box-nav-left">
+                            <div className="plugin-box-nav-close">
+                                <img style={{width: 7.2}} src={plugin_window_close}/>
                             </div>
-                            <div className="iframe-box-nav-min">
-                                <img src={iframe_min}/>
+                            <div className="plugin-box-nav-min">
+                                <img src={plugin_window_min}/>
                             </div>
-                            <div className="iframe-box-nav-max">
-                                <img  style={{width: 6}} src={iframe_max}/>
+                            <div className="plugin-box-nav-max">
+                                <img  style={{width: 6}} src={plugin_window_max}/>
                             </div>
                         </div>
-                        <div style={{pointerEvents: "auto"}} className="iframe-box-search">
+                        <div style={{pointerEvents: "auto"}} className="plugin-box-search">
                             <Input
                                 onPressEnter={this.submitUrl}
                                 value={this.state.url}
@@ -125,17 +126,17 @@ export class WhiteIframePlugin extends React.Component<IframeComponentProps, Ifr
                                 style={{pointerEvents: "auto"}}
                             />
                         </div>
-                        <div className="iframe-box-nav-right">
-                            <div className="iframe-box-nav-right-btn">
-                                <img src={fix_icon}/>
+                        <div className="plugin-box-nav-right">
+                            <div className="plugin-box-nav-right-btn">
+                                <img src={plugin_fix_icon}/>
                             </div>
-                            <div onClick={() => this.setState({isClickDisable: !this.state.isClickDisable})} className="iframe-box-nav-right-btn">
-                                {isClickDisable ? <img src={editor_icon}/> : <img src={uneditor_icon}/>}
+                            <div onClick={() => this.setState({isClickDisable: !this.state.isClickDisable})} className="plugin-box-nav-right-btn">
+                                {isClickDisable ? <img src={plugin_editor_icon}/> : <img src={plugin_uneditor_icon}/>}
                             </div>
                         </div>
                         {/*<button style={{pointerEvents: "auto"}}  className="iframe-controller" onClick={() => this.submitUrl()}>提交</button>*/}
                     </div>
-                    <div className="iframe-box-body">
+                    <div className="plugin-box-body">
                         {this.renderIframe()}
                     </div>
                 </div>

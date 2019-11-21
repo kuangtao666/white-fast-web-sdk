@@ -41,6 +41,7 @@ import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -203,7 +204,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteVideoPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
