@@ -98,7 +98,11 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                     classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.guest}/`);
                 }
             } else {
-                classUrl = url.replace(`${IdentityType.host}/`, `${IdentityType.listener}/`);
+                if (this.state.shareUrl === ShareUrlType.readOnly) {
+                    classUrl = url.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
+                } else {
+                    classUrl = url.replace(`${IdentityType.guest}/`, `${IdentityType.guest}/`);
+                }
             }
             if (this.props.isReadOnly) {
                 classUrl = classUrl.replace(`${IdentityType.guest}/`, `${IdentityType.listener}/`);
@@ -127,35 +131,34 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     private handleClose = (): void => {
         this.setState({isCloseTipsVisible: true});
     }
+
+    private handleRenderStop = (): React.ReactNode => {
+        return (
+            <div onClick={this.handleClose} className="whiteboard-top-right-user">
+                <img src={stop_icon}/>
+            </div>
+        );
+    }
     private handleUserAvatar = (): React.ReactNode => {
         const  {userAvatarUrl, userId} = this.props;
-        const isHost = this.props.identity === IdentityType.host;
-        if (isHost) {
+        if (userAvatarUrl) {
             return (
-                <div onClick={this.handleClose} className="whiteboard-top-right-user">
-                    <img src={stop_icon}/>
+                <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
+                    <img src={userAvatarUrl}/>
                 </div>
             );
         } else {
-            if (userAvatarUrl) {
-                return (
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
-                        <img src={userAvatarUrl}/>
+            return (
+                <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
+                    <div className="whiteboard-top-right-avatar">
+                        <Identicon
+                            className={`avatar-${userId}`}
+                            size={22}
+                            string={userId}
+                        />
                     </div>
-                );
-            } else {
-                return (
-                    <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-user">
-                        <div className="whiteboard-top-right-avatar">
-                            <Identicon
-                                className={`avatar-${userId}`}
-                                size={22}
-                                string={userId}
-                            />
-                        </div>
-                    </div>
-                );
-            }
+                </div>
+            );
         }
     }
 
@@ -181,16 +184,52 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
     private renderSideMenu = (): React.ReactNode => {
         const  {isManagerOpen} = this.props;
         const isHost = this.props.identity === IdentityType.host;
-        if (isHost && !isManagerOpen) {
-            return (
-                <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+        if (!isManagerOpen) {
+            if (isHost) {
+                return (
+                    <Badge offset={[-5, 7]} dot={this.handleDotState()}>
+                        <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
+                            <img style={{width: 16}} src={menu_out}/>
+                        </div>
+                    </Badge>
+                );
+            } else {
+                return (
                     <div onClick={() => this.props.handleManagerState()} className="whiteboard-top-right-cell">
                         <img style={{width: 16}} src={menu_out}/>
                     </div>
-                </Badge>
-            );
+                );
+            }
         } else {
             return null;
+        }
+    }
+
+    private renderExit = (): React.ReactNode => {
+        const isEnglish = this.props.language === LanguageEnum.English;
+        if (this.props.identity === IdentityType.host) {
+            return (
+                <div onClick={() => {
+                    if (this.props.replayCallback) {
+                        this.props.replayCallback();
+                        this.setState({isCloseTipsVisible: false});
+                    }
+                }} className="replay-video-cover">
+                    {isEnglish ?
+                        <img src={replay_video_cover_en}/> :
+                        <img src={replay_video_cover}/>
+                    }
+                </div>
+            );
+        } else {
+            return (
+                <div className="go-back-image">
+                    {isEnglish ?
+                        "Are you sure you want to quit the room?" :
+                        "您确认要退出房间 ?"
+                    }
+                </div>
+            );
         }
     }
     public render(): React.ReactNode {
@@ -198,12 +237,13 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         const isEnglish = this.props.language === LanguageEnum.English;
         return (
             <div className="whiteboard-top-right-box">
+                <div className="whiteboard-top-user-box">
+                    {this.handleUserAvatar()}
+                    {this.handleRenderStop()}
+                </div>
                 <div
                     className="whiteboard-top-right-cell" onClick={this.handleInvite}>
                     <img style={{width: 18}} src={add}/>
-                </div>
-                <div className="whiteboard-top-user-box">
-                    {this.handleUserAvatar()}
                 </div>
                 {this.renderSideMenu()}
                 <Modal
@@ -255,17 +295,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 >
                     <div className="whiteboard-share-box">
                         <div className="whiteboard-share-text-box">
-                            <div onClick={() => {
-                                if (this.props.replayCallback) {
-                                    this.props.replayCallback();
-                                    this.setState({isCloseTipsVisible: false});
-                                }
-                            }} className="replay-video-cover">
-                                {isEnglish ?
-                                    <img src={replay_video_cover_en}/> :
-                                    <img src={replay_video_cover}/>
-                                }
-                            </div>
+                            {this.renderExit()}
                             <Button
                                     onClick={() => {
                                         if (this.props.exitRoomCallback) {

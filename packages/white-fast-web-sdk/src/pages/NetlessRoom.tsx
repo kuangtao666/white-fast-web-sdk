@@ -584,7 +584,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
-                    ossConfigObj={this.props.ossConfigObj}
+                    ossConfigObj={this.state.ossConfigObj}
                     startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
                     room={this.state.room!}

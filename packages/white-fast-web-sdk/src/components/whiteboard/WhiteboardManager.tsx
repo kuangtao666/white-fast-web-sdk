@@ -377,7 +377,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     {this.renderHost()}
                     <div className="chat-box-switch">
                         <Tabs activeKey={this.state.activeKey} onChange={this.handleTabsChange}>
-                            <TabPane tab={this.renderChatListTitle()} key="1">
+                            <TabPane forceRender tab={this.renderChatListTitle()} key="1">
                                 <WhiteboardChat
                                     elementId={this.props.elementId}
                                     identity={this.props.identity}
@@ -388,7 +388,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                     userName={this.props.userName}
                                     room={this.props.room}/>
                             </TabPane>
-                            <TabPane tab={this.renderUserListTitle()} key="2">
+                            <TabPane forceRender tab={this.renderUserListTitle()} key="2">
                                 <div className="guest-box">
                                     {this.renderGuest()}
                                 </div>
