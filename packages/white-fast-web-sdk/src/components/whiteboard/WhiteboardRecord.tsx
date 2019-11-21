@@ -24,7 +24,7 @@ export type WhiteboardRecordState = {
 export type WhiteboardRecordProps = {
     channelName: string;
     uuid: string;
-    ossConfigObj?: OSSConfigObjType;
+    ossConfigObj: OSSConfigObjType;
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
@@ -163,24 +163,6 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 }
             } else {
                 if (isMediaRun) {
-                    let storageConfig;
-                    if (this.props.ossConfigObj) {
-                        storageConfig = {
-                            vendor: 2,
-                            region: this.handleRegion(this.props.ossConfigObj.region),
-                            bucket: this.props.ossConfigObj.bucket,
-                            accessKey: this.props.ossConfigObj.accessKeyId,
-                            secretKey: this.props.ossConfigObj.accessKeySecret,
-                        };
-                    } else {
-                        storageConfig = {
-                            vendor: 2,
-                            region: 0,
-                            bucket: "netless-media",
-                            accessKey: ossConfigObj.accessKeyId,
-                            secretKey: ossConfigObj.accessKeySecret,
-                        };
-                    }
                     this.recrod = new RecordOperator(rtc.token, rtc.restId, rtc.restSecret, uuid,
                         {
                             audioProfile: 1,
@@ -193,7 +175,13 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                                 // "maxResolutionUid": "1",
                             },
                         },
-                        storageConfig);
+                        {
+                            vendor: 2,
+                            region: this.handleRegion(this.props.ossConfigObj.region),
+                            bucket: this.props.ossConfigObj.bucket,
+                            accessKey: this.props.ossConfigObj.accessKeyId,
+                            secretKey: this.props.ossConfigObj.accessKeySecret,
+                        });
                     await this.recrod.acquire();
                 }
             }
