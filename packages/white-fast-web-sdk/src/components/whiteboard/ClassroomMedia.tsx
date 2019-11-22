@@ -284,10 +284,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 return (
                     <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.classMode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
-                        const users = guestUsers.map((user: GuestUserType) => {
-                            user.applyForRtc = false;
-                            return user;
-                        });
+                        let users: GuestUserType[] | undefined = undefined;
+                        if (guestUsers) {
+                            users = guestUsers.map((user: GuestUserType) => {
+                                user.applyForRtc = false;
+                                return user;
+                            });
+                        }
                         if (hostInfo.classMode === ClassModeType.handUp) {
                             room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}});
                         } else {
