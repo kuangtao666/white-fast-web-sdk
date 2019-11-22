@@ -5,6 +5,7 @@ import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
 import {IdentityType} from "./WhiteboardCreatorPage";
+import {OSSConfigObjType} from "../../../white-fast-web-sdk/src/appToken";
 export type WhiteboardPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;
@@ -96,6 +97,14 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 language: "Chinese",
                 toolBarPosition: "left",
                 isManagerOpen: true,
+                // ossConfigObj: {
+                //     accessKeyId: "LTAIMCKvqa9EeK4c",
+                //     accessKeySecret: "0twckwYwJudmSOf2GEECozJlvBepQp",
+                //     region: "oss-cn-hangzhou",
+                //     bucket: "fast-sdk-test",
+                //     folder: "media",
+                //     prefix: "https://fast-sdk-test.oss-cn-hangzhou.aliyuncs.com",
+                // },
                //  uploadToolBox: [
                //      {
                //          enable: true,
