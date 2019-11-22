@@ -29,7 +29,9 @@ export type WhiteboardRecordProps = {
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
     startRtc?: (recordFunc?: () => void) => void;
+    stopRecordCallback?: (recordFunc: () => void) => void;
     replayCallback?: () => void;
+    setRecordingState: (state: boolean) => void;
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
@@ -46,6 +48,11 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         };
     }
 
+    public componentDidMount(): void {
+        if (this.props.stopRecordCallback) {
+            this.props.stopRecordCallback(this.record);
+        }
+    }
     private tick = (): void => {
         this.setState(({
             secondsElapsed: this.state.secondsElapsed + 1,
@@ -193,6 +200,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     if (resp.serverResponse.fileList) {
                         const res = await this.recrod.stop();
                         message.info("结束录制");
+                        this.props.setRecordingState(false);
                         const time =  new Date();
                         const timeStamp = time.getTime();
                         this.setState({isRecord: false});
@@ -206,6 +214,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     }
                 } else {
                     message.info("结束录制");
+                    this.props.setRecordingState(false);
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     this.setState({isRecord: false, isRecordOver: true});
@@ -222,6 +231,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 try {
                     await this.recrod.start();
                     message.success("开始录制");
+                    this.props.setRecordingState(true);
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     if (this.props.recordDataCallback) {
@@ -235,6 +245,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 }
             } else {
                 message.success("开始录制");
+                this.props.setRecordingState(true);
                 const time =  new Date();
                 const timeStamp = time.getTime();
                 if (this.props.recordDataCallback) {

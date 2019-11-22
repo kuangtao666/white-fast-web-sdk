@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Badge, Tabs, Icon, message} from "antd";
+import {Badge, Tabs, Icon} from "antd";
 import "./WhiteboardManager.less";
 import {Room} from "white-react-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
@@ -85,7 +85,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable} applyForRtc={false}
                                         startRtcCallback={context.startRtcCallback}
                                         stopRtcCallback={context.stopRtcCallback}
+                                        isRecording={context.isRecording}
                                         language={this.props.language}
+                                        stopRecord={context.stopRecord}
                                         rtc={this.props.rtc} classMode={hostInfo.classMode}
                                         userId={parseInt(this.props.userId)}
                                         handleManagerState={this.props.handleManagerState}
@@ -107,6 +109,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 stopRtcCallback={context.stopRtcCallback}
                                                 language={this.props.language}
                                                 rtc={this.props.rtc}
+                                                isRecording={context.isRecording}
+                                                stopRecord={context.stopRecord}
                                                 classMode={hostInfo.classMode}
                                                 userId={parseInt(this.props.userId)}
                                                 handleManagerState={this.props.handleManagerState}
@@ -124,6 +128,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 stopRtcCallback={context.stopRtcCallback}
                                                 language={this.props.language}
                                                 rtc={this.props.rtc}
+                                                isRecording={context.isRecording}
+                                                stopRecord={context.stopRecord}
                                                 classMode={hostInfo.classMode}
                                                 userId={parseInt(this.props.userId)}
                                                 handleManagerState={this.props.handleManagerState}
@@ -142,6 +148,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                             stopRtcCallback={context.stopRtcCallback}
                                             language={this.props.language}
                                             rtc={this.props.rtc}
+                                            stopRecord={context.stopRecord}
+                                            isRecording={context.isRecording}
                                             classMode={hostInfo.classMode}
                                             userId={parseInt(this.props.userId)}
                                             handleManagerState={this.props.handleManagerState}

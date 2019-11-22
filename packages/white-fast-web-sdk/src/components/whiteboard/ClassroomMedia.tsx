@@ -35,6 +35,7 @@ export type ClassroomMediaStates = {
 export type ClassroomMediaProps = {
     userId: number;
     channelId: string;
+    isRecording: boolean;
     room: Room;
     classMode: ClassModeType;
     identity?: IdentityType;
@@ -45,6 +46,7 @@ export type ClassroomMediaProps = {
     isVideoEnable: boolean;
     startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
     stopRtcCallback: (stopRtc: () => void) => void;
+    stopRecord?: () => void;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -454,7 +456,34 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        <div className="manager-box-inner-host2">
                            <div className="manager-box-btn">
                                <Tooltip placement={"right"} title={isEnglish ? "Close video call" : "关闭视频"}>
-                                   <div className="manager-box-btn-hang" onClick={() => this.stopRtc()}>
+                                   <div className="manager-box-btn-hang" onClick={() => {
+                                       if (this.props.isRecording && this.props.identity === IdentityType.host) {
+                                           const key = `rtc-close`;
+                                           const btn = (
+                                               <Button type="primary" onClick={() => {
+                                                   if (this.props.stopRecord) {
+                                                       this.props.stopRecord();
+                                                   }
+                                                   this.stopRtc();
+                                                   notification.close(key);
+                                               }}>
+                                                   停止录制并关闭
+                                               </Button>
+                                           );
+                                           notification.open({
+                                               message: `关闭 RTC 提醒`,
+                                               duration: 6,
+                                               description:
+                                                   "您正开启录制服务，关闭 RTC 之前请先停止录制。否则视频和白板会录制时长不统一。",
+                                               icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                                               btn,
+                                               key,
+                                               top: 64,
+                                           });
+                                       } else {
+                                           this.stopRtc();
+                                       }
+                                   }}>
                                        <img src={hangUp}/>
                                    </div>
                                </Tooltip>
