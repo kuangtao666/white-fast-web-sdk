@@ -1,9 +1,7 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
-import {Room, RoomMember, ViewMode} from "white-react-sdk";
+import {Room, ViewMode} from "white-react-sdk";
 import {Button, Radio, Tooltip, notification, Icon} from "antd";
-import ClassroomMediaCell from "./ClassroomMediaCell";
-import ClassroomMediaHostCell from "./ClassroomMediaHostCell";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
@@ -11,9 +9,9 @@ import * as menu_in from "../../assets/image/menu_in.svg";
 import * as close_white from "../../assets/image/close_white.svg";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import Identicon from "react-identicons";
-import ClassroomVideo from "./ClassroomVideo";
+import ClassroomMediaManager from "./ClassroomMediaManager";
 export type NetlessStream = {
-    state: {isVideoOpen: boolean, isAudioOpen: boolean},
+    state: {isInStage: boolean, identity?: IdentityType},
 } & any;
 
 export enum IdentityType {
@@ -26,9 +24,7 @@ export type ClassroomMediaStates = {
     isRtcStart: boolean;
     isMaskAppear: boolean;
     isFullScreen: boolean;
-    remoteMediaStreams: NetlessStream[];
-    streams: any[];
-    localStream: NetlessStream | null;
+    streams: NetlessStream[];
     isLocalStreamPublish: boolean;
     isRtcLoading: boolean;
 };
@@ -60,9 +56,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             isRtcStart: false,
             isMaskAppear: false,
             isFullScreen: false,
-            remoteMediaStreams: [],
             streams: [],
-            localStream: null,
             isRtcLoading: false,
             isLocalStreamPublish: false,
         };
@@ -112,20 +106,20 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }
         }
 
-        if (this.props.classMode !== nextProps.classMode) {
-            if (nextProps.classMode !== ClassModeType.discuss && this.agoraClient !==  undefined) {
-                if (this.props.identity !== IdentityType.host && this.state.localStream) {
-                    this.agoraClient.unpublish(this.state.localStream);
-                }
-            }
-        }
+        // if (this.props.classMode !== nextProps.classMode) {
+        //     if (nextProps.classMode !== ClassModeType.discuss && this.agoraClient !==  undefined) {
+        //         if (this.props.identity !== IdentityType.host && this.state.localStream) {
+        //             this.agoraClient.unpublish(this.state.localStream);
+        //         }
+        //     }
+        // }
 
-        if (this.props.applyForRtc !== nextProps.applyForRtc) {
-            const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
-            if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc) {
-                this.publishRtc();
-            }
-        }
+        // if (this.props.applyForRtc !== nextProps.applyForRtc) {
+        //     const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
+        //     if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc) {
+        //         this.publishRtc();
+        //     }
+        // }
     }
 
     private videoJoinRemind = (): void => {
@@ -387,7 +381,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                                    if (this.props.stopRecord) {
                                                        this.props.stopRecord();
                                                    }
-                                                   // this.stopRtc();
+                                                   this.stopRtc();
                                                    notification.close(key);
                                                }}>
                                                    停止录制并关闭
@@ -404,7 +398,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                                top: 64,
                                            });
                                        } else {
-                                           // this.stopRtc();
+                                           this.stopRtc();
                                        }
                                    }}>
                                        <img src={hangUp}/>
@@ -426,7 +420,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                            {this.renderHostController(hostInfo)}
                        </div>
                    </div>}
-                   <ClassroomVideo userId={this.props.userId} streams={this.state.streams}/>
+                   <ClassroomMediaManager
+                       rtcClient={this.agoraClient}
+                       userId={this.props.userId}
+                       streams={this.state.streams}/>
                </div>
             </div>
         );
@@ -442,22 +439,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }});
         }
     }
-    private publishRtc = (): void => {
-        const {localStream} = this.state;
-        if (localStream && this.agoraClient) {
-            this.setState({isLocalStreamPublish: true});
-            // localStream.play("rtc_local_stream");
-            // this.agoraClient.publish(localStream, (err: any) => {
-            //     console.log("Publish local stream error: " + err);
-            // });
-        }
-    }
     private startRtc = (recordFunc?: () => void, isUnPublish?: boolean): void => {
         const {rtc, identity, userId, channelId} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
         // 按钮 loading
-        // this.setState({isRtcLoading: true});
+        this.setState({isRtcLoading: true});
         // 初始化
         this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
         this.agoraClient.init(agoraAppId, () => {
@@ -476,6 +463,28 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
     }
 
+    private stopRtc = (): void => {
+        const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
+        const remoteStreams = this.state.streams.filter(stream => stream.getId() !== this.props.userId);
+        this.agoraClient.leave(() => {
+            // Stop playing the local stream
+            if (localStream) {
+                localStream.stop();
+                localStream.close();
+            }
+            // Stop playing the remote streams and remove the views
+            while (remoteStreams.length > 0) {
+                const stream = remoteStreams.shift();
+                stream.stop();
+            }
+            this.setState({streams: [], isRtcStart: false});
+            console.log("client leaves channel success");
+        }, (err: any) => {
+            console.log("channel leave failed");
+            console.error(err);
+        });
+    }
+
     private createLocalStream = (rtcObj: any, userId: number): void => {
         // 创建本地流对象
         const localStream = rtcObj.createStream({
@@ -487,6 +496,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         // 初始化本地流
         localStream.init(()  => {
             console.log("getUserMedia successfully");
+            this.setState({isRtcStart: true, isRtcLoading: false});
             this.addStream(localStream);
         }, (err: any) => {
             console.log("getUserMedia failed", err);
@@ -495,7 +505,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
     private addStream = (stream: any): void => {
         const originalStreamArray = this.state.streams;
-        originalStreamArray.push(stream);
+        const newStream: NetlessStream = {...stream, state: {
+                isInStage: false, identity: this.props.identity,
+            }};
+        originalStreamArray.push(newStream);
         this.setState({streams: originalStreamArray});
     }
 
@@ -527,9 +540,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             console.log("Subscribe remote stream successfully: " + stream.getId());
         });
         rtcClient.on("peer-leave", (evt: any) => {
-            const uid = evt.uid;
-            // this.stopStreams(uid);
-            console.log("remote user left ", uid);
+            const stream = evt.stream;
+            this.removeStream(stream);
+            console.log("remote user left ", evt.uid);
         });
         rtcClient.on("mute-video", (evt: any) => {
             const uid = evt.uid;

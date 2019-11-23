@@ -1,19 +1,14 @@
 import * as React from "react";
-import {IdentityType, NetlessStream} from "./ClassroomMedia";
-import "./ClassroomMediaCell.less";
-import {CSSProperties} from "react";
+import "./ClassroomMediaManager.less";
 
-export type ClassroomMediaCellProps = {
-    stream: NetlessStream;
-    identity?: IdentityType;
-    streamsLength: number;
-    hasHost: boolean;
+export type ClassroomManagerCellProps = {
+    stream: any;
 };
 
-export default class ClassroomMediaCell extends React.Component<ClassroomMediaCellProps, {}> {
+export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
 
 
-    public constructor(props: ClassroomMediaCellProps) {
+    public constructor(props: ClassroomManagerCellProps) {
         super(props);
     }
 
@@ -27,37 +22,8 @@ export default class ClassroomMediaCell extends React.Component<ClassroomMediaCe
         const {stream} = this.props;
         const streamId =  stream.getId();
         return (
-            <div id={`netless-${streamId}`} style={this.handleVideoBox()} className="media-box">
+            <div id={`netless-${streamId}`} className="media-box-text">
             </div>
         );
     }
-
-    private handleVideoBox = (): CSSProperties => {
-        const {streamsLength, identity, hasHost} = this.props;
-        if (identity === IdentityType.host) {
-            if (streamsLength === 1) {
-                return {width: "100%", height: 150};
-            } else if (streamsLength === 2) {
-                return {width: "50%", height: 150};
-            } else {
-                return {width: "33.33%", height: 75};
-            }
-        } else {
-            let myLength;
-            if (hasHost) {
-                myLength = streamsLength + 1;
-            } else {
-                myLength = streamsLength;
-            }
-            if (myLength === 1) {
-                return {width: "100%", height: 150};
-            } else if (myLength === 2) {
-                return {width: "50%", height: 150};
-            } else {
-                return {width: "33.33%", height: 75};
-            }
-        }
-    }
-
-
 }
