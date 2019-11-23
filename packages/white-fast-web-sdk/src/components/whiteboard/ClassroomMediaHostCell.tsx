@@ -62,11 +62,18 @@ export default class ClassroomMediaHostCell extends React.Component<ClassroomMed
     }
 
     public render(): React.ReactNode {
-        const {stream} = this.props;
+        const {stream, streamsLength} = this.props;
         const streamId =  stream.getId();
-        return (
-            <div id={`netless-${streamId}`} style={this.handleLocalVideoBox()} className="media-box">
-            </div>
-        );
+        if (streamsLength === 0) {
+            return (
+                <div id={`netless-${streamId}`} style={{width: "100%", height: 300}} className="media-box">
+                </div>
+            );
+        } else {
+            return (
+                <div id={`netless-${streamId}`} style={{width: "100%", height: 150}} className="media-box">
+                </div>
+            );
+        }
     }
 }
