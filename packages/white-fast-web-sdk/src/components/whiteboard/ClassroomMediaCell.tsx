@@ -1,8 +1,10 @@
 import * as React from "react";
 import "./ClassroomMediaManager.less";
+import {NetlessStream} from "./ClassroomMedia";
 
 export type ClassroomManagerCellProps = {
-    stream: any;
+    stream: NetlessStream;
+    userId: number;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -19,11 +21,18 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     }
 
     public render(): React.ReactNode {
-        const {stream} = this.props;
+        const {stream, userId} = this.props;
         const streamId =  stream.getId();
-        return (
-            <div id={`netless-${streamId}`} className="media-box-text">
-            </div>
-        );
+        if (streamId === userId) {
+            return (
+                <div id={`netless-${streamId}`} className="rtc-media-cell-box" style={{border: "3px solid #5B908E"}}>
+                </div>
+            );
+        } else {
+            return (
+                <div id={`netless-${streamId}`} className="rtc-media-cell-box">
+                </div>
+            );
+        }
     }
 }

@@ -40,7 +40,7 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         });
         if (audienceStreams && audienceStreams.length > 0) {
             return audienceStreams.map(audienceStream => {
-                return <ClassroomMediaCell stream={audienceStream}/>;
+                return <ClassroomMediaCell key={`${audienceStream.getId()}`} userId={this.props.userId} stream={audienceStream}/>;
             });
         } else {
             return null;

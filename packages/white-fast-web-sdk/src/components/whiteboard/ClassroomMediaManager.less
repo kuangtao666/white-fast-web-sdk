@@ -1,18 +1,21 @@
 .rtc-media-box {
     width: 300px;
     height: 300px;
+    position: relative;
 }
 
 .rtc-media-cell-box {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    z-index: 2;
+}
+
+.rtc-media-stage-box {
     width: 100%;
     height: 100%;
-}
-
-.media-box-text {
-    width: 90px;
-    height: 90px;
-}
-
-.rtc-media-cell-box-self {
-
+    position: absolute;
+    z-index: 1;
 }

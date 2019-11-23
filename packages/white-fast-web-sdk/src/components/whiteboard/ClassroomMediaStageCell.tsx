@@ -37,12 +37,12 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
         const streamId =  stream.getId();
         if (streamId === userId) {
             return (
-                <div id={`netless-${streamId}`} className="rtc-media-cell-box-self">
+                <div id={`netless-${streamId}`} className="rtc-media-stage-box" style={{border: "3px solid #5B908E"}}>
                 </div>
             );
         } else {
             return (
-                <div id={`netless-${streamId}`} className="rtc-media-cell-box">
+                <div id={`netless-${streamId}`} className="rtc-media-stage-box">
                 </div>
             );
         }
