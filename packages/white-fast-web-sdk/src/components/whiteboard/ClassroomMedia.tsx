@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
 import {Room, ViewMode} from "white-react-sdk";
-import {Button, Radio, Tooltip, notification, Icon} from "antd";
+import {Button, Radio, Tooltip, notification, Icon, message} from "antd";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
@@ -63,8 +63,14 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     public componentDidMount(): void {
+        const {userId, room} = this.props;
+        if (this.props.identity === IdentityType.host) {
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            if (hostInfo && hostInfo.isRecording === true) {
+                this.startRtc();
+            }
+        }
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
-            const {userId, room} = this.props;
             const hostInfo: HostUserType = room.state.globalState.hostInfo;
             const key = `${Date.now()}`;
             const btn = (
@@ -73,7 +79,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         if (hostInfo.classMode === ClassModeType.discuss) {
                             this.startRtc();
                         } else {
-                            this.startRtc(undefined, true);
+                            this.startRtc(undefined);
                         }
                     }
                     notification.close(key);
@@ -81,16 +87,29 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     确认加入
                 </Button>
             );
-            notification.open({
-                message: `你好！${userId}`,
-                duration: 8,
-                description:
-                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
-                icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
-                btn,
-                key,
-                top: 64,
-            });
+            if (this.props.classMode === ClassModeType.discuss) {
+                notification.open({
+                    message: `你好！${userId}`,
+                    duration: 8,
+                    description:
+                        "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                    icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                    btn,
+                    key,
+                    top: 64,
+                });
+            } else {
+                notification.open({
+                    message: `你好！${userId}`,
+                    duration: 8,
+                    description:
+                        "此教室中老师已经开启视频授课，请确认是否订阅。",
+                    icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                    btn,
+                    key,
+                    top: 64,
+                });
+            }
         }
         this.props.startRtcCallback(this.startRtc);
         this.props.stopRtcCallback(this.stopRtc);
@@ -106,13 +125,14 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }
         }
 
-        // if (this.props.classMode !== nextProps.classMode) {
-        //     if (nextProps.classMode !== ClassModeType.discuss && this.agoraClient !==  undefined) {
-        //         if (this.props.identity !== IdentityType.host && this.state.localStream) {
-        //             this.agoraClient.unpublish(this.state.localStream);
-        //         }
-        //     }
-        // }
+
+        if (this.props.classMode !== nextProps.classMode) {
+            if (nextProps.classMode === ClassModeType.handUp) {
+                if (this.props.identity === IdentityType.guest) {
+                    message.info("课堂切换到举手参与模式，您可以点击右下角 [举手] 图标申请互动。");
+                }
+            }
+        }
 
         if (this.props.applyForRtc !== nextProps.applyForRtc) {
             const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
@@ -135,7 +155,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         if (hostInfo.classMode === ClassModeType.discuss) {
                             this.startRtc();
                         } else {
-                            this.startRtc(undefined, true);
+                            this.startRtc();
                         }
                     }
                     notification.close(key);
@@ -143,16 +163,29 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     确认加入
                 </Button>
             );
-            notification.open({
-                message: `你好！${userId}`,
-                duration: 6,
-                description:
-                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
-                icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
-                btn,
-                key,
-                top: 64,
-            });
+            if (this.props.classMode === ClassModeType.discuss) {
+                notification.open({
+                    message: `你好！${userId}`,
+                    duration: 8,
+                    description:
+                        "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                    icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                    btn,
+                    key,
+                    top: 64,
+                });
+            } else {
+                notification.open({
+                    message: `你好！${userId}`,
+                    duration: 8,
+                    description:
+                        "此教室中老师已经开启视频授课，请确认是否订阅。",
+                    icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                    btn,
+                    key,
+                    top: 64,
+                });
+            }
         }
     }
 
@@ -205,17 +238,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 return (
                     <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.classMode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
-                        let users: GuestUserType[] | undefined = undefined;
-                        if (guestUsers) {
-                            users = guestUsers.map((user: GuestUserType) => {
-                                user.applyForRtc = false;
-                                return user;
-                            });
-                        }
                         if (hostInfo.classMode === ClassModeType.handUp) {
                             room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}});
                         } else {
-                            room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}, guestUsers: users});
+                            room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}, guestUsers: guestUsers});
                         }
                     }}>
                         <Radio.Button value={ClassModeType.lecture}>{isEnglish ? "Lecture" : "讲课模式"}</Radio.Button>
@@ -305,7 +331,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                     <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
                                     :
                                     <Tooltip placement={"right"} title={isEnglish ? "Start video call" : "开启音视频通信"}>
-                                        <Button onClick={() => this.startRtc(undefined, true)} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                                        <Button onClick={() => this.startRtc()} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
                                     </Tooltip>
                                 }
                             </div>
@@ -443,7 +469,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }});
         }
     }
-    private startRtc = (recordFunc?: () => void, isUnPublish?: boolean): void => {
+    private startRtc = (recordFunc?: () => void): void => {
         const {rtc, classMode, userId, channelId, identity} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;

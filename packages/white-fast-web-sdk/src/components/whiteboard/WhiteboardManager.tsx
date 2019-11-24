@@ -304,7 +304,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                         string={guestUser.userId}/>
                                 </div>
                             }
-                            <div className="control-box-name">{guestUser.name}</div>
+                            <div className="control-box-name">{guestUser.name ? guestUser.name : guestUser.userId}</div>
                         </div>
                         {this.renderGuestIcon(guestUser, globalGuestUsers)}
                     </div>

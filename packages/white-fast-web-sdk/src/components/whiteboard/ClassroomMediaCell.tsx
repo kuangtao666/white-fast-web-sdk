@@ -31,6 +31,7 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     public componentWillUnmount(): void {
         const {stream} = this.props;
         stream.stop();
+        this.unpublishLocalStream(stream);
     }
 
     private renderStyle = (): CSSProperties => {
@@ -58,6 +59,17 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         if (streamId === userId) {
             rtcClient.publish(stream, (err: any) => {
                 console.log("publish failed");
+                console.error(err);
+            });
+        }
+    }
+
+    private unpublishLocalStream = (stream: NetlessStream): void => {
+        const {userId, rtcClient} = this.props;
+        const streamId = stream.getId();
+        if (streamId === userId) {
+            rtcClient.unpublish(stream, (err: any) => {
+                console.log("unpublish failed");
                 console.error(err);
             });
         }

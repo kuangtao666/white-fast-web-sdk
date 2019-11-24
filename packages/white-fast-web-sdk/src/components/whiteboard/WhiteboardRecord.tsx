@@ -10,6 +10,7 @@ import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
+import {IdentityType} from "./ClassroomMedia";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -201,6 +202,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                         const res = await this.recrod.stop();
                         message.info("结束录制");
                         this.props.setRecordingState(false);
+                        this.setRecordState(false);
                         const time =  new Date();
                         const timeStamp = time.getTime();
                         this.setState({isRecord: false});
@@ -231,6 +233,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 try {
                     await this.recrod.start();
                     message.success("开始录制");
+                    this.setRecordState(true);
                     this.props.setRecordingState(true);
                     const time =  new Date();
                     const timeStamp = time.getTime();
@@ -246,6 +249,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
             } else {
                 message.success("开始录制");
                 this.props.setRecordingState(true);
+                this.setRecordState(true);
                 const time =  new Date();
                 const timeStamp = time.getTime();
                 if (this.props.recordDataCallback) {
@@ -258,6 +262,14 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
     }
     public componentWillUnmount(): void {
         this.stopClock();
+    }
+
+    private setRecordState = (state: boolean): void => {
+        const {room} = this.props;
+        room.setGlobalState({hostInfo: {
+                ...room.state.globalState.hostInfo,
+                isRecording: state,
+            }});
     }
 
     private handleCancel = (): void => {

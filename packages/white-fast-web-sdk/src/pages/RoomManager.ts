@@ -26,6 +26,7 @@ export type HostUserType = {
     avatar?: string,
     name?: string,
     isVideoFullScreen?: boolean,
+    isRecording?: boolean,
     classMode: ClassModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,

@@ -224,10 +224,12 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
             const user = this.getSelfUserInfo();
             if (user) {
                 if (user.isReadOnly) {
-                    return <div onClick={() => this.handleHandup(hostInfo.classMode, room, this.props.userId)}
-                                className="manager-under-btn">
-                        <img src={user.isHandUp ? handup_black : handup}/>
-                    </div>;
+                    return <Tooltip title={user.isHandUp ? "收回举手请求" : "举手请求互动"}>
+                        <div onClick={() => this.handleHandup(hostInfo.classMode, room, this.props.userId)}
+                             className="manager-under-btn">
+                            <img src={user.isHandUp ? handup_black : handup}/>
+                        </div>
+                    </Tooltip>;
                 } else {
                     return null;
                 }
