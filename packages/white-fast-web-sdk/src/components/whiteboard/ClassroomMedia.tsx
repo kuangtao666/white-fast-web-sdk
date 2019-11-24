@@ -11,7 +11,7 @@ import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import Identicon from "react-identicons";
 import ClassroomMediaManager from "./ClassroomMediaManager";
 export type NetlessStream = {
-    state: {isInStage: boolean, identity?: IdentityType},
+    state: {isAudioOpen: boolean, isInStage: boolean, identity?: IdentityType},
 } & any;
 
 export enum IdentityType {
@@ -93,16 +93,16 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             });
         }
         this.props.startRtcCallback(this.startRtc);
-        // this.props.stopRtcCallback(this.stopRtc);
+        this.props.stopRtcCallback(this.stopRtc);
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
         if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
             if (nextProps.isVideoEnable) {
                 this.videoJoinRemind();
-            }  else {
+            } else {
                 notification.close("notification");
-                // this.stopRtc();
+                this.stopRtc();
             }
         }
 
@@ -114,12 +114,14 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         //     }
         // }
 
-        // if (this.props.applyForRtc !== nextProps.applyForRtc) {
-        //     const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
-        //     if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc) {
-        //         this.publishRtc();
-        //     }
-        // }
+        if (this.props.applyForRtc !== nextProps.applyForRtc) {
+            const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
+            if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc) {
+                const {rtc, userId} = this.props;
+                const AgoraRTC = rtc!.rtcObj;
+                this.createLocalStream(AgoraRTC, userId);
+            }
+        }
     }
 
     private videoJoinRemind = (): void => {
@@ -424,6 +426,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        rtcClient={this.agoraClient}
                        setMemberToStageById={this.setMemberToStageById}
                        userId={this.props.userId}
+                       classMode={this.props.classMode}
                        streams={this.state.streams}/>
                </div>
             </div>
@@ -441,7 +444,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
     private startRtc = (recordFunc?: () => void, isUnPublish?: boolean): void => {
-        const {rtc, identity, userId, channelId} = this.props;
+        const {rtc, classMode, userId, channelId, identity} = this.props;
         const AgoraRTC = rtc!.rtcObj;
         const agoraAppId = rtc!.token;
         // 按钮 loading
@@ -453,7 +456,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
                 console.log("User " + uid + " join channel successfully");
                 // 创建本地流对象
-                this.createLocalStream(AgoraRTC, userId);
+                this.setState({isRtcStart: true, isRtcLoading: false});
+                if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
+                    this.createLocalStream(AgoraRTC, userId);
+                }
                 // 添加监听
                 this.addRtcListeners(this.agoraClient);
             }, (err: any) => {
@@ -497,7 +503,6 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         // 初始化本地流
         localStream.init(()  => {
             console.log("getUserMedia successfully");
-            this.setState({isRtcStart: true, isRtcLoading: false});
             this.setMediaState(true);
             this.addStream(localStream);
         }, (err: any) => {
@@ -524,7 +529,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private addStream = (stream: any): void => {
         const originalStreamArray = this.state.streams;
         const newStream: NetlessStream = {...stream, state: {
-                isInStage: false, identity: this.getStreamIdentity(stream.getId()),
+                isAudioOpen: true,
+                isInStage: false,
+                identity: this.getStreamIdentity(stream.getId()),
             }};
         originalStreamArray.push(newStream);
         this.setState({streams: originalStreamArray});
@@ -594,23 +601,23 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
         rtcClient.on("mute-audio", (evt: any) => {
             const uid = evt.uid;
-            // const streams = this.state.remoteMediaStreams.map((data: any) => {
-            //     if (data.getId() === uid) {
-            //         data.state.isAudioOpen = false;
-            //     }
-            //     return data;
-            // });
-            // this.setState({remoteMediaStreams: streams});
+            const streams = this.state.streams.map((data: any) => {
+                if (data.getId() === uid) {
+                    data.state.isAudioOpen = false;
+                }
+                return data;
+            });
+            this.setState({streams: streams});
         });
         rtcClient.on("unmute-audio", (evt: any) => {
             const uid = evt.uid;
-            // const streams = this.state.remoteMediaStreams.map(data => {
-            //     if (data.getId() === uid) {
-            //         data.state.isAudioOpen = true;
-            //     }
-            //     return data;
-            // });
-            // this.setState({remoteMediaStreams: streams});
+            const streams = this.state.streams.map(data => {
+                if (data.getId() === uid) {
+                    data.state.isAudioOpen = true;
+                }
+                return data;
+            });
+            this.setState({streams: streams});
         });
     }
 

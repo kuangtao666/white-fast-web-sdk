@@ -3,10 +3,12 @@ import {IdentityType, NetlessStream} from "./ClassroomMedia";
 import ClassroomMediaStageCell from "./ClassroomMediaStageCell";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import "./ClassroomMediaManager.less";
+import {ClassModeType} from "../../pages/RoomManager";
 
 export type ClassroomMediaManagerProps = {
     streams: NetlessStream[];
     userId: number;
+    classMode: ClassModeType;
     identity?: IdentityType;
     rtcClient: any;
     setMemberToStageById: (userId: number) => void;
@@ -26,7 +28,7 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         const stageStream = this.getStageStream();
         if (stageStream) {
             return <ClassroomMediaStageCell
-                userId={this.props.userId}
+                userId={this.props.userId} classMode={this.props.classMode}
                 streamsLength={this.props.streams.length}
                 rtcClient={this.props.rtcClient}
                 stream={stageStream}/>;
@@ -43,7 +45,7 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         if (audienceStreams && audienceStreams.length > 0) {
             return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
                 return <ClassroomMediaCell
-                    key={`${audienceStream.getId()}`} streamIndex={index}
+                    key={`${audienceStream.getId()}`} streamIndex={index} classMode={this.props.classMode}
                     streamsLength={this.props.streams.length}
                     userId={this.props.userId}
                     setMemberToStageById={this.props.setMemberToStageById}

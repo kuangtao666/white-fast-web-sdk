@@ -2,6 +2,7 @@ import * as React from "react";
 import "./ClassroomMediaManager.less";
 import {NetlessStream} from "./ClassroomMedia";
 import {CSSProperties} from "react";
+import {ClassModeType} from "../../pages/RoomManager";
 
 export type ClassroomManagerCellProps = {
     stream: NetlessStream;
@@ -10,6 +11,7 @@ export type ClassroomManagerCellProps = {
     streamsLength: number;
     streamIndex: number
     setMemberToStageById: (userId: number) => void;
+    classMode: ClassModeType;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -23,6 +25,7 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         const {stream} = this.props;
         const streamId =  stream.getId();
         stream.play(`netless-${streamId}`);
+        this.publishLocalStream(stream);
     }
 
     public componentWillUnmount(): void {
@@ -46,6 +49,17 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
             } else {
                 return {width: 75, height: 75, right: (streamIndex * 75)};
             }
+        }
+    }
+
+    private publishLocalStream = (stream: NetlessStream): void => {
+        const {userId, rtcClient} = this.props;
+        const streamId = stream.getId();
+        if (streamId === userId) {
+            rtcClient.publish(stream, (err: any) => {
+                console.log("publish failed");
+                console.error(err);
+            });
         }
     }
 

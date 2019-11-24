@@ -1,6 +1,7 @@
 import * as React from "react";
 import {NetlessStream} from "./ClassroomMedia";
 import "./ClassroomMediaManager.less";
+import {ClassModeType} from "../../pages/RoomManager";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type ClassroomMediaStageCellProps = {
@@ -8,6 +9,7 @@ export type ClassroomMediaStageCellProps = {
     userId: number;
     rtcClient: any;
     streamsLength: number;
+    classMode: ClassModeType;
 };
 
 export default class ClassroomMediaStageCell extends React.Component<ClassroomMediaStageCellProps, {}> {
