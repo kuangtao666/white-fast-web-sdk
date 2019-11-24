@@ -1,6 +1,7 @@
 import * as React from "react";
 import {NetlessStream} from "./ClassroomMedia";
 import "./ClassroomMediaManager.less";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type ClassroomMediaStageCellProps = {
     stream: NetlessStream;
@@ -18,18 +19,40 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
     public componentDidMount(): void {
         const {stream} = this.props;
         this.startStream(stream);
+        this.publishLocalStream(stream);
+    }
+
+    public async UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaStageCellProps): Promise<void> {
+        if (nextProps.stream !== this.props.stream) {
+            this.stopStream(this.props.stream);
+            await timeout(0);
+            this.startStream(nextProps.stream);
+        }
     }
 
     private startStream = (stream: NetlessStream): void => {
-        const {userId, rtcClient} = this.props;
-        const streamId =  stream.getId();
+        const streamId = stream.getId();
         stream.play(`netless-${streamId}`);
+    }
+
+    private publishLocalStream = (stream: NetlessStream): void => {
+        const {userId, rtcClient} = this.props;
+        const streamId = stream.getId();
         if (streamId === userId) {
             rtcClient.publish(stream, (err: any) => {
                 console.log("publish failed");
                 console.error(err);
             });
         }
+    }
+
+    private stopStream = (stream: NetlessStream): void => {
+        stream.stop();
+    }
+
+    public componentWillUnmount(): void {
+        const {stream} = this.props;
+        this.stopStream(stream);
     }
 
     public render(): React.ReactNode {

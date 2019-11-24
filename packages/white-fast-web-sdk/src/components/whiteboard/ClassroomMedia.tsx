@@ -503,13 +503,38 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
     }
 
+    private getStreamIdentity = (userId: number): IdentityType => {
+        const {room} = this.props;
+        const roomMember = room.state.roomMembers.find((roomMember: any) => {
+            if (roomMember.payload && roomMember.payload.userId !== undefined) {
+                if (parseInt(roomMember.payload.userId) === userId) {
+                    return roomMember;
+                }
+            }
+        });
+        if (roomMember) {
+            return roomMember.payload.identity;
+        } else {
+            return IdentityType.listener;
+        }
+    }
+
     private addStream = (stream: any): void => {
         const originalStreamArray = this.state.streams;
         const newStream: NetlessStream = {...stream, state: {
-                isInStage: false, identity: this.props.identity,
+                isInStage: false, identity: this.getStreamIdentity(stream.getId()),
             }};
         originalStreamArray.push(newStream);
         this.setState({streams: originalStreamArray});
+    }
+
+    private setMemberToStageById = (userId: number): void => {
+        const originalStreamArray = this.state.streams;
+        const newStreams: NetlessStream[] = originalStreamArray.map(originalStream => {
+            originalStream.isInStage = originalStream.getId() === userId;
+            return originalStream;
+        });
+        this.setState({streams: newStreams});
     }
 
     private removeStream = (stream: any): void => {

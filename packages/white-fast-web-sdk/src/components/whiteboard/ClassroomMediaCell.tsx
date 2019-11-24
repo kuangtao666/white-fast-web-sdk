@@ -5,6 +5,7 @@ import {NetlessStream} from "./ClassroomMedia";
 export type ClassroomManagerCellProps = {
     stream: NetlessStream;
     userId: number;
+    rtcClient: any;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -18,6 +19,11 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         const {stream} = this.props;
         const streamId =  stream.getId();
         stream.play(`netless-${streamId}`);
+    }
+
+    public componentWillUnmount(): void {
+        const {stream} = this.props;
+        stream.stop();
     }
 
     public render(): React.ReactNode {

@@ -40,13 +40,13 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         });
         if (audienceStreams && audienceStreams.length > 0) {
             return audienceStreams.map(audienceStream => {
-                return <ClassroomMediaCell key={`${audienceStream.getId()}`} userId={this.props.userId} stream={audienceStream}/>;
+                return <ClassroomMediaCell key={`${audienceStream.getId()}`} userId={this.props.userId} rtcClient={this.props.rtcClient} stream={audienceStream}/>;
             });
         } else {
             return null;
         }
     }
-    private getStageStream = (): any => {
+    private getStageStream = (): NetlessStream => {
         const {streams, userId} = this.props;
         const stageStream = streams.find(stream => stream.state.isInStage);
         if (stageStream) {
