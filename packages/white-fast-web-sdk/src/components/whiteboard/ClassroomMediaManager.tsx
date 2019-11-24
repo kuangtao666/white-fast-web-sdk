@@ -9,6 +9,7 @@ export type ClassroomMediaManagerProps = {
     userId: number;
     identity?: IdentityType;
     rtcClient: any;
+    setMemberToStageById: (userId: number) => void;
 };
 
 export type ClassroomMediaManagerStates = {
@@ -26,6 +27,7 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         if (stageStream) {
             return <ClassroomMediaStageCell
                 userId={this.props.userId}
+                streamsLength={this.props.streams.length}
                 rtcClient={this.props.rtcClient}
                 stream={stageStream}/>;
         } else {
@@ -39,8 +41,14 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
             return stream.getId() !== stageStream.getId();
         });
         if (audienceStreams && audienceStreams.length > 0) {
-            return audienceStreams.map(audienceStream => {
-                return <ClassroomMediaCell key={`${audienceStream.getId()}`} userId={this.props.userId} rtcClient={this.props.rtcClient} stream={audienceStream}/>;
+            return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
+                return <ClassroomMediaCell
+                    key={`${audienceStream.getId()}`} streamIndex={index}
+                    streamsLength={this.props.streams.length}
+                    userId={this.props.userId}
+                    setMemberToStageById={this.props.setMemberToStageById}
+                    rtcClient={this.props.rtcClient}
+                    stream={audienceStream}/>;
             });
         } else {
             return null;
@@ -49,16 +57,27 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
     private getStageStream = (): NetlessStream => {
         const {streams, userId} = this.props;
         const stageStream = streams.find(stream => stream.state.isInStage);
+        // 如何制定了舞台的流就有限选用指定
         if (stageStream) {
             return stageStream;
         } else {
-            const hostStream = streams.find(stream => stream.state.identity === IdentityType.host);
-            if (hostStream) {
-                return hostStream;
+            const streamsLength = streams.length;
+            // 如果是两个人的时候就是吧对方的视频作为舞台。
+            if (streamsLength === 2) {
+                const theirStream = streams.find(stream => stream.getId() !== userId);
+                if (theirStream) {
+                    return theirStream;
+                }
             } else {
-                const selfStream = streams.find(stream => stream.getId() === userId);
-                if (selfStream) {
-                    return selfStream;
+                // 剩余的情况遵循，有老师显示老师，没老师显示自己。
+                const hostStream = streams.find(stream => stream.state.identity === IdentityType.host);
+                if (hostStream) {
+                    return hostStream;
+                } else {
+                    const selfStream = streams.find(stream => stream.getId() === userId);
+                    if (selfStream) {
+                        return selfStream;
+                    }
                 }
             }
         }

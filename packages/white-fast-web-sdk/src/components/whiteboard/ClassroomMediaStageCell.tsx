@@ -7,6 +7,7 @@ export type ClassroomMediaStageCellProps = {
     stream: NetlessStream;
     userId: number;
     rtcClient: any;
+    streamsLength: number;
 };
 
 export default class ClassroomMediaStageCell extends React.Component<ClassroomMediaStageCellProps, {}> {
@@ -56,16 +57,21 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
     }
 
     public render(): React.ReactNode {
-        const {stream, userId} = this.props;
+        const {stream, streamsLength} = this.props;
         const streamId =  stream.getId();
-        if (streamId === userId) {
+        if (streamsLength <= 2) {
             return (
-                <div id={`netless-${streamId}`} className="rtc-media-stage-box" style={{border: "3px solid #5B908E"}}>
+                <div id={`netless-${streamId}`} style={{width: 300, height: 300}} className="rtc-media-stage-box">
+                </div>
+            );
+        } else if (streamsLength > 3 && streamsLength < 6) {
+            return (
+                <div id={`netless-${streamId}`} style={{width: 300, height: 225}} className="rtc-media-stage-box">
                 </div>
             );
         } else {
             return (
-                <div id={`netless-${streamId}`} className="rtc-media-stage-box">
+                <div id={`netless-${streamId}`} style={{width: 300, height: 200}} className="rtc-media-stage-box">
                 </div>
             );
         }

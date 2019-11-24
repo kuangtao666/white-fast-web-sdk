@@ -1,11 +1,15 @@
 import * as React from "react";
 import "./ClassroomMediaManager.less";
 import {NetlessStream} from "./ClassroomMedia";
+import {CSSProperties} from "react";
 
 export type ClassroomManagerCellProps = {
     stream: NetlessStream;
     userId: number;
     rtcClient: any;
+    streamsLength: number;
+    streamIndex: number
+    setMemberToStageById: (userId: number) => void;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -26,19 +30,35 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         stream.stop();
     }
 
-    public render(): React.ReactNode {
-        const {stream, userId} = this.props;
-        const streamId =  stream.getId();
-        if (streamId === userId) {
-            return (
-                <div id={`netless-${streamId}`} className="rtc-media-cell-box" style={{border: "3px solid #5B908E"}}>
-                </div>
-            );
+    private renderStyle = (): CSSProperties => {
+        const {streamsLength, streamIndex} = this.props;
+        if (streamsLength === 2) {
+            return {width: 100, height: 100};
+        } else if (streamsLength === 3) {
+            return {width: 150, height: 100, right: (streamIndex * 150)};
+        } else if (streamsLength === 4) {
+            return {width: 100, height: 100, right: (streamIndex * 100)};
+        } else if (streamsLength === 5) {
+            return {width: 75, height: 75, right: (streamIndex * 75)};
         } else {
-            return (
-                <div id={`netless-${streamId}`} className="rtc-media-cell-box">
-                </div>
-            );
+            if (streamIndex >= 4) {
+                return {width: 75, height: 75, right: ((streamIndex - 4) * 75), bottom: 75};
+            } else {
+                return {width: 75, height: 75, right: (streamIndex * 75)};
+            }
         }
+    }
+
+    private handleClickVideo = (userId: number): void => {
+        this.props.setMemberToStageById(userId);
+    }
+
+    public render(): React.ReactNode {
+        const {stream} = this.props;
+        const streamId =  stream.getId();
+        return (
+            <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} style={this.renderStyle()} className="rtc-media-cell-box">
+            </div>
+        );
     }
 }

@@ -422,6 +422,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                    </div>}
                    <ClassroomMediaManager
                        rtcClient={this.agoraClient}
+                       setMemberToStageById={this.setMemberToStageById}
                        userId={this.props.userId}
                        streams={this.state.streams}/>
                </div>
@@ -535,6 +536,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             return originalStream;
         });
         this.setState({streams: newStreams});
+        console.log(this.state.streams);
     }
 
     private removeStream = (stream: any): void => {
