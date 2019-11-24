@@ -478,7 +478,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 const stream = remoteStreams.shift();
                 stream.stop();
             }
-            this.setState({streams: [], isRtcStart: false});
+            this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
             console.log("client leaves channel success");
         }, (err: any) => {
             console.log("channel leave failed");
@@ -498,6 +498,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         localStream.init(()  => {
             console.log("getUserMedia successfully");
             this.setState({isRtcStart: true, isRtcLoading: false});
+            this.setMediaState(true);
             this.addStream(localStream);
         }, (err: any) => {
             console.log("getUserMedia failed", err);
