@@ -159,6 +159,7 @@ export type RealTimeStates = {
     stopRtc?: () => void;
     stopRecord?: (stopRecordFunc?: () => void) => void;
     isRecording: boolean;
+    secondsElapsed?: number;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -362,6 +363,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.stopAll();
     }
 
+    private recordTime = (time: number): void => {
+        this.setState({secondsElapsed: time});
+    }
+
     private stopAll = (): void => {
         const {identity} = this.props;
         const {room} = this.state;
@@ -369,6 +374,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             room.setGlobalState({hostInfo: {
                     ...room.state.globalState.hostInfo,
                     isVideoEnable: false,
+                    secondsElapsed: this.state.secondsElapsed,
                 }});
         }
         this.didLeavePage = true;
@@ -588,7 +594,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
-                    ossConfigObj={this.state.ossConfigObj}
+                    ossConfigObj={this.state.ossConfigObj} recordTime={this.recordTime}
                     startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
                     stopRecordCallback={this.stopRecordCallback}

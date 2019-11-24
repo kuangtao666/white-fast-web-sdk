@@ -33,6 +33,7 @@ export type WhiteboardRecordProps = {
     stopRecordCallback?: (recordFunc: () => void) => void;
     replayCallback?: () => void;
     setRecordingState: (state: boolean) => void;
+    recordTime: (time: number) => void;
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
@@ -53,11 +54,18 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         if (this.props.stopRecordCallback) {
             this.props.stopRecordCallback(this.record);
         }
+        // const {room} = this.props;
+        // const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        // if (hostInfo && hostInfo.secondsElapsed !== undefined) {
+        //     this.setState({secondsElapsed: hostInfo.secondsElapsed, isRecord: true});
+        //     this.startClock();
+        // }
     }
     private tick = (): void => {
         this.setState(({
             secondsElapsed: this.state.secondsElapsed + 1,
         }));
+        this.props.recordTime(this.state.secondsElapsed);
     }
 
 
@@ -263,13 +271,20 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
     public componentWillUnmount(): void {
         this.stopClock();
     }
-
     private setRecordState = (state: boolean): void => {
         const {room} = this.props;
-        room.setGlobalState({hostInfo: {
-                ...room.state.globalState.hostInfo,
-                isRecording: state,
-            }});
+        if (state) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isRecording: state,
+                }});
+        } else {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isRecording: state,
+                    secondsElapsed: undefined,
+                }});
+        }
     }
 
     private handleCancel = (): void => {

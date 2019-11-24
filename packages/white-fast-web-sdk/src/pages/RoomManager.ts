@@ -31,6 +31,7 @@ export type HostUserType = {
     cameraState: ViewMode,
     disableCameraTransform: boolean,
     isVideoEnable: boolean,
+    secondsElapsed?: number,
 };
 
 export class RoomManager {

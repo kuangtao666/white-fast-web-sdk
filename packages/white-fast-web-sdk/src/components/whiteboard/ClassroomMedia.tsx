@@ -64,12 +64,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
     public componentDidMount(): void {
         const {userId, room} = this.props;
-        if (this.props.identity === IdentityType.host) {
-            const hostInfo: HostUserType = room.state.globalState.hostInfo;
-            if (hostInfo && hostInfo.isRecording === true) {
-                this.startRtc();
-            }
-        }
+        // if (this.props.identity === IdentityType.host) {
+        //     const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        //     if (hostInfo && hostInfo.isRecording === true) {
+        //         this.startRtc();
+        //     }
+        // }
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
             const hostInfo: HostUserType = room.state.globalState.hostInfo;
             const key = `${Date.now()}`;
@@ -483,6 +483,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 console.log("User " + uid + " join channel successfully");
                 // 创建本地流对象
                 this.setState({isRtcStart: true, isRtcLoading: false});
+                this.setMediaState(true);
+                if (recordFunc) {
+                    recordFunc();
+                }
                 if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
                     this.createLocalStream(AgoraRTC, userId);
                 }
@@ -511,6 +515,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 stream.stop();
             }
             this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
+            this.setMediaState(false);
             console.log("client leaves channel success");
         }, (err: any) => {
             console.log("channel leave failed");
