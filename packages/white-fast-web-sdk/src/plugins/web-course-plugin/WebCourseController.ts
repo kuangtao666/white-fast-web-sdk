@@ -1,4 +1,4 @@
-export class IframeController {
+export class WebCourseController {
 
     private readonly setGlobalState: (netlessState: any) => void;
     private handleStateFuncArray: ((netlessState: any) => void)[] = [];

@@ -51,7 +51,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: WhiteVideoPluginProps): void {
-        if (this.props !== nextProps) {
+        if (this.props.play !== nextProps.play) {
             if (this.room && this.room.state.globalState.hostInfo) {
                 const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
                 if (hostInfo.identity !== IdentityType.host) {
@@ -71,13 +71,14 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     }
 
     private handlePlayState = (play: boolean): void => {
-        this.props.operator.setProps(this.props.uuid, {play: play});
-        if (this.room && this.room.state.globalState.hostInfo) {
-            const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
-            if (hostInfo.identity === IdentityType.host) {
-                this.props.operator.setProps(this.props.uuid, {play: play});
-            }
-        }
+        console.log(play);
+        // if (this.room && this.room.state.globalState.hostInfo) {
+        //     const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
+        //     if (hostInfo.identity === IdentityType.host) {
+        //         this.props.operator.setProps(this.props.uuid, {play: play});
+        //         this.setState({play: play});
+        //     }
+        // }
     }
 
     public render(): React.ReactNode {
@@ -121,7 +122,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                 <div className="plugin-box-body">
                                     <Video
                                         videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
-                                        play={this.props.play}
+                                        play={this.state.play}
                                         controls={isHaveControls}
                                         width={600}
                                         height={600}

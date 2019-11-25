@@ -41,6 +41,7 @@ import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -155,7 +156,10 @@ export type RealTimeStates = {
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
     startRtc?: (recordFunc?: () => void) => void;
-    stopRtc?: (stopFunc?: () => void) => void;
+    stopRtc?: () => void;
+    stopRecord?: (stopRecordFunc?: () => void) => void;
+    isRecording: boolean;
+    secondsElapsed?: number;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -183,6 +187,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             classMode: this.props.classMode !== undefined ? this.props.classMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
+            isRecording: false,
         };
         this.cursor = new UserCursor();
     }
@@ -203,7 +208,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteVideoPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -358,6 +363,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.stopAll();
     }
 
+    private recordTime = (time: number): void => {
+        this.setState({secondsElapsed: time});
+    }
+
     private stopAll = (): void => {
         const {identity} = this.props;
         const {room} = this.state;
@@ -365,6 +374,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             room.setGlobalState({hostInfo: {
                     ...room.state.globalState.hostInfo,
                     isVideoEnable: false,
+                    secondsElapsed: this.state.secondsElapsed,
                 }});
         }
         this.didLeavePage = true;
@@ -584,8 +594,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
+                    ossConfigObj={this.state.ossConfigObj} recordTime={this.recordTime}
                     startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
+                    stopRecordCallback={this.stopRecordCallback}
+                    setRecordingState={this.setRecordingState}
                     room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
                     uuid={this.props.uuid} rtc={this.props.rtc}
@@ -638,7 +651,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({documentArray: state});
     }
 
-    private startRtcCallback = (func: () => void): void => {
+    private startRtcCallback = (func: (recordFunc?: () => void) => void): void => {
         this.setState({startRtc: func});
     }
 
@@ -646,6 +659,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({stopRtc: func});
     }
 
+    private stopRecordCallback = (func: () => void): void => {
+        this.setState({stopRecord: func});
+    }
+    private setRecordingState = (state: boolean): void => {
+        this.setState({isRecording: state});
+    }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId} = this.props;
@@ -687,6 +706,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     stopRtcCallback: this.stopRtcCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: room,
+                    stopRecord: this.state.stopRecord,
+                    isRecording: this.state.isRecording,
                 }}>
                     <div className="realtime-box">
                         <MenuBox

@@ -47,7 +47,7 @@ export default class ReplayPage extends React.Component<ReplayPageProps, Whitebo
         const roomToken = await this.getRoomToken(uuid);
         let url: string | undefined = undefined;
         if (mediaUrl) {
-            url = `https://netless-media.oss-cn-hangzhou.aliyuncs.com/${mediaUrl}`;
+            url = `https://beings.oss-cn-hangzhou.aliyuncs.com/${mediaUrl}`;
         }
         if (roomToken) {
             this.netlessPlayer = WhiteFastSDK.Player("netless-replay", {

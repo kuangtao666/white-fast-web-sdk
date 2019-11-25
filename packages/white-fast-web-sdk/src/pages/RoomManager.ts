@@ -26,10 +26,12 @@ export type HostUserType = {
     avatar?: string,
     name?: string,
     isVideoFullScreen?: boolean,
+    isRecording?: boolean,
     classMode: ClassModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
     isVideoEnable: boolean,
+    secondsElapsed?: number,
 };
 
 export class RoomManager {

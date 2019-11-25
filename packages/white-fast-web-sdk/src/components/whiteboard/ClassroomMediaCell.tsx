@@ -1,19 +1,23 @@
 import * as React from "react";
-import {IdentityType, NetlessStream} from "./ClassroomMedia";
-import "./ClassroomMediaCell.less";
+import "./ClassroomMediaManager.less";
+import {NetlessStream} from "./ClassroomMedia";
 import {CSSProperties} from "react";
+import {ClassModeType} from "../../pages/RoomManager";
 
-export type ClassroomMediaCellProps = {
+export type ClassroomManagerCellProps = {
     stream: NetlessStream;
-    identity?: IdentityType;
+    userId: number;
+    rtcClient: any;
     streamsLength: number;
-    hasHost: boolean;
+    streamIndex: number
+    setMemberToStageById: (userId: number) => void;
+    classMode: ClassModeType;
 };
 
-export default class ClassroomMediaCell extends React.Component<ClassroomMediaCellProps, {}> {
+export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
 
 
-    public constructor(props: ClassroomMediaCellProps) {
+    public constructor(props: ClassroomManagerCellProps) {
         super(props);
     }
 
@@ -21,43 +25,66 @@ export default class ClassroomMediaCell extends React.Component<ClassroomMediaCe
         const {stream} = this.props;
         const streamId =  stream.getId();
         stream.play(`netless-${streamId}`);
+        this.publishLocalStream(stream);
+    }
+
+    public componentWillUnmount(): void {
+        const {stream} = this.props;
+        stream.stop();
+        this.unpublishLocalStream(stream);
+    }
+
+    private renderStyle = (): CSSProperties => {
+        const {streamsLength, streamIndex} = this.props;
+        if (streamsLength === 2) {
+            return {width: 100, height: 100};
+        } else if (streamsLength === 3) {
+            return {width: 150, height: 100, right: (streamIndex * 150)};
+        } else if (streamsLength === 4) {
+            return {width: 100, height: 100, right: (streamIndex * 100)};
+        } else if (streamsLength === 5) {
+            return {width: 75, height: 75, right: (streamIndex * 75)};
+        } else {
+            if (streamIndex >= 4) {
+                return {width: 75, height: 75, right: ((streamIndex - 4) * 75), bottom: 75};
+            } else {
+                return {width: 75, height: 75, right: (streamIndex * 75)};
+            }
+        }
+    }
+
+    private publishLocalStream = (stream: NetlessStream): void => {
+        const {userId, rtcClient} = this.props;
+        const streamId = stream.getId();
+        if (streamId === userId) {
+            rtcClient.publish(stream, (err: any) => {
+                console.log("publish failed");
+                console.error(err);
+            });
+        }
+    }
+
+    private unpublishLocalStream = (stream: NetlessStream): void => {
+        const {userId, rtcClient} = this.props;
+        const streamId = stream.getId();
+        if (streamId === userId) {
+            rtcClient.unpublish(stream, (err: any) => {
+                console.log("unpublish failed");
+                console.error(err);
+            });
+        }
+    }
+
+    private handleClickVideo = (userId: number): void => {
+        this.props.setMemberToStageById(userId);
     }
 
     public render(): React.ReactNode {
         const {stream} = this.props;
         const streamId =  stream.getId();
         return (
-            <div id={`netless-${streamId}`} style={this.handleVideoBox()} className="media-box">
+            <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} style={this.renderStyle()} className="rtc-media-cell-box">
             </div>
         );
     }
-
-    private handleVideoBox = (): CSSProperties => {
-        const {streamsLength, identity, hasHost} = this.props;
-        if (identity === IdentityType.host) {
-            if (streamsLength === 1) {
-                return {width: "100%", height: 150};
-            } else if (streamsLength === 2) {
-                return {width: "50%", height: 150};
-            } else {
-                return {width: "33.33%", height: 75};
-            }
-        } else {
-            let myLength;
-            if (hasHost) {
-                myLength = streamsLength + 1;
-            } else {
-                myLength = streamsLength;
-            }
-            if (myLength === 1) {
-                return {width: "100%", height: 150};
-            } else if (myLength === 2) {
-                return {width: "50%", height: 150};
-            } else {
-                return {width: "33.33%", height: 75};
-            }
-        }
-    }
-
-
 }

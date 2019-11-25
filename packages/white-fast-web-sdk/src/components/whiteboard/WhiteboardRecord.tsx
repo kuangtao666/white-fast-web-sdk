@@ -4,12 +4,13 @@ import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
-import {ossConfigObj} from "../../appToken";
+import {ossConfigObj, OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
+import {IdentityType} from "./ClassroomMedia";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -24,11 +25,15 @@ export type WhiteboardRecordState = {
 export type WhiteboardRecordProps = {
     channelName: string;
     uuid: string;
+    ossConfigObj: OSSConfigObjType;
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
     startRtc?: (recordFunc?: () => void) => void;
+    stopRecordCallback?: (recordFunc: () => void) => void;
     replayCallback?: () => void;
+    setRecordingState: (state: boolean) => void;
+    recordTime: (time: number) => void;
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
@@ -45,10 +50,22 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         };
     }
 
+    public componentDidMount(): void {
+        if (this.props.stopRecordCallback) {
+            this.props.stopRecordCallback(this.record);
+        }
+        // const {room} = this.props;
+        // const hostInfo: HostUserType = room.state.globalState.hostInfo;
+        // if (hostInfo && hostInfo.secondsElapsed !== undefined) {
+        //     this.setState({secondsElapsed: hostInfo.secondsElapsed, isRecord: true});
+        //     this.startClock();
+        // }
+    }
     private tick = (): void => {
         this.setState(({
             secondsElapsed: this.state.secondsElapsed + 1,
         }));
+        this.props.recordTime(this.state.secondsElapsed);
     }
 
 
@@ -67,6 +84,89 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
             return hostInfo.isVideoEnable;
         } else {
             return false;
+        }
+    }
+
+    private handleRegion = (region: string): number => {
+        switch (region) {
+            case "CN_Hangzhou":
+                return 0;
+            case "oss-cn-hangzhou":
+                return 0;
+            case "CN_Shanghai":
+                return 1;
+            case "oss-cn-shanghai":
+                return 1;
+            case "CN_Qingdao":
+                return 2;
+            case "oss-cn-qingdao":
+                return 2;
+            case "CN_Beijin":
+                return 3;
+            case "oss-cn-beijing":
+                return 3;
+            case "CN_Zhangjiakou":
+                return 4;
+            case "oss-cn-zhangjiakou":
+                return 4;
+            case "CN_Huhehaote":
+                return 5;
+            case "oss-cn-huhehaote":
+                return 5;
+            case "CN_Shenzhen":
+                return 6;
+            case "oss-cn-shenzhen":
+                return 6;
+            case "CN_Hongkong":
+                return 7;
+            case "oss-cn-hongkong":
+                return 7;
+            case "US_West_1":
+                return 8;
+            case "oss-us-west-1":
+                return 8;
+            case "US_East_1":
+                return 9;
+            case "oss-us-east-1":
+                return 9;
+            case "AP_Southeast_1":
+                return 10;
+            case "oss-ap-southeast-1":
+                return 10;
+            case "AP_Southeast_2":
+                return 11;
+            case "oss-ap-southeast-2":
+                return 11;
+            case "AP_Southeast_3":
+                return 12;
+            case "oss-ap-southeast-3":
+                return 12;
+            case "AP_Southeast_5":
+                return 13;
+            case "oss-ap-southeast-5":
+                return 13;
+            case "AP_Northeast_1":
+                return 14;
+            case "oss-ap-northeast-1":
+                return 14;
+            case "AP_South_1":
+                return 15;
+            case "oss-ap-south-1":
+                return 15;
+            case "EU_Central_1":
+                return 16;
+            case "oss-eu-central-1":
+                return 16;
+            case "EU_West_1":
+                return 17;
+            case "oss-eu-west-1":
+                return 17;
+            case "EU_East_1":
+                return 18;
+            case "oss-me-east-1":
+                return 18;
+            default:
+                return 0;
         }
     }
     public record = async (): Promise<void> => {
@@ -93,10 +193,10 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                         },
                         {
                             vendor: 2,
-                            region: 0,
-                            bucket: "netless-media",
-                            accessKey: ossConfigObj.accessKeyId,
-                            secretKey: ossConfigObj.accessKeySecret,
+                            region: this.handleRegion(this.props.ossConfigObj.region),
+                            bucket: this.props.ossConfigObj.bucket,
+                            accessKey: this.props.ossConfigObj.accessKeyId,
+                            secretKey: this.props.ossConfigObj.accessKeySecret,
                         });
                     await this.recrod.acquire();
                 }
@@ -109,6 +209,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     if (resp.serverResponse.fileList) {
                         const res = await this.recrod.stop();
                         message.info("结束录制");
+                        this.props.setRecordingState(false);
+                        this.setRecordState(false);
                         const time =  new Date();
                         const timeStamp = time.getTime();
                         this.setState({isRecord: false});
@@ -122,6 +224,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     }
                 } else {
                     message.info("结束录制");
+                    this.props.setRecordingState(false);
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     this.setState({isRecord: false, isRecordOver: true});
@@ -138,6 +241,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 try {
                     await this.recrod.start();
                     message.success("开始录制");
+                    this.setRecordState(true);
+                    this.props.setRecordingState(true);
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     if (this.props.recordDataCallback) {
@@ -151,6 +256,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 }
             } else {
                 message.success("开始录制");
+                this.props.setRecordingState(true);
+                this.setRecordState(true);
                 const time =  new Date();
                 const timeStamp = time.getTime();
                 if (this.props.recordDataCallback) {
@@ -163,6 +270,21 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
     }
     public componentWillUnmount(): void {
         this.stopClock();
+    }
+    private setRecordState = (state: boolean): void => {
+        const {room} = this.props;
+        if (state) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isRecording: state,
+                }});
+        } else {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isRecording: state,
+                    secondsElapsed: undefined,
+                }});
+        }
     }
 
     private handleCancel = (): void => {

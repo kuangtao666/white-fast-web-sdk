@@ -6,6 +6,8 @@ export type RoomContext = {
     startRtcCallback: (func: () => void) => void;
     stopRtcCallback: (func: () => void) => void;
     onColorArrayChange?: (colorArray: string[]) => void;
+    stopRecord?: () => void;
+    isRecording: boolean;
 };
 
 const context = React.createContext<RoomContext>(undefined as any);
