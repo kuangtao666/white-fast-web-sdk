@@ -206,6 +206,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         user.isReadOnly = false;
                         user.cameraState = ViewMode.Freedom;
                         user.disableCameraTransform = false;
+                        user.applyForRtc = true;
                     }
                     return user;
                 });

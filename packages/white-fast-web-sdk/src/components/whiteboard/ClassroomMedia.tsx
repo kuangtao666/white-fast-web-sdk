@@ -136,10 +136,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
         if (this.props.applyForRtc !== nextProps.applyForRtc) {
             const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
-            if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc) {
+            if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc && nextProps.isVideoEnable) {
                 const {rtc, userId} = this.props;
                 const AgoraRTC = rtc!.rtcObj;
                 this.createLocalStream(AgoraRTC, userId);
+            } else if (hostInfo.classMode === ClassModeType.handUp && !nextProps.applyForRtc) {
+                this.unpublishStream();
             }
         }
     }
@@ -471,44 +473,52 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
     private startRtc = (recordFunc?: () => void): void => {
         const {rtc, classMode, userId, channelId, identity} = this.props;
-        const AgoraRTC = rtc!.rtcObj;
-        const agoraAppId = rtc!.token;
-        // 按钮 loading
-        this.setState({isRtcLoading: true});
-        // 初始化
-        this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
-        this.agoraClient.init(agoraAppId, () => {
-            console.log("AgoraRTC client initialized");
-            this.agoraClient.join(agoraAppId, channelId, userId, (uid: string) => {
-                console.log("User " + uid + " join channel successfully");
-                // 创建本地流对象
-                this.setState({isRtcStart: true, isRtcLoading: false});
-                this.setMediaState(true);
-                if (recordFunc) {
-                    recordFunc();
-                }
-                if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
-                    this.createLocalStream(AgoraRTC, userId);
-                }
-                // 添加监听
-                this.addRtcListeners(this.agoraClient);
+        if (rtc) {
+            const AgoraRTC = rtc.rtcObj;
+            let token: string | null = null;
+            let channel: string = channelId;
+            if (rtc.channel) {
+                channel = rtc.channel;
+            }
+            if (rtc.authConfig !== undefined) {
+                token = rtc.authConfig.token;
+            }
+            const appId = rtc.appId;
+            // 按钮 loading
+            this.setState({isRtcLoading: true});
+            // 初始化
+            this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
+            this.agoraClient.init(appId, () => {
+                console.log("AgoraRTC client initialized");
+                this.agoraClient.join(token, channel, userId, (uid: number) => {
+                    console.log("User " + uid + " join channel successfully");
+                    // 创建本地流对象
+                    this.setState({isRtcStart: true, isRtcLoading: false});
+                    this.setMediaState(true);
+                    if (recordFunc) {
+                        recordFunc();
+                    }
+                    if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
+                        this.createLocalStream(AgoraRTC, userId);
+                    }
+                    // 添加监听
+                    this.addRtcListeners(this.agoraClient);
+                }, (err: any) => {
+                    console.log(err);
+                });
             }, (err: any) => {
-                console.log(err);
+                console.log("AgoraRTC client init failed", err);
             });
-        }, (err: any) => {
-            console.log("AgoraRTC client init failed", err);
-        });
+        } else {
+            message.warning("请添加 rtc 配置，否则无法开启");
+        }
     }
 
     private stopRtc = (): void => {
-        const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
         const remoteStreams = this.state.streams.filter(stream => stream.getId() !== this.props.userId);
         this.agoraClient.leave(() => {
             // Stop playing the local stream
-            if (localStream) {
-                localStream.stop();
-                localStream.close();
-            }
+            this.unpublishStream();
             // Stop playing the remote streams and remove the views
             while (remoteStreams.length > 0) {
                 const stream = remoteStreams.shift();
@@ -523,13 +533,31 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
     }
 
+    private unpublishStream = (): void => {
+        const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
+        if (localStream) {
+            this.agoraClient.unpublish(localStream, (err: any) => {
+                console.log("unpublish failed");
+                console.error(err);
+            });
+            localStream.stop();
+            localStream.close();
+        }
+    }
+
     private createLocalStream = (rtcObj: any, userId: number): void => {
         // 创建本地流对象
-        const localStream = rtcObj.createStream({
-            streamID: userId,
-            audio: true,
-            video: true,
-        });
+        let localStream: NetlessStream;
+        const stream = this.state.streams.find(stream => stream.getId() === this.props.userId);
+        if (stream) {
+            localStream = stream;
+        } else {
+            localStream = rtcObj.createStream({
+                streamID: userId,
+                audio: true,
+                video: true,
+            });
+        }
 
         // 初始化本地流
         localStream.init(()  => {

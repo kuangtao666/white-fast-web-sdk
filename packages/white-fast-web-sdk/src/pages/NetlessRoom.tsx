@@ -77,9 +77,15 @@ export type UploadToolBoxType = {
 export type RtcType = {
     type: RtcEnum,
     rtcObj: any,
-    token: string,
-    restId?: string,
-    restSecret?: string,
+    appId: string,
+    channel?: string, // 不写默认是 uuid,
+    authConfig?: {
+        token: string,
+    }
+    recordConfig?: {
+        customerId: string,
+        customerCertificate: string,
+    },
 };
 export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
 export type RealTimeProps = {
