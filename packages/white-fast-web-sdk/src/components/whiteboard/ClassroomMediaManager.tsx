@@ -12,6 +12,8 @@ export type ClassroomMediaManagerProps = {
     identity?: IdentityType;
     rtcClient: any;
     setMemberToStageById: (userId: number) => void;
+    setLocalStreamState: (state: boolean) => void;
+    isLocalStreamPublish: boolean;
 };
 
 export type ClassroomMediaManagerStates = {
@@ -28,8 +30,9 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         const stageStream = this.getStageStream();
         if (stageStream) {
             return <ClassroomMediaStageCell
+                setLocalStreamState={this.props.setLocalStreamState}
                 userId={this.props.userId} classMode={this.props.classMode}
-                streamsLength={this.props.streams.length}
+                streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
                 rtcClient={this.props.rtcClient}
                 stream={stageStream}/>;
         } else {
@@ -44,9 +47,9 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         });
         if (audienceStreams && audienceStreams.length > 0) {
             return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
-                return <ClassroomMediaCell
+                return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
                     key={`${audienceStream.getId()}`} streamIndex={index} classMode={this.props.classMode}
-                    streamsLength={this.props.streams.length}
+                    streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
                     userId={this.props.userId}
                     setMemberToStageById={this.props.setMemberToStageById}
                     rtcClient={this.props.rtcClient}

@@ -10,6 +10,8 @@ import * as close_white from "../../assets/image/close_white.svg";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import Identicon from "react-identicons";
 import ClassroomMediaManager from "./ClassroomMediaManager";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
+
 export type NetlessStream = {
     state: {isAudioOpen: boolean, isInStage: boolean, identity?: IdentityType},
 } & any;
@@ -34,6 +36,7 @@ export type ClassroomMediaProps = {
     channelId: string;
     isRecording: boolean;
     room: Room;
+    isAllMemberAudioClose: boolean,
     classMode: ClassModeType;
     identity?: IdentityType;
     handleManagerState: () => void;
@@ -121,7 +124,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.videoJoinRemind();
             } else {
                 notification.close("notification");
-                this.stopRtc();
+                if (this.props.identity !== IdentityType.host) {
+                    this.stopRtc();
+                }
             }
         }
 
@@ -130,6 +135,17 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             if (nextProps.classMode === ClassModeType.handUp) {
                 if (this.props.identity === IdentityType.guest) {
                     message.info("课堂切换到举手参与模式，您可以点击右下角 [举手] 图标申请互动。");
+                }
+            }
+        }
+
+        if (this.props.isAllMemberAudioClose !== nextProps.isAllMemberAudioClose) {
+            const stream = this.state.streams.find(stream => stream.getId() === this.props.userId);
+            if (this.props.identity !== IdentityType.host) {
+                if (nextProps.isAllMemberAudioClose) {
+                    stream.muteAudio();
+                } else {
+                    stream.unmuteAudio();
                 }
             }
         }
@@ -189,6 +205,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 });
             }
         }
+    }
+
+    private setLocalStreamState = (state: boolean): void => {
+        this.setState({isLocalStreamPublish: state});
     }
 
     private handleHandup = (classMode: ClassModeType, room: Room, userId?: string): void => {
@@ -451,9 +471,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        </div>
                    </div>}
                    <ClassroomMediaManager
-                       rtcClient={this.agoraClient}
+                       rtcClient={this.agoraClient} isLocalStreamPublish={this.state.isLocalStreamPublish}
                        setMemberToStageById={this.setMemberToStageById}
-                       userId={this.props.userId}
+                       userId={this.props.userId} setLocalStreamState={this.setLocalStreamState}
                        classMode={this.props.classMode}
                        streams={this.state.streams}/>
                </div>
@@ -515,15 +535,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private stopRtc = (): void => {
-        const remoteStreams = this.state.streams.filter(stream => stream.getId() !== this.props.userId);
+        // const remoteStreams = this.state.streams.filter(stream => stream.getId() !== this.props.userId);
+        const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
         this.agoraClient.leave(() => {
-            // Stop playing the local stream
-            this.unpublishStream();
-            // Stop playing the remote streams and remove the views
-            while (remoteStreams.length > 0) {
-                const stream = remoteStreams.shift();
-                stream.stop();
+            if (localStream.isPlaying()) {
+                localStream.stop();
             }
+            localStream.close();
             this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
             this.setMediaState(false);
             console.log("client leaves channel success");
@@ -534,14 +552,19 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private unpublishStream = (): void => {
-        const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
+        const localStream = this.state.streams.find(stream => {
+            if (stream.getId() === this.props.userId) {
+                return stream;
+            }
+        });
         if (localStream) {
-            this.agoraClient.unpublish(localStream, (err: any) => {
-                console.log("unpublish failed");
-                console.error(err);
-            });
-            localStream.stop();
-            localStream.close();
+            if (this.state.isLocalStreamPublish) {
+                this.agoraClient.unpublish(localStream, (err: any) => {
+                    console.log("unpublish failed");
+                    console.error(err);
+                });
+                // this.setState({isLocalStreamPublish: false});
+            }
         }
     }
 
@@ -603,7 +626,6 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             return originalStream;
         });
         this.setState({streams: newStreams});
-        console.log(this.state.streams);
     }
 
     private removeStream = (stream: any): void => {
