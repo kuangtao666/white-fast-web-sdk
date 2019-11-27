@@ -15,9 +15,9 @@ export class RecordOperator {
     private recordId?: string;
     public resourceId?: string;
     private readonly uid: string;
-    private readonly token: string | null = null;
+    private readonly token: string | undefined = undefined;
 
-    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string, token: string | null) {
+    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string, token: string | undefined) {
         this.agoraAppId = agoraAppId;
         this.customerId = customerId;
         this.customerCertificate = customerCertificate;
