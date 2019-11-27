@@ -390,6 +390,18 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 }});
         }
     }
+
+    private renderAudioController = (): React.ReactNode => {
+        if (this.props.identity === IdentityType.host) {
+            return (
+                <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
+                    全部静音
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         if (this.props.isManagerOpen === null) {
             return null;
@@ -413,9 +425,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                             <TabPane forceRender tab={this.renderUserListTitle()} key="2">
                                 <div className="guest-box">
                                     {this.renderGuest()}
-                                    <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
-                                        全部静音
-                                    </div>
+                                    {this.renderAudioController()}
                                 </div>
                             </TabPane>
                         </Tabs>

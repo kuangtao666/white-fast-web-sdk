@@ -169,22 +169,6 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }
         }
     }
-
-    // private setApplyForRtcState = (state: boolean): void => {
-    //     const {room, identity, userId} = this.props;
-    //     if (identity === IdentityType.host) {
-    //         const guestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-    //         if (guestUsers && guestUsers.length > 0) {
-    //             const users = guestUsers.map((user: GuestUserType) => {
-    //                 if (user.userId === `${userId}`) {
-    //                     user.applyForRtc = false;
-    //                 }
-    //                 return user;
-    //             });
-    //             room.setGlobalState({guestUsers: users});
-    //         }
-    //     }
-    // }
     private videoJoinRemind = (): void => {
         const {userId, room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
