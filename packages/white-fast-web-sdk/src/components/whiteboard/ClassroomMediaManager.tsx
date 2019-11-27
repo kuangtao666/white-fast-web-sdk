@@ -42,24 +42,28 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
     private renderAudience = (): React.ReactNode => {
         const {streams} = this.props;
         const stageStream = this.getStageStream();
-        const audienceStreams = streams.filter(stream => {
-            return stream.getId() !== stageStream.getId();
-        });
-        if (audienceStreams && audienceStreams.length > 0) {
-            return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
-                return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
-                    key={`${audienceStream.getId()}`} streamIndex={index} classMode={this.props.classMode}
-                    streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
-                    userId={this.props.userId}
-                    setMemberToStageById={this.props.setMemberToStageById}
-                    rtcClient={this.props.rtcClient}
-                    stream={audienceStream}/>;
+        if (stageStream) {
+            const audienceStreams = streams.filter(stream => {
+                return stream.getId() !== stageStream.getId();
             });
+            if (audienceStreams && audienceStreams.length > 0) {
+                return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
+                    return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
+                                               key={`${audienceStream.getId()}`} streamIndex={index} classMode={this.props.classMode}
+                                               streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
+                                               userId={this.props.userId}
+                                               setMemberToStageById={this.props.setMemberToStageById}
+                                               rtcClient={this.props.rtcClient}
+                                               stream={audienceStream}/>;
+                });
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
     }
-    private getStageStream = (): NetlessStream => {
+    private getStageStream = (): NetlessStream | null => {
         const {streams, userId} = this.props;
         const stageStream = streams.find(stream => stream.state.isInStage);
         // 如何制定了舞台的流就有限选用指定
@@ -72,6 +76,8 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
                 const theirStream = streams.find(stream => stream.getId() !== userId);
                 if (theirStream) {
                     return theirStream;
+                } else {
+                    return null;
                 }
             } else {
                 // 剩余的情况遵循，有老师显示老师，没老师显示自己。
@@ -82,6 +88,8 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
                     const selfStream = streams.find(stream => stream.getId() === userId);
                     if (selfStream) {
                         return selfStream;
+                    } else {
+                        return null;
                     }
                 }
             }

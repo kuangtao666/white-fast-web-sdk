@@ -58,15 +58,15 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
         }
     }
     private unpublishLocalStream = (stream: NetlessStream): void => {
-        // const {userId, rtcClient} = this.props;
-        // const streamId = stream.getId();
-        // if (streamId === userId && this.props.isLocalStreamPublish) {
-        //     rtcClient.unpublish(stream, (err: any) => {
-        //         console.log("unpublish failed");
-        //         console.error(err);
-        //     });
-        //     this.props.setLocalStreamState(false);
-        // }
+        const {userId, rtcClient} = this.props;
+        const streamId = stream.getId();
+        if (streamId === userId && this.props.isLocalStreamPublish) {
+            rtcClient.unpublish(stream, (err: any) => {
+                console.log("unpublish failed");
+                console.error(err);
+            });
+            this.props.setLocalStreamState(false);
+        }
     }
     public componentWillUnmount(): void {
         const {stream} = this.props;

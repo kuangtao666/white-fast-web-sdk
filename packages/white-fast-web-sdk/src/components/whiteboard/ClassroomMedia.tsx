@@ -117,7 +117,6 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         this.props.startRtcCallback(this.startRtc);
         this.props.stopRtcCallback(this.stopRtc);
     }
-
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
         if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
             if (nextProps.isVideoEnable) {
@@ -155,13 +154,37 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc && nextProps.isVideoEnable) {
                 const {rtc, userId} = this.props;
                 const AgoraRTC = rtc!.rtcObj;
-                this.createLocalStream(AgoraRTC, userId);
+                const localStream = this.state.streams.find(stream => {
+                    if (stream.getId() === this.props.userId) {
+                        return stream;
+                    }
+                });
+                if (localStream) {
+                    this.publishStream();
+                } else {
+                    this.createLocalStream(AgoraRTC, userId);
+                }
             } else if (hostInfo.classMode === ClassModeType.handUp && !nextProps.applyForRtc) {
                 this.unpublishStream();
             }
         }
     }
 
+    // private setApplyForRtcState = (state: boolean): void => {
+    //     const {room, identity, userId} = this.props;
+    //     if (identity === IdentityType.host) {
+    //         const guestUsers: GuestUserType[] = room.state.globalState.guestUsers;
+    //         if (guestUsers && guestUsers.length > 0) {
+    //             const users = guestUsers.map((user: GuestUserType) => {
+    //                 if (user.userId === `${userId}`) {
+    //                     user.applyForRtc = false;
+    //                 }
+    //                 return user;
+    //             });
+    //             room.setGlobalState({guestUsers: users});
+    //         }
+    //     }
+    // }
     private videoJoinRemind = (): void => {
         const {userId, room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
@@ -507,7 +530,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             // 按钮 loading
             this.setState({isRtcLoading: true});
             // 初始化
-            this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
+            if (!this.agoraClient) {
+                this.agoraClient = AgoraRTC.createClient({mode: "rtc", codec: "h264"});
+            }
             this.agoraClient.init(appId, () => {
                 console.log("AgoraRTC client initialized");
                 this.agoraClient.join(token, channel, userId, (uid: number) => {
@@ -535,20 +560,24 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private stopRtc = (): void => {
-        // const remoteStreams = this.state.streams.filter(stream => stream.getId() !== this.props.userId);
-        const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
-        this.agoraClient.leave(() => {
-            if (localStream.isPlaying()) {
-                localStream.stop();
-            }
-            localStream.close();
-            this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
-            this.setMediaState(false);
-            console.log("client leaves channel success");
-        }, (err: any) => {
-            console.log("channel leave failed");
-            console.error(err);
-        });
+        if (this.agoraClient) {
+            const localStream = this.state.streams.find(stream => stream.getId() === this.props.userId);
+            this.agoraClient.leave(() => {
+                this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
+                this.setMediaState(false);
+                if (localStream) {
+                    if (localStream.isPlaying()) {
+                        localStream.stop();
+                    }
+                    localStream.close();
+                }
+                console.log("client leaves channel success");
+            }, (err: any) => {
+                console.log("channel leave failed");
+                console.error(err);
+            });
+            this.agoraClient = undefined;
+        }
     }
 
     private unpublishStream = (): void => {
@@ -563,25 +592,35 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     console.log("unpublish failed");
                     console.error(err);
                 });
-                // this.setState({isLocalStreamPublish: false});
+                this.setState({isLocalStreamPublish: false});
+            }
+        }
+    }
+
+    private publishStream = (): void => {
+        const localStream = this.state.streams.find(stream => {
+            if (stream.getId() === this.props.userId) {
+                return stream;
+            }
+        });
+        if (localStream) {
+            if (!this.state.isLocalStreamPublish) {
+                this.agoraClient.publish(localStream, (err: any) => {
+                    console.log("publish failed");
+                    console.error(err);
+                });
+                this.setState({isLocalStreamPublish: true});
             }
         }
     }
 
     private createLocalStream = (rtcObj: any, userId: number): void => {
         // 创建本地流对象
-        let localStream: NetlessStream;
-        const stream = this.state.streams.find(stream => stream.getId() === this.props.userId);
-        if (stream) {
-            localStream = stream;
-        } else {
-            localStream = rtcObj.createStream({
-                streamID: userId,
-                audio: true,
-                video: true,
-            });
-        }
-
+        const localStream = rtcObj.createStream({
+            streamID: userId,
+            audio: true,
+            video: true,
+        });
         // 初始化本地流
         localStream.init(()  => {
             console.log("getUserMedia successfully");
@@ -609,14 +648,16 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private addStream = (stream: any): void => {
-        const originalStreamArray = this.state.streams;
-        const newStream: NetlessStream = {...stream, state: {
-                isAudioOpen: true,
-                isInStage: false,
-                identity: this.getStreamIdentity(stream.getId()),
-            }};
-        originalStreamArray.push(newStream);
-        this.setState({streams: originalStreamArray});
+        if (stream) {
+            const originalStreamArray = this.state.streams;
+            const newStream: NetlessStream = {...stream, state: {
+                    isAudioOpen: true,
+                    isInStage: false,
+                    identity: this.getStreamIdentity(stream.getId()),
+                }};
+            originalStreamArray.push(newStream);
+            this.setState({streams: originalStreamArray});
+        }
     }
 
     private setMemberToStageById = (userId: number): void => {
@@ -629,11 +670,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     private removeStream = (stream: any): void => {
-        const originalStreamArray = this.state.streams;
-        const newStream = originalStreamArray.filter(originalStream => {
-            return stream.getId() !== originalStream.getId();
-        });
-        this.setState({streams: newStream});
+        if (stream) {
+            const originalStreamArray = this.state.streams;
+            const newStream = originalStreamArray.filter(originalStream => {
+                return stream.getId() !== originalStream.getId();
+            });
+            this.setState({streams: newStream});
+        }
     }
 
     private addRtcListeners = (rtcClient: any): void => {
