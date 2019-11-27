@@ -15,8 +15,9 @@ export class RecordOperator {
     private recordId?: string;
     public resourceId?: string;
     private readonly uid: string;
+    private readonly token: string | null = null;
 
-    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string = "mix") {
+    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string, token: string | null) {
         this.agoraAppId = agoraAppId;
         this.customerId = customerId;
         this.customerCertificate = customerCertificate;
@@ -25,6 +26,7 @@ export class RecordOperator {
         this.storageConfig = storageConfig;
         this.mode = mode;
         this.uid = `${Math.floor(Math.random() * 100000)}`;
+        this.token = token;
     }
 
     public async acquire(): Promise<void> {
@@ -65,7 +67,7 @@ export class RecordOperator {
             body: {
                 cname: this.channelName,
                 uid: this.uid,
-                clientRequest: { recordingConfig: this.recordingConfig, storageConfig: this.storageConfig },
+                clientRequest: {token: this.token, recordingConfig: this.recordingConfig, storageConfig: this.storageConfig },
             },
         });
         const res = json as any;

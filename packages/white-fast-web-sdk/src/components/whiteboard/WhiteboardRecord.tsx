@@ -10,7 +10,6 @@ import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
-import {IdentityType} from "./ClassroomMedia";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -172,14 +171,18 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
     public record = async (): Promise<void> => {
         const {rtc, uuid} = this.props;
         const isMediaRun = this.getMediaState();
-        if (rtc && rtc.restId !== undefined && rtc.restSecret !== undefined) {
+        if (rtc && rtc.recordConfig) {
             if (this.recrod) {
                 if (!this.recrod.resourceId) {
                     await this.recrod.acquire();
                 }
             } else {
                 if (isMediaRun) {
-                    this.recrod = new RecordOperator(rtc.token, rtc.restId, rtc.restSecret, uuid,
+                    let channel: string = uuid;
+                    if (rtc.channel) {
+                        channel = rtc.channel;
+                    }
+                    this.recrod = new RecordOperator(rtc.appId, rtc.recordConfig.customerId, rtc.recordConfig.customerCertificate, channel,
                         {
                             audioProfile: 1,
                             transcodingConfig: {
@@ -197,7 +200,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                             bucket: this.props.ossConfigObj.bucket,
                             accessKey: this.props.ossConfigObj.accessKeyId,
                             secretKey: this.props.ossConfigObj.accessKeySecret,
-                        });
+                        }, "mix", rtc.authConfig ? rtc.authConfig.token : null);
                     await this.recrod.acquire();
                 }
             }

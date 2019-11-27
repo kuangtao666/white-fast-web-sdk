@@ -86,6 +86,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                         startRtcCallback={context.startRtcCallback}
                                         stopRtcCallback={context.stopRtcCallback}
                                         isRecording={context.isRecording}
+                                        isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                         language={this.props.language}
                                         stopRecord={context.stopRecord}
                                         rtc={this.props.rtc} classMode={hostInfo.classMode}
@@ -107,6 +108,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 applyForRtc={selfInfo.applyForRtc}
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
+                                                isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 language={this.props.language}
                                                 rtc={this.props.rtc}
                                                 isRecording={context.isRecording}
@@ -127,6 +129,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
                                                 language={this.props.language}
+                                                isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 rtc={this.props.rtc}
                                                 isRecording={context.isRecording}
                                                 stopRecord={context.stopRecord}
@@ -147,6 +150,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                             startRtcCallback={context.startRtcCallback}
                                             stopRtcCallback={context.stopRtcCallback}
                                             language={this.props.language}
+                                            isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                             rtc={this.props.rtc}
                                             stopRecord={context.stopRecord}
                                             isRecording={context.isRecording}
@@ -206,6 +210,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         user.isReadOnly = false;
                         user.cameraState = ViewMode.Freedom;
                         user.disableCameraTransform = false;
+                        user.applyForRtc = true;
                     }
                     return user;
                 });
@@ -376,6 +381,27 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             return "manager-box-mask-close";
         }
     }
+    private setMediaAudioState = (state: boolean): void => {
+        const {room, identity} = this.props;
+        if (identity === IdentityType.host) {
+            room.setGlobalState({hostInfo: {
+                    ...room.state.globalState.hostInfo,
+                    isAllMemberAudioClose: state,
+                }});
+        }
+    }
+
+    private renderAudioController = (): React.ReactNode => {
+        if (this.props.identity === IdentityType.host) {
+            return (
+                <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
+                    全部静音
+                </div>
+            );
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         if (this.props.isManagerOpen === null) {
             return null;
@@ -399,6 +425,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                             <TabPane forceRender tab={this.renderUserListTitle()} key="2">
                                 <div className="guest-box">
                                     {this.renderGuest()}
+                                    {this.renderAudioController()}
                                 </div>
                             </TabPane>
                         </Tabs>

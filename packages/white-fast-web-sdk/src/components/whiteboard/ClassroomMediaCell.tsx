@@ -12,6 +12,8 @@ export type ClassroomManagerCellProps = {
     streamIndex: number
     setMemberToStageById: (userId: number) => void;
     classMode: ClassModeType;
+    setLocalStreamState: (state: boolean) => void;
+    isLocalStreamPublish: boolean;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -30,7 +32,9 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
 
     public componentWillUnmount(): void {
         const {stream} = this.props;
-        stream.stop();
+        if (stream.isPlaying()) {
+            stream.stop();
+        }
         this.unpublishLocalStream(stream);
     }
 
@@ -56,22 +60,24 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     private publishLocalStream = (stream: NetlessStream): void => {
         const {userId, rtcClient} = this.props;
         const streamId = stream.getId();
-        if (streamId === userId) {
+        if (streamId === userId && !this.props.isLocalStreamPublish) {
             rtcClient.publish(stream, (err: any) => {
                 console.log("publish failed");
                 console.error(err);
             });
+            this.props.setLocalStreamState(true);
         }
     }
 
     private unpublishLocalStream = (stream: NetlessStream): void => {
         const {userId, rtcClient} = this.props;
         const streamId = stream.getId();
-        if (streamId === userId) {
+        if (streamId === userId && this.props.isLocalStreamPublish) {
             rtcClient.unpublish(stream, (err: any) => {
                 console.log("unpublish failed");
                 console.error(err);
             });
+            this.props.setLocalStreamState(false);
         }
     }
 
@@ -83,7 +89,13 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         const {stream} = this.props;
         const streamId =  stream.getId();
         return (
-            <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} style={this.renderStyle()} className="rtc-media-cell-box">
+            <div className="rtc-media-cell-out-box" style={this.renderStyle()}>
+                <div className="rtc-media-cell-mid-box">
+                    <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} style={this.renderStyle()} className="rtc-media-cell-box">
+                    </div>
+                    <div style={{backgroundColor: stream.state.isAudioOpen ? "green" : "red"}} className="rtc-media-cell-icon">
+                    </div>
+                </div>
             </div>
         );
     }

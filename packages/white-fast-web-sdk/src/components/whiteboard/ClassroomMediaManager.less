@@ -5,10 +5,34 @@
 }
 
 .rtc-media-cell-box {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -1;
+}
+
+.rtc-media-cell-icon {
+    width: 24px;
+    height: 24px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 1;
+    right: 3px;
+    bottom: 3px;
+}
+
+.rtc-media-cell-out-box {
     position: absolute;
     bottom: 0;
     right: 0;
     z-index: 2;
+}
+
+.rtc-media-cell-mid-box {
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 .rtc-media-stage-box {

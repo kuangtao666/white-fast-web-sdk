@@ -10,6 +10,8 @@ export type ClassroomMediaStageCellProps = {
     rtcClient: any;
     streamsLength: number;
     classMode: ClassModeType;
+    setLocalStreamState: (state: boolean) => void;
+    isLocalStreamPublish: boolean;
 };
 
 export default class ClassroomMediaStageCell extends React.Component<ClassroomMediaStageCellProps, {}> {
@@ -41,25 +43,29 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
     private publishLocalStream = (stream: NetlessStream): void => {
         const {userId, rtcClient} = this.props;
         const streamId = stream.getId();
-        if (streamId === userId) {
+        if (streamId === userId && !this.props.isLocalStreamPublish) {
             rtcClient.publish(stream, (err: any) => {
                 console.log("publish failed");
                 console.error(err);
             });
+            this.props.setLocalStreamState(true);
         }
     }
 
     private stopStream = (stream: NetlessStream): void => {
-        stream.stop();
+        if (stream.isPlaying()) {
+            stream.stop();
+        }
     }
     private unpublishLocalStream = (stream: NetlessStream): void => {
         const {userId, rtcClient} = this.props;
         const streamId = stream.getId();
-        if (streamId === userId) {
+        if (streamId === userId && this.props.isLocalStreamPublish) {
             rtcClient.unpublish(stream, (err: any) => {
                 console.log("unpublish failed");
                 console.error(err);
             });
+            this.props.setLocalStreamState(false);
         }
     }
     public componentWillUnmount(): void {

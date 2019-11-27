@@ -31,6 +31,7 @@ export type HostUserType = {
     cameraState: ViewMode,
     disableCameraTransform: boolean,
     isVideoEnable: boolean,
+    isAllMemberAudioClose: boolean,
     secondsElapsed?: number,
 };
 
@@ -73,6 +74,7 @@ export class RoomManager {
                       cameraState: ViewMode.Broadcaster,
                       disableCameraTransform: false,
                       isVideoEnable: false,
+                      isAllMemberAudioClose: false,
                   };
                   this.room.disableCameraTransform = false;
                   this.room.setGlobalState({hostInfo: myHostInfo});
@@ -88,6 +90,7 @@ export class RoomManager {
                   cameraState: ViewMode.Broadcaster,
                   disableCameraTransform: false,
                   isVideoEnable: false,
+                  isAllMemberAudioClose: false,
               };
               this.room.disableCameraTransform = false;
               this.room.setGlobalState({hostInfo: myHostInfo});

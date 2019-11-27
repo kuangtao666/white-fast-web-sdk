@@ -5,7 +5,6 @@ import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
 import {IdentityType} from "./WhiteboardCreatorPage";
-import {OSSConfigObjType} from "../../../white-fast-web-sdk/src/appToken";
 export type WhiteboardPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;
@@ -89,9 +88,11 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 rtc: {
                    type: "agora",
                    rtcObj: AgoraRTC,
-                   token: "8595fd46955f427db44b4e9ba90f015d",
-                    restId: "b4e2bc22a89549b2a84969b844258fe3",
-                    restSecret: "594daac9c32b491795f8cbd27a7d5265",
+                    appId: "8595fd46955f427db44b4e9ba90f015d",
+                    recordConfig: {
+                        customerId: "b4e2bc22a89549b2a84969b844258fe3",
+                        customerCertificate: "594daac9c32b491795f8cbd27a7d5265",
+                    },
                },
                 identity: identityType,
                 language: "Chinese",
