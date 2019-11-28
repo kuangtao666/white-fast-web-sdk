@@ -85,18 +85,14 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 },
                 roomCallback: (room: any) => {
                 },
-                rtc: {
+               rtc: {
                    type: "agora",
                    rtcObj: AgoraRTC,
-                    appId: "4786126574ac458bb92764810c1ab4c4",
-                    channel: "7e12a4b9399e4bed8315aeffc1ffbebf",
-                    recordConfig: {
-                        customerId: "bdbba12175f042d283f5cf22e5ef9fe2",
-                        customerCertificate: "44f7a7a5846243758b197140472def3d",
-                    },
-                    authConfig: {
-                        token: "0064786126574ac458bb92764810c1ab4c4IABHBct9b4k/xcKGKdAlgGaEi669Zruw6VUiiUNwFTeZ8aatVkhFWgtJEACxT4VP1kHhXQEAAQDmjd9d",
-                    },
+                   appId: "8595fd46955f427db44b4e9ba90f015d",
+                   recordConfig: {
+                       customerId: "b4e2bc22a89549b2a84969b844258fe3",
+                       customerCertificate: "594daac9c32b491795f8cbd27a7d5265",
+                   },
                },
                 identity: identityType,
                 language: "Chinese",
