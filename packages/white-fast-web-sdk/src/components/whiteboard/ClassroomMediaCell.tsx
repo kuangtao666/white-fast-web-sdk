@@ -14,6 +14,7 @@ export type ClassroomManagerCellProps = {
     classMode: ClassModeType;
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
+    getMediaCellReleaseFunc: (fun: () => void) => void;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -28,14 +29,19 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         const streamId =  stream.getId();
         stream.play(`netless-${streamId}`);
         this.publishLocalStream(stream);
+        this.props.getMediaCellReleaseFunc(this.release);
     }
 
-    public componentWillUnmount(): void {
+    private release = (): void => {
         const {stream} = this.props;
         if (stream.isPlaying()) {
             stream.stop();
         }
         this.unpublishLocalStream(stream);
+    }
+
+    public componentWillUnmount(): void {
+       this.release();
     }
 
     private renderStyle = (): CSSProperties => {

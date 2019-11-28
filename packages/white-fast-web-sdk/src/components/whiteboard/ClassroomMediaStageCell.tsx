@@ -12,6 +12,7 @@ export type ClassroomMediaStageCellProps = {
     classMode: ClassModeType;
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
+    getMediaStageCellReleaseFunc: (fun: () => void) => void;
 };
 
 export default class ClassroomMediaStageCell extends React.Component<ClassroomMediaStageCellProps, {}> {
@@ -25,6 +26,7 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
         const {stream} = this.props;
         this.startStream(stream);
         this.publishLocalStream(stream);
+        this.props.getMediaStageCellReleaseFunc(this.release);
     }
 
     public async UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaStageCellProps): Promise<void> {
@@ -68,10 +70,14 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
             this.props.setLocalStreamState(false);
         }
     }
-    public componentWillUnmount(): void {
+
+    private release = (): void => {
         const {stream} = this.props;
         this.stopStream(stream);
         this.unpublishLocalStream(stream);
+    }
+    public componentWillUnmount(): void {
+        this.release();
     }
 
     public render(): React.ReactNode {

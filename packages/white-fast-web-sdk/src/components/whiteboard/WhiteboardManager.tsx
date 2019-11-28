@@ -85,6 +85,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                         <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable} applyForRtc={false}
                                         startRtcCallback={context.startRtcCallback}
                                         stopRtcCallback={context.stopRtcCallback}
+                                        getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                        getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                         isRecording={context.isRecording}
                                         isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                         language={this.props.language}
@@ -108,6 +110,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 applyForRtc={selfInfo.applyForRtc}
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
+                                                getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                                getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                                 isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 language={this.props.language}
                                                 rtc={this.props.rtc}
@@ -129,6 +133,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
                                                 language={this.props.language}
+                                                getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                                getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                                 isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 rtc={this.props.rtc}
                                                 isRecording={context.isRecording}
@@ -150,6 +156,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                             startRtcCallback={context.startRtcCallback}
                                             stopRtcCallback={context.stopRtcCallback}
                                             language={this.props.language}
+                                            getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                            getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                             isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                             rtc={this.props.rtc}
                                             stopRecord={context.stopRecord}

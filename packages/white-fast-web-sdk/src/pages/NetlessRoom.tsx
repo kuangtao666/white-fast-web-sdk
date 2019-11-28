@@ -166,6 +166,8 @@ export type RealTimeStates = {
     stopRecord?: (stopRecordFunc?: () => void) => void;
     isRecording: boolean;
     secondsElapsed?: number;
+    releaseMedia?: () => void;
+    releaseMediaStage?: () => void;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -373,6 +375,14 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({secondsElapsed: time});
     }
 
+    private getMediaCellReleaseFunc = (func: () => void): void => {
+        this.setState({releaseMedia: func});
+    }
+
+    private getMediaStageCellReleaseFunc = (func: () => void): void => {
+        this.setState({releaseMediaStage: func});
+    }
+
     private stopAll = (): void => {
         const {identity} = this.props;
         const {room} = this.state;
@@ -393,6 +403,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
         if (this.state.stopRtc) {
             this.state.stopRtc();
+        }
+        if (this.state.releaseMedia) {
+            this.state.releaseMedia();
+        }
+        if (this.state.releaseMediaStage) {
+            this.state.releaseMediaStage();
         }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("beforeunload", this.beforeunload);
@@ -600,7 +616,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
-                    ossConfigObj={this.state.ossConfigObj} recordTime={this.recordTime}
+                    ossConfigObj={this.state.ossConfigObj}
+                    recordTime={this.recordTime}
                     startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
                     stopRecordCallback={this.stopRecordCallback}
@@ -714,6 +731,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     room: room,
                     stopRecord: this.state.stopRecord,
                     isRecording: this.state.isRecording,
+                    getMediaCellReleaseFunc: this.getMediaCellReleaseFunc,
+                    getMediaStageCellReleaseFunc: this.getMediaStageCellReleaseFunc,
                 }}>
                     <div className="realtime-box">
                         <MenuBox

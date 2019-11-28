@@ -14,6 +14,8 @@ export type ClassroomMediaManagerProps = {
     setMemberToStageById: (userId: number) => void;
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
+    getMediaCellReleaseFunc: (func: () => void) => void;
+    getMediaStageCellReleaseFunc: (func: () => void) => void;
 };
 
 export type ClassroomMediaManagerStates = {
@@ -32,8 +34,10 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
             return <ClassroomMediaStageCell
                 setLocalStreamState={this.props.setLocalStreamState}
                 userId={this.props.userId} classMode={this.props.classMode}
-                streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
+                streamsLength={this.props.streams.length}
+                isLocalStreamPublish={this.props.isLocalStreamPublish}
                 rtcClient={this.props.rtcClient}
+                getMediaStageCellReleaseFunc={this.props.getMediaStageCellReleaseFunc}
                 stream={stageStream}/>;
         } else {
             return null;
@@ -49,6 +53,7 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
             if (audienceStreams && audienceStreams.length > 0) {
                 return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
                     return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
+                                               getMediaCellReleaseFunc={this.props.getMediaCellReleaseFunc}
                                                key={`${audienceStream.getId()}`} streamIndex={index} classMode={this.props.classMode}
                                                streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
                                                userId={this.props.userId}

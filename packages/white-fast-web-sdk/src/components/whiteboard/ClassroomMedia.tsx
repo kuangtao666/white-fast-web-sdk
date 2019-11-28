@@ -47,6 +47,8 @@ export type ClassroomMediaProps = {
     startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
     stopRtcCallback: (stopRtc: () => void) => void;
     stopRecord?: () => void;
+    getMediaCellReleaseFunc: (func: () => void) => void;
+    getMediaStageCellReleaseFunc: (func: () => void) => void;
 };
 
 export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
@@ -477,8 +479,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                            {this.renderHostController(hostInfo)}
                        </div>
                    </div>}
-                   <ClassroomMediaManager
-                       rtcClient={this.agoraClient} isLocalStreamPublish={this.state.isLocalStreamPublish}
+                   <ClassroomMediaManager getMediaCellReleaseFunc={this.props.getMediaCellReleaseFunc} getMediaStageCellReleaseFunc={this.props.getMediaStageCellReleaseFunc}
+                                          rtcClient={this.agoraClient} isLocalStreamPublish={this.state.isLocalStreamPublish}
                        setMemberToStageById={this.setMemberToStageById}
                        userId={this.props.userId} setLocalStreamState={this.setLocalStreamState}
                        classMode={this.props.classMode}
