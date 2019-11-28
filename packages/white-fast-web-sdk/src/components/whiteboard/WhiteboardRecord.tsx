@@ -239,7 +239,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                             bucket: this.props.ossConfigObj.bucket,
                             accessKey: this.props.ossConfigObj.accessKeyId,
                             secretKey: this.props.ossConfigObj.accessKeySecret,
-                        }, "mix", rtc.authConfig ? rtc.authConfig.token : undefined);
+                        }, "mix", rtc.recordConfig.recordToken ? rtc.recordConfig.recordToken : undefined,
+                        rtc.recordConfig.recordUid ? rtc.recordConfig.recordUid : `${Math.floor(Math.random() * 100000)}`);
                     await this.recordOperator.acquire();
                 }
             }

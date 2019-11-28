@@ -83,6 +83,8 @@ export type RtcType = {
         token: string,
     }
     recordConfig?: {
+        recordUid?: string,
+        recordToken?: string,
         customerId: string,
         customerCertificate: string,
     },

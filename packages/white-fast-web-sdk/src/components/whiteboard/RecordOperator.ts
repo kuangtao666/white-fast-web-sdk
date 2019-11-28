@@ -17,7 +17,7 @@ export class RecordOperator {
     private readonly uid: string;
     private readonly token: string | undefined = undefined;
 
-    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string, token: string | undefined) {
+    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string, token: string | undefined, uid: string) {
         this.agoraAppId = agoraAppId;
         this.customerId = customerId;
         this.customerCertificate = customerCertificate;
@@ -25,7 +25,7 @@ export class RecordOperator {
         this.recordingConfig = recordingConfig;
         this.storageConfig = storageConfig;
         this.mode = mode;
-        this.uid = `${Math.floor(Math.random() * 100000)}`;
+        this.uid = uid;
         this.token = token;
     }
 
