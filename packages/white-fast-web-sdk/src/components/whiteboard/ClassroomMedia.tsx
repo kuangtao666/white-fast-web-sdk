@@ -67,7 +67,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     public componentDidMount(): void {
-        const {userId, room} = this.props;
+        const {userId} = this.props;
         // if (this.props.identity === IdentityType.host) {
         //     const hostInfo: HostUserType = room.state.globalState.hostInfo;
         //     if (hostInfo && hostInfo.isRecording === true) {
@@ -165,18 +165,11 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
     private videoJoinRemind = (): void => {
         const {userId, room} = this.props;
-        const hostInfo: HostUserType = room.state.globalState.hostInfo;
         if (this.props.identity !== IdentityType.host) {
             const key = `notification`;
             const btn = (
                 <Button type="primary" onClick={() => {
-                    if (hostInfo) {
-                        if (hostInfo.classMode === ClassModeType.discuss) {
-                            this.startRtc();
-                        } else {
-                            this.startRtc();
-                        }
-                    }
+                    this.startRtc();
                     notification.close(key);
                 }}>
                     确认加入
@@ -628,9 +621,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private addStream = (stream: any): void => {
         if (stream) {
             const originalStreamArray = this.state.streams;
-            const newStream: NetlessStream = {...stream, state: {
+            const newStream = {...stream, state: {
                     isAudioOpen: true,
-                    isInStage: false,
+                    isInStage: false, isLocalStream: false,
                     identity: this.getStreamIdentity(stream.getId()),
                 }};
             originalStreamArray.push(newStream);

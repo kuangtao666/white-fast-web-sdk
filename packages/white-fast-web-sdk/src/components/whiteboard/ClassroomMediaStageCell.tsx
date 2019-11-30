@@ -2,6 +2,7 @@ import * as React from "react";
 import {NetlessStream} from "./ClassroomMedia";
 import "./ClassroomMediaManager.less";
 import {ClassModeType} from "../../pages/RoomManager";
+import {async} from "q";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type ClassroomMediaStageCellProps = {
@@ -22,9 +23,9 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
         super(props);
     }
 
-    public componentDidMount(): void {
+    public async componentDidMount(): Promise<void> {
         const {stream} = this.props;
-        this.startStream(stream);
+        await this.startStream(stream);
         this.publishLocalStream(stream);
         this.props.getMediaStageCellReleaseFunc(this.release);
     }
@@ -33,12 +34,14 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
         if (nextProps.stream !== this.props.stream) {
             this.stopStream(this.props.stream);
             await timeout(0);
-            this.startStream(nextProps.stream);
+            await this.startStream(nextProps.stream);
         }
     }
 
-    private startStream = (stream: NetlessStream): void => {
+    private startStream = async (stream: NetlessStream): Promise<void> => {
         const streamId = stream.getId();
+        this.publishLocalStream(stream);
+        await timeout(0);
         stream.play(`netless-${streamId}`);
     }
 
@@ -59,22 +62,22 @@ export default class ClassroomMediaStageCell extends React.Component<ClassroomMe
             stream.stop();
         }
     }
-    private unpublishLocalStream = (stream: NetlessStream): void => {
-        const {userId, rtcClient} = this.props;
-        const streamId = stream.getId();
-        if (streamId === userId && this.props.isLocalStreamPublish && rtcClient !== undefined) {
-            rtcClient.unpublish(stream, (err: any) => {
-                console.log("unpublish failed");
-                console.error(err);
-            });
-            this.props.setLocalStreamState(false);
-        }
-    }
+    // private unpublishLocalStream = (stream: NetlessStream): void => {
+    //     const {userId, rtcClient} = this.props;
+    //     const streamId = stream.getId();
+    //     if (streamId === userId && this.props.isLocalStreamPublish && rtcClient !== undefined) {
+    //         rtcClient.unpublish(stream, (err: any) => {
+    //             console.log("unpublish failed");
+    //             console.error(err);
+    //         });
+    //         this.props.setLocalStreamState(false);
+    //     }
+    // }
 
     private release = (): void => {
         const {stream} = this.props;
         this.stopStream(stream);
-        this.unpublishLocalStream(stream);
+        // this.unpublishLocalStream(stream);
     }
     public componentWillUnmount(): void {
         this.release();

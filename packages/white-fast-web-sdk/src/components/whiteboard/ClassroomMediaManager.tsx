@@ -43,30 +43,20 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
             return null;
         }
     }
-    private renderAudience = (): React.ReactNode => {
-        const {streams} = this.props;
-        const stageStream = this.getStageStream();
-        if (stageStream) {
-            const audienceStreams = streams.filter(stream => {
-                return stream.getId() !== stageStream.getId();
-            });
-            if (audienceStreams && audienceStreams.length > 0) {
-                return audienceStreams.map((audienceStream: NetlessStream, index: number) => {
-                    return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
-                                               getMediaCellReleaseFunc={this.props.getMediaCellReleaseFunc}
-                                               key={`${audienceStream.getId()}`} streamIndex={index} classMode={this.props.classMode}
-                                               streamsLength={this.props.streams.length} isLocalStreamPublish={this.props.isLocalStreamPublish}
-                                               userId={this.props.userId}
-                                               setMemberToStageById={this.props.setMemberToStageById}
-                                               rtcClient={this.props.rtcClient}
-                                               stream={audienceStream}/>;
-                });
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
+    private renderMediaCell = (streams: NetlessStream[]): React.ReactNode => {
+        return streams.map((stream: NetlessStream, index: number) => {
+            return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
+                                       getMediaCellReleaseFunc={this.props.getMediaCellReleaseFunc}
+                                       key={`${stream.getId()}`}
+                                       streamIndex={index}
+                                       classMode={this.props.classMode}
+                                       streamsLength={this.props.streams.length}
+                                       isLocalStreamPublish={this.props.isLocalStreamPublish}
+                                       userId={this.props.userId}
+                                       setMemberToStageById={this.props.setMemberToStageById}
+                                       rtcClient={this.props.rtcClient}
+                                       stream={stream}/>;
+        });
     }
     private getStageStream = (): NetlessStream | null => {
         const {streams, userId} = this.props;
@@ -100,11 +90,25 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
             }
         }
     }
+
+    private handleMediaArray = (): NetlessStream[] => {
+        const {streams} = this.props;
+        const stageStream: NetlessStream | null = this.getStageStream();
+        if (stageStream) {
+            stageStream.state.isInStage = true;
+            const audienceStreams = streams.filter(stream => {
+                return stream.getId() !== stageStream.getId();
+            });
+            return [stageStream, ... audienceStreams];
+        } else {
+            return streams;
+        }
+    }
     public render(): React.ReactNode {
+        const streams = this.handleMediaArray();
         return (
             <div className="rtc-media-box">
-                {this.renderStage()}
-                {this. renderAudience()}
+                {this.renderMediaCell(streams)}
             </div>
         );
     }
