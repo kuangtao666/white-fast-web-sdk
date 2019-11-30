@@ -65,7 +65,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
            this.netlessRoom = WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
                 roomToken: roomToken,
-                userId: 29716,
+                userId: userId,
                 // userName: "伍双",
                 // roomName: "伍双的房间",
                 // userAvatarUrl: "https://ohuuyffq2.qnssl.com/netless_icon.png",

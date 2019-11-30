@@ -75,17 +75,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         //     }
         // }
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
-            const hostInfo: HostUserType = room.state.globalState.hostInfo;
             const key = `${Date.now()}`;
             const btn = (
                 <Button type="primary" onClick={() => {
-                    if (hostInfo) {
-                        if (hostInfo.classMode === ClassModeType.discuss) {
-                            this.startRtc();
-                        } else {
-                            this.startRtc(undefined);
-                        }
-                    }
+                    this.startRtc();
                     notification.close(key);
                 }}>
                     确认加入
