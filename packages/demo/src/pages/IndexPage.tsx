@@ -6,7 +6,6 @@ import netless_black from "../assets/image/netless_black.svg";
 import {Link} from "@netless/i18n-react-router";
 import {FormComponentProps} from "antd/lib/form";
 import {IdentityType} from "./WhiteboardCreatorPage";
-import {ClassModeType} from "../../../white-fast-web-sdk/src/pages/RoomManager";
 
 const { TabPane } = Tabs;
 
@@ -62,12 +61,12 @@ export default class IndexPage extends React.Component<IndexPageProps, IndexPage
                             <TabPane tab="创建房间" key="1">
                                 <div className="page-input-left-inner-box">
                                     <Input className="page-input" onChange={e => this.setState({name: e.target.value})} size={"large"} placeholder={"输入用户名"}/>
-                                    <Radio.Group buttonStyle="solid" onChange={evt => {
+                                    <Radio.Group size={"large"} className="page-class" buttonStyle="solid" onChange={evt => {
                                         console.log(evt);
                                     }}>
-                                        <Radio.Button value={ClassModeType.lecture}>一对一</Radio.Button>
-                                        <Radio.Button value={ClassModeType.handUp}>小班课</Radio.Button>
-                                        <Radio.Button value={ClassModeType.discuss}>公开课</Radio.Button>
+                                        <Radio.Button value={""}>一对一</Radio.Button>
+                                        <Radio.Button value={""}>小班课</Radio.Button>
+                                        <Radio.Button value={""}>公开课</Radio.Button>
                                     </Radio.Group>
                                     <Button
                                         type="primary"
