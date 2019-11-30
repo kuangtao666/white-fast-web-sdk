@@ -5,7 +5,6 @@ import {Room} from "white-react-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {ViewMode} from "white-react-sdk";
-import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import user_empty from "../../assets/image/user_empty.svg";
@@ -14,6 +13,7 @@ import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
 import {RoomContextConsumer} from "../../pages/RoomContext";
+import Identicon from "../../tools/identicon/Identicon";
 const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {
@@ -82,7 +82,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             if (userId === hostInfo.userId) {
                 return (
                     <RoomContextConsumer children={context => (
-                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable} applyForRtc={false}
+                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                        applyForRtc={false}
                                         startRtcCallback={context.startRtcCallback}
                                         stopRtcCallback={context.stopRtcCallback}
                                         getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}

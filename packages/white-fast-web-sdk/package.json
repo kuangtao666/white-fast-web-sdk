@@ -1,6 +1,6 @@
 {
   "name": "@netless/white-fast-web-sdk",
-  "version": "1.1.30",
+  "version": "1.1.31",
   "main": "dist/bundle.js",
   "types": "dist/facade/index.d.ts",
   "author": "netless",
@@ -32,6 +32,7 @@
     "antd": "^3.24.3",
     "is-color": "^1.0.2",
     "is-touch-device": "^1.0.1",
+    "md5-typescript": "^1.0.5",
     "qrcode.react": "^0.9.3",
     "query-string": "5",
     "rc-queue-anim": "^1.6.12",
@@ -44,7 +45,6 @@
     "react-dom": "~16.8.0",
     "react-draggable": "^4.1.0",
     "react-dropzone": "4.2.10",
-    "react-identicons": "^1.1.7",
     "react-tiny-virtual-list": "^2.2.0",
     "uuid": "^3.3.2",
     "white-react-sdk": "^2.3.15"

@@ -8,9 +8,8 @@ import * as hangUp from "../../assets/image/hangUp.svg";
 import * as menu_in from "../../assets/image/menu_in.svg";
 import * as close_white from "../../assets/image/close_white.svg";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
-import Identicon from "react-identicons";
 import ClassroomMediaManager from "./ClassroomMediaManager";
-const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
+import Identicon from "../../tools/identicon/Identicon";
 
 export type NetlessStream = {
     state: {isAudioOpen: boolean, isInStage: boolean, identity?: IdentityType},

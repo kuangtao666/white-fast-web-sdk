@@ -11,10 +11,6 @@ declare module "*.png" {
     const content: string;
     export = content;
 }
-declare module "react-identicons" {
-    const Identicon: any;
-    export default Identicon;
-}
 declare module "react-draggable" {
     const Draggable: any;
     export default Draggable;
