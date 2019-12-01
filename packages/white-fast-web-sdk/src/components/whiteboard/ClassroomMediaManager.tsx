@@ -1,6 +1,5 @@
 import * as React from "react";
 import {IdentityType, NetlessStream} from "./ClassroomMedia";
-import ClassroomMediaStageCell from "./ClassroomMediaStageCell";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import "./ClassroomMediaManager.less";
 import {ClassModeType} from "../../pages/RoomManager";
@@ -14,6 +13,7 @@ export type ClassroomMediaManagerProps = {
     setMemberToStageById: (userId: number) => void;
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
+    userAvatarUrl?: string;
     getMediaCellReleaseFunc: (func: () => void) => void;
     getMediaStageCellReleaseFunc: (func: () => void) => void;
 };
@@ -26,22 +26,6 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
 
     public constructor(props: ClassroomMediaManagerProps) {
         super(props);
-    }
-
-    private renderStage = (): React.ReactNode => {
-        const stageStream = this.getStageStream();
-        if (stageStream) {
-            return <ClassroomMediaStageCell
-                setLocalStreamState={this.props.setLocalStreamState}
-                userId={this.props.userId} classMode={this.props.classMode}
-                streamsLength={this.props.streams.length}
-                isLocalStreamPublish={this.props.isLocalStreamPublish}
-                rtcClient={this.props.rtcClient}
-                getMediaStageCellReleaseFunc={this.props.getMediaStageCellReleaseFunc}
-                stream={stageStream}/>;
-        } else {
-            return null;
-        }
     }
     private renderMediaCell = (streams: NetlessStream[]): React.ReactNode => {
         return streams.map((stream: NetlessStream, index: number) => {
@@ -95,11 +79,10 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         const {streams} = this.props;
         const stageStream: NetlessStream | null = this.getStageStream();
         if (stageStream) {
-            stageStream.state.isInStage = true;
-            const audienceStreams = streams.filter(stream => {
-                return stream.getId() !== stageStream.getId();
+            return streams.map(stream => {
+                stream.state.isInStage = stream.getId() === stageStream.getId();
+                return stream;
             });
-            return [stageStream, ... audienceStreams];
         } else {
             return streams;
         }

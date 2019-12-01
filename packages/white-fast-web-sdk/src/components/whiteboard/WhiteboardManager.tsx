@@ -300,9 +300,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const {room, language} = this.props;
         const isEnglish = language === LanguageEnum.English;
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-
-        if (globalGuestUsers) {
-            const guestNodes = globalGuestUsers.map((guestUser: GuestUserType, index: number) => {
+        if (globalGuestUsers && globalGuestUsers.length > 0) {
+            const guestNodesOnline = globalGuestUsers.filter(guestUser => guestUser.isOnline);
+            const guestNodes = guestNodesOnline.map((guestUser: GuestUserType, index: number) => {
                 return (
                     <div className="room-member-cell" key={`${index}`}>
                         <div className="room-member-cell-inner">
@@ -402,11 +402,25 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
 
     private renderAudioController = (): React.ReactNode => {
         if (this.props.identity === IdentityType.host) {
-            return (
-                <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
-                    全部静音
-                </div>
-            );
+            const {room} = this.props;
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            if (hostInfo) {
+                if (hostInfo.isAllMemberAudioClose) {
+                    return (
+                        <div onClick={() => this.setMediaAudioState(false)} className="guest-box-btn">
+                            打开学生音频
+                        </div>
+                    );
+                } else {
+                    return (
+                        <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
+                            关闭学生音频
+                        </div>
+                    );
+                }
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

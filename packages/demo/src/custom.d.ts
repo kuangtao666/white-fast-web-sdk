@@ -8,6 +8,11 @@ declare module "@netless/white-fast-web-sdk" {
     export default WhiteFastSDK;
 }
 
+declare module "agora-rtc-sdk" {
+    const AgoraRTC: any;
+    export default AgoraRTC;
+}
+
 
 declare module "*.jpg" {
     const content: string;

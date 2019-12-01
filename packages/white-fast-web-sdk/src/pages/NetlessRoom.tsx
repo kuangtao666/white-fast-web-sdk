@@ -386,6 +386,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private stopAll = (): void => {
+        if (this.roomManager) {
+            this.roomManager.leave();
+        }
         const {identity} = this.props;
         const {room} = this.state;
         if (room && identity === IdentityType.host) {

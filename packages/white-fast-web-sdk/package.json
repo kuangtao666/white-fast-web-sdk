@@ -59,7 +59,6 @@
     "@babel/preset-typescript": "^7.6.0",
     "@babel/runtime": "^7.6.0",
     "@livechat/ui-kit": "^0.4.0-1",
-    "@types/agora-rtc-sdk": "^2.6.0",
     "@types/ali-oss": "^6.0.3",
     "@types/downloadjs": "^1.4.1",
     "@types/html2canvas": "^0.0.35",
