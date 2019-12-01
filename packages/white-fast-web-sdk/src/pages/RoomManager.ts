@@ -32,7 +32,6 @@ export type HostUserType = {
     cameraState: ViewMode,
     disableCameraTransform: boolean,
     isVideoEnable: boolean,
-    isOnline: boolean,
     isAllMemberAudioClose: boolean,
     secondsElapsed?: number,
 };
@@ -77,7 +76,6 @@ export class RoomManager {
                       disableCameraTransform: false,
                       isVideoEnable: false,
                       isAllMemberAudioClose: false,
-                      isOnline: true,
                   };
                   this.room.disableCameraTransform = false;
                   this.room.setGlobalState({hostInfo: myHostInfo});
@@ -94,7 +92,6 @@ export class RoomManager {
                   disableCameraTransform: false,
                   isVideoEnable: false,
                   isAllMemberAudioClose: false,
-                  isOnline: true,
               };
               this.room.disableCameraTransform = false;
               this.room.setGlobalState({hostInfo: myHostInfo});
@@ -162,12 +159,7 @@ export class RoomManager {
       }
   }
   public leave = (): void => {
-      if (this.identity === IdentityType.host) {
-          const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
-          if (hostInfo) {
-              this.room.setGlobalState({hostInfo: {...hostInfo, isOnline: false}});
-          }
-      } else if (this.identity === IdentityType.guest) {
+      if (this.identity === IdentityType.guest) {
           const guestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
           if (guestUsers && guestUsers.length > 0) {
               const newGuestUsers = guestUsers.map(guestUser => {
