@@ -407,8 +407,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private switchCamera = (): void => {
         const {localStream} = this.state;
         if (localStream) {
+            const uid = localStream.getId();
             if (this.state.isCameraOpen) {
                 const isVideoMute = localStream.muteVideo();
+                this.setVideoState(uid, false);
                 if (isVideoMute) {
                     this.setState({isCameraOpen: false});
                 } else {
@@ -416,6 +418,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }
             } else {
                 const isVideoMute = localStream.unmuteVideo();
+                this.setVideoState(uid, true);
                 if (isVideoMute) {
                     this.setState({isCameraOpen: true});
                 } else {
@@ -429,8 +432,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     private switchMicrophone = (): void => {
         const {localStream} = this.state;
         if (localStream) {
+            const uid = localStream.getId();
             if (this.state.isMicrophoneOpen) {
                 const isAudioMute = localStream.muteAudio();
+                this.setAudioState(uid, false);
                 if (isAudioMute) {
                     this.setState({isMicrophoneOpen: false});
                 } else {
@@ -438,6 +443,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }
             } else {
                 const isAudioMute = localStream.unmuteAudio();
+                this.setAudioState(uid, true);
                 if (isAudioMute) {
                     this.setState({isMicrophoneOpen: true});
                 } else {
@@ -729,6 +735,24 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
+    private setVideoState = (uid: number, state: boolean): void => {
+        const streams = this.state.streams.map(data => {
+            if (data.getId() === uid) {
+                data.state.isVideoOpen = state;
+            }
+            return data;
+        });
+        this.setState({streams: streams});
+    }
+    private setAudioState = (uid: number, state: boolean): void => {
+        const streams = this.state.streams.map(data => {
+            if (data.getId() === uid) {
+                data.state.isAudioOpen = state;
+            }
+            return data;
+        });
+        this.setState({streams: streams});
+    }
     private addRtcListeners = (rtcClient: any): void => {
         // 监听
         rtcClient.on("stream-published", () => {
@@ -755,16 +779,20 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         });
 
         rtcClient.on("mute-video", (evt: any) => {
-            alert(2);
+            const uid = evt.uid;
+            this.setVideoState(uid, false);
         });
         rtcClient.on("unmute-video", (evt: any) => {
-            alert(2);
+            const uid = evt.uid;
+            this.setVideoState(uid, true);
         });
         rtcClient.on("mute-audio", (evt: any) => {
-            alert(2);
+            const uid = evt.uid;
+            this.setAudioState(uid, false);
         });
         rtcClient.on("unmute-audio", (evt: any) => {
-            alert(2);
+            const uid = evt.uid;
+            this.setAudioState(uid, true);
         });
     }
 
