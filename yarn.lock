@@ -2365,10 +2365,10 @@ aggregate-error@^3.0.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
-agora-rtc-sdk@2.6.1:
-  version "2.6.1"
-  resolved "https://registry.npmjs.org/agora-rtc-sdk/-/agora-rtc-sdk-2.6.1.tgz#2478752b34faa8073b3c6cb9b9e17db602f597bd"
-  integrity sha512-pOWvKI0y+Ytiq9ns81yA54WC27u59VuM9zsWRpqF+0dJbHeei9ScOe/RktRIPjPAJibDUQEy9nCrkkgxq1lVDQ==
+agora-rtc-sdk@2.9.0:
+  version "2.9.0"
+  resolved "https://registry.npmjs.org/agora-rtc-sdk/-/agora-rtc-sdk-2.9.0.tgz#e94ce100c67b16b9e3919ff314995daf6e4e5359"
+  integrity sha512-91YDkMfIXTGdbuBicqf0VjCnaeYyRa1FXbJqpuOq/0Cq0kZ7+98980bLbKvdvhXgOVaYkYzBp9jAqmduKf4z5Q==
 
 ajv-errors@^1.0.0:
   version "1.0.1"
