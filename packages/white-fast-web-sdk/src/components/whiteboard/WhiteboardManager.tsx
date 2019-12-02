@@ -399,8 +399,23 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 }});
         }
     }
-
+    private getMediaState = (): boolean => {
+        const {room} = this.props;
+        if (room.state.globalState.hostInfo) {
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            if (hostInfo) {
+                return hostInfo.isVideoEnable;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     private renderAudioController = (): React.ReactNode => {
+        if (!this.getMediaState()) {
+            return null;
+        }
         if (this.props.identity === IdentityType.host) {
             const {room} = this.props;
             const hostInfo: HostUserType = room.state.globalState.hostInfo;

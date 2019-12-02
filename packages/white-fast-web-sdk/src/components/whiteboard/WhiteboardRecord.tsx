@@ -80,7 +80,11 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         const {room} = this.props;
         if (room.state.globalState.hostInfo) {
             const hostInfo: HostUserType = room.state.globalState.hostInfo;
-            return hostInfo.isVideoEnable;
+            if (hostInfo) {
+                return hostInfo.isVideoEnable;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
