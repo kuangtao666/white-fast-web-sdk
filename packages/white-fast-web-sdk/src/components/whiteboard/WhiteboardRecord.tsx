@@ -279,7 +279,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 this.startClock();
             }
         } else {
-            message.warning("sss");
+            message.warning("尚未添加 Rtc 相关配置");
         }
     }
     public componentWillUnmount(): void {
