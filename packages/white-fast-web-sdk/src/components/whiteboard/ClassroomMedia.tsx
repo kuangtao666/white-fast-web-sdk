@@ -146,10 +146,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         if (this.props.isAllMemberAudioClose !== nextProps.isAllMemberAudioClose) {
             const {localStream} = this.state;
             if (this.props.identity !== IdentityType.host) {
+                const uid = localStream.getId();
                 if (nextProps.isAllMemberAudioClose) {
                     localStream.muteAudio();
+                    this.setAudioState(uid, false);
                 } else {
                     localStream.unmuteAudio();
+                    this.setAudioState(uid, true);
                 }
             }
         }
