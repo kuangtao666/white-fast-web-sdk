@@ -586,14 +586,14 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.agoraClient.join(token, channel, userId, (uid: number) => {
                     console.log("User " + uid + " join channel successfully");
                     // 创建本地流对象
-                    if (recordFunc) {
-                        recordFunc();
-                    }
                     if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
-                        this.createLocalStream(AgoraRTC, userId);
+                        this.createLocalStream(AgoraRTC, userId, recordFunc);
                     } else {
-                        this.setState({isRtcStart: true, isRtcLoading: false});
                         this.setMediaState(true);
+                        this.setState({isRtcStart: true, isRtcLoading: false});
+                        if (recordFunc) {
+                            recordFunc();
+                        }
                     }
                     // 添加监听
                 }, (err: any) => {
@@ -660,7 +660,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private createLocalStream = (rtcObj: any, userId: number): void => {
+    private createLocalStream = (rtcObj: any, userId: number, recordFunc?: () => void): void => {
         // 创建本地流对象
         const localStream = rtcObj.createStream({
             streamID: userId,
@@ -678,6 +678,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 isCameraOpen: true,
                 isMicrophoneOpen: true,
                 localStream: localStream});
+            if (recordFunc) {
+                recordFunc();
+            }
         }, (err: any) => {
             console.log("getUserMedia failed", err);
         });

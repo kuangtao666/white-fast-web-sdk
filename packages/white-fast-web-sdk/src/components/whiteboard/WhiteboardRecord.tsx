@@ -4,7 +4,7 @@ import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
-import {ossConfigObj, OSSConfigObjType} from "../../appToken";
+import {OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
@@ -248,7 +248,6 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     await this.recordOperator.acquire();
                 }
             }
-
             if (isMediaRun) {
                 try {
                     await this.recordOperator.start();
