@@ -776,12 +776,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 identity={this.props.identity}
                                 roomName={this.props.roomName}
                                 logoUrl={this.props.logoUrl}/>
-                            {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
                                 isManagerOpen={this.state.isManagerOpen}
                                 exitRoomCallback={this.props.exitRoomCallback}
                                 handleManagerState={this.handleManagerState}
-                                whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState} deviceType={this.state.deviceType}
                                 identity={this.props.identity}
                                 userName={this.props.userName}
@@ -790,7 +788,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 replayCallback={this.props.replayCallback}
                                 language={this.props.language}
                                 isReadOnly={isReadOnly}
-                                userAvatarUrl={this.props.userAvatarUrl}/>}
+                                userAvatarUrl={this.props.userAvatarUrl}/>
                             <WhiteboardBottomLeft
                                 handleFileState={this.handleFileState}
                                 isManagerOpen={this.state.isManagerOpen}

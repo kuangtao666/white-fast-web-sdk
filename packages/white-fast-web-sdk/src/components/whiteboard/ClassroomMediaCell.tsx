@@ -20,6 +20,7 @@ export type ClassroomManagerCellProps = {
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
     getMediaCellReleaseFunc: (fun: () => void) => void;
+    mediaLayerDownRef: HTMLDivElement;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -57,31 +58,33 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     }
 
     private renderStageStyle = (): any => {
-        const {streamsLength} = this.props;
+        const {streamsLength, mediaLayerDownRef} = this.props;
+        const {clientWidth, clientHeight} = mediaLayerDownRef;
         if (streamsLength <= 2) {
-            return {width: 300, height: 300};
-        } else if (streamsLength > 3 && streamsLength < 6) {
-            return {width: 300, height: 225};
+            return {width: clientWidth, height: clientHeight};
+        } else if (streamsLength > 4 && streamsLength < 6) {
+            return {width: clientWidth, height: (0.75 * clientHeight)};
         } else {
-            return {width: 300, height: 200};
+            return {width: clientWidth, height: (0.7 * clientHeight)};
         }
     }
     private renderStyle = (): any => {
-        const {streamsLength, streamIndex} = this.props;
+        const {streamsLength, streamIndex, mediaLayerDownRef} = this.props;
+        const {clientWidth, clientHeight} = mediaLayerDownRef;
         const index = streamIndex - 1;
         if (streamsLength === 2) {
-            return {width: 100, height: 100};
+            return {width: (0.3 * clientWidth), height: (0.3 * clientHeight)};
         } else if (streamsLength === 3) {
-            return {width: 150, height: 100, left: (index * 150)};
+            return {width: (0.5 * clientWidth), height: (0.3 * clientHeight), left: (index * (0.5 * clientWidth))};
         } else if (streamsLength === 4) {
-            return {width: 100, height: 100, left: (index * 100)};
+            return {width: (clientWidth / 3), height: (0.3 * clientHeight), left: (index * (clientWidth / 3))};
         } else if (streamsLength === 5) {
-            return {width: 75, height: 75, left: (index * 75)};
+            return {width: (0.25 * clientWidth), height: (0.25 * clientHeight), left: (index * (0.25 * clientWidth))};
         } else {
             if (streamIndex >= 4) {
-                return {width: 75, height: 75, left: ((index - 4) * 75), bottom: 75};
+                return {width: (0.25 * clientWidth), height: (0.25 * clientHeight), left: ((index - 4) * (0.25 * clientWidth)), bottom: (0.25 * clientHeight)};
             } else {
-                return {width: 75, height: 75, left: (index * 75)};
+                return {width: (0.25 * clientWidth), height: (0.25 * clientHeight), left: (index * (0.25 * clientWidth))};
             }
         }
     }

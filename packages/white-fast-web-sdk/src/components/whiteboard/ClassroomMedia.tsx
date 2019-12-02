@@ -79,12 +79,6 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
     public componentDidMount(): void {
         const {userId} = this.props;
-        // if (this.props.identity === IdentityType.host) {
-        //     const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        //     if (hostInfo && hostInfo.isRecording === true) {
-        //         this.startRtc();
-        //     }
-        // }
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
             const key = `${Date.now()}`;
             const btn = (
@@ -175,7 +169,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
     private videoJoinRemind = (): void => {
         const {userId} = this.props;
-        if (this.props.identity !== IdentityType.host) {
+        if (this.props.identity !== IdentityType.host && !this.state.isRtcStart) {
             const key = `notification`;
             const btn = (
                 <Button type="primary" onClick={() => {
