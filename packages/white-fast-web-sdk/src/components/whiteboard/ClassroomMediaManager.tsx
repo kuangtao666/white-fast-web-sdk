@@ -54,32 +54,27 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
     }
     private getStageStream = (): NetlessStream | null => {
         const {streams, userId} = this.props;
-        const stageStream = streams.find(stream => stream.state.isInStage);
-        // 如何制定了舞台的流就有限选用指定
-        if (stageStream) {
-            return stageStream;
+        const streamsLength = streams.length;
+        if (streamsLength === 1) {
+            return streams[0];
+        } else if (streamsLength === 2) {
+            const theirStream = streams.find(stream => stream.getId() !== userId);
+            if (theirStream) {
+                return theirStream;
+            } else {
+                return null;
+            }
         } else {
-            const streamsLength = streams.length;
-            // 如果是两个人的时候就是吧对方的视频作为舞台。
-            if (streamsLength === 2) {
-                const theirStream = streams.find(stream => stream.getId() !== userId);
-                if (theirStream) {
-                    return theirStream;
+            // 剩余的情况遵循，有老师显示老师，没老师显示自己。
+            const hostStream = streams.find(stream => stream.state.identity === IdentityType.host);
+            if (hostStream) {
+                return hostStream;
+            } else {
+                const selfStream = streams.find(stream => stream.getId() === userId);
+                if (selfStream) {
+                    return selfStream;
                 } else {
                     return null;
-                }
-            } else {
-                // 剩余的情况遵循，有老师显示老师，没老师显示自己。
-                const hostStream = streams.find(stream => stream.state.identity === IdentityType.host);
-                if (hostStream) {
-                    return hostStream;
-                } else {
-                    const selfStream = streams.find(stream => stream.getId() === userId);
-                    if (selfStream) {
-                        return selfStream;
-                    } else {
-                        return null;
-                    }
                 }
             }
         }

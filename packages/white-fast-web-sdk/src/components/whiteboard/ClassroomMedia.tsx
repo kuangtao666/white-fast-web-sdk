@@ -44,17 +44,17 @@ export type ClassroomMediaProps = {
     room: Room;
     isAllMemberAudioClose: boolean,
     classMode: ClassModeType;
-    identity?: IdentityType;
     handleManagerState: () => void;
-    rtc?: RtcType;
     applyForRtc: boolean;
-    language?: LanguageEnum;
     isVideoEnable: boolean;
     startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
     stopRtcCallback: (stopRtc: () => void) => void;
-    stopRecord?: () => void;
     getMediaCellReleaseFunc: (func: () => void) => void;
     getMediaStageCellReleaseFunc: (func: () => void) => void;
+    identity?: IdentityType;
+    rtc?: RtcType;
+    language?: LanguageEnum;
+    stopRecord?: () => void;
     userAvatarUrl?: string;
 };
 
@@ -78,7 +78,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     public componentDidMount(): void {
-        const {userId} = this.props;
+        const {userId, startRtcCallback, stopRtcCallback} = this.props;
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
             const key = `${Date.now()}`;
             const btn = (
@@ -113,9 +113,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 });
             }
         }
-        this.props.startRtcCallback(this.startRtc);
-        this.props.stopRtcCallback(this.stopRtc);
+        startRtcCallback(this.startRtc);
+        stopRtcCallback(this.stopRtc);
     }
+
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
         if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
             if (nextProps.isVideoEnable) {
