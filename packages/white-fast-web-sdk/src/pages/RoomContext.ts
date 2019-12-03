@@ -8,6 +8,8 @@ export type RoomContext = {
     onColorArrayChange?: (colorArray: string[]) => void;
     stopRecord?: () => void;
     isRecording: boolean;
+    getMediaCellReleaseFunc: (func: () => void) => void;
+    getMediaStageCellReleaseFunc: (func: () => void) => void;
 };
 
 const context = React.createContext<RoomContext>(undefined as any);

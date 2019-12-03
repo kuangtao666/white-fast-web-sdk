@@ -19,6 +19,7 @@ export type GuestUserType = {
     disableCameraTransform: boolean,
     isReminded: boolean,
     applyForRtc: boolean,
+    isOnline: boolean,
 };
 export type HostUserType = {
     userId: string,
@@ -115,6 +116,7 @@ export class RoomManager {
                   disableCameraTransform: true,
                   isReminded: false,
                   applyForRtc: false,
+                  isOnline: true,
               };
               this.room.disableCameraTransform = true;
               this.room.setGlobalState({guestUsers: [guestUser]});
@@ -125,6 +127,15 @@ export class RoomManager {
               if (myUser) {
                   this.room.disableDeviceInputs = myUser.isReadOnly;
                   this.room.disableCameraTransform = myUser.disableCameraTransform;
+                  const newGuestUsers = globalGuestUsers.map(guestUser => {
+                      if (guestUser.userId === this.userId) {
+                          guestUser.isOnline = true;
+                          return guestUser;
+                      } else {
+                          return guestUser;
+                      }
+                  });
+                  this.room.setGlobalState({guestUsers: newGuestUsers});
               } else {
                   const guestUser: GuestUserType = {
                       userId: this.userId,
@@ -137,12 +148,29 @@ export class RoomManager {
                       disableCameraTransform: true,
                       isReminded: false,
                       applyForRtc: false,
+                      isOnline: true,
                   };
                   this.room.disableCameraTransform = true;
                   globalGuestUsers.push(guestUser);
                   this.room.setGlobalState({guestUsers: globalGuestUsers});
                   this.room.disableDeviceInputs = true;
               }
+          }
+      }
+  }
+  public leave = (): void => {
+      if (this.identity === IdentityType.guest) {
+          const guestUsers: GuestUserType[] = this.room.state.globalState.guestUsers;
+          if (guestUsers && guestUsers.length > 0) {
+              const newGuestUsers = guestUsers.map(guestUser => {
+                  if (guestUser.userId === this.userId) {
+                      guestUser.isOnline = false;
+                      return guestUser;
+                  } else {
+                      return guestUser;
+                  }
+              });
+              this.room.setGlobalState({guestUsers: newGuestUsers});
           }
       }
   }

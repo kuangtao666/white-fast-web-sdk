@@ -83,6 +83,8 @@ export type RtcType = {
         token: string,
     }
     recordConfig?: {
+        recordUid?: string,
+        recordToken?: string,
         customerId: string,
         customerCertificate: string,
     },
@@ -166,6 +168,8 @@ export type RealTimeStates = {
     stopRecord?: (stopRecordFunc?: () => void) => void;
     isRecording: boolean;
     secondsElapsed?: number;
+    releaseMedia?: () => void;
+    releaseMediaStage?: () => void;
 };
 
 export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
@@ -373,7 +377,18 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         this.setState({secondsElapsed: time});
     }
 
+    private getMediaCellReleaseFunc = (func: () => void): void => {
+        this.setState({releaseMedia: func});
+    }
+
+    private getMediaStageCellReleaseFunc = (func: () => void): void => {
+        this.setState({releaseMediaStage: func});
+    }
+
     private stopAll = (): void => {
+        if (this.roomManager) {
+            this.roomManager.leave();
+        }
         const {identity} = this.props;
         const {room} = this.state;
         if (room && identity === IdentityType.host) {
@@ -393,6 +408,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
         if (this.state.stopRtc) {
             this.state.stopRtc();
+        }
+        if (this.state.releaseMedia) {
+            this.state.releaseMedia();
+        }
+        if (this.state.releaseMediaStage) {
+            this.state.releaseMediaStage();
         }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("beforeunload", this.beforeunload);
@@ -600,7 +621,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (this.props.identity === IdentityType.host && this.state.deviceType !== DeviceType.Touch) {
             return (
                 <WhiteboardRecord
-                    ossConfigObj={this.state.ossConfigObj} recordTime={this.recordTime}
+                    ossConfigObj={this.state.ossConfigObj}
+                    recordTime={this.recordTime}
                     startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
                     stopRecordCallback={this.stopRecordCallback}
@@ -714,6 +736,8 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                     room: room,
                     stopRecord: this.state.stopRecord,
                     isRecording: this.state.isRecording,
+                    getMediaCellReleaseFunc: this.getMediaCellReleaseFunc,
+                    getMediaStageCellReleaseFunc: this.getMediaStageCellReleaseFunc,
                 }}>
                     <div className="realtime-box">
                         <MenuBox
@@ -752,12 +776,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 identity={this.props.identity}
                                 roomName={this.props.roomName}
                                 logoUrl={this.props.logoUrl}/>
-                            {this.state.whiteboardLayerDownRef &&
                             <WhiteboardTopRight
                                 isManagerOpen={this.state.isManagerOpen}
                                 exitRoomCallback={this.props.exitRoomCallback}
                                 handleManagerState={this.handleManagerState}
-                                whiteboardLayerDownRef={this.state.whiteboardLayerDownRef}
                                 roomState={roomState} deviceType={this.state.deviceType}
                                 identity={this.props.identity}
                                 userName={this.props.userName}
@@ -766,7 +788,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                 replayCallback={this.props.replayCallback}
                                 language={this.props.language}
                                 isReadOnly={isReadOnly}
-                                userAvatarUrl={this.props.userAvatarUrl}/>}
+                                userAvatarUrl={this.props.userAvatarUrl}/>
                             <WhiteboardBottomLeft
                                 handleFileState={this.handleFileState}
                                 isManagerOpen={this.state.isManagerOpen}

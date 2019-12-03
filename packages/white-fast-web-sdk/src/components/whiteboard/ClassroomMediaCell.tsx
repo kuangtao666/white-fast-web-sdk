@@ -3,17 +3,24 @@ import "./ClassroomMediaManager.less";
 import {NetlessStream} from "./ClassroomMedia";
 import {CSSProperties} from "react";
 import {ClassModeType} from "../../pages/RoomManager";
-
+import * as microphone_open from "../../assets/image/microphone_open.svg";
+import * as microphone_close from "../../assets/image/microphone_close.svg";
+import * as camera_open from "../../assets/image/camera_open.svg";
+import * as camera_close from "../../assets/image/camera_close.svg";
+import Identicon from "../../tools/identicon/Identicon";
 export type ClassroomManagerCellProps = {
     stream: NetlessStream;
     userId: number;
     rtcClient: any;
     streamsLength: number;
     streamIndex: number
+    userAvatarUrl?: string;
     setMemberToStageById: (userId: number) => void;
     classMode: ClassModeType;
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
+    getMediaCellReleaseFunc: (fun: () => void) => void;
+    mediaLayerDownRef: HTMLDivElement;
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
@@ -23,36 +30,61 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         super(props);
     }
 
-    public componentDidMount(): void {
+    public async componentDidMount(): Promise<void> {
         const {stream} = this.props;
-        const streamId =  stream.getId();
-        stream.play(`netless-${streamId}`);
+        await this.startStream(stream);
+        this.props.getMediaCellReleaseFunc(this.release);
+    }
+
+    private startStream = (stream: NetlessStream): void => {
+        const streamId = stream.getId();
         this.publishLocalStream(stream);
+        stream.play(`netless-${streamId}`);
+    }
+
+    private release = (): void => {
+        const {stream} = this.props;
+        this.stopStream(stream);
     }
 
     public componentWillUnmount(): void {
-        const {stream} = this.props;
+       this.release();
+    }
+
+    private stopStream = (stream: NetlessStream): void => {
         if (stream.isPlaying()) {
             stream.stop();
         }
-        this.unpublishLocalStream(stream);
     }
 
-    private renderStyle = (): CSSProperties => {
-        const {streamsLength, streamIndex} = this.props;
+    private renderStageStyle = (): any => {
+        const {streamsLength, mediaLayerDownRef} = this.props;
+        const {clientWidth, clientHeight} = mediaLayerDownRef;
+        if (streamsLength <= 2) {
+            return {width: clientWidth, height: clientHeight};
+        } else if (streamsLength > 4 && streamsLength < 6) {
+            return {width: clientWidth, height: (0.75 * clientHeight)};
+        } else {
+            return {width: clientWidth, height: (0.7 * clientHeight)};
+        }
+    }
+    private renderStyle = (): any => {
+        const {streamsLength, streamIndex, mediaLayerDownRef} = this.props;
+        const {clientWidth, clientHeight} = mediaLayerDownRef;
+        const index = streamIndex - 1;
         if (streamsLength === 2) {
-            return {width: 100, height: 100};
+            return {width: (0.3 * clientWidth), height: (0.3 * clientHeight)};
         } else if (streamsLength === 3) {
-            return {width: 150, height: 100, right: (streamIndex * 150)};
+            return {width: (0.5 * clientWidth), height: (0.3 * clientHeight), left: (index * (0.5 * clientWidth))};
         } else if (streamsLength === 4) {
-            return {width: 100, height: 100, right: (streamIndex * 100)};
+            return {width: (clientWidth / 3), height: (0.3 * clientHeight), left: (index * (clientWidth / 3))};
         } else if (streamsLength === 5) {
-            return {width: 75, height: 75, right: (streamIndex * 75)};
+            return {width: (0.25 * clientWidth), height: (0.25 * clientHeight), left: (index * (0.25 * clientWidth))};
         } else {
             if (streamIndex >= 4) {
-                return {width: 75, height: 75, right: ((streamIndex - 4) * 75), bottom: 75};
+                return {width: (0.25 * clientWidth), height: (0.25 * clientHeight), left: ((index - 4) * (0.25 * clientWidth)), bottom: (0.25 * clientHeight)};
             } else {
-                return {width: 75, height: 75, right: (streamIndex * 75)};
+                return {width: (0.25 * clientWidth), height: (0.25 * clientHeight), left: (index * (0.25 * clientWidth))};
             }
         }
     }
@@ -60,7 +92,7 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     private publishLocalStream = (stream: NetlessStream): void => {
         const {userId, rtcClient} = this.props;
         const streamId = stream.getId();
-        if (streamId === userId && !this.props.isLocalStreamPublish) {
+        if (streamId === userId && !this.props.isLocalStreamPublish && rtcClient !== undefined) {
             rtcClient.publish(stream, (err: any) => {
                 console.log("publish failed");
                 console.error(err);
@@ -69,34 +101,72 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
         }
     }
 
-    private unpublishLocalStream = (stream: NetlessStream): void => {
-        const {userId, rtcClient} = this.props;
-        const streamId = stream.getId();
-        if (streamId === userId && this.props.isLocalStreamPublish) {
-            rtcClient.unpublish(stream, (err: any) => {
-                console.log("unpublish failed");
-                console.error(err);
-            });
-            this.props.setLocalStreamState(false);
-        }
-    }
-
     private handleClickVideo = (userId: number): void => {
         this.props.setMemberToStageById(userId);
     }
 
+    private renderStageAvatar = (): React.ReactNode => {
+        const {userAvatarUrl, userId, stream} = this.props;
+        const size = this.renderStageStyle();
+        if (userAvatarUrl) {
+            return <div className="rtc-media-avatar-image">
+                <img src={userAvatarUrl}/>
+            </div>;
+        } else {
+            return <div className="rtc-media-avatar-image">
+                <Identicon
+                    className="rtc-media-stage-image-avatar"
+                    size={size.width}
+                    string={`${stream.getId()}`}/>
+            </div>;
+        }
+    }
+
+    private renderAvatar = (): React.ReactNode => {
+        const {userAvatarUrl, stream} = this.props;
+        const size = this.renderStyle();
+        if (userAvatarUrl) {
+            return <div className="rtc-media-avatar-image">
+                <img src={userAvatarUrl}/>
+            </div>;
+        } else {
+            return <div className="rtc-media-avatar-image">
+                <Identicon
+                    className="rtc-media-stage-image-avatar"
+                    size={size.width}
+                    string={`${stream.getId()}`}/>
+            </div>;
+        }
+    }
     public render(): React.ReactNode {
         const {stream} = this.props;
         const streamId =  stream.getId();
-        return (
-            <div className="rtc-media-cell-out-box" style={this.renderStyle()}>
-                <div className="rtc-media-cell-mid-box">
-                    <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} style={this.renderStyle()} className="rtc-media-cell-box">
-                    </div>
-                    <div style={{backgroundColor: stream.state.isAudioOpen ? "green" : "red"}} className="rtc-media-cell-icon">
+        if (stream.state.isInStage) {
+            return (
+                <div className="rtc-media-stage-out-box" style={this.renderStageStyle()}>
+                    <div className="rtc-media-stage-mid-box">
+                        <div className="rtc-media-stage-icon">
+                            {stream.state.isAudioOpen ? <img src={microphone_open}/> : <img src={microphone_close}/>}
+                        </div>
+                        {!stream.state.isVideoOpen && this.renderStageAvatar()}
+                        <div id={`netless-${streamId}`} className="rtc-media-stage-box">
+                        </div>
                     </div>
                 </div>
-            </div>
-        );
+            );
+        } else {
+            return (
+                <div className="rtc-media-cell-out-box" style={this.renderStyle()}>
+                    <div className="rtc-media-cell-mid-box">
+                        <div className="rtc-media-cell-icon">
+                            {stream.state.isAudioOpen ? <img src={microphone_open}/> : <img src={microphone_close}/>}
+                        </div>
+                        {!stream.state.isVideoOpen && this.renderAvatar()}
+                        <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} className="rtc-media-cell-box">
+                        </div>
+                    </div>
+                </div>
+            );
+        }
     }
 }

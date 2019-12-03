@@ -4,7 +4,7 @@ import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
 import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
-import {ossConfigObj, OSSConfigObjType} from "../../appToken";
+import {OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
 import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
@@ -36,7 +36,7 @@ export type WhiteboardRecordProps = {
 };
 
 export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
-    private recrod: RecordOperator;
+    private recordOperator: RecordOperator;
     private interval: any;
     public constructor(props: WhiteboardRecordProps) {
         super(props);
@@ -51,7 +51,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
 
     public componentDidMount(): void {
         if (this.props.stopRecordCallback) {
-            this.props.stopRecordCallback(this.record);
+            this.props.stopRecordCallback(this.stopRecord);
         }
         // const {room} = this.props;
         // const hostInfo: HostUserType = room.state.globalState.hostInfo;
@@ -80,7 +80,11 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         const {room} = this.props;
         if (room.state.globalState.hostInfo) {
             const hostInfo: HostUserType = room.state.globalState.hostInfo;
-            return hostInfo.isVideoEnable;
+            if (hostInfo) {
+                return hostInfo.isVideoEnable;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -168,49 +172,14 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 return 0;
         }
     }
-    public record = async (): Promise<void> => {
-        const {rtc, uuid} = this.props;
+    public stopRecord = async (): Promise<void> => {
         const isMediaRun = this.getMediaState();
-        if (rtc && rtc.recordConfig) {
-            if (this.recrod) {
-                if (!this.recrod.resourceId) {
-                    await this.recrod.acquire();
-                }
-            } else {
-                if (isMediaRun) {
-                    let channel: string = uuid;
-                    if (rtc.channel) {
-                        channel = rtc.channel;
-                    }
-                    this.recrod = new RecordOperator(rtc.appId, rtc.recordConfig.customerId, rtc.recordConfig.customerCertificate, channel,
-                        {
-                            audioProfile: 1,
-                            transcodingConfig: {
-                                width: 240,
-                                height: 180,
-                                bitrate: 120,
-                                fps: 15,
-                                // "mixedVideoLayout": 1,
-                                // "maxResolutionUid": "1",
-                            },
-                        },
-                        {
-                            vendor: 2,
-                            region: this.handleRegion(this.props.ossConfigObj.region),
-                            bucket: this.props.ossConfigObj.bucket,
-                            accessKey: this.props.ossConfigObj.accessKeyId,
-                            secretKey: this.props.ossConfigObj.accessKeySecret,
-                        }, "mix", rtc.authConfig ? rtc.authConfig.token : null);
-                    await this.recrod.acquire();
-                }
-            }
-        }
         if (this.state.isRecord) {
             try {
                 if (isMediaRun) {
-                    const resp = await this.recrod.query();
+                    const resp = await this.recordOperator.query();
                     if (resp.serverResponse.fileList) {
-                        const res = await this.recrod.stop();
+                        const res = await this.recordOperator.stop();
                         message.info("结束录制");
                         this.props.setRecordingState(false);
                         this.setRecordState(false);
@@ -239,10 +208,49 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
             } catch (err) {
                 console.log(err);
             }
-        } else {
+        }
+    }
+
+    private startRecord = async (): Promise<void>  => {
+        const {rtc, uuid} = this.props;
+        const isMediaRun = this.getMediaState();
+        if (rtc && rtc.recordConfig) {
+            if (this.recordOperator) {
+                if (!this.recordOperator.resourceId) {
+                    await this.recordOperator.acquire();
+                }
+            } else {
+                if (isMediaRun) {
+                    let channel: string = uuid;
+                    if (rtc.channel) {
+                        channel = rtc.channel;
+                    }
+                    this.recordOperator = new RecordOperator(rtc.appId, rtc.recordConfig.customerId, rtc.recordConfig.customerCertificate, channel,
+                        {
+                            audioProfile: 1,
+                            transcodingConfig: {
+                                width: 240,
+                                height: 180,
+                                bitrate: 120,
+                                fps: 15,
+                                // "mixedVideoLayout": 1,
+                                // "maxResolutionUid": "1",
+                            },
+                        },
+                        {
+                            vendor: 2,
+                            region: this.handleRegion(this.props.ossConfigObj.region),
+                            bucket: this.props.ossConfigObj.bucket,
+                            accessKey: this.props.ossConfigObj.accessKeyId,
+                            secretKey: this.props.ossConfigObj.accessKeySecret,
+                        }, "mix", rtc.recordConfig.recordToken ? rtc.recordConfig.recordToken : undefined,
+                        rtc.recordConfig.recordUid ? rtc.recordConfig.recordUid : `${Math.floor(Math.random() * 100000)}`);
+                    await this.recordOperator.acquire();
+                }
+            }
             if (isMediaRun) {
                 try {
-                    await this.recrod.start();
+                    await this.recordOperator.start();
                     message.success("开始录制");
                     this.setRecordState(true);
                     this.props.setRecordingState(true);
@@ -269,6 +277,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 this.setState({isRecord: true, startTime: timeStamp});
                 this.startClock();
             }
+        } else {
+            message.warning("尚未添加 Rtc 相关配置");
         }
     }
     public componentWillUnmount(): void {
@@ -311,19 +321,29 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
           </div>;
         }
         if (isMediaRun || this.state.isRecordWhiteboardOnly) {
-            return (
-                <div onClick={this.record} className="record-out-box">
-                    <div className="record-box">
-                        {this.state.isRecord ?
-                            <div className="record-box-inner-rect"/> :
+            if (this.state.isRecord) {
+                return (
+                    <div onClick={() => this.stopRecord()} className="record-out-box">
+                        <div className="record-box">
+                            <div className="record-box-inner-rect"/>
+                        </div>
+                        <div className="record-time">
+                            {displayWatch(this.state.secondsElapsed)}
+                        </div>
+                    </div>
+                );
+            } else {
+                return (
+                    <div onClick={() => this.startRecord()} className="record-out-box">
+                        <div className="record-box">
                             <div className="record-box-inner"/>
-                        }
+                        </div>
+                        <div className="record-time">
+                            {displayWatch(this.state.secondsElapsed)}
+                        </div>
                     </div>
-                    <div className="record-time">
-                        {displayWatch(this.state.secondsElapsed)}
-                    </div>
-                </div>
-            );
+                );
+            }
         } else {
             return (
                 <div onClick={() => this.setState({isRecordModalVisible: true})} className="record-out-box">
@@ -354,7 +374,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     <div className="record-select-box">
                         <div onClick={() => {
                             if (this.props.startRtc) {
-                                this.props.startRtc(this.record);
+                                this.props.startRtc(this.startRecord);
                                 this.setState({isRecordModalVisible: false});
                             }
                         }} className="record-select-cell">
@@ -366,7 +386,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                             </div>
                         </div>
                         <div onClick={async() => {
-                            await this.record();
+                            await this.startRecord();
                             this.setState({isRecordModalVisible: false, isRecordWhiteboardOnly: true});
                         }} className="record-select-cell">
                             <div className="record-select-cell-icon">

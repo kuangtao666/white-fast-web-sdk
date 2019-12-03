@@ -5,7 +5,6 @@ import {Room} from "white-react-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
 import {ViewMode} from "white-react-sdk";
-import Identicon from "react-identicons";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import user_empty from "../../assets/image/user_empty.svg";
@@ -14,6 +13,7 @@ import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
 import {RoomContextConsumer} from "../../pages/RoomContext";
+import Identicon from "../../tools/identicon/Identicon";
 const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {
@@ -82,9 +82,12 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
             if (userId === hostInfo.userId) {
                 return (
                     <RoomContextConsumer children={context => (
-                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable} applyForRtc={false}
+                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                        applyForRtc={false}
                                         startRtcCallback={context.startRtcCallback}
                                         stopRtcCallback={context.stopRtcCallback}
+                                        getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                        getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                         isRecording={context.isRecording}
                                         isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                         language={this.props.language}
@@ -108,6 +111,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 applyForRtc={selfInfo.applyForRtc}
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
+                                                getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                                getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                                 isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 language={this.props.language}
                                                 rtc={this.props.rtc}
@@ -129,6 +134,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
                                                 language={this.props.language}
+                                                getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                                getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                                 isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 rtc={this.props.rtc}
                                                 isRecording={context.isRecording}
@@ -150,6 +157,8 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                             startRtcCallback={context.startRtcCallback}
                                             stopRtcCallback={context.stopRtcCallback}
                                             language={this.props.language}
+                                            getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
+                                            getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                             isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                             rtc={this.props.rtc}
                                             stopRecord={context.stopRecord}
@@ -291,9 +300,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const {room, language} = this.props;
         const isEnglish = language === LanguageEnum.English;
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
-
-        if (globalGuestUsers) {
-            const guestNodes = globalGuestUsers.map((guestUser: GuestUserType, index: number) => {
+        if (globalGuestUsers && globalGuestUsers.length > 0) {
+            const guestNodesOnline = globalGuestUsers.filter(guestUser => guestUser.isOnline);
+            const guestNodes = guestNodesOnline.map((guestUser: GuestUserType, index: number) => {
                 return (
                     <div className="room-member-cell" key={`${index}`}>
                         <div className="room-member-cell-inner">
@@ -390,14 +399,43 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                 }});
         }
     }
-
+    private getMediaState = (): boolean => {
+        const {room} = this.props;
+        if (room.state.globalState.hostInfo) {
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            if (hostInfo) {
+                return hostInfo.isVideoEnable;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     private renderAudioController = (): React.ReactNode => {
+        if (!this.getMediaState()) {
+            return null;
+        }
         if (this.props.identity === IdentityType.host) {
-            return (
-                <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
-                    全部静音
-                </div>
-            );
+            const {room} = this.props;
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            if (hostInfo) {
+                if (hostInfo.isAllMemberAudioClose) {
+                    return (
+                        <div onClick={() => this.setMediaAudioState(false)} className="guest-box-btn">
+                            打开学生音频
+                        </div>
+                    );
+                } else {
+                    return (
+                        <div onClick={() => this.setMediaAudioState(true)} className="guest-box-btn">
+                            关闭学生音频
+                        </div>
+                    );
+                }
+            } else {
+                return null;
+            }
         } else {
             return null;
         }

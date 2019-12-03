@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Input, Button, Tabs} from "antd";
+import {Input, Button, Tabs, Radio} from "antd";
 import "./IndexPage.less";
 import {RouteComponentProps} from "react-router";
 import netless_black from "../assets/image/netless_black.svg";
@@ -61,6 +61,13 @@ export default class IndexPage extends React.Component<IndexPageProps, IndexPage
                             <TabPane tab="创建房间" key="1">
                                 <div className="page-input-left-inner-box">
                                     <Input className="page-input" onChange={e => this.setState({name: e.target.value})} size={"large"} placeholder={"输入用户名"}/>
+                                    <Radio.Group size={"large"} className="page-class" buttonStyle="solid" onChange={evt => {
+                                        console.log(evt);
+                                    }}>
+                                        <Radio.Button value={""}>一对一</Radio.Button>
+                                        <Radio.Button value={""}>小班课</Radio.Button>
+                                        <Radio.Button value={""}>公开课</Radio.Button>
+                                    </Radio.Group>
                                     <Button
                                         type="primary"
                                         size="large"

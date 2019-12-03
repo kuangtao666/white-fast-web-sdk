@@ -4,7 +4,7 @@
     "accessKeySecret": "9FE19EMIG3pWzVElJn1iolz66XxPkO",
     "bucket": "beings",
     "region": "oss-cn-hangzhou",
-    "folder": "ppt",
+    "folder": "test",
     "prefix": "https://beings.oss-cn-hangzhou.aliyuncs.com/"
   }
 }

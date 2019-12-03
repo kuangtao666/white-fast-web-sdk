@@ -2,7 +2,6 @@ import * as React from "react";
 import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
 import {Badge, Button, message, Modal, Input, Radio} from "antd";
 import Clipboard from "react-clipboard.js";
-import Identicon from "react-identicons";
 import QRCode from "qrcode.react";
 import menu_out from "../../assets/image/menu_out.svg";
 import stop_icon from "../../assets/image/stop_icon.svg";
@@ -12,12 +11,12 @@ import * as add from "../../assets/image/add.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {ClassModeType, GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
+import Identicon from "../../tools/identicon/Identicon";
 
 export type WhiteboardTopRightProps = {
     userId: string;
     room: Room;
     roomState: RoomState;
-    whiteboardLayerDownRef: HTMLDivElement;
     handleManagerState: () => void;
     deviceType: DeviceType;
     userAvatarUrl?: string;
@@ -154,7 +153,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <Identicon
                             className={`avatar-${userId}`}
                             size={22}
-                            string={userId}
+                            string={`${userId}`}
                         />
                     </div>
                 </div>

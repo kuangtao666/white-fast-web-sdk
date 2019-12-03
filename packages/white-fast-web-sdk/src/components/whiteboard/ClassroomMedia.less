@@ -43,21 +43,25 @@
     height: 240px;
 }
 .classroom-box-video-set {
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     background-color: #3C3F41;
-    border-radius: 50%;
-    position: absolute;
-    right: 16px;
-    top: 8px;
-    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    img {
-        width: 26px;
-    }
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+.classroom-box-video-set-box {
+    width: 96px;
+    height: 42px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 24px;
 }
 
 .netless-video-box {
@@ -68,6 +72,24 @@
     display: flex;
     flex-wrap: wrap;
     background-color: #3C3F41;
+}
+
+.netless-set-icon {
+    width: 32px;
+    height: 32px;
+    background-color: #3C3F41;
+    position: absolute;
+    right: 16px;
+    top: 8px;
+    z-index: 5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    cursor: pointer;
+    opacity: 0.6;
+    overflow: hidden;
 }
 
 .netless-video-mask {

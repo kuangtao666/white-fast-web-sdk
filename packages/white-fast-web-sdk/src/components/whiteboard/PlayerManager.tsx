@@ -1,7 +1,6 @@
 import * as React from "react";
 import {Tabs, Tooltip} from "antd";
 import {ViewMode} from "white-react-sdk";
-import Identicon from "react-identicons";
 import {Player} from "white-react-sdk";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import WhiteboardChat from "./WhiteboardChat";
@@ -11,6 +10,7 @@ import user_empty from "../../assets/image/user_empty.svg";
 import menu_in from "../../assets/image/menu_in.svg";
 import teacher from "../../assets/image/teacher.svg";
 import "./PlayerManager.less";
+import Identicon from "../../tools/identicon/Identicon";
 const { TabPane } = Tabs;
 
 export type PlayerManagerProps = {
