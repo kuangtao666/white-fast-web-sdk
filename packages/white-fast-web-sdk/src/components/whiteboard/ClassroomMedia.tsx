@@ -132,7 +132,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         if (this.props.classMode !== nextProps.classMode) {
             if (this.props.identity !== IdentityType.host && nextProps.classMode === ClassModeType.lecture) {
                 this.unpublishStream(true);
-            } else if (this.props.identity === IdentityType.guest && nextProps.classMode === ClassModeType.discuss && !this.state.isLocalStreamPublish) {
+            } else if (this.props.identity === IdentityType.guest &&
+                nextProps.classMode === ClassModeType.discuss &&
+                !this.state.isLocalStreamPublish && this.props.isVideoEnable) {
                 const key = `${Date.now()}`;
                 const btn = (
                     <Button type="primary" onClick={() => {
