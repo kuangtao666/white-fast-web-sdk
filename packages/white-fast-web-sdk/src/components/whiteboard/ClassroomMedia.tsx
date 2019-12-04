@@ -175,7 +175,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
         if (this.props.isAllMemberAudioClose !== nextProps.isAllMemberAudioClose) {
             const {localStream} = this.state;
-            if (this.props.identity !== IdentityType.host) {
+            if (this.props.identity !== IdentityType.host && localStream) {
                 const uid = localStream.getId();
                 if (nextProps.isAllMemberAudioClose) {
                     localStream.muteAudio();
@@ -381,6 +381,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const isEnglish = language === LanguageEnum.English;
         if (rtc) {
             if (hostInfo.classMode === ClassModeType.discuss) {
+                if (identity === IdentityType.listener && !hostInfo.isVideoEnable) {
+                    return null;
+                }
                 return (
                     <div className="manager-box-btn">
                         {this.state.isRtcLoading ?
@@ -528,7 +531,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const isEnglish = language === LanguageEnum.English;
         if (this.state.isRtcStart && rtc) {
             const AgoraRTC = rtc.rtcObj;
-            if (identity !== IdentityType.host && classMode === ClassModeType.discuss && !this.state.isLocalStreamPublish) {
+            if (identity === IdentityType.guest && classMode === ClassModeType.discuss && !this.state.isLocalStreamPublish) {
                 return (
                     <div className="join-video-icon">
                         {this.state.isRtcLoading ?
@@ -681,8 +684,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.agoraClient.join(token, channel, userId, (uid: number) => {
                     console.log("User " + uid + " join channel successfully");
                     // 创建本地流对象
-                    if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
+                    if (identity === IdentityType.host) {
                         this.createLocalStream(AgoraRTC, userId, recordFunc);
+                    } else if (identity === IdentityType.guest) {
+                        if (classMode === ClassModeType.discuss) {
+                            this.createLocalStream(AgoraRTC, userId, recordFunc);
+                        } else {
+                            this.setMediaState(true);
+                            this.setState({isRtcStart: true, isRtcLoading: false});
+                            if (recordFunc) {
+                                recordFunc();
+                            }
+                        }
                     } else {
                         this.setMediaState(true);
                         this.setState({isRtcStart: true, isRtcLoading: false});
