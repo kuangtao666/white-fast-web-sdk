@@ -168,7 +168,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
-            if (mode === ClassModeType.handUp && globalGuestUsers) {
+            if (mode === ClassModeType.lecture && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     if (user.userId === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
@@ -220,7 +220,7 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
     private renderHandUpBtn = (): React.ReactNode => {
         const {room} = this.props;
         const hostInfo = room.state.globalState.hostInfo;
-        if (hostInfo && hostInfo.classMode === ClassModeType.handUp) {
+        if (hostInfo && hostInfo.classMode === ClassModeType.lecture && hostInfo.isAllowHandUp) {
             const user = this.getSelfUserInfo();
             if (user) {
                 if (user.isReadOnly) {
