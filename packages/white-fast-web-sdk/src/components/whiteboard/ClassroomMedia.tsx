@@ -44,17 +44,18 @@ export type ClassroomMediaProps = {
     room: Room;
     isAllMemberAudioClose: boolean,
     classMode: ClassModeType;
-    identity?: IdentityType;
     handleManagerState: () => void;
-    rtc?: RtcType;
     applyForRtc: boolean;
-    language?: LanguageEnum;
     isVideoEnable: boolean;
     startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
     stopRtcCallback: (stopRtc: () => void) => void;
-    stopRecord?: () => void;
     getMediaCellReleaseFunc: (func: () => void) => void;
     getMediaStageCellReleaseFunc: (func: () => void) => void;
+    isAllowHandUp: boolean;
+    identity?: IdentityType;
+    rtc?: RtcType;
+    language?: LanguageEnum;
+    stopRecord?: () => void;
     userAvatarUrl?: string;
 };
 
@@ -78,7 +79,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     public componentDidMount(): void {
-        const {userId} = this.props;
+        const {userId, startRtcCallback, stopRtcCallback} = this.props;
         if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
             const key = `${Date.now()}`;
             const btn = (
@@ -113,9 +114,10 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 });
             }
         }
-        this.props.startRtcCallback(this.startRtc);
-        this.props.stopRtcCallback(this.stopRtc);
+        startRtcCallback(this.startRtc);
+        stopRtcCallback(this.stopRtc);
     }
+
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
         if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
             if (nextProps.isVideoEnable) {
@@ -127,19 +129,53 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }
             }
         }
-
-
         if (this.props.classMode !== nextProps.classMode) {
-            if (nextProps.classMode === ClassModeType.handUp) {
-                if (this.props.identity === IdentityType.guest) {
-                    message.info("课堂切换到举手参与模式，您可以点击右下角 [举手] 图标申请互动。");
-                }
+            if (this.props.identity !== IdentityType.host && nextProps.classMode === ClassModeType.lecture) {
+                this.unpublishStream(true);
+            } else if (this.props.identity === IdentityType.guest &&
+                nextProps.classMode === ClassModeType.discuss &&
+                !this.state.isLocalStreamPublish && this.props.isVideoEnable) {
+                const key = `${Date.now()}`;
+                const btn = (
+                    <Button type="primary" onClick={() => {
+                        if (this.props.rtc) {
+                            const AgoraRTC = this.props.rtc.rtcObj;
+                            if (this.state.localStream) {
+                                this.publishStream();
+                            } else {
+                                this.createLocalStream(AgoraRTC, this.props.userId);
+                            }
+                        }
+                        notification.close(key);
+                    }}>
+                        确认加入
+                    </Button>
+                );
+                notification.open({
+                    message: `你好！${this.props.userId}`,
+                    duration: 8,
+                    description:
+                        "此教室中老师开启自由讨论，请确认是否加入。",
+                    icon: <Icon type="smile" style={{ color: "#108ee9" }} />,
+                    btn,
+                    key,
+                    top: 64,
+                });
+            }
+        }
+
+        if (this.props.isAllowHandUp !== nextProps.isAllowHandUp && nextProps.classMode === ClassModeType.lecture &&
+            this.props.identity === IdentityType.guest) {
+            if (nextProps.isAllowHandUp) {
+                message.info("老师开启举手，您可以点击右下角 [举手] 图标申请互动。");
+            } else {
+                message.info("老师关闭举手。");
             }
         }
 
         if (this.props.isAllMemberAudioClose !== nextProps.isAllMemberAudioClose) {
             const {localStream} = this.state;
-            if (this.props.identity !== IdentityType.host) {
+            if (this.props.identity !== IdentityType.host && localStream) {
                 const uid = localStream.getId();
                 if (nextProps.isAllMemberAudioClose) {
                     localStream.muteAudio();
@@ -153,7 +189,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
 
         if (this.props.applyForRtc !== nextProps.applyForRtc) {
             const hostInfo: HostUserType = this.props.room.state.globalState.hostInfo;
-            if (hostInfo.classMode === ClassModeType.handUp && nextProps.applyForRtc && nextProps.isVideoEnable) {
+            if (hostInfo.classMode === ClassModeType.lecture && nextProps.applyForRtc && nextProps.isVideoEnable) {
                 const {rtc, userId} = this.props;
                 const {localStream} = this.state;
                 const AgoraRTC = rtc!.rtcObj;
@@ -162,7 +198,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 } else {
                     this.createLocalStream(AgoraRTC, userId);
                 }
-            } else if (hostInfo.classMode === ClassModeType.handUp && !nextProps.applyForRtc) {
+            } else if (hostInfo.classMode === ClassModeType.lecture && !nextProps.applyForRtc) {
                 this.unpublishStream(true);
             }
         }
@@ -213,7 +249,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const globalGuestUsers: GuestUserType[] = room.state.globalState.guestUsers;
         const selfHostInfo: HostUserType = room.state.globalState.hostInfo;
         if (userId) {
-            if (classMode === ClassModeType.handUp && globalGuestUsers) {
+            if (classMode === ClassModeType.lecture && globalGuestUsers) {
                 const users = globalGuestUsers.map((user: GuestUserType) => {
                     if (parseInt(user.userId) === this.props.userId) {
                         user.isHandUp = !user.isHandUp;
@@ -258,14 +294,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 return (
                     <Radio.Group buttonStyle="solid" size={"small"} style={{marginTop: 6, fontSize: 12}} value={hostInfo.classMode} onChange={evt => {
                         this.handleHandup(evt.target.value, room);
-                        if (hostInfo.classMode === ClassModeType.handUp) {
+                        if (hostInfo.classMode === ClassModeType.lecture) {
                             room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}});
                         } else {
                             room.setGlobalState({hostInfo: {...hostInfo, classMode: evt.target.value}, guestUsers: guestUsers});
                         }
                     }}>
                         <Radio.Button value={ClassModeType.lecture}>{isEnglish ? "Lecture" : "讲课模式"}</Radio.Button>
-                        <Radio.Button value={ClassModeType.handUp}>{isEnglish ? "Hand Up" : "举手参与"}</Radio.Button>
                         <Radio.Button value={ClassModeType.discuss}>{isEnglish ? "Interactive" : "自由互动"}</Radio.Button>
                     </Radio.Group>
                 );
@@ -279,6 +314,33 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         <div style={{marginTop: 6, color: "white"}}>模式：{this.handleModeText(hostInfo.classMode)}</div>
                     );
                 }
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private renderHandUpController = (hostInfo: HostUserType): React.ReactNode => {
+        const {room} = this.props;
+        if (hostInfo.classMode) {
+            if (this.props.identity === IdentityType.host && hostInfo.classMode === ClassModeType.lecture) {
+                return (
+                    <Radio.Group
+                        buttonStyle="solid"
+                        size={"small"}
+                        style={{marginTop: 12, fontSize: 12}}
+                        value={hostInfo.isAllowHandUp}
+                        onChange={evt => {
+                            this.handleHandup(evt.target.value, room);
+                            room.setGlobalState({hostInfo: {...hostInfo, isAllowHandUp: evt.target.value}});
+                        }}
+                    >
+                        <Radio.Button value={true}>{"允许举手"}</Radio.Button>
+                        <Radio.Button value={false}>{"禁止举手"}</Radio.Button>
+                    </Radio.Group>
+                );
+            } else {
+                return null;
             }
         } else {
             return null;
@@ -319,6 +381,9 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         const isEnglish = language === LanguageEnum.English;
         if (rtc) {
             if (hostInfo.classMode === ClassModeType.discuss) {
+                if (identity === IdentityType.listener && !hostInfo.isVideoEnable) {
+                    return null;
+                }
                 return (
                     <div className="manager-box-btn">
                         {this.state.isRtcLoading ?
@@ -394,6 +459,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                         <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
                     }
                     {this.renderHostController(hostInfo)}
+                    {this.renderHandUpController(hostInfo)}
                 </div>
             );
         } else {
@@ -460,6 +526,36 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             </div>
         );
     }
+    private renderJoinVideoIcon = (): React.ReactNode => {
+        const {rtc, userId, language, identity, classMode} = this.props;
+        const isEnglish = language === LanguageEnum.English;
+        if (this.state.isRtcStart && rtc) {
+            const AgoraRTC = rtc.rtcObj;
+            if (identity === IdentityType.guest && classMode === ClassModeType.discuss && !this.state.isLocalStreamPublish) {
+                return (
+                    <div className="join-video-icon">
+                        {this.state.isRtcLoading ?
+                            <Button style={{fontSize: 16}} type="primary" shape="circle" icon="loading"/>
+                            :
+                            <Tooltip placement={"right"} title={isEnglish ? "Join video call" : "参与音视频互动"}>
+                                <Button onClick={() => {
+                                    if (this.state.localStream) {
+                                        this.publishStream();
+                                    } else {
+                                        this.createLocalStream(AgoraRTC, userId);
+                                    }
+                                }} style={{fontSize: 16}} type="primary" shape="circle" icon="video-camera"/>
+                            </Tooltip>
+                        }
+                    </div>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
     public render(): React.ReactNode {
         const {room, language} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
@@ -472,6 +568,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                </div>}
                <div className="netless-video-box">
                    {this.renderSetIcon()}
+                   {this.renderJoinVideoIcon()}
                    {this.state.isMaskAppear &&
                    <div className="classroom-box-video-mask">
                        <div className="manager-box-inner-host2">
@@ -522,6 +619,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                                <div className="manager-box-text">老师：{hostInfo.name ? hostInfo.name : hostInfo.userId}</div>
                            }
                            {this.renderHostController(hostInfo)}
+                           {this.renderHandUpController(hostInfo)}
                            <div className="classroom-box-video-set-box">
                                <div onClick={() => {
                                    this.switchMicrophone();
@@ -586,8 +684,18 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 this.agoraClient.join(token, channel, userId, (uid: number) => {
                     console.log("User " + uid + " join channel successfully");
                     // 创建本地流对象
-                    if (classMode === ClassModeType.discuss || identity === IdentityType.host) {
+                    if (identity === IdentityType.host) {
                         this.createLocalStream(AgoraRTC, userId, recordFunc);
+                    } else if (identity === IdentityType.guest) {
+                        if (classMode === ClassModeType.discuss) {
+                            this.createLocalStream(AgoraRTC, userId, recordFunc);
+                        } else {
+                            this.setMediaState(true);
+                            this.setState({isRtcStart: true, isRtcLoading: false});
+                            if (recordFunc) {
+                                recordFunc();
+                            }
+                        }
                     } else {
                         this.setMediaState(true);
                         this.setState({isRtcStart: true, isRtcLoading: false});
@@ -641,6 +749,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
             }
             if (isLocalStop) {
                 localStream.stop();
+                localStream.close();
                 this.removeStream(localStream);
                 this.setState({localStream: null});
             }

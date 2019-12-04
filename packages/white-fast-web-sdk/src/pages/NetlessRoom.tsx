@@ -95,7 +95,7 @@ export type RealTimeProps = {
     roomToken: string;
     userId: string;
     roomFacadeSetter: RoomFacadeSetter;
-    classMode?: ClassModeType,
+    defaultClassMode?: ClassModeType,
     userName?: string;
     roomName?: string;
     userAvatarUrl?: string;
@@ -194,7 +194,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             isFileOpen: false,
             deviceType: DeviceType.Desktop,
             isManagerOpen: this.handleManagerOpenState(),
-            classMode: this.props.classMode !== undefined ? this.props.classMode : ClassModeType.discuss,
+            classMode: this.props.defaultClassMode !== undefined ? this.props.defaultClassMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
             isRecording: false,

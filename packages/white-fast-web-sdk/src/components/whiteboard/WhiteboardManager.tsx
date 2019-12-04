@@ -92,7 +92,9 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                         isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                         language={this.props.language}
                                         stopRecord={context.stopRecord}
-                                        rtc={this.props.rtc} classMode={hostInfo.classMode}
+                                        rtc={this.props.rtc}
+                                        isAllowHandUp={hostInfo.isAllowHandUp}
+                                        classMode={hostInfo.classMode}
                                         userId={parseInt(this.props.userId)}
                                         handleManagerState={this.props.handleManagerState}
                                         identity={this.props.identity}
@@ -111,6 +113,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 applyForRtc={selfInfo.applyForRtc}
                                                 startRtcCallback={context.startRtcCallback}
                                                 stopRtcCallback={context.stopRtcCallback}
+                                                isAllowHandUp={hostInfo.isAllowHandUp}
                                                 getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
                                                 getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                                 isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
@@ -138,6 +141,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                                 getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                                 isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
                                                 rtc={this.props.rtc}
+                                                isAllowHandUp={hostInfo.isAllowHandUp}
                                                 isRecording={context.isRecording}
                                                 stopRecord={context.stopRecord}
                                                 classMode={hostInfo.classMode}
@@ -157,6 +161,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                                             startRtcCallback={context.startRtcCallback}
                                             stopRtcCallback={context.stopRtcCallback}
                                             language={this.props.language}
+                                            isAllowHandUp={hostInfo.isAllowHandUp}
                                             getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
                                             getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                             isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
@@ -243,7 +248,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const {room} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
         const isHost = this.props.identity === IdentityType.host;
-        if (hostInfo && hostInfo.classMode === ClassModeType.handUp) {
+        if (hostInfo && hostInfo.classMode === ClassModeType.lecture) {
             if (guestUser.isHandUp) {
                 if (guestUser.isReadOnly) {
                     return (
@@ -324,11 +329,18 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     </div>
                 );
             });
-            return (
-                <div>
-                    {guestNodes}
-                </div>
-            );
+            if (guestNodes.length > 0) {
+                return (
+                    <div>
+                        {guestNodes}
+                    </div>
+                );
+            } else {
+                return <div className="room-member-empty">
+                    <img src={user_empty}/>
+                    <div>{isEnglish ? "No students have joined" : "尚且无学生加入"}</div>
+                </div>;
+            }
         } else {
             return <div className="room-member-empty">
                 <img src={user_empty}/>
@@ -337,18 +349,22 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
-    private handleDotState = (): boolean => {
+    private handleDotState = (): React.ReactNode => {
         const isActive = this.state.activeKey === "2";
         if (this.props.isManagerOpen && !isActive) {
             const guestUsers: GuestUserType[] = this.props.room.state.globalState.guestUsers;
             if (guestUsers && guestUsers.length > 0) {
                 const handUpGuestUsers = guestUsers.filter((guestUser: GuestUserType) => guestUser.isHandUp);
-                return handUpGuestUsers && handUpGuestUsers.length > 0;
+                if (handUpGuestUsers && handUpGuestUsers.length > 0) {
+                    return "举手";
+                } else {
+                    return  null;
+                }
             } else {
-                return false;
+                return null;
             }
         } else {
-            return false;
+            return null;
         }
     }
 
@@ -357,7 +373,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         const isEnglish = language === LanguageEnum.English;
         if (this.props.identity === IdentityType.host) {
             return (
-                <Badge dot={this.handleDotState()} overflowCount={99} offset={[8, -2]}>
+                <Badge count={this.handleDotState()} overflowCount={99} offset={[8, -2]}>
                     <div>{isEnglish ? "Users List" : "用户列表"}</div>
                 </Badge>
             );

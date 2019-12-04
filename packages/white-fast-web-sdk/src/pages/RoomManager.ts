@@ -4,7 +4,6 @@ import {message} from "antd";
 
 export enum ClassModeType {
     lecture = "lecture",
-    handUp = "handUp",
     discuss = "discuss",
 }
 
@@ -24,16 +23,17 @@ export type GuestUserType = {
 export type HostUserType = {
     userId: string,
     identity: IdentityType,
-    avatar?: string,
-    name?: string,
-    isVideoFullScreen?: boolean,
-    isRecording?: boolean,
     classMode: ClassModeType,
     cameraState: ViewMode,
     disableCameraTransform: boolean,
     isVideoEnable: boolean,
     isAllMemberAudioClose: boolean,
+    isAllowHandUp: boolean,
     secondsElapsed?: number,
+    avatar?: string,
+    name?: string,
+    isVideoFullScreen?: boolean,
+    isRecording?: boolean,
 };
 
 export class RoomManager {
@@ -71,6 +71,7 @@ export class RoomManager {
                       identity: this.identity,
                       avatar: this.userAvatarUrl,
                       name: this.name,
+                      isAllowHandUp: false,
                       classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                       cameraState: ViewMode.Broadcaster,
                       disableCameraTransform: false,
@@ -89,6 +90,7 @@ export class RoomManager {
                   name: this.name,
                   classMode: this.classMode ? this.classMode : ClassModeType.discuss,
                   cameraState: ViewMode.Broadcaster,
+                  isAllowHandUp: false,
                   disableCameraTransform: false,
                   isVideoEnable: false,
                   isAllMemberAudioClose: false,
