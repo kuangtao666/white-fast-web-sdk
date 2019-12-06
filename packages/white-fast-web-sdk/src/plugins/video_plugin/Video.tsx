@@ -43,7 +43,6 @@ export default class Video extends React.Component<VideoProps> {
     }
     public componentDidMount(): void {
         if (this.player.current) {
-            alert(1);
             this.player.current.currentTime = this.props.currentTime;
         }
         if (this.player.current) {

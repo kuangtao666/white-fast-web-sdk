@@ -93,10 +93,11 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         this.props.playerFacadeSetter(this);
     }
 
+    public componentWillUnmount(): void {
+        this.props.playerFacadeSetter(null);
+    }
+
     public release(): void {
-        if (this.state.player) {
-            this.state.player.stop();
-        }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("keydown", this.handleSpaceKey);
     }
@@ -165,7 +166,9 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
 
     private handleSpaceKey = (evt: any): void => {
         if (evt.code === "Space") {
-            this.onClickOperationButton(this.state.player!);
+            if (this.state.player) {
+                this.onClickOperationButton(this.state.player);
+            }
         }
     }
 
@@ -261,7 +264,11 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         <div className="player-controller-left">
                             <div className="player-left-box">
                                 <div
-                                    onClick={() => this.onClickOperationButton(this.state.player!)}
+                                    onClick={() => {
+                                        if (this.state.player) {
+                                            this.onClickOperationButton(this.state.player);
+                                        }
+                                    }}
                                     className="player-controller">
                                     {this.operationButton(this.state.phase)}
                                 </div>
@@ -369,7 +376,11 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                         onMouseLeave={() => this.setState({isVisible: false})}
                     >
                         <div
-                            onClick={() => this.onClickOperationButton(this.state.player!)}
+                            onClick={() => {
+                                if (this.state.player) {
+                                    this.onClickOperationButton(this.state.player);
+                                }
+                            }}
                             className="player-mask">
                             {this.state.phase === PlayerPhase.Pause &&
                             <div className="player-big-icon">
