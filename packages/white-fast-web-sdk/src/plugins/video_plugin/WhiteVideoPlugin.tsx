@@ -55,6 +55,12 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         };
     }
 
+    public componentDidMount(): void {
+        this.setState({seek: this.props.currentTime});
+        this.handleSeekData(this.props.currentTime);
+        this.handlePlayState(false);
+    }
+
     public UNSAFE_componentWillReceiveProps(nextProps: WhiteVideoPluginProps): void {
         if (this.selfUserInf) {
             if (this.props.play !== nextProps.play) {
@@ -113,6 +119,14 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         }
     }
 
+    private onTimeUpdate = (time: number): void => {
+        if (this.selfUserInf) {
+            if (this.selfUserInf.identity === IdentityType.host) {
+                this.props.operator.setProps(this.props.uuid, {currentTime: time});
+            }
+        }
+    }
+
     public render(): React.ReactNode {
         const {width, height} = this.props;
         return (
@@ -147,7 +161,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                 <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
                                     <Video
                                         videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
-                                        play={this.state.play}
+                                        play={this.state.play} onTimeUpdate={this.onTimeUpdate}
                                         controls={this.detectIsHaveControls(room)}
                                         seek={this.state.seek} isClickEnable={this.state.isClickEnable}
                                         onPlayed={this.handlePlayState}

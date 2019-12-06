@@ -11,6 +11,7 @@ export type VideoProps = {
     readonly onPlayed: (play: boolean) => void;
     readonly onSeeked: (seek: number) => void;
     isClickEnable: boolean;
+    onTimeUpdate: (time: number) => void;
 };
 
 export default class Video extends React.Component<VideoProps> {
@@ -63,6 +64,12 @@ export default class Video extends React.Component<VideoProps> {
 
     }
 
+    private timeUpdate = (): void => {
+        if (this.player.current) {
+            this.props.onTimeUpdate(this.player.current.currentTime);
+        }
+    }
+
     public render(): React.ReactNode {
         return (
             <video src={this.props.videoURL}
@@ -73,6 +80,7 @@ export default class Video extends React.Component<VideoProps> {
                        pointerEvents: this.props.isClickEnable ? "auto" : "none",
                        outline: "none",
                    }}
+                   onTimeUpdate={this.timeUpdate}
                    preload="auto"
                    controls={this.props.controls}
             />
