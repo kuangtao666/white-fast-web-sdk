@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room} from "white-react-sdk";
+import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-react-sdk";
 import plugin_window_close from "../../assets/image/plugin_window_close.svg";
 import plugin_window_min from "../../assets/image/plugin_window_min.svg";
 import plugin_window_max from "../../assets/image/plugin_window_max.svg";
@@ -21,7 +21,7 @@ export enum VideoStateEnum {
 export type WhiteVideoPluginProps = PluginComponentProps & {
     play: boolean;
     seek: number;
-    currentTime: 0;
+    currentTime: number;
 };
 
 export type WhiteVideoPluginStates = {
@@ -39,6 +39,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
 
     public static readonly protocol: string = "media";
     private room: Room | undefined = undefined;
+    private play: Player | undefined = undefined;
     public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {play: false, seek: 0, currentTime: 0};
     private selfUserInf: SelfUserInf | null = null;
 
@@ -77,7 +78,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     }
 
     private handleSeekData = (seek: number): void => {
-        if (this.selfUserInf) {
+        if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
                 this.props.operator.setProps(this.props.uuid, {seek: seek});
             }
@@ -85,7 +86,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     }
 
     private handlePlayState = (play: boolean): void => {
-        if (this.selfUserInf) {
+        if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
                 this.props.operator.setProps(this.props.uuid, {play: play});
                 this.setState({play: play});
@@ -93,27 +94,32 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         }
     }
 
-    private setMyIdentity = (room: Room | undefined): void => {
-        if (room) {
-            const observerId = room.observerId;
-            const roomMember = room.state.roomMembers.find(roomMember => observerId === roomMember.memberId);
-            if (roomMember && roomMember.payload) {
-                this.selfUserInf = {
-                    userId: roomMember.payload.userId,
-                    identity: roomMember.payload.identity,
-                };
-            }
+    private setMyIdentityRoom = (room: Room): void => {
+        const observerId = room.observerId;
+        const roomMember = room.state.roomMembers.find(roomMember => observerId === roomMember.memberId);
+        if (roomMember && roomMember.payload) {
+            this.selfUserInf = {
+                userId: roomMember.payload.userId,
+                identity: roomMember.payload.identity,
+            };
         }
     }
 
-    private detectIsHaveControls = (room: Room | undefined): boolean => {
-        if (room) {
-            if (room && room.state.globalState.hostInfo && this.selfUserInf) {
-                const hostInfo: HostUserType = room.state.globalState.hostInfo;
-                return hostInfo.userId === `${this.selfUserInf.userId}`;
-            } else {
-                return false;
-            }
+    private setMyIdentityPlay = (play: Player): void => {
+        const observerId = play.observerId;
+        const roomMember = play.state.roomMembers.find(roomMember => observerId === roomMember.memberId);
+        if (roomMember && roomMember.payload) {
+            this.selfUserInf = {
+                userId: roomMember.payload.userId,
+                identity: roomMember.payload.identity,
+            };
+        }
+    }
+
+    private detectIsHaveControlsRoom = (room: Room): boolean => {
+        if (room && room.state.globalState.hostInfo && this.selfUserInf) {
+            const hostInfo: HostUserType = room.state.globalState.hostInfo;
+            return hostInfo.userId === `${this.selfUserInf.userId}`;
         } else {
             return false;
         }
@@ -126,51 +132,100 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
             }
         }
     }
-
     public render(): React.ReactNode {
         const {width, height} = this.props;
         return (
             <CNode kind={CNodeKind.HTML}>
                 <RoomConsumer>
                     {(room: Room | undefined) => {
-                        this.room = room;
-                        this.setMyIdentity(room);
-                        return (
-                            <div className="plugin-box" style={{width: width, height: height}}>
-                                <div className="plugin-box-nav">
-                                    <div className="plugin-box-nav-left">
-                                        <div className="plugin-box-nav-close">
-                                            <img style={{width: 7.2}} src={plugin_window_close}/>
+                        if (room) {
+                            this.room = room;
+                            this.setMyIdentityRoom(room);
+                            return (
+                                <div className="plugin-box" style={{width: width, height: height}}>
+                                    <div className="plugin-box-nav">
+                                        <div className="plugin-box-nav-left">
+                                            <div className="plugin-box-nav-close">
+                                                <img style={{width: 7.2}} src={plugin_window_close}/>
+                                            </div>
+                                            <div className="plugin-box-nav-min">
+                                                <img src={plugin_window_min}/>
+                                            </div>
+                                            <div className="plugin-box-nav-max">
+                                                <img  style={{width: 6}} src={plugin_window_max}/>
+                                            </div>
                                         </div>
-                                        <div className="plugin-box-nav-min">
-                                            <img src={plugin_window_min}/>
-                                        </div>
-                                        <div className="plugin-box-nav-max">
-                                            <img  style={{width: 6}} src={plugin_window_max}/>
+                                        <div className="plugin-box-nav-right">
+                                            <div className="plugin-box-nav-right-btn">
+                                                <img src={plugin_fix_icon}/>
+                                            </div>
+                                            <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
+                                                {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="plugin-box-nav-right">
-                                        <div className="plugin-box-nav-right-btn">
-                                            <img src={plugin_fix_icon}/>
-                                        </div>
-                                        <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
-                                            {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
-                                        </div>
+                                    <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
+                                        <Video
+                                            videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
+                                            play={this.state.play}
+                                            onTimeUpdate={this.onTimeUpdate} currentTime={this.props.currentTime}
+                                            controls={this.detectIsHaveControlsRoom(room)}
+                                            seek={this.state.seek} isClickEnable={this.state.isClickEnable}
+                                            onPlayed={this.handlePlayState}
+                                            onSeeked={this.handleSeekData}/>
                                     </div>
                                 </div>
-                                <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
-                                    <Video
-                                        videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
-                                        play={this.state.play} onTimeUpdate={this.onTimeUpdate}
-                                        controls={this.detectIsHaveControls(room)}
-                                        seek={this.state.seek} isClickEnable={this.state.isClickEnable}
-                                        onPlayed={this.handlePlayState}
-                                        onSeeked={this.handleSeekData}/>
-                                </div>
-                            </div>
-                        );
+                            );
+                        } else {
+                            return null;
+                        }
                     }}
                 </RoomConsumer>
+                <PlayerConsumer>
+                    {(play: Player | undefined) => {
+                        if (play) {
+                            this.play = play;
+                            this.setMyIdentityPlay(play);
+                            return (
+                                <div className="plugin-box" style={{width: width, height: height}}>
+                                    <div className="plugin-box-nav">
+                                        <div className="plugin-box-nav-left">
+                                            <div className="plugin-box-nav-close">
+                                                <img style={{width: 7.2}} src={plugin_window_close}/>
+                                            </div>
+                                            <div className="plugin-box-nav-min">
+                                                <img src={plugin_window_min}/>
+                                            </div>
+                                            <div className="plugin-box-nav-max">
+                                                <img  style={{width: 6}} src={plugin_window_max}/>
+                                            </div>
+                                        </div>
+                                        <div className="plugin-box-nav-right">
+                                            <div className="plugin-box-nav-right-btn">
+                                                <img src={plugin_fix_icon}/>
+                                            </div>
+                                            <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
+                                                {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
+                                        <Video
+                                            videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
+                                            play={this.props.play}
+                                            controls={false} currentTime={this.props.currentTime}
+                                            seek={this.props.seek}
+                                            isClickEnable={false}
+                                            onPlayed={this.handlePlayState}
+                                            onSeeked={this.handleSeekData}/>
+                                    </div>
+                                </div>
+                            );
+                        } else {
+                            return null;
+                        }
+                    }}
+                </PlayerConsumer>
             </CNode>
         );
     }

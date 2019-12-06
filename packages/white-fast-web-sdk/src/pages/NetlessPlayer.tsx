@@ -18,6 +18,8 @@ import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
+import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
+import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum LayoutType {
     Suspension = "Suspension",
@@ -113,7 +115,7 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             this.setState({isManagerOpen: true});
         }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk();
+            const whiteWebSdk = new WhiteWebSdk({ plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,

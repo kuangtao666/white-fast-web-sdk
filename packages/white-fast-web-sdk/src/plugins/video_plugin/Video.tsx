@@ -11,7 +11,8 @@ export type VideoProps = {
     readonly onPlayed: (play: boolean) => void;
     readonly onSeeked: (seek: number) => void;
     isClickEnable: boolean;
-    onTimeUpdate: (time: number) => void;
+    currentTime: number;
+    onTimeUpdate?: (time: number) => void;
 };
 
 export default class Video extends React.Component<VideoProps> {
@@ -20,7 +21,6 @@ export default class Video extends React.Component<VideoProps> {
         super(props);
         this.player = React.createRef();
     }
-
     public componentWillReceiveProps(nextProps: Readonly<VideoProps>): void {
         if (this.props.play !== nextProps.play) {
             if (nextProps.play) {
@@ -42,6 +42,10 @@ export default class Video extends React.Component<VideoProps> {
         }
     }
     public componentDidMount(): void {
+        if (this.player.current) {
+            alert(1);
+            this.player.current.currentTime = this.props.currentTime;
+        }
         if (this.player.current) {
             this.player.current.addEventListener("play", (event: any) => {
                 if (!this.props.play) {
@@ -65,7 +69,7 @@ export default class Video extends React.Component<VideoProps> {
     }
 
     private timeUpdate = (): void => {
-        if (this.player.current) {
+        if (this.player.current && this.props.onTimeUpdate) {
             this.props.onTimeUpdate(this.player.current.currentTime);
         }
     }
