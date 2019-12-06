@@ -1,13 +1,15 @@
 import * as React from "react";
+import {SelfUserInf, WhiteVideoPluginProps} from "./WhiteVideoPlugin";
+import {error} from "util";
 
 
 export type VideoProps = {
     readonly videoURL: string;
     readonly play: boolean;
     readonly controls: boolean;
-    readonly seek?: number;
-    readonly width: number;
-    readonly height: number;
+    readonly seek: number;
+    readonly width?: number;
+    readonly height?: number;
     readonly onPlayed: (play: boolean) => void;
     readonly onSeeked: (seek: number) => void;
 };
@@ -20,10 +22,12 @@ export default class Video extends React.Component<VideoProps> {
     }
 
     public componentWillReceiveProps(nextProps: Readonly<VideoProps>): void {
-        if (nextProps.play !== undefined) {
+        if (this.props.play !== nextProps.play) {
             if (nextProps.play) {
                 if (this.player.current) {
-                    this.player.current.play();
+                    this.player.current.play().catch(error => {
+                        console.log(error);
+                    });
                 }
             } else {
                 if (this.player.current) {
@@ -31,14 +35,12 @@ export default class Video extends React.Component<VideoProps> {
                 }
             }
         }
-        if (nextProps.seek !== undefined) {
+        if (this.props.seek !== nextProps.seek) {
             if (this.player.current) {
                 this.player.current.currentTime = nextProps.seek;
             }
         }
-
     }
-
     public componentDidMount(): void {
         if (this.player.current) {
             this.player.current.addEventListener("play", (event: any) => {
@@ -67,9 +69,10 @@ export default class Video extends React.Component<VideoProps> {
             <video src={this.props.videoURL}
                    ref={this.player}
                    style={{
-                       width: this.props.width,
-                       height: this.props.height,
+                       width: this.props.width ? this.props.width : "100%",
+                       height: this.props.height ? this.props.height : "100%",
                        pointerEvents: this.props.controls ? "auto" : "inherit",
+                       outline: "none",
                    }}
                    preload="auto"
                    controls={this.props.controls}

@@ -12,7 +12,6 @@ import Video from "./Video";
 import {HostUserType} from "../../pages/RoomManager";
 import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 import {WhiteEditorPluginProps} from "../../../../white-editor-plugin/src";
-import {number} from "prop-types";
 
 export enum VideoStateEnum {
     play = "play",
@@ -22,19 +21,26 @@ export enum VideoStateEnum {
 export type WhiteVideoPluginProps = PluginComponentProps & {
     play: boolean;
     seek: number;
+    currentTime: 0;
 };
 
 export type WhiteVideoPluginStates = {
     isClickDisable: boolean;
     play: boolean;
     seek: number;
+    currentTime: number;
+};
+
+export type SelfUserInf = {
+    userId: number, identity: IdentityType,
 };
 
 export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
 
     public static readonly protocol: string = "media";
     private room: Room | undefined = undefined;
-    public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {play: false, seek: 0};
+    public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {play: false, seek: 0, currentTime: 0};
+    private selfUserInf: SelfUserInf | null = null;
 
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;
@@ -45,57 +51,76 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
             isClickDisable: false,
             play: false,
             seek: 0,
+            currentTime: 0,
         };
-    }
-    public componentDidMount(): void {
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: WhiteVideoPluginProps): void {
-        if (this.props.play !== nextProps.play) {
-            if (this.room && this.room.state.globalState.hostInfo) {
-                const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
-                if (hostInfo.identity !== IdentityType.host) {
+        if (this.selfUserInf) {
+            if (this.props.play !== nextProps.play) {
+                if (this.selfUserInf.identity !== IdentityType.host) {
                     this.setState({play: nextProps.play});
+                }
+            }
+            if (this.props.seek !== nextProps.seek) {
+                if (this.selfUserInf.identity !== IdentityType.host) {
+                    this.setState({seek: nextProps.seek});
                 }
             }
         }
     }
 
     private handleSeekData = (seek: number): void => {
-        if (this.room && this.room.state.globalState.hostInfo) {
-            const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
-            if (hostInfo.identity === IdentityType.host) {
+        if (this.selfUserInf) {
+            if (this.selfUserInf.identity === IdentityType.host) {
                 this.props.operator.setProps(this.props.uuid, {seek: seek});
             }
         }
     }
 
     private handlePlayState = (play: boolean): void => {
-        console.log(play);
-        // if (this.room && this.room.state.globalState.hostInfo) {
-        //     const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
-        //     if (hostInfo.identity === IdentityType.host) {
-        //         this.props.operator.setProps(this.props.uuid, {play: play});
-        //         this.setState({play: play});
-        //     }
-        // }
+        if (this.selfUserInf) {
+            if (this.selfUserInf.identity === IdentityType.host) {
+                this.props.operator.setProps(this.props.uuid, {play: play});
+                this.setState({play: play});
+            }
+        }
+    }
+
+    private setMyIdentity = (room: Room | undefined): void => {
+        if (room) {
+            const observerId = room.observerId;
+            const roomMember = room.state.roomMembers.find(roomMember => observerId === roomMember.memberId);
+            if (roomMember && roomMember.payload) {
+                this.selfUserInf = {
+                    userId: roomMember.payload.userId,
+                    identity: roomMember.payload.identity,
+                };
+            }
+        }
+    }
+
+    private detectIsHaveControls = (room: Room | undefined): boolean => {
+        if (room) {
+            if (room && room.state.globalState.hostInfo && this.selfUserInf) {
+                const hostInfo: HostUserType = room.state.globalState.hostInfo;
+                return hostInfo.userId === `${this.selfUserInf.userId}`;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     public render(): React.ReactNode {
         const {width, height} = this.props;
-
         return (
             <CNode kind={CNodeKind.HTML}>
                 <RoomConsumer>
                     {(room: Room | undefined) => {
                         this.room = room;
-                        let isHaveControls: boolean = false;
-                        if (this.room && this.room.state.globalState.hostInfo) {
-                            const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
-                            if (hostInfo.userId === (window as any).__userId) {
-                                isHaveControls = true;
-                            }
-                        }
+                        this.setMyIdentity(room);
                         return (
                             <div className="plugin-box" style={{width: width, height: height}}>
                                 <div className="plugin-box-nav">
@@ -123,9 +148,8 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                     <Video
                                         videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
                                         play={this.state.play}
-                                        controls={isHaveControls}
-                                        width={600}
-                                        height={600}
+                                        controls={this.detectIsHaveControls(room)}
+                                        seek={this.state.seek}
                                         onPlayed={this.handlePlayState}
                                         onSeeked={this.handleSeekData}/>
                                 </div>
