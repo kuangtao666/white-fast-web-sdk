@@ -1,6 +1,4 @@
 import * as React from "react";
-import {SelfUserInf, WhiteVideoPluginProps} from "./WhiteVideoPlugin";
-import {error} from "util";
 
 
 export type VideoProps = {
@@ -12,6 +10,7 @@ export type VideoProps = {
     readonly height?: number;
     readonly onPlayed: (play: boolean) => void;
     readonly onSeeked: (seek: number) => void;
+    isClickEnable: boolean;
 };
 
 export default class Video extends React.Component<VideoProps> {
@@ -71,7 +70,7 @@ export default class Video extends React.Component<VideoProps> {
                    style={{
                        width: this.props.width ? this.props.width : "100%",
                        height: this.props.height ? this.props.height : "100%",
-                       pointerEvents: this.props.controls ? "auto" : "inherit",
+                       pointerEvents: this.props.isClickEnable ? "auto" : "none",
                        outline: "none",
                    }}
                    preload="auto"

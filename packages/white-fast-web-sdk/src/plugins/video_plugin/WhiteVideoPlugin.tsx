@@ -25,7 +25,7 @@ export type WhiteVideoPluginProps = PluginComponentProps & {
 };
 
 export type WhiteVideoPluginStates = {
-    isClickDisable: boolean;
+    isClickEnable: boolean;
     play: boolean;
     seek: number;
     currentTime: number;
@@ -48,7 +48,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     public constructor(props: WhiteVideoPluginProps) {
         super(props);
         this.state = {
-            isClickDisable: false,
+            isClickEnable: true,
             play: false,
             seek: 0,
             currentTime: 0,
@@ -139,17 +139,17 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                         <div className="plugin-box-nav-right-btn">
                                             <img src={plugin_fix_icon}/>
                                         </div>
-                                        <div onClick={() => this.setState({isClickDisable: !this.state.isClickDisable})} className="plugin-box-nav-right-btn">
-                                            {this.state.isClickDisable ? <img src={plugin_editor_icon}/> : <img src={plugin_uneditor_icon}/>}
+                                        <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
+                                            {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="plugin-box-body">
+                                <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
                                     <Video
                                         videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
                                         play={this.state.play}
                                         controls={this.detectIsHaveControls(room)}
-                                        seek={this.state.seek}
+                                        seek={this.state.seek} isClickEnable={this.state.isClickEnable}
                                         onPlayed={this.handlePlayState}
                                         onSeeked={this.handleSeekData}/>
                                 </div>
