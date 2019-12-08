@@ -195,11 +195,10 @@ export class UploadManager {
     this.room.completeImageUpload(task.uuid, fileUrl);
   }
 
-
   private getFile = (name: string): string => {
     return this.ossClient.generateObjectUrl(name);
   }
-  private addFile = async (path: string, rawFile: File, onProgress?: PPTProgressListener): Promise<string> => {
+  public addFile = async (path: string, rawFile: File, onProgress?: PPTProgressListener): Promise<string> => {
     const res: MultipartUploadResult = await this.ossClient.multipartUpload(
       path,
       rawFile,

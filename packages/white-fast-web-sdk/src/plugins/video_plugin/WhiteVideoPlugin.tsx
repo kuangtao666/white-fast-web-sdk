@@ -1,5 +1,7 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-react-sdk";
+import {Icon, Upload} from "antd";
+import uuidv4 from "uuid/v4";
 import plugin_window_close from "../../assets/image/plugin_window_close.svg";
 import plugin_window_min from "../../assets/image/plugin_window_min.svg";
 import plugin_window_max from "../../assets/image/plugin_window_max.svg";
@@ -12,7 +14,9 @@ import Video from "./Video";
 import {HostUserType} from "../../pages/RoomManager";
 import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 import {WhiteEditorPluginProps} from "../../../../white-editor-plugin/src";
-
+import * as OSS from "ali-oss";
+import {PPTProgressPhase, UploadManager} from "../../tools/upload/UploadManager";
+import {ossConfigObj} from "../../appToken";
 export enum VideoStateEnum {
     play = "play",
     pause = "pause",
@@ -22,6 +26,9 @@ export type WhiteVideoPluginProps = PluginComponentProps & {
     play: boolean;
     seek: number;
     currentTime: number;
+    url: string;
+    loadingPercent: number;
+    isUpload: boolean;
 };
 
 export type WhiteVideoPluginStates = {
@@ -29,6 +36,9 @@ export type WhiteVideoPluginStates = {
     play: boolean;
     seek: number;
     currentTime: number;
+    url: string;
+    loadingPercent: number;
+    isUpload: boolean;
 };
 
 export type SelfUserInf = {
@@ -40,8 +50,11 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     public static readonly protocol: string = "media";
     private room: Room | undefined = undefined;
     private play: Player | undefined = undefined;
-    public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {play: false, seek: 0, currentTime: 0};
+    public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {play: false, seek: 0, currentTime: 0, url: "",
+        loadingPercent: 0,
+        isUpload: false};
     private selfUserInf: SelfUserInf | null = null;
+    private readonly client: any;
 
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;
@@ -53,7 +66,16 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
             play: false,
             seek: 0,
             currentTime: 0,
+            url: "",
+            loadingPercent: 0,
+            isUpload: false,
         };
+        this.client = new OSS({
+            accessKeyId: ossConfigObj.accessKeyId,
+            accessKeySecret: ossConfigObj.accessKeySecret,
+            region: ossConfigObj.region,
+            bucket: ossConfigObj.bucket,
+        });
     }
 
     public componentDidMount(): void {
@@ -72,6 +94,22 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
             if (this.props.seek !== nextProps.seek) {
                 if (this.selfUserInf.identity !== IdentityType.host) {
                     this.setState({seek: nextProps.seek});
+                }
+            }
+
+            if (this.props.url !== nextProps.url) {
+                if (this.selfUserInf.identity !== IdentityType.host) {
+                    this.setState({url: nextProps.url});
+                }
+            }
+            if (this.props.loadingPercent !== nextProps.loadingPercent) {
+                if (this.selfUserInf.identity !== IdentityType.host) {
+                    this.setState({loadingPercent: nextProps.loadingPercent});
+                }
+            }
+            if (this.props.isUpload !== nextProps.isUpload) {
+                if (this.selfUserInf.identity !== IdentityType.host) {
+                    this.setState({isUpload: nextProps.isUpload});
                 }
             }
         }
@@ -125,11 +163,90 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         }
     }
 
+    private handleUrl = (url: string): void => {
+        if (this.selfUserInf) {
+            if (this.selfUserInf.identity === IdentityType.host) {
+                this.props.operator.setProps(this.props.uuid, {url: url});
+            }
+        }
+    }
+
     private onTimeUpdate = (time: number): void => {
         if (this.selfUserInf) {
             if (this.selfUserInf.identity === IdentityType.host) {
                 this.props.operator.setProps(this.props.uuid, {currentTime: time});
             }
+        }
+    }
+
+    private handleUploadVideo = (isUpload: boolean): void => {
+        if (this.selfUserInf) {
+            if (this.selfUserInf.identity === IdentityType.host) {
+                this.props.operator.setProps(this.props.uuid, {isUpload: isUpload});
+            }
+        }
+    }
+
+    private uploadVideo = async (event: any): Promise<void> => {
+        const videoFile = event.file;
+        if (this.room) {
+            this.setState({isUpload: true});
+            this.handleUploadVideo(true);
+            const uploadManager = new UploadManager(this.client, this.room);
+            try {
+                const res = await uploadManager.addFile(`${uuidv4()}/${videoFile.name}`, videoFile, this.loadingCallback);
+                this.setState({isUpload: false});
+                this.handleUploadVideo(false);
+                const url = res.replace("http", "https");
+                this.handleUrl(url);
+                this.setState({url: url});
+            } catch (err) {
+                this.setState({isUpload: false});
+                this.handleUploadVideo(false);
+                console.log(err);
+            }
+        }
+    }
+
+    private handleUploadPercent = (percent: number): void => {
+        if (this.selfUserInf) {
+            if (this.selfUserInf.identity === IdentityType.host) {
+                this.props.operator.setProps(this.props.uuid, {loadingPercent: percent});
+            }
+        }
+    }
+
+    private loadingCallback = (phase: PPTProgressPhase, percent: number) => {
+        this.handleUploadPercent(percent);
+        this.setState({loadingPercent: percent});
+    }
+
+    private renderVideoUploadBox = (room: Room): React.ReactNode => {
+        if (this.state.url) {
+            return  <Video
+                videoURL={this.state.url}
+                play={this.state.play}
+                onTimeUpdate={this.onTimeUpdate} currentTime={this.props.currentTime}
+                controls={this.detectIsHaveControlsRoom(room)}
+                seek={this.state.seek} isClickEnable={this.state.isClickEnable}
+                onPlayed={this.handlePlayState}
+                onSeeked={this.handleSeekData}/>;
+        } else {
+            return (
+                <div>
+                    <div>
+                        {this.state.isUpload ? <Icon type="loading" style={{fontSize: 32}}/> : <Icon type="inbox" style={{fontSize: 32}}/>}
+                        {this.state.loadingPercent}
+                    </div>
+                    <Upload
+                        style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}}
+                        accept="video/mp4"
+                        showUploadList={false}
+                        customRequest={this.uploadVideo}>
+                        上传
+                    </Upload>
+                </div>
+            );
         }
     }
     public render(): React.ReactNode {
@@ -165,14 +282,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                         </div>
                                     </div>
                                     <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
-                                        <Video
-                                            videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
-                                            play={this.state.play}
-                                            onTimeUpdate={this.onTimeUpdate} currentTime={this.props.currentTime}
-                                            controls={this.detectIsHaveControlsRoom(room)}
-                                            seek={this.state.seek} isClickEnable={this.state.isClickEnable}
-                                            onPlayed={this.handlePlayState}
-                                            onSeeked={this.handleSeekData}/>
+                                        {this.renderVideoUploadBox(room)}
                                     </div>
                                 </div>
                             );
