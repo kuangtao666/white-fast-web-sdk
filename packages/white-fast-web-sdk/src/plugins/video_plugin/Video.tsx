@@ -1,4 +1,6 @@
 import * as React from "react";
+import {Button, Icon, notification} from "antd";
+import {async} from "q";
 
 
 export type VideoProps = {
@@ -15,19 +17,28 @@ export type VideoProps = {
     onTimeUpdate?: (time: number) => void;
 };
 
-export default class Video extends React.Component<VideoProps> {
+export type VideoStates = {
+    isMediaPlayAllow: boolean;
+};
+
+export default class Video extends React.Component<VideoProps, VideoStates> {
     private readonly player: React.RefObject<HTMLVideoElement>;
     public constructor(props: VideoProps) {
         super(props);
         this.player = React.createRef();
+        this.state = {
+            isMediaPlayAllow: true,
+        };
     }
-    public componentWillReceiveProps(nextProps: Readonly<VideoProps>): void {
+    public async componentWillReceiveProps(nextProps: Readonly<VideoProps>): Promise<void> {
         if (this.props.play !== nextProps.play) {
             if (nextProps.play) {
                 if (this.player.current) {
-                    this.player.current.play().catch(error => {
-                        console.log(error);
-                    });
+                    try {
+                        await this.player.current.play();
+                    } catch (err) {
+                        this.playErrorNotification();
+                    }
                 }
             } else {
                 if (this.player.current) {
@@ -38,6 +49,42 @@ export default class Video extends React.Component<VideoProps> {
         if (this.props.seek !== nextProps.seek) {
             if (this.player.current) {
                 this.player.current.currentTime = nextProps.seek;
+            }
+        }
+    }
+
+    private playErrorNotification = (): void => {
+        const key = `video-notification`;
+        const btn = (
+            <Button type="primary" onClick={async () => {
+                await this.restart();
+                notification.close(key);
+            }}>
+                确认加入
+            </Button>
+        );
+        if (this.state.isMediaPlayAllow) {
+            notification.open({
+                message: `注意`,
+                duration: 0,
+                description:
+                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                icon: <Icon type="exclamation-circle" style={{color: "#FF756E"}} />,
+                btn,
+                key,
+                top: 64,
+            });
+            this.setState({isMediaPlayAllow: false});
+        }
+    }
+    public restart = async (): Promise<void> => {
+        if (this.player.current) {
+            this.player.current.currentTime = this.props.currentTime;
+            try {
+                await this.player.current.play();
+                this.setState({isMediaPlayAllow: true});
+            } catch (err) {
+                this.playErrorNotification();
             }
         }
     }
