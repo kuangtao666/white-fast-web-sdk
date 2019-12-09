@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-react-sdk";
-import {Icon, Upload, Progress, Button} from "antd";
+import {Icon, Upload, Progress, Button, Tooltip} from "antd";
 import uuidv4 from "uuid/v4";
 import plugin_window_close from "../../assets/image/plugin_window_close.svg";
 import plugin_window_min from "../../assets/image/plugin_window_min.svg";
@@ -83,6 +83,9 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         this.handleSeekData(this.props.currentTime);
         this.handlePlayState(false);
         this.setState({url: this.props.url});
+        if (this.selfUserInf && this.selfUserInf.identity !== IdentityType.host) {
+            this.setState({isClickEnable: false});
+        }
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: WhiteVideoPluginProps): void {
@@ -228,9 +231,11 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
             return  <Video
                 videoURL={this.state.url}
                 play={this.state.play}
-                onTimeUpdate={this.onTimeUpdate} currentTime={this.props.currentTime}
+                onTimeUpdate={this.onTimeUpdate}
+                currentTime={this.props.currentTime}
                 controls={this.detectIsHaveControlsRoom(room)}
-                seek={this.state.seek} isClickEnable={this.state.isClickEnable}
+                seek={this.state.seek}
+                isClickEnable={this.state.isClickEnable}
                 onPlayed={this.handlePlayState}
                 onSeeked={this.handleSeekData}/>;
         } else {
@@ -266,20 +271,22 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
                                         <div className="plugin-box-nav-left">
-                                            <div className="plugin-box-nav-close">
-                                                <img style={{width: 7.2}} src={plugin_window_close}/>
-                                            </div>
-                                            <div className="plugin-box-nav-min">
-                                                <img src={plugin_window_min}/>
-                                            </div>
-                                            <div className="plugin-box-nav-max">
-                                                <img  style={{width: 6}} src={plugin_window_max}/>
-                                            </div>
+                                            <Tooltip title="用橡皮工具删除">
+                                                <div className="plugin-box-nav-close">
+                                                    <img style={{width: 7.2}} src={plugin_window_close}/>
+                                                </div>
+                                            </Tooltip>
+                                            {/*<div className="plugin-box-nav-min">*/}
+                                                {/*<img src={plugin_window_min}/>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="plugin-box-nav-max">*/}
+                                                {/*<img  style={{width: 6}} src={plugin_window_max}/>*/}
+                                            {/*</div>*/}
                                         </div>
                                         <div className="plugin-box-nav-right">
-                                            <div className="plugin-box-nav-right-btn">
-                                                <img src={plugin_fix_icon}/>
-                                            </div>
+                                            {/*<div className="plugin-box-nav-right-btn">*/}
+                                                {/*<img src={plugin_fix_icon}/>*/}
+                                            {/*</div>*/}
                                             <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
                                                 {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
                                             </div>
@@ -307,17 +314,17 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                             <div className="plugin-box-nav-close">
                                                 <img style={{width: 7.2}} src={plugin_window_close}/>
                                             </div>
-                                            <div className="plugin-box-nav-min">
-                                                <img src={plugin_window_min}/>
-                                            </div>
-                                            <div className="plugin-box-nav-max">
-                                                <img  style={{width: 6}} src={plugin_window_max}/>
-                                            </div>
+                                            {/*<div className="plugin-box-nav-min">*/}
+                                                {/*<img src={plugin_window_min}/>*/}
+                                            {/*</div>*/}
+                                            {/*<div className="plugin-box-nav-max">*/}
+                                                {/*<img  style={{width: 6}} src={plugin_window_max}/>*/}
+                                            {/*</div>*/}
                                         </div>
                                         <div className="plugin-box-nav-right">
-                                            <div className="plugin-box-nav-right-btn">
-                                                <img src={plugin_fix_icon}/>
-                                            </div>
+                                            {/*<div className="plugin-box-nav-right-btn">*/}
+                                                {/*<img src={plugin_fix_icon}/>*/}
+                                            {/*</div>*/}
                                             <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
                                                 {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
                                             </div>
@@ -325,7 +332,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                     </div>
                                     <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
                                         <Video
-                                            videoURL={"https://white-sdk.oss-cn-beijing.aliyuncs.com/video/whiteboard_video.mp4"}
+                                            videoURL={this.state.url}
                                             play={this.props.play}
                                             controls={false} currentTime={this.props.currentTime}
                                             seek={this.props.seek}
