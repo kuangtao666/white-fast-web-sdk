@@ -94,7 +94,7 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                             </div>
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传视频"}>
-                                    <div onClick={() => this.insertPlugin("media", 720, 600)} className="extend-inner-icon">
+                                    <div onClick={() => this.insertPlugin("media", 480, 270)} className="extend-inner-icon">
                                         <img style={{width: 26}} src={video_plugin}/>
                                     </div>
                                 </Tooltip>

@@ -218,11 +218,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktops, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
             (window as any).__userId = userId;
+            (window as any).__identity = identity;
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,

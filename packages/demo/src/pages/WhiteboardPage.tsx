@@ -36,6 +36,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
         }
     }
 
+
     private handleReplayUrl = (): void => {
         const {userId, uuid} = this.props.match.params;
         const {recordData} = this.state;
@@ -172,7 +173,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
     public async componentDidMount(): Promise<void> {
         await this.startJoinRoom();
     }
-
     public componentWillUnmount(): void {
         if (this.netlessRoom) {
             this.netlessRoom.release();
