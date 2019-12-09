@@ -37,6 +37,7 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
                     try {
                         await this.player.current.play();
                     } catch (err) {
+                        console.log(err);
                         this.playErrorNotification();
                     }
                 }
@@ -60,15 +61,15 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
                 await this.restart();
                 notification.close(key);
             }}>
-                确认加入
+                确认同意
             </Button>
         );
         if (this.state.isMediaPlayAllow) {
             notification.open({
-                message: `注意`,
+                message: `重要说明`,
                 duration: 0,
                 description:
-                    "此教室中老师已经开启视频通讯邀请，请确认是否加入。",
+                    "您的尚未授权播放外部内容，点击确认才能播放。",
                 icon: <Icon type="exclamation-circle" style={{color: "#FF756E"}} />,
                 btn,
                 key,
@@ -84,6 +85,7 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
                 await this.player.current.play();
                 this.setState({isMediaPlayAllow: true});
             } catch (err) {
+                console.log(err);
                 this.playErrorNotification();
             }
         }

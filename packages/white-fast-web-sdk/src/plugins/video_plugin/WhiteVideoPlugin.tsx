@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-react-sdk";
-import {Icon, Upload} from "antd";
+import {Icon, Upload, Progress, Button} from "antd";
 import uuidv4 from "uuid/v4";
 import plugin_window_close from "../../assets/image/plugin_window_close.svg";
 import plugin_window_min from "../../assets/image/plugin_window_min.svg";
@@ -82,6 +82,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         this.setState({seek: this.props.currentTime});
         this.handleSeekData(this.props.currentTime);
         this.handlePlayState(false);
+        this.setState({url: this.props.url});
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: WhiteVideoPluginProps): void {
@@ -217,8 +218,9 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
     }
 
     private loadingCallback = (phase: PPTProgressPhase, percent: number) => {
-        this.handleUploadPercent(percent);
-        this.setState({loadingPercent: percent});
+        const thisPercent = Math.round(percent * 100);
+        this.handleUploadPercent(thisPercent);
+        this.setState({loadingPercent: thisPercent});
     }
 
     private renderVideoUploadBox = (room: Room): React.ReactNode => {
@@ -233,17 +235,19 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                 onSeeked={this.handleSeekData}/>;
         } else {
             return (
-                <div>
-                    <div>
-                        {this.state.isUpload ? <Icon type="loading" style={{fontSize: 32}}/> : <Icon type="inbox" style={{fontSize: 32}}/>}
-                        {this.state.loadingPercent}
-                    </div>
+                <div className="video-upload-box">
+                    {this.state.isUpload ?
+                        <Progress width={80} type="circle" style={{marginBottom: 18}} percent={this.state.loadingPercent}  strokeLinecap="square" /> :
+                        <Icon style={{fontSize: 64, color: "#5B908E", marginBottom: 18}} type="inbox" />
+                    }
                     <Upload
                         style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}}
                         accept="video/mp4"
                         showUploadList={false}
                         customRequest={this.uploadVideo}>
-                        上传
+                        <Button size={"large"}>
+                            <Icon type="upload" /> 点击上传视频
+                        </Button>
                     </Upload>
                 </div>
             );
