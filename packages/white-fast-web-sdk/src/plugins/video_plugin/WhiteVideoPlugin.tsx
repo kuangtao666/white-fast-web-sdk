@@ -201,7 +201,13 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                 const res = await uploadManager.addFile(`${uuidv4()}/${videoFile.name}`, videoFile, this.loadingCallback);
                 this.setState({isUpload: false});
                 this.handleUploadVideo(false);
-                const url = res.replace("http", "https");
+                const isHttps = res.indexOf("https") !== -1;
+                let url;
+                if (isHttps) {
+                    url = res;
+                } else {
+                    url = res.replace("http", "https");
+                }
                 this.handleUrl(url);
                 this.setState({url: url});
             } catch (err) {
