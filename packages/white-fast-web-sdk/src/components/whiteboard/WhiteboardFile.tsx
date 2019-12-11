@@ -57,15 +57,6 @@ export default class WhiteboardFile extends React.Component<WhiteboardFileProps,
                 } else {
                     room.putScenes(`/${uuid}/${activeData.id}`, activeData.data);
                     room.setScenePath(`/${uuid}/${activeData.id}/1`);
-                    const newDocumentArrayState = documentArrayState.map(newDoc => {
-                        if (newDoc.id === id) {
-                            newDoc.isHaveScenes = true;
-                            return newDoc;
-                        } else {
-                            return newDoc;
-                        }
-                    });
-                    room.setGlobalState({documentArrayState: newDocumentArrayState});
                 }
             }
         }

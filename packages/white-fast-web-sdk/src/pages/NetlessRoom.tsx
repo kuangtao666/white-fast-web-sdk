@@ -222,8 +222,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
-            (window as any).__userId = userId;
-            (window as any).__identity = identity;
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
