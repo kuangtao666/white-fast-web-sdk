@@ -42,6 +42,7 @@ import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
+import WebPpt from "./WebPpt";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -95,6 +96,7 @@ export type RealTimeProps = {
     roomToken: string;
     userId: string;
     roomFacadeSetter: RoomFacadeSetter;
+    isScreenLock?: boolean;
     defaultClassMode?: ClassModeType,
     userName?: string;
     roomName?: string;
@@ -152,6 +154,7 @@ export type RealTimeStates = {
     isFileMenuOpen: boolean;
     isChatOpen: boolean;
     isFileOpen: boolean;
+    boardPointerEvents: any;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
@@ -198,6 +201,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
             isRecording: false,
+            boardPointerEvents: "auto",
         };
         this.cursor = new UserCursor();
     }
@@ -211,7 +215,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
+        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen, isScreenLock} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
@@ -255,12 +259,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
-            room.moveCameraToContain({
-                originX: - 600,
-                originY: - 337.5,
-                width: 1200,
-                height: 675,
-                animationMode: "immediately",
+            room.moveCamera({
+                centerX: 0,
+                centerY: 0,
             });
             if (this.props.roomCallback) {
                 this.props.roomCallback(room);
@@ -694,7 +695,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
-        const {language, loadingSvgUrl, userId} = this.props;
+        const {language, loadingSvgUrl, userId, isScreenLock} = this.props;
         const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
@@ -725,6 +726,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             } else {
                 cameraState = ViewMode.Follower;
                 disableCameraTransform = true;
+            }
+            if (isScreenLock !== undefined && isScreenLock) {
+                room.disableCameraTransform = isScreenLock;
             }
             return (
                 <RoomContextProvider value={{
@@ -829,11 +833,21 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
                                     this.renderExtendTool(),
+                                    <div onClick={() => {
+                                        if (this.state.boardPointerEvents === "auto") {
+                                            this.setState({boardPointerEvents: "none"});
+                                        } else {
+                                            this.setState({boardPointerEvents: "auto"});
+                                        }
+                                    }}>
+                                        111
+                                    </div>,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
-                            <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
+                            <div style={{pointerEvents: this.state.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
+                            <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager
@@ -864,7 +878,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100%", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}/>;
+                                   style={{width: "100%", height: "100%"}}/>;
         } else {
             return null;
         }

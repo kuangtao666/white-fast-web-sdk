@@ -150,6 +150,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                //      "#9E51B6",
                //      "#1E2023",
                //  ],
+                isScreenLock: true,
                 documentArray: [
                     {
                         active: false,

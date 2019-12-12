@@ -60,6 +60,7 @@ export class RoomManager {
           return this.classMode !== ClassModeType.discuss;
       }
   }
+
   public start = async (): Promise<void> => {
       if (this.identity === IdentityType.host) {
           const hostInfo: HostUserType = this.room.state.globalState.hostInfo;
