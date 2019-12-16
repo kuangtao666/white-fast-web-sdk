@@ -51,19 +51,23 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         const {roomState, isReadOnly} = this.props;
         if (isReadOnly) {
             return <div className="whiteboard-box-bottom-left">
-                <ScaleController
-                    zoomScale={roomState.zoomScale} isReadOnly={this.props.isReadOnly}
-                    deviceType={this.props.deviceType}
-                    zoomChange={this.zoomChange}/>
+                <div className="whiteboard-box-mid">
+                    <ScaleController
+                        zoomScale={roomState.zoomScale} isReadOnly={this.props.isReadOnly}
+                        deviceType={this.props.deviceType}
+                        zoomChange={this.zoomChange}/>
+                </div>
             </div>;
         }
         return (
             <div className="whiteboard-box-bottom-left">
-                {this.renderFileIcon()}
-                <ScaleController
-                    zoomScale={roomState.zoomScale}
-                    deviceType={this.props.deviceType}
-                    zoomChange={this.zoomChange}/>
+                <div className="whiteboard-box-mid">
+                    {this.renderFileIcon()}
+                    <ScaleController
+                        zoomScale={roomState.zoomScale}
+                        deviceType={this.props.deviceType}
+                        zoomChange={this.zoomChange}/>
+                </div>
             </div>
         );
     }

@@ -16989,10 +16989,38 @@ white-react-sdk@^2.3.15:
     react "~16.8.0"
     white-web-sdk "2.3.15"
 
+white-react-sdk@^2.3.17:
+  version "2.3.17"
+  resolved "https://registry.npmjs.org/white-react-sdk/-/white-react-sdk-2.3.17.tgz#ee03b851c81381fa445f5b8fca5d9faaa01a3f0a"
+  integrity sha512-8uapCNKIxEb1da9l4cuYsfrMxefd9BEjJPb9KRptSwgy6Ui+G27vsJoWq0ov80NS/Vl1usDcRAXwM2tmgT2/zg==
+  dependencies:
+    react "~16.8.0"
+    react-dom "~16.8.0"
+    white-web-sdk "2.3.17"
+
 white-web-sdk@2.3.15:
   version "2.3.15"
   resolved "https://registry.npmjs.org/white-web-sdk/-/white-web-sdk-2.3.15.tgz#906c8c6118f2393f384f243084e7c740ea894655"
   integrity sha512-mlgufmzLZnCKvk63rAwFlsiuQLJkWJ95KcvtyAzvls4QDYEIfIEGUmRMshTlRwZfQG0mYQoK7faJs4qg4WnjRA==
+  dependencies:
+    bezier-js "^2.4.0"
+    color "^3.1.2"
+    mathjs "6.2.2"
+    mobx "^4.9.3"
+    mobx-react "^5.4.3"
+    query-string "5"
+    react "^16.8.0"
+    react-dom "^16.8.0"
+    spark-md5 "^3.0.0"
+    url-parse "^1.4.6"
+    uuid "^3.3.2"
+    video.js "^7.4.1"
+    xml-js "^1.6.11"
+
+white-web-sdk@2.3.17:
+  version "2.3.17"
+  resolved "https://registry.npmjs.org/white-web-sdk/-/white-web-sdk-2.3.17.tgz#b9319c792b201934764aad895de4772d70840601"
+  integrity sha512-lKeFtgrEP15bSwDi8m9fNhtzwy35IMwp+ww76wqEneWEbI/vIvX5bNcf//5xPxSmgePesqFjkfEEhj3HCUj/5w==
   dependencies:
     bezier-js "^2.4.0"
     color "^3.1.2"

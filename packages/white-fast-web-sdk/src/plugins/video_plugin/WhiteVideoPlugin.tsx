@@ -237,6 +237,7 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
             return  <Video
                 videoURL={this.state.url}
                 play={this.state.play}
+                identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
                 onTimeUpdate={this.onTimeUpdate}
                 currentTime={this.props.currentTime}
                 controls={this.detectIsHaveControlsRoom(room)}
@@ -338,9 +339,10 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                     </div>
                                     <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
                                         <Video
-                                            videoURL={this.state.url}
+                                            videoURL={this.state.url} identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
                                             play={this.props.play}
-                                            controls={false} currentTime={this.props.currentTime}
+                                            controls={false}
+                                            currentTime={this.props.currentTime}
                                             seek={this.props.seek}
                                             isClickEnable={false}
                                             onPlayed={this.handlePlayState}

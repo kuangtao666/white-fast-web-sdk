@@ -21,7 +21,7 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
         super(props);
     }
     public componentDidMount(): void {
-        this.iframeController = new WebCourseController("calculation-under", this.setGlobalState);
+        this.iframeController = new WebCourseController("calculation-under", this.props.room, this.setGlobalState);
     }
 
     public componentWillReceiveProps(nextProps: WebPptProps): void {

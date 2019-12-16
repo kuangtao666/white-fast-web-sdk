@@ -1,7 +1,8 @@
 import * as React from "react";
+import "./WhiteVideoPlugin.less";
 import {Button, Icon, notification} from "antd";
-import {async} from "q";
-
+import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
+import * as mute_icon from "../../assets/image/mute_icon.svg";
 
 export type VideoProps = {
     readonly videoURL: string;
@@ -14,11 +15,13 @@ export type VideoProps = {
     readonly onSeeked: (seek: number) => void;
     isClickEnable: boolean;
     currentTime: number;
+    identity?: IdentityType;
     onTimeUpdate?: (time: number) => void;
 };
 
 export type VideoStates = {
     isMediaPlayAllow: boolean;
+    muted: boolean;
 };
 
 export default class Video extends React.Component<VideoProps, VideoStates> {
@@ -28,6 +31,7 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
         this.player = React.createRef();
         this.state = {
             isMediaPlayAllow: true,
+            muted: false,
         };
     }
     public async componentWillReceiveProps(nextProps: Readonly<VideoProps>): Promise<void> {
@@ -39,6 +43,8 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
                     } catch (err) {
                         console.log(err);
                         this.playErrorNotification();
+                        this.setState({muted: true});
+                        await this.player.current.play();
                     }
                 }
             } else {
@@ -59,17 +65,18 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
         const btn = (
             <Button type="primary" onClick={async () => {
                 await this.restart();
+                this.setState({muted: false});
                 notification.close(key);
             }}>
-                确认同意
+                确认打开声音
             </Button>
         );
         if (this.state.isMediaPlayAllow) {
             notification.open({
-                message: `重要说明`,
+                message: `重要提醒`,
                 duration: 0,
                 description:
-                    "您的尚未授权播放外部内容，点击确认才能播放。",
+                    "您的尚未授权播放声音，如需打开音频请点击确认。",
                 icon: <Icon type="exclamation-circle" style={{color: "#FF756E"}} />,
                 btn,
                 key,
@@ -122,20 +129,49 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
         }
     }
 
+    private renderMuteBox = (): React.ReactNode => {
+        if (this.props.identity !== IdentityType.host) {
+            if (this.state.muted) {
+                return (
+                    <div className="media-mute-box">
+                        <div onClick={() => {
+                            this.setState({muted: false});
+                            notification.close("video-notification");
+                        }} style={{pointerEvents: "auto"}} className="media-mute-box-inner">
+                            <img src={mute_icon}/>
+                        </div>
+                    </div>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
     public render(): React.ReactNode {
         return (
-            <video src={this.props.videoURL}
-                   ref={this.player}
-                   style={{
-                       width: this.props.width ? this.props.width : "100%",
-                       height: this.props.height ? this.props.height : "100%",
-                       pointerEvents: this.props.isClickEnable ? "auto" : "none",
-                       outline: "none",
-                   }}
-                   onTimeUpdate={this.timeUpdate}
-                   preload="auto"
-                   controls={this.props.controls}
-            />
+            <div className="white-plugin-video-box" style={{
+                width: this.props.width ? this.props.width : "100%",
+                height: this.props.height ? this.props.height : "100%",
+            }}>
+                {this.renderMuteBox()}
+                <video className="white-plugin-video" src={this.props.videoURL}
+                       ref={this.player}
+                       muted={this.state.muted}
+                       style={{
+                           width: "100%",
+                           height: "100%",
+                           pointerEvents: "auto",
+                           outline: "none",
+                       }}
+                       controlsList={"nodownload"}
+                       onTimeUpdate={this.timeUpdate}
+                       preload="auto"
+                       controls={this.props.controls}
+                />
+            </div>
         );
     }
 }

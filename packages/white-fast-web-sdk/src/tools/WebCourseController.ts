@@ -1,17 +1,22 @@
+import {Room, Scene} from "white-react-sdk";
 export class WebCourseController {
 
     private readonly setGlobalState: (netlessState: any) => void;
     private handleStateFuncArray: ((netlessState: any) => void)[] = [];
     private iframeState: any;
+    private room: Room;
     private readonly domId: string;
-    public constructor(domId: string, setGlobalState: (netlessState: any) => void) {
+    public constructor(domId: string, room: Room, setGlobalState: (netlessState: any) => void) {
         this.setGlobalState = setGlobalState;
         this.domId = domId;
+        this.room = room;
         window.addEventListener("message", this.handleReceiveMessage, false);
     }
 
     private handleReceiveMessage = (evt: any): void => {
         this.setGlobalState(evt.data);
+        const iframeMessage = JSON.parse(evt.data);
+        this.handlePage(iframeMessage);
         if (this.handleStateFuncArray.length > 0) {
             for (const handleStateFunc of this.handleStateFuncArray) {
                 try {
@@ -23,7 +28,42 @@ export class WebCourseController {
         }
     }
 
+    private addPages = (pages: number): void => {
+        const currentScenes = this.room.state.sceneState.scenes;
+        const scenesLength = currentScenes.length;
+        const newScenes = [...currentScenes];
 
+        for (let i = 0; i < (pages - scenesLength); i++) {
+            newScenes.push([{name: `${scenesLength + i}`}]);
+        }
+        if (pages !== scenesLength) {
+            const scenePath = this.room.state.sceneState.scenePath;
+            const pathName = this.pathName(scenePath);
+            this.room.putScenes(`/${pathName}`, newScenes);
+        }
+    }
+    private pathName = (path: string): string => {
+        const reg = /\/([^\/]*)\//g;
+        reg.exec(path);
+        if (RegExp.$1 === "aria") {
+            return "";
+        } else {
+            return RegExp.$1;
+        }
+    }
+    private setPage = (index: number): void => {
+        this.room.setSceneIndex(index - 1);
+    }
+    private handlePage = (iframeMessage: any): void => {
+        if (iframeMessage.method === "onPagenum") {
+            console.log(iframeMessage.totalPages);
+            this.addPages(iframeMessage.totalPages);
+        }
+        if (iframeMessage.method === "onJumpPage") {
+            console.log(iframeMessage.toPage);
+            this.setPage(iframeMessage.toPage);
+        }
+    }
 
     public addStateChangeListener = (handleStateChange: (netlessState: any) => void): void => {
         this.handleStateFuncArray.push(handleStateChange);
@@ -39,23 +79,23 @@ export class WebCourseController {
                 ...this.iframeState,
                 tuoKeJson: param,
             };
-            this.handlePushToIframe(this.iframeState);
+            this.handlePushToIframe(this.domId, this.iframeState);
         } else {
             this.iframeState = {
                 ...this.iframeState,
                 ...param,
             };
-            this.handlePushToIframe(this.iframeState);
+            this.handlePushToIframe(this.domId, this.iframeState);
         }
     }
 
     public deleteIframeState = (stateKey: string): void => {
         delete this.iframeState[stateKey];
-        this.handlePushToIframe(this.iframeState);
+        this.handlePushToIframe(this.domId, this.iframeState);
     }
 
-    private handlePushToIframe = (netlessState: any): void => {
-        const childFrameObj = document.getElementById(this.domId) as HTMLIFrameElement;
+    private handlePushToIframe = (domId: string, netlessState: any): void => {
+        const childFrameObj = document.getElementById(domId) as HTMLIFrameElement;
         if (childFrameObj) {
             if (netlessState.tuoKeJson) {
                 childFrameObj.contentWindow!.postMessage(netlessState.tuoKeJson, "*");

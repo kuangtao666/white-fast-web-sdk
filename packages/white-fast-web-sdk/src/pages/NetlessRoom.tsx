@@ -40,6 +40,8 @@ import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
+import * as click_icon from "../assets/image/click_icon.svg";
+import * as click_icon_black from "../assets/image/click_icon_black.svg";
 import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
@@ -833,21 +835,12 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                         whiteboardRef={this.state.whiteboardLayerDownRef}
                                     />,
                                     this.renderExtendTool(),
-                                    <div onClick={() => {
-                                        if (this.state.boardPointerEvents === "auto") {
-                                            this.setState({boardPointerEvents: "none"});
-                                        } else {
-                                            this.setState({boardPointerEvents: "auto"});
-                                        }
-                                    }}>
-                                        111
-                                    </div>,
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div style={{pointerEvents: this.state.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
-                            <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
+                            {/*<WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>*/}
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager
@@ -875,7 +868,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
     private renderWhiteboard(): React.ReactNode {
-        const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
                                    style={{width: "100%", height: "100%"}}/>;
