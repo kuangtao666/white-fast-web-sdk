@@ -43,6 +43,7 @@ import * as default_cover from "../assets/image/default_cover.svg";
 import * as click_icon from "../assets/image/click_icon.svg";
 import * as click_icon_black from "../assets/image/click_icon_black.svg";
 import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteAudioPlugin from "../plugins/audio_plugin/WhiteAudioPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
@@ -224,7 +225,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin, WhiteAudioPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
