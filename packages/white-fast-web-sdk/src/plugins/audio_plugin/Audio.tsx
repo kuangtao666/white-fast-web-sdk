@@ -157,21 +157,21 @@ export default class Audio extends React.Component<VideoProps, VideoStates> {
                 height: this.props.height ? this.props.height : "100%",
             }}>
                 {this.renderMuteBox()}
-                <audio className="white-plugin-video"
-                       src={this.props.videoURL}
-                       ref={this.player}
-                       muted={this.state.muted}
-                       style={{
-                           width: "100%",
-                           height: "100%",
-                           pointerEvents: this.props.isClickEnable ? "auto" : "none",
-                           outline: "none",
-                       }}
-                       controlsList={"nodownload"}
-                       onTimeUpdate={this.timeUpdate}
-                       preload="auto"
-                       controls={true}
-                />
+                <div>
+                    <audio className="white-plugin-video"
+                           src={this.props.videoURL}
+                           ref={this.player}
+                           muted={this.state.muted}
+                           style={{
+                               pointerEvents: this.props.isClickEnable ? "auto" : "none",
+                               outline: "none",
+                           }}
+                           controlsList={"nodownload"}
+                           onTimeUpdate={this.timeUpdate}
+                           preload="auto"
+                           controls={true}
+                    />
+                </div>
             </div>
         );
     }
