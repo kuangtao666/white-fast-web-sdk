@@ -842,7 +842,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                             <div style={{pointerEvents: this.state.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
-                            {/*<WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>*/}
+                            <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager
