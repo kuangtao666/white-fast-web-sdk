@@ -82,6 +82,7 @@ export type RtcType = {
     type: RtcEnum,
     rtcObj: any,
     appId: string,
+    defaultStart?: boolean,
     channel?: string, // 不写默认是 uuid,
     authConfig?: {
         token: string,
