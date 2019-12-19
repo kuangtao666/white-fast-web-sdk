@@ -40,12 +40,12 @@ import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
-import * as click_icon from "../assets/image/click_icon.svg";
-import * as click_icon_black from "../assets/image/click_icon_black.svg";
 import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
 import WhiteAudioPlugin from "../plugins/audio_plugin/WhiteAudioPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
+import {roomStore} from "../models/RoomStore";
+import {observer} from "mobx-react";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -158,7 +158,6 @@ export type RealTimeStates = {
     isFileMenuOpen: boolean;
     isChatOpen: boolean;
     isFileOpen: boolean;
-    boardPointerEvents: any;
     room?: Room;
     roomState?: RoomState;
     pptConverter?: PptConverter;
@@ -179,7 +178,8 @@ export type RealTimeStates = {
     releaseMediaStage?: () => void;
 };
 
-export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
+@observer
+class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
@@ -205,7 +205,6 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
             isRecording: false,
-            boardPointerEvents: "auto",
         };
         this.cursor = new UserCursor();
     }
@@ -224,9 +223,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin, WhiteAudioPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin, WhiteAudioPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -267,6 +266,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                 centerX: 0,
                 centerY: 0,
             });
+            (window as any).room = room;
             if (this.props.roomCallback) {
                 this.props.roomCallback(room);
             }
@@ -839,7 +839,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                     this.renderExtendTool(),
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
-                            <div style={{pointerEvents: this.state.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
+                            <div style={{pointerEvents: roomStore.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
                             <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
@@ -878,3 +878,5 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
 }
+
+export default NetlessRoom;

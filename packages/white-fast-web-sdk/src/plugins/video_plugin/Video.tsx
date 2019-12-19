@@ -7,7 +7,6 @@ import * as mute_icon from "../../assets/image/mute_icon.svg";
 export type VideoProps = {
     readonly videoURL: string;
     readonly play: boolean;
-    readonly controls: boolean;
     readonly seek: number;
     readonly width?: number;
     readonly height?: number;
@@ -150,6 +149,16 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
         }
     }
 
+    private detectVideoClickEnable = (): any => {
+        if (this.props.identity !== IdentityType.host) {
+            return "none";
+        }
+        if (this.props.isClickEnable) {
+            return "auto";
+        } else {
+            return "none";
+        }
+    }
     public render(): React.ReactNode {
         return (
             <div className="white-plugin-video-box" style={{
@@ -163,13 +172,13 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
                        style={{
                            width: "100%",
                            height: "100%",
-                           pointerEvents: "auto",
+                           pointerEvents: this.detectVideoClickEnable(),
                            outline: "none",
                        }}
+                       controls
                        controlsList={"nodownload"}
                        onTimeUpdate={this.timeUpdate}
                        preload="auto"
-                       controls={this.props.controls}
                 />
             </div>
         );

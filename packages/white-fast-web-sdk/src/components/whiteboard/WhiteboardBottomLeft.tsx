@@ -1,9 +1,13 @@
 import * as React from "react";
 import {DeviceType, Room, RoomState} from "white-react-sdk";
+import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
 import file from "../../assets/image/file.svg";
 import {IdentityType} from "./WhiteboardTopRight";
+import * as click_icon from "../../assets/image/click_icon.svg";
+import * as click_icon_black from "../../assets/image/click_icon_black.svg";
+import {roomStore} from "../../models/RoomStore";
 
 export type WhiteboardBottomLeftProps = {
     room: Room;
@@ -15,8 +19,8 @@ export type WhiteboardBottomLeftProps = {
     isReadOnly?: boolean;
 };
 
-
-export default class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
+@observer
+class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
 
     public constructor(props: WhiteboardBottomLeftProps) {
         super(props);
@@ -62,6 +66,15 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         return (
             <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
+                    {/*<div onClick={() => {*/}
+                        {/*if (roomStore.boardPointerEvents === "auto") {*/}
+                            {/*roomStore.boardPointerEvents = "none";*/}
+                        {/*} else {*/}
+                            {/*roomStore.boardPointerEvents = "auto";*/}
+                        {/*}*/}
+                    {/*}} className="whiteboard-click-icon">*/}
+                        {/*{roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}*/}
+                    {/*</div>*/}
                     {this.renderFileIcon()}
                     <ScaleController
                         zoomScale={roomState.zoomScale}
@@ -73,3 +86,5 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
     }
 
 }
+
+export default WhiteboardBottomLeft;

@@ -40,8 +40,8 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
     public render(): React.ReactNode {
         return (
             <div className="whiteboard-h5-ppt">
-                <iframe  id="calculation-under" frameBorder={0} src={"http://doccdn.talk-cloud.net/upload0/20190507_232816_slizsenl/index.html"}>
-                </iframe>
+                {/*<iframe  id="calculation-under" frameBorder={0} src={"http://doccdn.talk-cloud.net/upload0/20190507_232816_slizsenl/index.html"}>*/}
+                {/*</iframe>*/}
             </div>
         );
     }

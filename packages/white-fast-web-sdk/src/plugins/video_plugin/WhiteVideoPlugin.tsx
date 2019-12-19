@@ -1,17 +1,10 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-react-sdk";
-import {Icon, Upload, Progress, Button, Tooltip} from "antd";
+import {Icon, Upload, Progress, Button} from "antd";
 import uuidv4 from "uuid/v4";
-import plugin_window_close from "../../assets/image/plugin_window_close.svg";
-import plugin_window_min from "../../assets/image/plugin_window_min.svg";
-import plugin_window_max from "../../assets/image/plugin_window_max.svg";
-import plugin_fix_icon from "../../assets/image/plugin_fix_icon.svg";
-import plugin_editor_icon from "../../assets/image/plugin_editor_icon.svg";
-import plugin_uneditor_icon from "../../assets/image/plugin_uneditor_icon.svg";
 import "./WhiteVideoPlugin.less";
 import "../PluginStyle.less";
 import Video from "./Video";
-import {HostUserType} from "../../pages/RoomManager";
 import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 import {WhiteEditorPluginProps} from "../../../../white-editor-plugin/src";
 import * as OSS from "ali-oss";
@@ -158,15 +151,6 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         }
     }
 
-    private detectIsHaveControlsRoom = (room: Room): boolean => {
-        if (room && room.state.globalState.hostInfo && this.selfUserInf) {
-            const hostInfo: HostUserType = room.state.globalState.hostInfo;
-            return hostInfo.userId === `${this.selfUserInf.userId}`;
-        } else {
-            return false;
-        }
-    }
-
     private handleUrl = (url: string): void => {
         if (this.selfUserInf) {
             if (this.selfUserInf.identity === IdentityType.host) {
@@ -236,33 +220,47 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         if (this.state.url) {
             return  <Video
                 videoURL={this.state.url}
+                isClickEnable={this.state.isClickEnable}
                 play={this.state.play}
                 identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
                 onTimeUpdate={this.onTimeUpdate}
                 currentTime={this.props.currentTime}
-                controls={this.detectIsHaveControlsRoom(room)}
                 seek={this.state.seek}
-                isClickEnable={this.state.isClickEnable}
                 onPlayed={this.handlePlayState}
                 onSeeked={this.handleSeekData}/>;
         } else {
-            return (
-                <div className="video-upload-box">
-                    {this.state.isUpload ?
-                        <Progress width={80} type="circle" style={{marginBottom: 18}} percent={this.state.loadingPercent}  strokeLinecap="square" /> :
-                        <Icon style={{fontSize: 64, color: "#5B908E", marginBottom: 18}} type="inbox" />
-                    }
-                    <Upload
-                        style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}}
-                        accept="video/mp4"
-                        showUploadList={false}
-                        customRequest={this.uploadVideo}>
-                        <Button size={"large"}>
-                            <Icon type="upload" /> 点击上传视频
-                        </Button>
-                    </Upload>
-                </div>
-            );
+            if (this.selfUserInf && this.selfUserInf.identity === IdentityType.host) {
+                return (
+                    <div className="video-upload-box">
+                        {this.state.isUpload ?
+                            <Progress width={80} type="circle" style={{marginBottom: 18}} percent={this.state.loadingPercent}  strokeLinecap="square" /> :
+                            <Icon style={{fontSize: 64, color: "#5B908E", marginBottom: 18}} type="inbox" />
+                        }
+                        <Upload
+                            style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}}
+                            accept="video/mp4"
+                            showUploadList={false}
+                            customRequest={this.uploadVideo}>
+                            <Button size={"large"}>
+                                <Icon type="upload" /> 点击上传视频
+                            </Button>
+                        </Upload>
+                    </div>
+                );
+            } else {
+                return (
+                    <div className="video-upload-box">
+                        {this.state.isUpload ?
+                            <Progress width={80} type="circle" style={{marginBottom: 18}} percent={this.state.loadingPercent}  strokeLinecap="square" /> :
+                            <Icon style={{fontSize: 64, color: "#5B908E", marginBottom: 18}} type="inbox" />
+                        }
+                        <div>
+                            等待老师上传视频
+                        </div>
+                    </div>
+                );
+            }
+
         }
     }
     public render(): React.ReactNode {
@@ -277,29 +275,11 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                             return (
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
-                                        <div className="plugin-box-nav-left">
-                                            <Tooltip title="用橡皮工具删除">
-                                                <div className="plugin-box-nav-close">
-                                                    <img style={{width: 7.2}} src={plugin_window_close}/>
-                                                </div>
-                                            </Tooltip>
-                                            {/*<div className="plugin-box-nav-min">*/}
-                                                {/*<img src={plugin_window_min}/>*/}
-                                            {/*</div>*/}
-                                            {/*<div className="plugin-box-nav-max">*/}
-                                                {/*<img  style={{width: 6}} src={plugin_window_max}/>*/}
-                                            {/*</div>*/}
-                                        </div>
-                                        <div className="plugin-box-nav-right">
-                                            {/*<div className="plugin-box-nav-right-btn">*/}
-                                                {/*<img src={plugin_fix_icon}/>*/}
-                                            {/*</div>*/}
-                                            <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
-                                                {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
-                                            </div>
-                                        </div>
+                                        <span>
+                                            视频播放
+                                        </span>
                                     </div>
-                                    <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
+                                    <div className="plugin-box-body">
                                         {this.renderVideoUploadBox(room)}
                                     </div>
                                 </div>
@@ -317,34 +297,17 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                             return (
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
-                                        <div className="plugin-box-nav-left">
-                                            <div className="plugin-box-nav-close">
-                                                <img style={{width: 7.2}} src={plugin_window_close}/>
-                                            </div>
-                                            {/*<div className="plugin-box-nav-min">*/}
-                                                {/*<img src={plugin_window_min}/>*/}
-                                            {/*</div>*/}
-                                            {/*<div className="plugin-box-nav-max">*/}
-                                                {/*<img  style={{width: 6}} src={plugin_window_max}/>*/}
-                                            {/*</div>*/}
-                                        </div>
-                                        <div className="plugin-box-nav-right">
-                                            {/*<div className="plugin-box-nav-right-btn">*/}
-                                                {/*<img src={plugin_fix_icon}/>*/}
-                                            {/*</div>*/}
-                                            <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
-                                                {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
-                                            </div>
-                                        </div>
+                                        <span>
+                                            视频播放
+                                        </span>
                                     </div>
-                                    <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
+                                    <div className="plugin-box-body">
                                         <Video
-                                            videoURL={this.state.url} identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
+                                            videoURL={this.props.url}
+                                            isClickEnable={false}
                                             play={this.props.play}
-                                            controls={false}
                                             currentTime={this.props.currentTime}
                                             seek={this.props.seek}
-                                            isClickEnable={false}
                                             onPlayed={this.handlePlayState}
                                             onSeeked={this.handleSeekData}/>
                                     </div>
