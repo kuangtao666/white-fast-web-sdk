@@ -1,10 +1,7 @@
 import * as React from "react";
 import "./WhiteVideoPlugin.less";
-import {Button, Icon, notification} from "antd";
 import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 import * as mute_icon from "../../assets/image/mute_icon.svg";
-import {observer} from "mobx-react";
-import {replayStore} from "../../models/ReplayStore";
 
 export type VideoProps = {
     readonly videoURL: string;
@@ -25,7 +22,6 @@ export type VideoStates = {
     muted: boolean;
 };
 
-@observer
 class Video extends React.Component<VideoProps, VideoStates> {
     private readonly player: React.RefObject<HTMLVideoElement>;
     public constructor(props: VideoProps) {
@@ -44,7 +40,6 @@ class Video extends React.Component<VideoProps, VideoStates> {
                         await this.player.current.play();
                     } catch (err) {
                         console.log(err);
-                        this.playErrorNotification();
                         this.setState({muted: true});
                         await this.player.current.play();
                     }
@@ -56,56 +51,14 @@ class Video extends React.Component<VideoProps, VideoStates> {
             }
         }
         if (this.props.seek !== nextProps.seek) {
-            const date = new Date(this.props.seek - nextProps.seek);
-            const time = date.getTime();
-            console.log("------<>");
-            console.log(time);
             if (this.player.current) {
                 this.player.current.currentTime = nextProps.seek;
             }
         }
     }
 
-    private playErrorNotification = (): void => {
-        const key = `video-notification`;
-        const btn = (
-            <Button type="primary" onClick={async () => {
-                await this.restart();
-                this.setState({muted: false});
-                notification.close(key);
-            }}>
-                确认打开声音
-            </Button>
-        );
-        if (this.state.isMediaPlayAllow) {
-            notification.open({
-                message: `重要提醒`,
-                duration: 0,
-                description:
-                    "您的尚未授权播放声音，如需打开音频请点击确认。",
-                icon: <Icon type="exclamation-circle" style={{color: "#FF756E"}} />,
-                btn,
-                key,
-                top: 64,
-            });
-            this.setState({isMediaPlayAllow: false});
-        }
-    }
-    public restart = async (): Promise<void> => {
-        if (this.player.current) {
-            this.player.current.currentTime = this.props.currentTime;
-            try {
-                await this.player.current.play();
-                this.setState({isMediaPlayAllow: true});
-            } catch (err) {
-                console.log(err);
-                this.playErrorNotification();
-            }
-        }
-    }
     public componentDidMount(): void {
         if (this.player.current) {
-            replayStore.playerCurrent = this.player.current;
             this.player.current.currentTime = this.props.currentTime;
             this.player.current.addEventListener("play", (event: any) => {
                 if (!this.props.play) {
@@ -141,9 +94,9 @@ class Video extends React.Component<VideoProps, VideoStates> {
                     <div className="media-mute-box">
                         <div onClick={() => {
                             this.setState({muted: false});
-                            notification.close("video-notification");
                         }} style={{pointerEvents: "auto"}} className="media-mute-box-inner">
                             <img src={mute_icon}/>
+                            <span>unmute</span>
                         </div>
                     </div>
                 );

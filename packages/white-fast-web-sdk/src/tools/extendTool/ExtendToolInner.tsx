@@ -65,13 +65,27 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         }
     }
     private insertPlugin = (protocal: string, width: number, height: number): void => {
-        this.props.room.insertPlugin({
-            protocal: protocal,
-            centerX: 0,
-            centerY: 0,
-            width: width,
-            height: height,
-        });
+        if (protocal === "video") {
+            this.props.room.insertPlugin({
+                protocal: protocal,
+                centerX: 0,
+                centerY: 0,
+                width: width,
+                height: height,
+                props: {
+                    videoUrl: "https://netless-whiteboard.oss-cn-hangzhou.aliyuncs.com/oceans.mp4",
+                },
+            });
+        } else {
+            this.props.room.insertPlugin({
+                protocal: protocal,
+                centerX: 0,
+                centerY: 0,
+                width: width,
+                height: height,
+            });
+        }
+
     }
     public render(): React.ReactNode {
         const {language} = this.props;
