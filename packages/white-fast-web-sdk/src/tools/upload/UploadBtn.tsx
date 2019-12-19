@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Popover, Upload} from "antd";
+import uuidv4 from "uuid/v4";
 import * as OSS from "ali-oss";
 import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
@@ -102,6 +103,22 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             const clientHeight = window.innerHeight;
             await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
         }
+    }
+
+    private uploadVideo = async (event: any): Promise<void> => {
+        const {ossUploadCallback} = this.props;
+        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
+        const res = await uploadManager.addFile(`${uuidv4()}/${event.file.name}`, event.file, ossUploadCallback);
+        this.props.room.insertPlugin({
+            protocal: "video",
+            centerX: 0,
+            centerY: 0,
+            width: 480,
+            height: 270,
+            props: {
+                videoUrl: "https://netless-whiteboard.oss-cn-hangzhou.aliyuncs.com/oceans.mp4",
+            },
+        });
     }
 
     private renderUploadButton = (): React.ReactNode => {
