@@ -3,6 +3,8 @@ import "./WhiteVideoPlugin.less";
 import {Button, Icon, notification} from "antd";
 import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 import * as mute_icon from "../../assets/image/mute_icon.svg";
+import {observer} from "mobx-react";
+import {replayStore} from "../../models/ReplayStore";
 
 export type VideoProps = {
     readonly videoURL: string;
@@ -23,7 +25,8 @@ export type VideoStates = {
     muted: boolean;
 };
 
-export default class Video extends React.Component<VideoProps, VideoStates> {
+@observer
+class Video extends React.Component<VideoProps, VideoStates> {
     private readonly player: React.RefObject<HTMLVideoElement>;
     public constructor(props: VideoProps) {
         super(props);
@@ -53,6 +56,10 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
             }
         }
         if (this.props.seek !== nextProps.seek) {
+            const date = new Date(this.props.seek - nextProps.seek);
+            const time = date.getTime();
+            console.log("------<>");
+            console.log(time);
             if (this.player.current) {
                 this.player.current.currentTime = nextProps.seek;
             }
@@ -98,9 +105,8 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
     }
     public componentDidMount(): void {
         if (this.player.current) {
+            replayStore.playerCurrent = this.player.current;
             this.player.current.currentTime = this.props.currentTime;
-        }
-        if (this.player.current) {
             this.player.current.addEventListener("play", (event: any) => {
                 if (!this.props.play) {
                     this.props.onPlayed(true);
@@ -184,3 +190,5 @@ export default class Video extends React.Component<VideoProps, VideoStates> {
         );
     }
 }
+
+export default Video;
