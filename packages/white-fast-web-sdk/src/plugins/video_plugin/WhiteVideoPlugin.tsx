@@ -10,7 +10,6 @@ import {WhiteEditorPluginProps} from "../../../../white-editor-plugin/src";
 import * as OSS from "ali-oss";
 import {PPTProgressPhase, UploadManager} from "../../tools/upload/UploadManager";
 import {ossConfigObj} from "../../appToken";
-import {observer} from "mobx-react";
 export enum VideoStateEnum {
     play = "play",
     pause = "pause",
@@ -39,7 +38,6 @@ export type SelfUserInf = {
     userId: number, identity: IdentityType,
 };
 
-@observer
 class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
 
     public static readonly protocol: string = "video";
