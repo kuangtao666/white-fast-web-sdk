@@ -33,15 +33,22 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
     }
     private setGlobalState = (netlessState: any) => {
         const {room, identity} = this.props;
-        if (identity === IdentityType.host) {
-            room.setGlobalState({ppt: netlessState});
-        }
+        // if (identity === IdentityType.host) {
+        //     room.setGlobalState({ppt: netlessState});
+        // }
+    }
+
+    private isHavePpt = (): boolean => {
+        const {room} = this.props;
+        return !!(room.state.globalState && room.state.globalState.h5PptUrl);
     }
     public render(): React.ReactNode {
+        const {room} = this.props;
         return (
             <div className="whiteboard-h5-ppt">
-                {/*<iframe  id="calculation-under" frameBorder={0} src={"http://doccdn.talk-cloud.net/upload0/20190507_232816_slizsenl/index.html"}>*/}
-                {/*</iframe>*/}
+                {this.isHavePpt() &&
+                <iframe  id="calculation-under" frameBorder={0} src={room.state.globalState.h5PptUrl}>
+                </iframe>}
             </div>
         );
     }

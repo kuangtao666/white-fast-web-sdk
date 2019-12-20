@@ -14,6 +14,7 @@ import "./ToolBox.less";
 import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 import {isMobile} from "react-device-detect";
+import {roomStore} from "../../models/RoomStore";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;

@@ -28,6 +28,7 @@ export type ExtendToolInnerProps = {
 export type ExtendToolInnerStates = {
     activeKey: string;
     isInputH5Visible: boolean;
+    url: string | null;
 };
 
 @observer
@@ -37,6 +38,7 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
         this.state = {
             activeKey: "1",
             isInputH5Visible: false,
+            url: null,
         };
     }
 
@@ -75,29 +77,52 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
     }
 
     private uploadVideo = async (event: any): Promise<void> => {
-        const uploadManager = new UploadManager(this.props.client, this.props.room);
-        const res = await uploadManager.addFile(`${uuidv4()}/${event.file.name}`, event.file,  this.props.onProgress);
-        const isHttps = res.indexOf("https") !== -1;
-        let url;
-        if (isHttps) {
-            url = res;
-        } else {
-            url = res.replace("http", "https");
-        }
-        if (url) {
-            this.props.room.insertPlugin({
-                protocal: "video",
-                centerX: 0,
-                centerY: 0,
-                width: 480,
-                height: 270,
-                props: {
-                    videoUrl: url,
-                    identity: roomStore.identity,
-                },
-            });
+        try {
+            const uploadManager = new UploadManager(this.props.client, this.props.room);
+            const res = await uploadManager.addFile(`${uuidv4()}/${event.file.name}`, event.file,  this.props.onProgress);
+            const isHttps = res.indexOf("https") !== -1;
+            let url;
+            if (isHttps) {
+                url = res;
+            } else {
+                url = res.replace("http", "https");
+            }
+            if (url) {
+                this.props.room.insertPlugin({
+                    protocal: "video",
+                    centerX: 0,
+                    centerY: 0,
+                    width: 480,
+                    height: 270,
+                    props: {
+                        videoUrl: url,
+                    },
+                });
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
+    private isURL(): boolean {// 验证url
+        const strRegex = "^((https|http|ftp|rtsp|mms)?://)"
+            + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
+            + "(([0-9]{1,3}\.){3}[0-9]{1,3}" // IP形式的URL- 199.194.52.184
+            + "|" // 允许IP和DOMAIN（域名）
+            + "([0-9a-z_!~*'()-]+\.)*" // 域名- www.
+            + "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\." // 二级域名
+            + "[a-z]{2,6})" // first level domain- .com or .museum
+            + "(:[0-9]{1,4})?" // 端口- :80
+            + "((/?)|" // a slash isn't required if there is no file name
+            + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
+        const re = new RegExp(strRegex);
+        if (this.state.url) {
+            return re.test(this.state.url);
+        } else {
+            return false;
+        }
+    }
+
+
     public render(): React.ReactNode {
         const {language} = this.props;
         const isEnglish = language === LanguageEnum.English;
@@ -149,13 +174,19 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                 <Modal
                     visible={this.state.isInputH5Visible}
                     footer={null}
-                    title={isEnglish ? "Exit classroom" : "退出教室"}
+                    title={isEnglish ? "H5 课件" : "H5 课件"}
                     onCancel={() => this.setState({isInputH5Visible: false})}
                 >
                     <div className="whiteboard-share-box">
                         <div className="whiteboard-share-text-box">
-                            <Input/>
+                            <Input onChange={event => this.setState({url: event.target.value})} placeholder={"输入 H5 课件地址"} size="large"/>
                             <Button
+                                disabled={!this.isURL()}
+                                type="primary"
+                                onClick={() => {
+                                    this.props.room.setGlobalState({h5PptUrl: this.state.url});
+                                    this.setState({isInputH5Visible: false});
+                                }}
                                 style={{marginTop: 16, width: 240}}
                                 size="large">
                                 提交 H5 课件地址
@@ -168,4 +199,4 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
     }
 }
 
-export default ExtendToolInner
+export default ExtendToolInner;

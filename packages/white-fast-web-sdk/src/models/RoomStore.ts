@@ -8,10 +8,6 @@ export class RoomStore {
     public identity: IdentityType = IdentityType.guest;
     @observable
     public h5PptUrl: string = "";
-    @observable
-    public extendToolState: boolean = false;
 
-    public startRtc(): void {
-    }
 }
 export const roomStore = new RoomStore();

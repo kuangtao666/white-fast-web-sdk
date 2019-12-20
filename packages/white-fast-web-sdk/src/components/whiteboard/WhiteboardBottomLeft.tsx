@@ -50,7 +50,10 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
             return null;
         }
     }
-
+    private isHavePpt = (): boolean => {
+        const {room} = this.props;
+        return !!(room.state.globalState && room.state.globalState.h5PptUrl);
+    }
     public render(): React.ReactNode {
         const {roomState, isReadOnly} = this.props;
         if (isReadOnly) {
@@ -66,15 +69,16 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         return (
             <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
-                    {/*<div onClick={() => {*/}
-                        {/*if (roomStore.boardPointerEvents === "auto") {*/}
-                            {/*roomStore.boardPointerEvents = "none";*/}
-                        {/*} else {*/}
-                            {/*roomStore.boardPointerEvents = "auto";*/}
-                        {/*}*/}
-                    {/*}} className="whiteboard-click-icon">*/}
-                        {/*{roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}*/}
-                    {/*</div>*/}
+                    {this.isHavePpt() &&
+                    <div onClick={() => {
+                        if (roomStore.boardPointerEvents === "auto") {
+                            roomStore.boardPointerEvents = "none";
+                        } else {
+                            roomStore.boardPointerEvents = "auto";
+                        }
+                    }} className="whiteboard-click-icon">
+                        {roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}
+                    </div>}
                     {this.renderFileIcon()}
                     <ScaleController
                         zoomScale={roomState.zoomScale}
