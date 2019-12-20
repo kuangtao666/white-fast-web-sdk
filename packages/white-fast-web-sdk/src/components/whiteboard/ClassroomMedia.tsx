@@ -79,8 +79,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     public componentDidMount(): void {
-        const {userId, startRtcCallback, stopRtcCallback} = this.props;
-        if (this.props.identity !== IdentityType.host && this.props.isVideoEnable) {
+        const {userId, startRtcCallback, stopRtcCallback, identity, rtc} = this.props;
+        if (identity !== IdentityType.host && this.props.isVideoEnable) {
             const key = `${Date.now()}`;
             const btn = (
                 <Button type="primary" onClick={() => {

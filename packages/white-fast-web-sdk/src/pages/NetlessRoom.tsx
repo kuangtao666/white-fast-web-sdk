@@ -40,8 +40,12 @@ import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
-import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteVideoPlugin from "@netless/white-video-plugin";
+import WhiteAudioPlugin from "../plugins/audio_plugin/WhiteAudioPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
+import WebPpt from "./WebPpt";
+import {roomStore} from "../models/RoomStore";
+import {observer} from "mobx-react";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export enum MenuInnerType {
@@ -78,6 +82,7 @@ export type RtcType = {
     type: RtcEnum,
     rtcObj: any,
     appId: string,
+    defaultStart?: boolean,
     channel?: string, // 不写默认是 uuid,
     authConfig?: {
         token: string,
@@ -95,6 +100,7 @@ export type RealTimeProps = {
     roomToken: string;
     userId: string;
     roomFacadeSetter: RoomFacadeSetter;
+    isScreenLock?: boolean;
     defaultClassMode?: ClassModeType,
     userName?: string;
     roomName?: string;
@@ -172,7 +178,8 @@ export type RealTimeStates = {
     releaseMediaStage?: () => void;
 };
 
-export default class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
+@observer
+class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
@@ -211,19 +218,17 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
+        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen, isScreenLock} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Touch});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Desktop, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin, WhiteAudioPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
-            (window as any).__userId = userId;
-            (window as any).__identity = identity;
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
@@ -257,13 +262,11 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                         });
                     },
                 });
-            room.moveCameraToContain({
-                originX: - 600,
-                originY: - 337.5,
-                width: 1200,
-                height: 675,
-                animationMode: "immediately",
+            room.moveCamera({
+                centerX: 0,
+                centerY: 0,
             });
+            (window as any).room = room;
             if (this.props.roomCallback) {
                 this.props.roomCallback(room);
             }
@@ -696,7 +699,7 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
-        const {language, loadingSvgUrl, userId} = this.props;
+        const {language, loadingSvgUrl, userId, isScreenLock} = this.props;
         const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
@@ -727,6 +730,9 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
             } else {
                 cameraState = ViewMode.Follower;
                 disableCameraTransform = true;
+            }
+            if (isScreenLock !== undefined && isScreenLock) {
+                room.disableCameraTransform = isScreenLock;
             }
             return (
                 <RoomContextProvider value={{
@@ -833,9 +839,10 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
                                     this.renderExtendTool(),
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
-                            <div className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
+                            <div style={{pointerEvents: roomStore.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
                                 {this.renderWhiteboard()}
                             </div>
+                            <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
                         </Dropzone>
                         {!isMobile &&
                         <WhiteboardManager
@@ -863,12 +870,13 @@ export default class NetlessRoom extends React.Component<RealTimeProps, RealTime
         }
     }
     private renderWhiteboard(): React.ReactNode {
-        const {boardBackgroundColor} = this.props;
         if (this.state.room) {
             return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100%", backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}/>;
+                                   style={{width: "100%", height: "100%"}}/>;
         } else {
             return null;
         }
     }
 }
+
+export default NetlessRoom;

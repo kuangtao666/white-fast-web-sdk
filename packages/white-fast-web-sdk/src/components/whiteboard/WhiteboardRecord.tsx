@@ -10,6 +10,7 @@ import {Room} from "white-react-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
+import {IdentityType} from "./ClassroomMedia";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -53,12 +54,17 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         if (this.props.stopRecordCallback) {
             this.props.stopRecordCallback(this.stopRecord);
         }
-        // const {room} = this.props;
-        // const hostInfo: HostUserType = room.state.globalState.hostInfo;
-        // if (hostInfo && hostInfo.secondsElapsed !== undefined) {
-        //     this.setState({secondsElapsed: hostInfo.secondsElapsed, isRecord: true});
-        //     this.startClock();
-        // }
+    }
+
+    public componentWillReceiveProps(nextProps: WhiteboardRecordProps): void {
+        const {rtc} = this.props;
+        if (nextProps.startRtc !== this.props.startRtc) {
+            if (rtc && rtc.defaultStart === true) {
+                if (nextProps.startRtc) {
+                    nextProps.startRtc(this.startRecord);
+                }
+            }
+        }
     }
     private tick = (): void => {
         this.setState(({

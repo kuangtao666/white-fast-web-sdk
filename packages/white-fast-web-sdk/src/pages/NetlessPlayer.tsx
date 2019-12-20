@@ -19,7 +19,9 @@ import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
-import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteVideoPlugin from "@netless/white-video-plugin";
+import {observer} from "mobx-react";
+import {replayStore} from "../models/ReplayStore";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum LayoutType {
     Suspension = "Suspension",
@@ -61,7 +63,8 @@ export type PlayerPageStates = {
     layoutType: LayoutType;
 };
 
-export default class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> implements PlayerFacadeObject {
+@observer
+class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> implements PlayerFacadeObject {
     private scheduleTime: number = 0;
     private readonly cursor: any;
 
@@ -128,6 +131,9 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
                 }, {
                     onPhaseChanged: phase => {
                         this.setState({phase: phase});
+                        if (phase === PlayerPhase.Ended) {
+                            replayStore.seekToScheduleTime(0);
+                        }
                     },
                     onLoadFirstFrame: () => {
                         this.setState({isFirstScreenReady: true});
@@ -229,14 +235,17 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
             case PlayerPhase.WaitingFirstFrame:
             case PlayerPhase.Pause: {
                 player.play();
+                replayStore.play();
                 break;
             }
             case PlayerPhase.Playing: {
                 player.pause();
+                replayStore.pause();
                 break;
             }
             case PlayerPhase.Ended: {
                 player.seekToScheduleTime(0);
+                replayStore.seekToScheduleTime(0);
                 break;
             }
         }
@@ -412,3 +421,4 @@ export default class NetlessPlayer extends React.Component<PlayerPageProps, Play
         );
     }
 }
+export default NetlessPlayer;

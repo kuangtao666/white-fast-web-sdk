@@ -8,9 +8,9 @@ import plugin_window_max from "../../assets/image/plugin_window_max.svg";
 import plugin_fix_icon from "../../assets/image/plugin_fix_icon.svg";
 import plugin_editor_icon from "../../assets/image/plugin_editor_icon.svg";
 import plugin_uneditor_icon from "../../assets/image/plugin_uneditor_icon.svg";
-import "./WhiteVideoPlugin.less";
+import "./WhiteAudioPlugin.less";
 import "../PluginStyle.less";
-import Video from "./Video";
+import Audio from "./Audio";
 import {HostUserType} from "../../pages/RoomManager";
 import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 import {WhiteEditorPluginProps} from "../../../../white-editor-plugin/src";
@@ -45,9 +45,9 @@ export type SelfUserInf = {
     userId: number, identity: IdentityType,
 };
 
-export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
+export default class WhiteAudioPlugin extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
 
-    public static readonly protocol: string = "media";
+    public static readonly protocol: string = "audio";
     private room: Room | undefined = undefined;
     private play: Player | undefined = undefined;
     public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {play: false, seek: 0, currentTime: 0, url: "",
@@ -232,11 +232,12 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
         this.setState({loadingPercent: thisPercent});
     }
 
-    private renderVideoUploadBox = (room: Room): React.ReactNode => {
+    private renderAudioUploadBox = (room: Room): React.ReactNode => {
         if (this.state.url) {
-            return  <Video
+            return  <Audio
                 videoURL={this.state.url}
                 play={this.state.play}
+                identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
                 onTimeUpdate={this.onTimeUpdate}
                 currentTime={this.props.currentTime}
                 controls={this.detectIsHaveControlsRoom(room)}
@@ -253,15 +254,32 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                     }
                     <Upload
                         style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}}
-                        accept="video/mp4"
+                        accept="audio/mp3"
                         showUploadList={false}
                         customRequest={this.uploadVideo}>
                         <Button size={"large"}>
-                            <Icon type="upload" /> 点击上传视频
+                            <Icon type="upload" /> 点击上传音频
                         </Button>
                     </Upload>
                 </div>
             );
+        }
+    }
+
+    private renderPluginNavRight = (): React.ReactNode => {
+        if (this.selfUserInf && this.selfUserInf.identity === IdentityType.host) {
+            return (
+                <div className="plugin-box-nav-right">
+                    {/*<div className="plugin-box-nav-right-btn">*/}
+                    {/*<img src={plugin_fix_icon}/>*/}
+                    {/*</div>*/}
+                    <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
+                        {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
+                    </div>
+                </div>
+            );
+        } else {
+            return null;
         }
     }
     public render(): React.ReactNode {
@@ -289,17 +307,10 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                                 {/*<img  style={{width: 6}} src={plugin_window_max}/>*/}
                                             {/*</div>*/}
                                         </div>
-                                        <div className="plugin-box-nav-right">
-                                            {/*<div className="plugin-box-nav-right-btn">*/}
-                                                {/*<img src={plugin_fix_icon}/>*/}
-                                            {/*</div>*/}
-                                            <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
-                                                {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
-                                            </div>
-                                        </div>
+                                        {this.renderPluginNavRight()}
                                     </div>
                                     <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
-                                        {this.renderVideoUploadBox(room)}
+                                        {this.renderAudioUploadBox(room)}
                                     </div>
                                 </div>
                             );
@@ -327,20 +338,13 @@ export default class WhiteVideoPlugin extends React.Component<WhiteVideoPluginPr
                                                 {/*<img  style={{width: 6}} src={plugin_window_max}/>*/}
                                             {/*</div>*/}
                                         </div>
-                                        <div className="plugin-box-nav-right">
-                                            {/*<div className="plugin-box-nav-right-btn">*/}
-                                                {/*<img src={plugin_fix_icon}/>*/}
-                                            {/*</div>*/}
-                                            <div onClick={() => this.setState({isClickEnable: !this.state.isClickEnable})} className="plugin-box-nav-right-btn">
-                                                {this.state.isClickEnable ? <img src={plugin_uneditor_icon}/> : <img src={plugin_editor_icon}/>}
-                                            </div>
-                                        </div>
                                     </div>
                                     <div style={{pointerEvents: this.state.isClickEnable ? "auto" : "none"}} className="plugin-box-body">
-                                        <Video
-                                            videoURL={this.state.url}
+                                        <Audio
+                                            videoURL={this.state.url} identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
                                             play={this.props.play}
-                                            controls={false} currentTime={this.props.currentTime}
+                                            controls={false}
+                                            currentTime={this.props.currentTime}
                                             seek={this.props.seek}
                                             isClickEnable={false}
                                             onPlayed={this.handlePlayState}

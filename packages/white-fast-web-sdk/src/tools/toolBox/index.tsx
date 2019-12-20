@@ -167,7 +167,9 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         switch (toolBarPosition) {
             case ToolBarPositionEnum.top: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box">
+                    <div style={{
+                        display: isReadOnly ? "none" : "flex",
+                    }} className="whiteboard-tool-box">
                         <div className="tool-mid-box">
                             {this.addCustomerComponent(nodes)}
                         </div>

@@ -147,6 +147,7 @@ class MenuAnnexBox extends React.Component<MenuAnnexBoxProps, MenuAnnexBoxState>
                         className="menu-under-btn-inner"
                         onClick={() => {
                             const {room, roomState} = this.props;
+                            const activeIndex = roomState.sceneState.index;
                             const newSceneIndex = activeIndex + 1;
                             const scenePath = roomState.sceneState.scenePath;
                             const pathName = this.pathName(scenePath);

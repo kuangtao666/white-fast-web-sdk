@@ -12,6 +12,7 @@ import {LanguageEnum} from "../../pages/NetlessRoom";
 import {DeviceType, ViewMode} from "white-react-sdk";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import {isMobile} from "react-device-detect";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type MessageType = {
     name: string,
@@ -101,51 +102,44 @@ export default class WhiteboardBottomRight extends React.Component<WhiteboardBot
         }
     }
 
-    private pageIcon = (): React.ReactNode => {
-        const {deviceType, language} = this.props;
-        const isMobile = deviceType === DeviceType.Touch;
-        const isEnglish = language === LanguageEnum.English;
-        if (isMobile) {
-            return (
-                <div
-                    onClick={this.props.handleAnnexBoxMenuState}
-                    className="whiteboard-bottom-right-cell">
-                    <img src={annex_box}/>
-                </div>
-            );
-        } else {
-            return (
-                <Tooltip placement="topRight" title={isEnglish ? "Preview" : "预览"}>
-                    <div
-                        onClick={this.props.handleAnnexBoxMenuState}
-                        className="whiteboard-bottom-right-cell">
-                        <img src={annex_box}/>
-                    </div>
-                </Tooltip>
-            );
+    private handlePushToIframe = (netlessState: string): void => {
+        const childFrameObj = document.getElementById("calculation-under") as HTMLIFrameElement;
+        if (childFrameObj) {
+            childFrameObj.contentWindow!.postMessage(netlessState, "*");
         }
     }
+    private handlePptPreviousStep = async (): Promise<void> => {
+        const {room} = this.props;
+        const currentPage = room.state.sceneState.index + 1;
+        const previousPage = currentPage - 1;
+        const jumpPageMessage = {toPage: previousPage, method: "onJumpPage", sendUserId: "a1001576140868974"};
+        this.handlePushToIframe(JSON.stringify(jumpPageMessage));
+        await timeout(500);
+        room.pptPreviousStep();
+    }
+    private handlePptNextStep = async (): Promise<void> => {
+        const {room} = this.props;
+        const currentPage = room.state.sceneState.index + 1;
+        const nextPage = currentPage + 1;
+        const jumpPageMessage = {toPage: nextPage, method: "onJumpPage", sendUserId: "a1001576140868974"};
+        this.handlePushToIframe(JSON.stringify(jumpPageMessage));
+        await timeout(500);
+        room.pptNextStep();
+    }
     private renderAnnexBox = (): React.ReactNode => {
-        const {roomState, room} = this.props;
-        const scenes = roomState.sceneState.scenes;
         return (
-            <div>
-                {scenes.length > 1 ?
-                    <div className="whiteboard-annex-box">
-                        <div
-                            onClick={() => room.pptPreviousStep()}
-                            className="whiteboard-annex-arrow-left">
-                            <img src={left_arrow}/>
-                        </div>
-                        {this.pageNumber()}
-                        <div
-                            onClick={() => room.pptNextStep()}
-                            className="whiteboard-annex-arrow-right">
-                            <img src={right_arrow}/>
-                        </div>
-                    </div> :
-                    this.pageIcon()
-                }
+            <div className="whiteboard-annex-box">
+                <div
+                    onClick={() => this.handlePptPreviousStep()}
+                    className="whiteboard-annex-arrow-left">
+                    <img src={left_arrow}/>
+                </div>
+                {this.pageNumber()}
+                <div
+                    onClick={() => this.handlePptNextStep()}
+                    className="whiteboard-annex-arrow-right">
+                    <img src={right_arrow}/>
+                </div>
             </div>
         );
     }

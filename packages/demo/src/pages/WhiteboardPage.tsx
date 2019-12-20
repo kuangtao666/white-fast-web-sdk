@@ -89,6 +89,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 rtc: {
                     type: "agora",
                     rtcObj: AgoraRTC,
+                    // defaultStart: true,
                     appId: "8595fd46955f427db44b4e9ba90f015d",
                     recordConfig: {
                         customerId: "b4e2bc22a89549b2a84969b844258fe3",
@@ -150,6 +151,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                //      "#9E51B6",
                //      "#1E2023",
                //  ],
+               //  isScreenLock: true,
                 documentArray: [
                     {
                         active: false,

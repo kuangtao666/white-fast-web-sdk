@@ -1,9 +1,13 @@
 import * as React from "react";
 import {DeviceType, Room, RoomState} from "white-react-sdk";
+import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
 import file from "../../assets/image/file.svg";
 import {IdentityType} from "./WhiteboardTopRight";
+import * as click_icon from "../../assets/image/click_icon.svg";
+import * as click_icon_black from "../../assets/image/click_icon_black.svg";
+import {roomStore} from "../../models/RoomStore";
 
 export type WhiteboardBottomLeftProps = {
     room: Room;
@@ -15,8 +19,8 @@ export type WhiteboardBottomLeftProps = {
     isReadOnly?: boolean;
 };
 
-
-export default class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
+@observer
+class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}> {
 
     public constructor(props: WhiteboardBottomLeftProps) {
         super(props);
@@ -51,21 +55,36 @@ export default class WhiteboardBottomLeft extends React.Component<WhiteboardBott
         const {roomState, isReadOnly} = this.props;
         if (isReadOnly) {
             return <div className="whiteboard-box-bottom-left">
-                <ScaleController
-                    zoomScale={roomState.zoomScale} isReadOnly={this.props.isReadOnly}
-                    deviceType={this.props.deviceType}
-                    zoomChange={this.zoomChange}/>
+                <div className="whiteboard-box-mid">
+                    <ScaleController
+                        zoomScale={roomState.zoomScale} isReadOnly={this.props.isReadOnly}
+                        deviceType={this.props.deviceType}
+                        zoomChange={this.zoomChange}/>
+                </div>
             </div>;
         }
         return (
             <div className="whiteboard-box-bottom-left">
-                {this.renderFileIcon()}
-                <ScaleController
-                    zoomScale={roomState.zoomScale}
-                    deviceType={this.props.deviceType}
-                    zoomChange={this.zoomChange}/>
+                <div className="whiteboard-box-mid">
+                    {/*<div onClick={() => {*/}
+                        {/*if (roomStore.boardPointerEvents === "auto") {*/}
+                            {/*roomStore.boardPointerEvents = "none";*/}
+                        {/*} else {*/}
+                            {/*roomStore.boardPointerEvents = "auto";*/}
+                        {/*}*/}
+                    {/*}} className="whiteboard-click-icon">*/}
+                        {/*{roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}*/}
+                    {/*</div>*/}
+                    {this.renderFileIcon()}
+                    <ScaleController
+                        zoomScale={roomState.zoomScale}
+                        deviceType={this.props.deviceType}
+                        zoomChange={this.zoomChange}/>
+                </div>
             </div>
         );
     }
 
 }
+
+export default WhiteboardBottomLeft;

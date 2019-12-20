@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Input, Button, Tabs, Radio} from "antd";
+import {Input, Button, Tabs} from "antd";
 import "./IndexPage.less";
 import {RouteComponentProps} from "react-router";
 import netless_black from "../assets/image/netless_black.svg";
@@ -30,7 +30,7 @@ export default class IndexPage extends React.Component<IndexPageProps, IndexPage
         const isUrl = this.state.url.substring(0, 4) === "http";
         if (this.state.url) {
             if (isUrl) {
-                window.open(this.state.url);
+                window.open(this.state.url, "_self");
             } else {
                 if (this.state.url.length === 32) {
                     const isNotLive = this.state.url.search("live") === -1;
@@ -60,14 +60,7 @@ export default class IndexPage extends React.Component<IndexPageProps, IndexPage
                         <Tabs className="page-input-left-mid-box-tab" defaultActiveKey="1">
                             <TabPane tab="创建房间" key="1">
                                 <div className="page-input-left-inner-box">
-                                    <Input className="page-input" onChange={e => this.setState({name: e.target.value})} size={"large"} placeholder={"输入用户名"}/>
-                                    <Radio.Group size={"large"} className="page-class" buttonStyle="solid" onChange={evt => {
-                                        console.log(evt);
-                                    }}>
-                                        <Radio.Button value={""}>一对一</Radio.Button>
-                                        <Radio.Button value={""}>小班课</Radio.Button>
-                                        <Radio.Button value={""}>公开课</Radio.Button>
-                                    </Radio.Group>
+                                    <Input className="page-input" onChange={e => this.setState({name: e.target.value})} size={"large"} placeholder={"输入房间名称"}/>
                                     <Button
                                         type="primary"
                                         size="large"
