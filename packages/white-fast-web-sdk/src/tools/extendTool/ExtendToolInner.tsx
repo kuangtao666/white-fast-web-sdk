@@ -12,6 +12,8 @@ import video_plugin from "../../assets/image/video_plugin.svg";
 import audio_plugin from "../../assets/image/audio_plugin.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
 import {PPTProgressListener, UploadManager} from "../upload/UploadManager";
+import {roomStore} from "../../models/RoomStore";
+import {observer} from "mobx-react";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
@@ -28,7 +30,8 @@ export type ExtendToolInnerStates = {
     isInputH5Visible: boolean;
 };
 
-export default class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolInnerStates> {
+@observer
+class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolInnerStates> {
     public constructor(props: ExtendToolInnerProps) {
         super(props);
         this.state = {
@@ -62,27 +65,13 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         }
     }
     private insertPlugin = (protocal: string, width: number, height: number): void => {
-        if (protocal === "video") {
-            this.props.room.insertPlugin({
-                protocal: protocal,
-                centerX: 0,
-                centerY: 0,
-                width: width,
-                height: height,
-                props: {
-                    videoUrl: "https://netless-whiteboard.oss-cn-hangzhou.aliyuncs.com/oceans.mp4",
-                },
-            });
-        } else {
-            this.props.room.insertPlugin({
-                protocal: protocal,
-                centerX: 0,
-                centerY: 0,
-                width: width,
-                height: height,
-            });
-        }
-
+        this.props.room.insertPlugin({
+            protocal: protocal,
+            centerX: 0,
+            centerY: 0,
+            width: width,
+            height: height,
+        });
     }
 
     private uploadVideo = async (event: any): Promise<void> => {
@@ -104,6 +93,7 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                 height: 270,
                 props: {
                     videoUrl: url,
+                    identity: roomStore.identity,
                 },
             });
         }
@@ -177,3 +167,5 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         );
     }
 }
+
+export default ExtendToolInner

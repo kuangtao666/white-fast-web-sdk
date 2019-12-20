@@ -16964,7 +16964,7 @@ white-react-sdk@^2.3.17:
     react-dom "~16.8.0"
     white-web-sdk "2.3.18"
 
-white-web-sdk@2.3.18:
+white-web-sdk@2.3.18, white-web-sdk@^2.3.18:
   version "2.3.18"
   resolved "https://registry.npmjs.org/white-web-sdk/-/white-web-sdk-2.3.18.tgz#eed456a7a4492f9f4aa59b77e8bf0b95ffa3cec0"
   integrity sha512-MDjP5dCFabMoMJlojFd5IliiQGNUKqUrr83A4JYntEO5ehgjqZhcKCSYokA3QAGw92RugO76FxZwjPG64+mBZA==

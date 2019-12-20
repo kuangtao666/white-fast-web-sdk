@@ -6,7 +6,6 @@ import {Icon, message} from "antd";
 import Dropzone from "react-dropzone";
 import {
     WhiteWebSdk,
-    RoomWhiteboard,
     Room,
     RoomState,
     RoomPhase,
@@ -15,7 +14,7 @@ import {
     ViewMode,
     DeviceType,
     PluginComponentClass,
-} from "white-react-sdk";
+} from "white-web-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
 import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
@@ -370,6 +369,9 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         }
     }
     public componentWillMount (): void {
+        if (this.props.identity) {
+            roomStore.identity = this.props.identity;
+        }
         this.props.roomFacadeSetter(this);
         window.addEventListener("beforeunload", this.beforeunload);
     }
@@ -872,9 +874,9 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         }
     }
     private renderWhiteboard(): React.ReactNode {
-        if (this.state.room) {
-            return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100%"}}/>;
+        const {room} = this.state;
+        if (room) {
+            return <div ref={ref => room.bindHtmlElement(ref)} style={{width: "100%", height: "100%"}}/>;
         } else {
             return null;
         }

@@ -4,7 +4,7 @@ import * as OSS from "ali-oss";
 import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
 import "./UploadBtn.less";
-import {DeviceType, PptKind, Room, WhiteWebSdk} from "white-react-sdk";
+import {DeviceType, PptKind, Room, WhiteWebSdk} from "white-web-sdk";
 import * as image_icon from "../../assets/image/image_icon.svg";
 import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";

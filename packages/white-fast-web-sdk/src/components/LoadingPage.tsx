@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./LoadingPage.less";
-import {RoomPhase} from "white-react-sdk";
+import {RoomPhase} from "white-web-sdk";
 import {LanguageEnum} from "../pages/NetlessRoom";
 export type LoadingPageProps = {
     loadingSvgUrl?: string;

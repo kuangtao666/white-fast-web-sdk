@@ -1,5 +1,5 @@
 import * as React from "react";
-import {DeviceType, Room, RoomState} from "white-react-sdk";
+import {DeviceType, Room, RoomState} from "white-web-sdk";
 import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";

@@ -6,7 +6,7 @@ import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../pages/RoomContext";
 import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
-import {PluginComponentClass} from "white-react-sdk";
+import {PluginComponentClass} from "white-web-sdk";
 import * as OSS from "ali-oss";
 import {PPTProgressListener} from "../upload/UploadManager";
 

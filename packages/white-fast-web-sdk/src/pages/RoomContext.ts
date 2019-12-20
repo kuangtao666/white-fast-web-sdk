@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Room} from "white-react-sdk";
+import {Room} from "white-web-sdk";
 export type RoomContext = {
     whiteboardLayerDownRef: HTMLDivElement;
     room: Room;

@@ -1,4 +1,4 @@
-import {Room, ViewMode} from "white-react-sdk";
+import {Room, ViewMode} from "white-web-sdk";
 import {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import {message} from "antd";
 

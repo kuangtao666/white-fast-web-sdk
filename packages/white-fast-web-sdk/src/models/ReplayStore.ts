@@ -1,5 +1,5 @@
 import {observable} from "mobx";
-import {PlayerPhase} from "white-react-sdk";
+import {PlayerPhase} from "white-web-sdk";
 export class ReplayStore {
     @observable
     public phase: PlayerPhase = PlayerPhase.Stopped;

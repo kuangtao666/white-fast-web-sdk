@@ -1,6 +1,6 @@
 {
   "name": "@netless/white-video-plugin",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "",
   "private": false,
   "main": "dist/index.js",
@@ -15,14 +15,14 @@
   "author": "netless",
   "license": "MIT",
   "dependencies": {
-    "react": "~16.8.0",
-    "react-dom": "~16.8.0",
-    "white-react-sdk": "^2.3.17"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "white-web-sdk": "^2.3.18"
   },
   "peerDependencies": {
-    "react": "~16.8.0",
-    "react-dom": "~16.8.0",
-    "white-react-sdk": "^2.3.17"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "white-web-sdk": "^2.3.18"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

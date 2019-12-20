@@ -3,7 +3,7 @@ import "./WebPpt.less";
 import {WebCourseController} from "../tools/WebCourseController";
 import {
     Room,
-} from "white-react-sdk";
+} from "white-web-sdk";
 import {IdentityType} from "../components/whiteboard/ClassroomMedia";
 export type WebPptProps = {
     room: Room;

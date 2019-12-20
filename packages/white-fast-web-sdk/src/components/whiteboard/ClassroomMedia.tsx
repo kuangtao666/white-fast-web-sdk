@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
-import {Room, ViewMode} from "white-react-sdk";
+import {Room, ViewMode} from "white-web-sdk";
 import {Button, Radio, Tooltip, notification, Icon, message} from "antd";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";

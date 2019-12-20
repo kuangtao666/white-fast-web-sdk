@@ -1,7 +1,7 @@
 import * as React from "react";
 import TweenOne from "rc-tween-one";
 import "./styles.less";
-import {DeviceType} from "white-react-sdk";
+import {DeviceType} from "white-web-sdk";
 export type ScaleControllerState = {
   scaleAnimation: boolean;
   reverseState: boolean;

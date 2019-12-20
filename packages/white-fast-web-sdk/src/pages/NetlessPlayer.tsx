@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Badge, Icon} from "antd";
-import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player} from "white-react-sdk";
+import {WhiteWebSdk, PlayerPhase, Player} from "white-web-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
@@ -397,10 +397,11 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                             </div>}
                         </div>
                         {player &&
-                        <PlayerWhiteboard
+                        <div
                             style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}
                             className="player-box"
-                            player={player}/>}
+                            ref={ref => player.bindHtmlElement(ref)}
+                            />}
                     </div>
                 </div>
                 {this.state.layoutType === LayoutType.Side &&

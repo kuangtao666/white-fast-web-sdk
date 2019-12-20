@@ -1,5 +1,5 @@
 import * as React from "react";
-import {CursorAdapter, CursorDescription, Cursor, RoomMember, Color} from "white-react-sdk";
+import {CursorAdapter, CursorDescription, Cursor, RoomMember, Color} from "white-web-sdk";
 import * as selector from "../../assets/image/selector.svg";
 import * as pencil from "../../assets/image/pencil.svg";
 import * as text from "../../assets/image/text.svg";

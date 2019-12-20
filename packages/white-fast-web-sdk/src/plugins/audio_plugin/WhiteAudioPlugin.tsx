@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-react-sdk";
+import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-web-sdk";
 import {Icon, Upload, Progress, Button, Tooltip} from "antd";
 import uuidv4 from "uuid/v4";
 import plugin_window_close from "../../assets/image/plugin_window_close.svg";

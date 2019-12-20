@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ViewMode, Player, Scene, DeviceType} from "white-react-sdk";
+import {ViewMode, Player, Scene, DeviceType} from "white-web-sdk";
 import {Badge} from "antd";
 import menu_out from "../../assets/image/menu_out.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
