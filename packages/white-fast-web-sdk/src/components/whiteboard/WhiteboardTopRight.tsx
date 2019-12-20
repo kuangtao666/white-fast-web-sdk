@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
+import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-web-sdk";
 import {Badge, Button, message, Modal, Input, Radio} from "antd";
 import Clipboard from "react-clipboard.js";
 import QRCode from "qrcode.react";
@@ -9,7 +9,7 @@ import replay_video_cover_en from "../../assets/image/replay_video_cover_en.svg"
 import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
-import {ClassModeType, GuestUserType} from "../../pages/RoomManager";
+import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 import Identicon from "../../tools/identicon/Identicon";
 

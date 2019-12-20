@@ -4,7 +4,7 @@ import "./ExtendToolInner.less";
 import {
     Room,
     PluginComponentClass,
-} from "white-react-sdk";
+} from "white-web-sdk";
 import {Button, Input, Modal, Tabs, Tooltip, Upload} from "antd";
 import web_plugin from "../../assets/image/web_plugin.svg";
 import editor_plugin from "../../assets/image/editor_plugin.svg";

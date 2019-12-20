@@ -6,11 +6,10 @@ import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
 import {OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
-import {Room} from "white-react-sdk";
+import {Room} from "white-web-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
-import {IdentityType} from "./ClassroomMedia";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;

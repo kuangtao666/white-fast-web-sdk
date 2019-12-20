@@ -1,10 +1,9 @@
 import * as React from "react";
 import {Badge, Tabs, Icon} from "antd";
 import "./WhiteboardManager.less";
-import {Room} from "white-react-sdk";
+import {Room, ViewMode} from "white-web-sdk";
 import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import {IdentityType} from "./WhiteboardTopRight";
-import {ViewMode} from "white-react-sdk";
 import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import user_empty from "../../assets/image/user_empty.svg";

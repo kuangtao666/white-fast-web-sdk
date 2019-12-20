@@ -1,12 +1,11 @@
 import * as React from "react";
-import {Badge, Icon} from "antd";
+import SeekSlider from "@netless/react-seek-slider";
+import {Badge, Icon, message} from "antd";
 import {WhiteWebSdk, PlayerPhase, Player} from "white-web-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
-import SeekSlider from "@netless/react-seek-slider";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
-import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
