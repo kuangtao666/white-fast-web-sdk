@@ -5,26 +5,23 @@ import {
     Room,
     PluginComponentClass,
 } from "white-react-sdk";
-import {Button, Input, Modal, Tabs, Tooltip} from "antd";
+import {Button, Input, Modal, Tabs, Tooltip, Upload} from "antd";
 import web_plugin from "../../assets/image/web_plugin.svg";
 import editor_plugin from "../../assets/image/editor_plugin.svg";
 import video_plugin from "../../assets/image/video_plugin.svg";
 import audio_plugin from "../../assets/image/audio_plugin.svg";
 import {LanguageEnum} from "../../pages/NetlessRoom";
+import {PPTProgressListener, UploadManager} from "../upload/UploadManager";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
+    client: any;
     room: Room;
+    onProgress: PPTProgressListener,
     language?: LanguageEnum;
     userId: string;
     plugins?: PluginComponentClass | ReadonlyArray<PluginComponentClass>;
 };
-
-enum ExtendToolType {
-    plugin = "plugin",
-    geometry = "geometry",
-    subject = "subject",
-}
 
 export type ExtendToolInnerStates = {
     activeKey: string;
@@ -87,6 +84,30 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
         }
 
     }
+
+    private uploadVideo = async (event: any): Promise<void> => {
+        const uploadManager = new UploadManager(this.props.client, this.props.room);
+        const res = await uploadManager.addFile(`${uuidv4()}/${event.file.name}`, event.file,  this.props.onProgress);
+        const isHttps = res.indexOf("https") !== -1;
+        let url;
+        if (isHttps) {
+            url = res;
+        } else {
+            url = res.replace("http", "https");
+        }
+        if (url) {
+            this.props.room.insertPlugin({
+                protocal: "video",
+                centerX: 0,
+                centerY: 0,
+                width: 480,
+                height: 270,
+                props: {
+                    videoUrl: url,
+                },
+            });
+        }
+    }
     public render(): React.ReactNode {
         const {language} = this.props;
         const isEnglish = language === LanguageEnum.English;
@@ -113,9 +134,14 @@ export default class ExtendToolInner extends React.Component<ExtendToolInnerProp
                             </div>
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传视频"}>
-                                    <div onClick={() => this.insertPlugin("video", 480, 270)} className="extend-inner-icon">
-                                        <img style={{width: 26}} src={video_plugin}/>
-                                    </div>
+                                    <Upload
+                                        accept={"video/mp4"}
+                                        showUploadList={false}
+                                        customRequest={this.uploadVideo}>
+                                        <div className="extend-inner-icon">
+                                            <img style={{width: 26}} src={video_plugin}/>
+                                        </div>
+                                    </Upload>
                                 </Tooltip>
                             </div>
                             <div className="extend-icon-box">

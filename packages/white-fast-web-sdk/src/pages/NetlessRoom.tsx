@@ -670,7 +670,9 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         if (!isMobile) {
             return (
                 <ExtendTool
+                    oss={this.state.ossConfigObj}
                     userId={this.props.userId}
+                    onProgress={this.progress}
                     language={this.props.language}
                     toolBarPosition={this.props.toolBarPosition}/>
             );

@@ -1,6 +1,5 @@
 import * as React from "react";
 import {Popover, Upload} from "antd";
-import uuidv4 from "uuid/v4";
 import * as OSS from "ali-oss";
 import {ToolBoxUpload} from "./ToolBoxUpload";
 import {PPTProgressListener, UploadManager} from "./UploadManager";
@@ -102,31 +101,6 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
             const clientWidth = window.innerWidth;
             const clientHeight = window.innerHeight;
             await uploadManager.uploadImageFiles(uploadFileArray, clientWidth / 2, clientHeight / 2, this.props.onProgress);
-        }
-    }
-
-    private uploadVideo = async (event: any): Promise<void> => {
-        const {ossUploadCallback} = this.props;
-        const uploadManager = new UploadManager(this.client, this.props.room, ossUploadCallback);
-        const res = await uploadManager.addFile(`${uuidv4()}/${event.file.name}`, event.file, ossUploadCallback);
-        const isHttps = res.indexOf("https") !== -1;
-        let url;
-        if (isHttps) {
-            url = res;
-        } else {
-            url = res.replace("http", "https");
-        }
-        if (url) {
-            this.props.room.insertPlugin({
-                protocal: "video",
-                centerX: 0,
-                centerY: 0,
-                width: 480,
-                height: 270,
-                props: {
-                    videoUrl: url,
-                },
-            });
         }
     }
 
@@ -256,24 +230,6 @@ export default class UploadBtn extends React.Component<UploadBtnProps, ToolBoxUp
                     accept={FileUploadStatic}
                     showUploadList={false}
                     customRequest={this.uploadStatic}>
-                    <div className="popover-section">
-                        <div className="popover-section-inner">
-                            <div className="popover-section-image">
-                                <img width={72} src={image_transform}/>
-                            </div>
-                            <div className="popover-section-script">
-                                <div className="popover-section-title">{isEnglish ? "Docs transfer image" : "资料转图片"}</div>
-                                <div className="popover-section-text">{isEnglish ? "Support ppt、pptx、word and pdf." : "支持 ppt、pptx、word 以及 pdf。"}</div>
-                            </div>
-                        </div>
-                    </div>
-                </Upload>,
-                <Upload
-                    key={`video`}
-                    disabled={!this.props.roomToken}
-                    accept={"video/mp4"}
-                    showUploadList={false}
-                    customRequest={this.uploadVideo}>
                     <div className="popover-section">
                         <div className="popover-section-inner">
                             <div className="popover-section-image">
