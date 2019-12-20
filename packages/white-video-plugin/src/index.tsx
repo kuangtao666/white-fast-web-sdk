@@ -1,12 +1,16 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-web-sdk";
-import "./WhiteVideoPlugin.less";
-import "../PluginStyle.less";
+import "./PluginStyle.less";
 import Video from "./Video";
-import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
 export enum VideoStateEnum {
     play = "play",
     pause = "pause",
+}
+
+export enum IdentityType {
+    host = "host",
+    guest = "guest",
+    listener = "listener",
 }
 
 export type WhiteVideoPluginProps = PluginComponentProps & {
@@ -30,7 +34,7 @@ export type SelfUserInf = {
     userId: number, identity: IdentityType,
 };
 
-class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
+class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
 
     public static readonly protocol: string = "video";
     private room: Room | undefined = undefined;
@@ -206,4 +210,4 @@ class WhiteVideoPlugin extends React.Component<WhiteVideoPluginProps, WhiteVideo
     }
 }
 
-export default WhiteVideoPlugin;
+export default Index;

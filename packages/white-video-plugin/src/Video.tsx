@@ -1,7 +1,6 @@
 import * as React from "react";
-import "./WhiteVideoPlugin.less";
-import {IdentityType} from "../../components/whiteboard/WhiteboardTopRight";
-import * as mute_icon from "../../assets/image/mute_icon.svg";
+import "./index.less";
+import * as mute_icon from "./image/mute_icon.svg";
 
 export type VideoProps = {
     readonly videoURL: string;
@@ -16,6 +15,11 @@ export type VideoProps = {
     identity?: IdentityType;
     onTimeUpdate?: (time: number) => void;
 };
+export enum IdentityType {
+    host = "host",
+    guest = "guest",
+    listener = "listener",
+}
 
 export type VideoStates = {
     isMediaPlayAllow: boolean;

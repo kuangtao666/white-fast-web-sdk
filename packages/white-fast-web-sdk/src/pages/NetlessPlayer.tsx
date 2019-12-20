@@ -19,7 +19,7 @@ import "./NetlessPlayer.less";
 import {LanguageEnum} from "./NetlessRoom";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
-import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteVideoPlugin from "@netless/white-video-plugin";
 import {observer} from "mobx-react";
 import {replayStore} from "../models/ReplayStore";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));

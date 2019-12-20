@@ -40,7 +40,7 @@ import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
-import WhiteVideoPlugin from "../plugins/video_plugin/WhiteVideoPlugin";
+import WhiteVideoPlugin from "@netless/white-video-plugin";
 import WhiteAudioPlugin from "../plugins/audio_plugin/WhiteAudioPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
