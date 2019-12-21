@@ -9,7 +9,6 @@ import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
-import {RoomContextConsumer} from "../../pages/RoomContext";
 import Identicon from "../../tools/identicon/Identicon";
 import {ClassModeType, IdentityType, LanguageEnum, RtcType} from "../../pages/NetlessRoomTypes";
 const { TabPane } = Tabs;
@@ -79,26 +78,18 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         if (hostInfo) {
             if (userId === hostInfo.userId) {
                 return (
-                    <RoomContextConsumer children={context => (
-                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                        applyForRtc={false}
-                                        startRtcCallback={context.startRtcCallback}
-                                        stopRtcCallback={context.stopRtcCallback}
-                                        getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
-                                        getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
-                                        isRecording={context.isRecording}
-                                        isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
-                                        language={this.props.language}
-                                        stopRecord={context.stopRecord}
-                                        rtc={this.props.rtc}
-                                        isAllowHandUp={hostInfo.isAllowHandUp}
-                                        classMode={hostInfo.classMode}
-                                        userId={parseInt(this.props.userId)}
-                                        handleManagerState={this.props.handleManagerState}
-                                        identity={this.props.identity}
-                                        room={this.props.room}
-                                        channelId={this.props.uuid}/>
-                    )}/>
+                    <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                    applyForRtc={false}
+                                    isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
+                                    language={this.props.language}
+                                    rtc={this.props.rtc}
+                                    isAllowHandUp={hostInfo.isAllowHandUp}
+                                    classMode={hostInfo.classMode}
+                                    userId={parseInt(this.props.userId)}
+                                    handleManagerState={this.props.handleManagerState}
+                                    identity={this.props.identity}
+                                    room={this.props.room}
+                                    channelId={this.props.uuid}/>
                 );
             } else {
                 const thisGuestUsers = room.state.globalState.guestUsers;
@@ -106,73 +97,49 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
                     const selfInfo: GuestUserType = thisGuestUsers.find((guestUser: GuestUserType) => guestUser.userId === userId);
                     if (selfInfo) {
                         return (
-                            <RoomContextConsumer children={context => (
-                                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                                applyForRtc={selfInfo.applyForRtc}
-                                                startRtcCallback={context.startRtcCallback}
-                                                stopRtcCallback={context.stopRtcCallback}
-                                                isAllowHandUp={hostInfo.isAllowHandUp}
-                                                getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
-                                                getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
-                                                isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
-                                                language={this.props.language}
-                                                rtc={this.props.rtc}
-                                                isRecording={context.isRecording}
-                                                stopRecord={context.stopRecord}
-                                                classMode={hostInfo.classMode}
-                                                userId={parseInt(this.props.userId)}
-                                                handleManagerState={this.props.handleManagerState}
-                                                identity={this.props.identity}
-                                                room={this.props.room}
-                                                channelId={this.props.uuid}/>
-                            )}/>
-                        );
-                    } else {
-                        return (
-                            <RoomContextConsumer children={context => (
-                                <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                                applyForRtc={false}
-                                                startRtcCallback={context.startRtcCallback}
-                                                stopRtcCallback={context.stopRtcCallback}
-                                                language={this.props.language}
-                                                getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
-                                                getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
-                                                isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
-                                                rtc={this.props.rtc}
-                                                isAllowHandUp={hostInfo.isAllowHandUp}
-                                                isRecording={context.isRecording}
-                                                stopRecord={context.stopRecord}
-                                                classMode={hostInfo.classMode}
-                                                userId={parseInt(this.props.userId)}
-                                                handleManagerState={this.props.handleManagerState}
-                                                identity={this.props.identity}
-                                                room={this.props.room}
-                                                channelId={this.props.uuid}/>
-                            )}/>
-                        );
-                    }
-                } else {
-                    return (
-                        <RoomContextConsumer children={context => (
                             <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
-                                            applyForRtc={false}
-                                            startRtcCallback={context.startRtcCallback}
-                                            stopRtcCallback={context.stopRtcCallback}
-                                            language={this.props.language}
+                                            applyForRtc={selfInfo.applyForRtc}
                                             isAllowHandUp={hostInfo.isAllowHandUp}
-                                            getMediaStageCellReleaseFunc={context.getMediaStageCellReleaseFunc}
-                                            getMediaCellReleaseFunc={context.getMediaCellReleaseFunc}
                                             isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
+                                            language={this.props.language}
                                             rtc={this.props.rtc}
-                                            stopRecord={context.stopRecord}
-                                            isRecording={context.isRecording}
                                             classMode={hostInfo.classMode}
                                             userId={parseInt(this.props.userId)}
                                             handleManagerState={this.props.handleManagerState}
                                             identity={this.props.identity}
                                             room={this.props.room}
                                             channelId={this.props.uuid}/>
-                        )}/>
+                        );
+                    } else {
+                        return (
+                            <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                            applyForRtc={false}
+                                            language={this.props.language}
+                                            isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
+                                            rtc={this.props.rtc}
+                                            isAllowHandUp={hostInfo.isAllowHandUp}
+                                            classMode={hostInfo.classMode}
+                                            userId={parseInt(this.props.userId)}
+                                            handleManagerState={this.props.handleManagerState}
+                                            identity={this.props.identity}
+                                            room={this.props.room}
+                                            channelId={this.props.uuid}/>
+                        );
+                    }
+                } else {
+                    return (
+                        <ClassroomMedia isVideoEnable={hostInfo.isVideoEnable}
+                                        applyForRtc={false}
+                                        language={this.props.language}
+                                        isAllowHandUp={hostInfo.isAllowHandUp}
+                                        isAllMemberAudioClose={hostInfo.isAllMemberAudioClose}
+                                        rtc={this.props.rtc}
+                                        classMode={hostInfo.classMode}
+                                        userId={parseInt(this.props.userId)}
+                                        handleManagerState={this.props.handleManagerState}
+                                        identity={this.props.identity}
+                                        room={this.props.room}
+                                        channelId={this.props.uuid}/>
                     );
                 }
             }

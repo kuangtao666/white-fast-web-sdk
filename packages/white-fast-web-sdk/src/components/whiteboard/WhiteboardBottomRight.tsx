@@ -20,8 +20,6 @@ export type MessageType = {
     messageInner: string[],
 };
 
-
-
 export type hotkeyTooltipState = {
     hotkeyTooltipDisplay: boolean,
     messages:  MessageType[],

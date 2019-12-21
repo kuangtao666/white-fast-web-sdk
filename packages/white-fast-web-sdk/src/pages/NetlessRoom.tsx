@@ -37,7 +37,7 @@ import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
-import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
+import {RoomFacadeObject} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
@@ -55,7 +55,6 @@ const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export type NetlessRoomStates = {
     phase: RoomPhase;
     connectedFail: boolean;
-    didSlaveConnected: boolean;
     menuInnerState: MenuInnerType;
     isMenuVisible: boolean;
     roomToken: string | null;
@@ -76,13 +75,6 @@ export type NetlessRoomStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
-    startRtc?: (recordFunc?: () => void) => void;
-    stopRtc?: () => void;
-    stopRecord?: (stopRecordFunc?: () => void) => void;
-    isRecording: boolean;
-    secondsElapsed?: number;
-    releaseMedia?: () => void;
-    releaseMediaStage?: () => void;
 };
 
 @observer
@@ -96,7 +88,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         this.state = {
             phase: RoomPhase.Connecting,
             connectedFail: false,
-            didSlaveConnected: false,
             menuInnerState: MenuInnerType.PPTBox,
             isMenuVisible: false,
             roomToken: null,
@@ -111,7 +102,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             classMode: this.props.defaultClassMode !== undefined ? this.props.defaultClassMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
-            isRecording: false,
         };
         this.cursor = new UserCursor();
     }
@@ -286,18 +276,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         this.stopAll();
     }
 
-    private recordTime = (time: number): void => {
-        this.setState({secondsElapsed: time});
-    }
-
-    private getMediaCellReleaseFunc = (func: () => void): void => {
-        this.setState({releaseMedia: func});
-    }
-
-    private getMediaStageCellReleaseFunc = (func: () => void): void => {
-        this.setState({releaseMediaStage: func});
-    }
-
     private stopAll = (): void => {
         if (this.roomManager) {
             this.roomManager.leave();
@@ -308,7 +286,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             room.setGlobalState({hostInfo: {
                     ...room.state.globalState.hostInfo,
                     isVideoEnable: false,
-                    secondsElapsed: this.state.secondsElapsed,
                 }});
         }
         this.didLeavePage = true;
@@ -319,14 +296,11 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         if (this.roomManager) {
             this.roomManager.stop();
         }
-        if (this.state.stopRtc) {
-            this.state.stopRtc();
+        if (roomStore.stopRtc) {
+            roomStore.stopRtc();
         }
-        if (this.state.releaseMedia) {
-            this.state.releaseMedia();
-        }
-        if (this.state.releaseMediaStage) {
-            this.state.releaseMediaStage();
+        if (roomStore.releaseMedia) {
+            roomStore.releaseMedia();
         }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("beforeunload", this.beforeunload);
@@ -535,11 +509,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             return (
                 <WhiteboardRecord
                     ossConfigObj={this.state.ossConfigObj}
-                    recordTime={this.recordTime}
-                    startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
-                    stopRecordCallback={this.stopRecordCallback}
-                    setRecordingState={this.setRecordingState}
                     room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
                     uuid={this.props.uuid} rtc={this.props.rtc}
@@ -593,21 +563,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     private handleDocumentArrayState = (state: PPTDataType[]): void => {
         this.setState({documentArray: state});
     }
-
-    private startRtcCallback = (func: (recordFunc?: () => void) => void): void => {
-        this.setState({startRtc: func});
-    }
-
-    private stopRtcCallback = (func: () => void): void => {
-        this.setState({stopRtc: func});
-    }
-
-    private stopRecordCallback = (func: () => void): void => {
-        this.setState({stopRecord: func});
-    }
-    private setRecordingState = (state: boolean): void => {
-        this.setState({isRecording: state});
-    }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
         const {language, loadingSvgUrl, userId, isScreenLock} = this.props;
@@ -648,14 +603,8 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
-                    startRtcCallback: this.startRtcCallback,
-                    stopRtcCallback: this.stopRtcCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: room,
-                    stopRecord: this.state.stopRecord,
-                    isRecording: this.state.isRecording,
-                    getMediaCellReleaseFunc: this.getMediaCellReleaseFunc,
-                    getMediaStageCellReleaseFunc: this.getMediaStageCellReleaseFunc,
                 }}>
                     <div className="realtime-box">
                         <MenuBox

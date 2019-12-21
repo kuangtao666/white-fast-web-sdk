@@ -16,8 +16,6 @@ export type WhiteboardFileProps = {
     handleDocumentArrayState: (state: PPTDataType[]) => void;
 };
 
-
-
 export default class WhiteboardFile extends React.Component<WhiteboardFileProps, {}> {
 
     public constructor(props: WhiteboardFileProps) {

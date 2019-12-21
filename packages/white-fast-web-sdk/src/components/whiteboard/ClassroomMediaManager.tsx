@@ -14,8 +14,6 @@ export type ClassroomMediaManagerProps = {
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
     userAvatarUrl?: string;
-    getMediaCellReleaseFunc: (func: () => void) => void;
-    getMediaStageCellReleaseFunc: (func: () => void) => void;
 };
 
 export type ClassroomMediaManagerStates = {
@@ -36,7 +34,6 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
         if (mediaLayerDownRef) {
             return streams.map((stream: NetlessStream, index: number) => {
                 return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
-                                           getMediaCellReleaseFunc={this.props.getMediaCellReleaseFunc}
                                            key={`${stream.getId()}`}
                                            streamIndex={index}
                                            mediaLayerDownRef={mediaLayerDownRef}

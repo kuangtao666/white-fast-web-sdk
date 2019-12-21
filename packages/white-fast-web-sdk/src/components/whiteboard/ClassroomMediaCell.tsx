@@ -5,6 +5,7 @@ import * as microphone_open from "../../assets/image/microphone_open.svg";
 import * as microphone_close from "../../assets/image/microphone_close.svg";
 import Identicon from "../../tools/identicon/Identicon";
 import {ClassModeType} from "../../pages/NetlessRoomTypes";
+import {roomStore} from "../../models/RoomStore";
 export type ClassroomManagerCellProps = {
     stream: NetlessStream;
     userId: number;
@@ -16,7 +17,6 @@ export type ClassroomManagerCellProps = {
     classMode: ClassModeType;
     setLocalStreamState: (state: boolean) => void;
     isLocalStreamPublish: boolean;
-    getMediaCellReleaseFunc: (fun: () => void) => void;
     mediaLayerDownRef: HTMLDivElement;
 };
 
@@ -30,7 +30,7 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     public async componentDidMount(): Promise<void> {
         const {stream} = this.props;
         await this.startStream(stream);
-        this.props.getMediaCellReleaseFunc(this.release);
+        roomStore.releaseMedia = this.release;
     }
 
     private startStream = (stream: NetlessStream): void => {
