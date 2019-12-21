@@ -4,7 +4,7 @@ import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
-import {IdentityType} from "./WhiteboardCreatorPage";
+import {IdentityType} from "./IndexPage";
 export type WhiteboardPageProps = RouteComponentProps<{
     uuid: string;
     userId: string;

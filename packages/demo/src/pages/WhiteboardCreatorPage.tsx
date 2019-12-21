@@ -4,11 +4,8 @@ import {netlessWhiteboardApi, RoomType} from "../apiMiddleware";
 import {message} from "antd";
 import {RouteComponentProps} from "react-router";
 import PageError from "./PageError";
-export enum IdentityType {
-    host = "host",
-    guest = "guest",
-    listener = "listener",
-}
+import {IdentityType} from "./IndexPage";
+
 export type WhiteboardCreatorPageState = {
     uuid?: string;
     userId?: string;

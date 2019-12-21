@@ -1,13 +1,10 @@
 import * as React from "react";
 import "./ClassroomMediaManager.less";
 import {NetlessStream} from "./ClassroomMedia";
-import {CSSProperties} from "react";
-import {ClassModeType} from "../../pages/RoomManager";
 import * as microphone_open from "../../assets/image/microphone_open.svg";
 import * as microphone_close from "../../assets/image/microphone_close.svg";
-import * as camera_open from "../../assets/image/camera_open.svg";
-import * as camera_close from "../../assets/image/camera_close.svg";
 import Identicon from "../../tools/identicon/Identicon";
+import {ClassModeType} from "../../pages/NetlessRoomTypes";
 export type ClassroomManagerCellProps = {
     stream: NetlessStream;
     userId: number;

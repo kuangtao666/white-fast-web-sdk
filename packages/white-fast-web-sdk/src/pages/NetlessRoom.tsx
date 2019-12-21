@@ -17,7 +17,7 @@ import {
 } from "white-web-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
-import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
+import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRight";
 import MenuBox from "../components/menu/MenuBox";
@@ -32,7 +32,7 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType, PPTType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
-import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
+import {GuestUserType, HostUserType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
@@ -40,111 +40,19 @@ import "./NetlessRoom.less";
 import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
-import WhiteAudioPlugin from "../plugins/audio_plugin/WhiteAudioPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
 import {roomStore} from "../models/RoomStore";
 import {observer} from "mobx-react";
+import {
+    ClassModeType,
+    IdentityType,
+    MenuInnerType,
+    NetlessRoomProps,
+    PagePreviewPositionEnum,
+} from "./NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
-
-export enum MenuInnerType {
-    AnnexBox = "AnnexBox",
-    PPTBox = "PPTBox",
-}
-
-export enum LanguageEnum {
-    Chinese = "Chinese",
-    English = "English",
-}
-
-export enum UploadDocumentEnum {
-    image = "image",
-    static_conversion = "static_conversion",
-    dynamic_conversion = "dynamic_conversion",
-}
-
-export enum RtcEnum {
-    agora = "agora",
-    zego = "zego",
-    qiniu = "qiniu",
-}
-
-export type UploadToolBoxType = {
-    enable: boolean,
-    type: UploadDocumentEnum,
-    icon?: string,
-    title?: string,
-    script?: string,
-};
-
-export type RtcType = {
-    type: RtcEnum,
-    rtcObj: any,
-    appId: string,
-    defaultStart?: boolean,
-    channel?: string, // 不写默认是 uuid,
-    authConfig?: {
-        token: string,
-    }
-    recordConfig?: {
-        recordUid?: string,
-        recordToken?: string,
-        customerId: string,
-        customerCertificate: string,
-    },
-};
-export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
-export type RealTimeProps = {
-    uuid: string;
-    roomToken: string;
-    userId: string;
-    roomFacadeSetter: RoomFacadeSetter;
-    isScreenLock?: boolean;
-    defaultClassMode?: ClassModeType,
-    userName?: string;
-    roomName?: string;
-    userAvatarUrl?: string;
-    isReadOnly?: boolean;
-    uploadToolBox?: UploadToolBoxType[],
-    toolBarPosition?: ToolBarPositionEnum;
-    pagePreviewPosition?: PagePreviewPositionEnum;
-    boardBackgroundColor?: string;
-    defaultColorArray?: string[];
-    identity?: IdentityType;
-    colorArrayStateCallback?: (colorArray: string[]) => void;
-    roomRenameCallback?: (name: string) => void;
-    documentArray?: PPTDataType[];
-    logoUrl?: string;
-    loadingSvgUrl?: string;
-    language?: LanguageEnum;
-    clickLogoCallback?: () => void;
-    deviceType?: DeviceType;
-    rtc?: RtcType;
-    roomCallback?: (room: Room) => void;
-    exitRoomCallback?: () => void;
-    replayCallback?: () => void;
-    recordDataCallback?: (data: RecordDataType) => void;
-    documentArrayCallback?: (data: PPTDataType[]) => void;
-    isManagerOpen?: boolean | null;
-    elementId: string;
-    ossConfigObj?: OSSConfigObjType;
-    ossUploadCallback?: (res: any) => void;
-    enableRecord?: boolean;
-};
-
-export enum ToolBarPositionEnum {
-    top = "top",
-    bottom = "bottom",
-    left = "left",
-    right = "right",
-}
-
-export enum PagePreviewPositionEnum {
-    left = "left",
-    right = "right",
-}
-
-export type RealTimeStates = {
+export type NetlessRoomStates = {
     phase: RoomPhase;
     connectedFail: boolean;
     didSlaveConnected: boolean;
@@ -178,12 +86,12 @@ export type RealTimeStates = {
 };
 
 @observer
-class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
+class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> implements RoomFacadeObject {
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
     private menuChild: React.Component;
-    public constructor(props: RealTimeProps) {
+    public constructor(props: NetlessRoomProps) {
         super(props);
         this.state = {
             phase: RoomPhase.Connecting,
@@ -224,7 +132,7 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin, WhiteAudioPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -240,7 +148,6 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
                     }},
                 {
                     onPhaseChanged: phase => {
-                        console.log(phase);
                         if (!this.didLeavePage) {
                             this.setState({phase});
                         }

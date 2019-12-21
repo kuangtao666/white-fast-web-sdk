@@ -4,7 +4,7 @@ import {WebCourseController} from "../tools/WebCourseController";
 import {
     Room,
 } from "white-web-sdk";
-import {IdentityType} from "../components/whiteboard/ClassroomMedia";
+import {IdentityType} from "./NetlessRoomTypes";
 export type WebPptProps = {
     room: Room;
     ppt?: any;

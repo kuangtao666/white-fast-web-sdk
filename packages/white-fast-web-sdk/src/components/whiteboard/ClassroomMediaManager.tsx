@@ -1,8 +1,8 @@
 import * as React from "react";
-import {IdentityType, NetlessStream} from "./ClassroomMedia";
+import {NetlessStream} from "./ClassroomMedia";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import "./ClassroomMediaManager.less";
-import {ClassModeType} from "../../pages/RoomManager";
+import {ClassModeType, IdentityType} from "../../pages/NetlessRoomTypes";
 
 export type ClassroomMediaManagerProps = {
     streams: NetlessStream[];

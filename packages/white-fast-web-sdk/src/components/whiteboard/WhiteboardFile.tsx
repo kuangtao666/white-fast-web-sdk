@@ -4,7 +4,7 @@ import {Room} from "white-web-sdk";
 import * as default_cover_home from "../../assets/image/default_cover_home.svg";
 import * as close from "../../assets/image/close.svg";
 import {PPTDataType, PPTType} from "../menu/PPTDatas";
-import {LanguageEnum} from "../../pages/NetlessRoom";
+import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 export type WhiteboardFileProps = {
     room: Room;
     handleFileState: () => void;

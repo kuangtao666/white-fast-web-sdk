@@ -2,9 +2,7 @@ import * as React from "react";
 import {Badge, Tabs, Icon} from "antd";
 import "./WhiteboardManager.less";
 import {Room, ViewMode} from "white-web-sdk";
-import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
-import {IdentityType} from "./WhiteboardTopRight";
-import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import speak from "../../assets/image/speak.svg";
 import user_empty from "../../assets/image/user_empty.svg";
 import raise_hands_active from "../../assets/image/raise_hands_active.svg";
@@ -13,6 +11,7 @@ import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
 import {RoomContextConsumer} from "../../pages/RoomContext";
 import Identicon from "../../tools/identicon/Identicon";
+import {ClassModeType, IdentityType, LanguageEnum, RtcType} from "../../pages/NetlessRoomTypes";
 const { TabPane } = Tabs;
 
 export type WhiteboardManagerProps = {

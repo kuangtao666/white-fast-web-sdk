@@ -11,10 +11,9 @@ import {
     ToolBoxText,
 } from "./ToolIconComponent";
 import "./ToolBox.less";
-import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 import {isMobile} from "react-device-detect";
-import {roomStore} from "../../models/RoomStore";
+import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;

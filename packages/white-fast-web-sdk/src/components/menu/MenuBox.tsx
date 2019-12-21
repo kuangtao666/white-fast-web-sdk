@@ -1,7 +1,7 @@
 import * as React from "react";
-import {LanguageEnum, PagePreviewPositionEnum} from "../../pages/NetlessRoom";
 import close from "../../assets/image/close.svg";
 import add_icon from "../../assets/image/add_icon.svg";
+import {LanguageEnum, PagePreviewPositionEnum} from "../../pages/NetlessRoomTypes";
 const Menu = require("react-burger-menu/lib/menus/slide");
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));

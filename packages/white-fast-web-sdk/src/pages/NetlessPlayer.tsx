@@ -15,12 +15,12 @@ import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
-import {LanguageEnum} from "./NetlessRoom";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
 import {observer} from "mobx-react";
 import {replayStore} from "../models/ReplayStore";
+import {LanguageEnum} from "./NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum LayoutType {
     Suspension = "Suspension",

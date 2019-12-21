@@ -2,7 +2,7 @@ import * as React from "react";
 import "./ClassroomMedia.less";
 import {Room, ViewMode} from "white-web-sdk";
 import {Button, Radio, Tooltip, notification, Icon, message} from "antd";
-import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
 import * as menu_in from "../../assets/image/menu_in.svg";
@@ -11,19 +11,14 @@ import * as microphone_open from "../../assets/image/microphone_open.svg";
 import * as microphone_close from "../../assets/image/microphone_close.svg";
 import * as camera_open from "../../assets/image/camera_open.svg";
 import * as camera_close from "../../assets/image/camera_close.svg";
-import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import ClassroomMediaManager from "./ClassroomMediaManager";
 import Identicon from "../../tools/identicon/Identicon";
+import {ClassModeType, IdentityType, LanguageEnum, RtcType} from "../../pages/NetlessRoomTypes";
 
 export type NetlessStream = {
     state: {isAudioOpen: boolean, isVideoOpen: boolean, isInStage: boolean, identity?: IdentityType},
 } & any;
 
-export enum IdentityType {
-    host = "host",
-    guest = "guest",
-    listener = "listener",
-}
 
 export type ClassroomMediaStates = {
     isRtcStart: boolean;

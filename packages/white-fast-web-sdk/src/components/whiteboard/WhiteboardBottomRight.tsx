@@ -8,9 +8,9 @@ import * as handup_black from "../../assets/image/handup_black.svg";
 import "./WhiteboardBottomRight.less";
 import {Badge, message, Tooltip} from "antd";
 import {Room, Scene, RoomState, DeviceType, ViewMode} from "white-web-sdk";
-import {LanguageEnum} from "../../pages/NetlessRoom";
-import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import {isMobile} from "react-device-detect";
+import {ClassModeType, LanguageEnum} from "../../pages/NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type MessageType = {

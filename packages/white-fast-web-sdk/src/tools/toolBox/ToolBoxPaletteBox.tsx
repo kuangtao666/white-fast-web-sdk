@@ -6,7 +6,7 @@ import isColor from "is-color";
 import {message} from "antd";
 import ToolBoxAddColor from "./ToolBoxAddColor";
 import {RoomContextConsumer} from "../../pages/RoomContext";
-import {LanguageEnum} from "../../pages/NetlessRoom";
+import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 export type ToolBoxPaletteBoxProps = {
     displayStroke: boolean;
     setMemberState: (modifyState: Partial<any>) => void;

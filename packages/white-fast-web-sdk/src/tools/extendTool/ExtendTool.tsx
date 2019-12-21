@@ -4,11 +4,11 @@ import "./ExtendTool.less";
 import {ExtendToolIcon} from "./ExtendToolIcon";
 import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../pages/RoomContext";
-import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 import {PluginComponentClass} from "white-web-sdk";
 import * as OSS from "ali-oss";
 import {PPTProgressListener} from "../upload/UploadManager";
+import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
 
 export type ExtendToolStates = {
     toolBoxColor: string;

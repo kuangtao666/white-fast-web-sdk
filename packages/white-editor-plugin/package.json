@@ -14,14 +14,14 @@
   "license": "MIT",
   "dependencies": {
     "braft-editor": "^2.3.8",
-    "react": "~16.8.0",
-    "react-dom": "~16.8.0",
-    "white-react-sdk": "^2.3.17"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "white-web-sdk": "^2.3.17"
   },
   "peerDependencies": {
-    "react": "~16.8.0",
-    "react-dom": "~16.8.0",
-    "white-react-sdk": "^2.3.17"
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
+    "white-web-sdk": "^2.3.17"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

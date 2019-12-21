@@ -2,7 +2,6 @@ import * as React from "react";
 import {message, Modal} from "antd";
 import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
-import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
 import {OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
@@ -10,6 +9,7 @@ import {Room} from "white-web-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
+import {RecordDataType, RtcType} from "../../pages/NetlessRoomTypes";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;

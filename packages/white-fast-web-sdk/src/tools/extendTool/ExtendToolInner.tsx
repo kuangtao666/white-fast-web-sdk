@@ -10,10 +10,9 @@ import web_plugin from "../../assets/image/web_plugin.svg";
 import editor_plugin from "../../assets/image/editor_plugin.svg";
 import video_plugin from "../../assets/image/video_plugin.svg";
 import audio_plugin from "../../assets/image/audio_plugin.svg";
-import {LanguageEnum} from "../../pages/NetlessRoom";
 import {PPTProgressListener, UploadManager} from "../upload/UploadManager";
-import {roomStore} from "../../models/RoomStore";
 import {observer} from "mobx-react";
+import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;

@@ -1,11 +1,8 @@
 import {Room, ViewMode} from "white-web-sdk";
-import {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
 import {message} from "antd";
+import {ClassModeType, IdentityType} from "./NetlessRoomTypes";
 
-export enum ClassModeType {
-    lecture = "lecture",
-    discuss = "discuss",
-}
+
 
 export type GuestUserType = {
     userId: string,

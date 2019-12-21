@@ -8,9 +8,9 @@ import {DeviceType, PptKind, Room, WhiteWebSdk} from "white-web-sdk";
 import * as image_icon from "../../assets/image/image_icon.svg";
 import * as image_transform from "../../assets/image/image_transform.svg";
 import * as web_transform from "../../assets/image/web_transform.svg";
-import {LanguageEnum, ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 import {PPTDataType} from "../../components/menu/PPTDatas";
+import {LanguageEnum, ToolBarPositionEnum, UploadDocumentEnum, UploadToolBoxType} from "../../pages/NetlessRoomTypes";
 export type ToolBoxUploadBoxState = {
     toolBoxColor: string,
 };

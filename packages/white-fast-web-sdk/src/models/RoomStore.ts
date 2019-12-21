@@ -1,5 +1,5 @@
 import {observable} from "mobx";
-import {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
+import {IdentityType} from "../pages/NetlessRoomTypes";
 
 export class RoomStore {
     @observable

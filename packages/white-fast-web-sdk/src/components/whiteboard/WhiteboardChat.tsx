@@ -14,8 +14,7 @@ import {
 import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";
-import {LanguageEnum} from "../../pages/NetlessRoom";
-import {IdentityType} from "./WhiteboardTopRight";
+import {IdentityType, LanguageEnum} from "../../pages/NetlessRoomTypes";
 
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 

@@ -2,11 +2,11 @@ import * as React from "react";
 import {ViewMode, Player, Scene, DeviceType} from "white-web-sdk";
 import {Badge} from "antd";
 import menu_out from "../../assets/image/menu_out.svg";
-import {LanguageEnum} from "../../pages/NetlessRoom";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 import {LayoutType} from "../../pages/NetlessPlayer";
 import Identicon from "../../tools/identicon/Identicon";
+import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 
 export type PlayerTopRightProps = {
     userId: string;

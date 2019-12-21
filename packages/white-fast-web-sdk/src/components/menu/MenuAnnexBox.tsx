@@ -4,8 +4,8 @@ import add_icon from "../../assets/image/add_icon.svg";
 import TweenOne from "rc-tween-one";
 import {Room, RoomState, Scene} from "white-web-sdk";
 import "./MenuAnnexBox.less";
-import {LanguageEnum} from "../../pages/NetlessRoom";
 import VirtualList, {ItemInfo} from "react-tiny-virtual-list";
+import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 
 export type MenuAnnexBoxState = {
     isFocus: boolean,

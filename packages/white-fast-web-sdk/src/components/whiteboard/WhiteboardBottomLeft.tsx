@@ -4,10 +4,10 @@ import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
 import file from "../../assets/image/file.svg";
-import {IdentityType} from "./WhiteboardTopRight";
 import * as click_icon from "../../assets/image/click_icon.svg";
 import * as click_icon_black from "../../assets/image/click_icon_black.svg";
 import {roomStore} from "../../models/RoomStore";
+import {IdentityType} from "../../pages/NetlessRoomTypes";
 
 export type WhiteboardBottomLeftProps = {
     room: Room;
