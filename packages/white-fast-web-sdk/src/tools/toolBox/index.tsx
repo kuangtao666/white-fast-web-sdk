@@ -16,6 +16,7 @@ import {isMobile} from "react-device-detect";
 import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
 import {DisplayProperty} from "csstype";
 import {roomStore} from "../../models/RoomStore";
+import {Room} from "white-web-sdk";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -37,6 +38,7 @@ export type MemberState = {
 };
 export type ToolBoxProps = {
     memberState: Readonly<MemberState>;
+    room: Room;
     setMemberState: (modifyState: Partial<MemberState>) => void;
     isReadOnly?: boolean;
     toolBarPosition?: ToolBarPositionEnum;
@@ -109,7 +111,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             this.props.setMemberState({currentApplianceName: applianceName});
             this.setState({extendsPanel: false});
         }
-    };
+    }
 
     public componentDidMount(): void {
         this.setState({extendsPanel: false, windowHeight: window.innerHeight});
@@ -118,7 +120,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         if (!visible) {
             this.setState({extendsPanel: false});
         }
-    };
+    }
 
     private buttonColor(isSelected: boolean): string {
         if (isSelected) {
@@ -150,10 +152,21 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         } else {
             return nodes;
         }
-    };
+    }
 
+    private isHavePpt = (): boolean => {
+        const {room} = this.props;
+        const isHave = !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        if (isHave) {
+            roomStore.isScreenZoomLock = true;
+        }
+        return isHave;
+    }
     private detectToolboxState = (): DisplayProperty => {
         const {isReadOnly} = this.props;
+        if (!this.isHavePpt()) {
+            return "flex";
+        }
         if (isReadOnly || roomStore.boardPointerEvents === "none") {
             return "none";
         } else {
@@ -162,7 +175,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
     }
 
     public render(): React.ReactNode {
-        const {toolBarPosition, isReadOnly} = this.props;
+        const {toolBarPosition} = this.props;
         const nodes: React.ReactNode[] = [];
         for (const applianceName in ToolBox.descriptions) {
             const description = ToolBox.descriptions[applianceName];
@@ -289,7 +302,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 return "left";
             }
         }
-    };
+    }
 
     private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
         return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}

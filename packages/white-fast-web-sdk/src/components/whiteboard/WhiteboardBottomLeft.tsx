@@ -69,6 +69,8 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
 
     private deletePptUrl = (): void => {
         this.props.room.setGlobalState({h5PptUrl: ""});
+        roomStore.boardPointerEvents = "auto";
+        roomStore.isScreenZoomLock = false;
     }
 
     private renderPptPopover = (): React.ReactNode => {

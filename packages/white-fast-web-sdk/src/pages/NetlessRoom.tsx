@@ -704,6 +704,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 room={room}/>
                             {this.renderRecordComponent()}
                             <ToolBox
+                                room={room}
                                 isReadOnly={isReadOnly}
                                 language={this.props.language}
                                 toolBarPosition={this.props.toolBarPosition}
