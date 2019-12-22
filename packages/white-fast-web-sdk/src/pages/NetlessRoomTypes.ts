@@ -77,6 +77,7 @@ export type NetlessRoomProps = {
     roomToken: string;
     userId: string;
     roomFacadeSetter: RoomFacadeSetter;
+    plugins?: any[];
     defaultClassMode?: ClassModeType,
     userName?: string;
     roomName?: string;

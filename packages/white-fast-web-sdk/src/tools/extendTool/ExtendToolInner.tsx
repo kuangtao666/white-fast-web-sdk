@@ -101,6 +101,33 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
             console.log(err);
         }
     }
+    private uploadAudio = async (event: any): Promise<void> => {
+        try {
+            const uploadManager = new UploadManager(this.props.client, this.props.room);
+            const res = await uploadManager.addFile(`${uuidv4()}/${event.file.name}`, event.file,  this.props.onProgress);
+            const isHttps = res.indexOf("https") !== -1;
+            let url;
+            if (isHttps) {
+                url = res;
+            } else {
+                url = res.replace("http", "https");
+            }
+            if (url) {
+                this.props.room.insertPlugin({
+                    protocal: "audio",
+                    centerX: 0,
+                    centerY: 0,
+                    width: 480,
+                    height: 270,
+                    props: {
+                        audioUrl: url,
+                    },
+                });
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
     private isURL(): boolean {// 验证url
         const strRegex = "^((https|http|ftp|rtsp|mms)?://)"
             + "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" // ftp的user@
@@ -159,9 +186,15 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                             </div>
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传音频"}>
-                                    <div onClick={() => this.insertPlugin("audio", 480, 270)} className="extend-inner-icon">
-                                        <img style={{width: 26}} src={audio_plugin}/>
-                                    </div>
+                                    <Upload
+                                        accept={"audio/mp3"}
+                                        showUploadList={false}
+                                        customRequest={this.uploadAudio}>
+                                        <div onClick={() => this.insertPlugin("audio", 480, 270)}
+                                             className="extend-inner-icon">
+                                            <img style={{width: 26}} src={audio_plugin}/>
+                                        </div>
+                                    </Upload>
                                 </Tooltip>
                             </div>
                         </div>
