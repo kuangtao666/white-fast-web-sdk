@@ -14,6 +14,8 @@ import "./ToolBox.less";
 import {TooltipPlacement} from "antd/lib/tooltip";
 import {isMobile} from "react-device-detect";
 import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
+import {DisplayProperty} from "csstype";
+import {roomStore} from "../../models/RoomStore";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -107,7 +109,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             this.props.setMemberState({currentApplianceName: applianceName});
             this.setState({extendsPanel: false});
         }
-    }
+    };
 
     public componentDidMount(): void {
         this.setState({extendsPanel: false, windowHeight: window.innerHeight});
@@ -116,7 +118,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         if (!visible) {
             this.setState({extendsPanel: false});
         }
-    }
+    };
 
     private buttonColor(isSelected: boolean): string {
         if (isSelected) {
@@ -148,6 +150,15 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         } else {
             return nodes;
         }
+    };
+
+    private detectToolboxState = (): DisplayProperty => {
+        const {isReadOnly} = this.props;
+        if (isReadOnly || roomStore.boardPointerEvents === "none") {
+            return "none";
+        } else {
+            return "flex";
+        }
     }
 
     public render(): React.ReactNode {
@@ -168,7 +179,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             case ToolBarPositionEnum.top: {
                 return (
                     <div style={{
-                        display: isReadOnly ? "none" : "flex",
+                        display: this.detectToolboxState(),
                     }} className="whiteboard-tool-box">
                         <div className="tool-mid-box">
                             {this.addCustomerComponent(nodes)}
@@ -178,7 +189,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             case ToolBarPositionEnum.bottom: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-bottom">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-bottom">
                         <div className="tool-mid-box">
                                 {this.addCustomerComponent(nodes)}
                         </div>
@@ -187,7 +198,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             case ToolBarPositionEnum.left: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-left">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-left">
                         <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>
@@ -196,7 +207,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             case ToolBarPositionEnum.right: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-right">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-right">
                         <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>
@@ -205,7 +216,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             default: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-left">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-left">
                         <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>
@@ -278,7 +289,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
                 return "left";
             }
         }
-    }
+    };
 
     private renderToolBoxPaletteBox(isSelected: boolean, description: ApplianceDescription): React.ReactNode {
         return <ToolBoxPaletteBox colorConfig={this.props.colorConfig}

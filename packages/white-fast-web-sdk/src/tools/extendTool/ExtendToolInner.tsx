@@ -13,6 +13,7 @@ import audio_plugin from "../../assets/image/audio_plugin.svg";
 import {PPTProgressListener, UploadManager} from "../upload/UploadManager";
 import {observer} from "mobx-react";
 import {LanguageEnum} from "../../pages/NetlessRoomTypes";
+import {roomStore} from "../../models/RoomStore";
 const { TabPane } = Tabs;
 export type ExtendToolInnerProps = {
     whiteboardLayerDownRef: HTMLDivElement;
@@ -26,7 +27,6 @@ export type ExtendToolInnerProps = {
 
 export type ExtendToolInnerStates = {
     activeKey: string;
-    isInputH5Visible: boolean;
     url: string | null;
 };
 
@@ -36,7 +36,6 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
         super(props);
         this.state = {
             activeKey: "1",
-            isInputH5Visible: false,
             url: null,
         };
     }
@@ -133,7 +132,7 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                             <div className="extend-icon-box">
                                 <Tooltip placement="bottom" title={isEnglish ? "Web page" : "H5 课件"}>
                                     <div onClick={() => {
-                                        this.setState({isInputH5Visible: true});
+                                        roomStore.isInputH5Visible = true;
                                     }} className="extend-inner-icon">
                                         <img src={web_plugin}/>
                                     </div>
@@ -171,10 +170,10 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                     </TabPane>
                 </Tabs>
                 <Modal
-                    visible={this.state.isInputH5Visible}
+                    visible={roomStore.isInputH5Visible}
                     footer={null}
                     title={isEnglish ? "H5 课件" : "H5 课件"}
-                    onCancel={() => this.setState({isInputH5Visible: false})}
+                    onCancel={() => roomStore.isInputH5Visible = false}
                 >
                     <div className="whiteboard-share-box">
                         <div className="whiteboard-share-text-box">
@@ -184,7 +183,7 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                                 type="primary"
                                 onClick={() => {
                                     this.props.room.setGlobalState({h5PptUrl: this.state.url});
-                                    this.setState({isInputH5Visible: false});
+                                    roomStore.isInputH5Visible = false;
                                 }}
                                 style={{marginTop: 16, width: 240}}
                                 size="large">

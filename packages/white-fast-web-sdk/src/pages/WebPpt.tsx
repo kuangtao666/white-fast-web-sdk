@@ -5,6 +5,7 @@ import {
     Room,
 } from "white-web-sdk";
 import {IdentityType} from "./NetlessRoomTypes";
+import {roomStore} from "../models/RoomStore";
 export type WebPptProps = {
     room: Room;
     ppt?: any;
@@ -40,7 +41,11 @@ class WebPpt extends React.Component<WebPptProps, WebPptStates> {
 
     private isHavePpt = (): boolean => {
         const {room} = this.props;
-        return !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        const isHave = !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        if (isHave) {
+            roomStore.isScreenZoomLock = true;
+        }
+        return isHave;
     }
     public render(): React.ReactNode {
         const {room} = this.props;

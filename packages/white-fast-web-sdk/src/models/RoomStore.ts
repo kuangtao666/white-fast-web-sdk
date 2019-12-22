@@ -20,5 +20,9 @@ export class RoomStore {
     public releaseMedia: (() => void) | null;
     @observable
     public isRecording: boolean = false;
+    @observable
+    public isScreenZoomLock: boolean = false;
+    @observable
+    public isInputH5Visible: boolean = false;
 }
 export const roomStore = new RoomStore();

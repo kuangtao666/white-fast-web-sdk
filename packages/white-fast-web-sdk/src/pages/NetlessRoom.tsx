@@ -115,7 +115,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen, isScreenLock} = this.props;
+        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
@@ -563,9 +563,55 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     private handleDocumentArrayState = (state: PPTDataType[]): void => {
         this.setState({documentArray: state});
     }
+
+    private getCameraState = (room: Room): ViewMode => {
+        const {userId} = this.props;
+        if (this.props.identity === IdentityType.host) {
+            const userSelf: HostUserType = room.state.globalState.hostInfo;
+            if (userSelf) {
+                return userSelf.cameraState;
+            } else {
+                return ViewMode.Freedom;
+            }
+        } else if (this.props.identity === IdentityType.guest) {
+            const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+            if (userSelf) {
+                return userSelf.cameraState;
+            } else {
+                return ViewMode.Freedom;
+            }
+        } else {
+            return ViewMode.Follower;
+        }
+    }
+
+    private getDisableCameraTransformState = (room: Room): boolean => {
+        const {userId} = this.props;
+        if (this.props.identity === IdentityType.host) {
+            const userSelf: HostUserType = room.state.globalState.hostInfo;
+            if (userSelf) {
+                return userSelf.disableCameraTransform;
+            } else {
+                return true;
+            }
+        } else if (this.props.identity === IdentityType.guest) {
+            const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+            if (userSelf) {
+                return userSelf.disableCameraTransform;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    private handleScreenLock = (room: Room): void => {
+        room.disableCameraTransform = roomStore.isScreenZoomLock;
+    }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
-        const {language, loadingSvgUrl, userId, isScreenLock} = this.props;
+        const {language, loadingSvgUrl} = this.props;
         const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
@@ -579,27 +625,9 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         } else if (!roomState) {
             return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else {
-            let cameraState;
-            let disableCameraTransform;
-            if (this.props.identity === IdentityType.host) {
-                const userSelf: HostUserType = room.state.globalState.hostInfo;
-                if (userSelf) {
-                    cameraState = userSelf.cameraState;
-                    disableCameraTransform = userSelf.disableCameraTransform;
-                }
-            } else if (this.props.identity === IdentityType.guest) {
-                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
-                if (userSelf) {
-                    cameraState = userSelf.cameraState;
-                    disableCameraTransform = userSelf.disableCameraTransform;
-                }
-            } else {
-                cameraState = ViewMode.Follower;
-                disableCameraTransform = true;
-            }
-            if (isScreenLock !== undefined && isScreenLock) {
-                room.disableCameraTransform = isScreenLock;
-            }
+            const cameraState = this.getCameraState(room);
+            const disableCameraTransform = this.getDisableCameraTransformState(room);
+            this.handleScreenLock(room);
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,

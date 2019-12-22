@@ -4,10 +4,14 @@ import {observer} from "mobx-react";
 import "./WhiteboardBottomLeft.less";
 import ScaleController from "../../tools/scaleController";
 import file from "../../assets/image/file.svg";
+import * as change_icon from "../../assets/image/change_icon.svg";
+import * as delete_ppt_icon from "../../assets/image/delete_ppt_icon.svg";
 import * as click_icon from "../../assets/image/click_icon.svg";
 import * as click_icon_black from "../../assets/image/click_icon_black.svg";
+import * as ppt_click_icon from "../../assets/image/ppt_click_icon.svg";
 import {roomStore} from "../../models/RoomStore";
 import {IdentityType} from "../../pages/NetlessRoomTypes";
+import {Popover} from "antd";
 
 export type WhiteboardBottomLeftProps = {
     room: Room;
@@ -54,6 +58,50 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
         const {room} = this.props;
         return !!(room.state.globalState && room.state.globalState.h5PptUrl);
     }
+
+    private handlePptClick = (): void => {
+        if (roomStore.boardPointerEvents === "auto") {
+            roomStore.boardPointerEvents = "none";
+        } else {
+            roomStore.boardPointerEvents = "auto";
+        }
+    }
+
+    private deletePptUrl = (): void => {
+        this.props.room.setGlobalState({h5PptUrl: ""});
+    }
+
+    private renderPptPopover = (): React.ReactNode => {
+        return <div className="ppt-popover">
+            <div onClick={this.handlePptClick} className="ppt-popover-cell">
+                <div className="ppt-popover-icon">
+                    <img style={{width: 24}} src={ppt_click_icon}/>
+                </div>
+                <div className="ppt-popover-title">
+                    切换点击 PPT
+                </div>
+            </div>
+            <div onClick={() => {
+                roomStore.isInputH5Visible = true;
+            }} className="ppt-popover-cell">
+                <div className="ppt-popover-icon">
+                    <img style={{width: 23}} src={change_icon}/>
+                </div>
+                <div className="ppt-popover-title">
+                    更换 PPT 链接
+                </div>
+            </div>
+            <div onClick={this.deletePptUrl} className="ppt-popover-cell">
+                <div className="ppt-popover-icon">
+                    <img style={{width: 26}} src={delete_ppt_icon}/>
+                </div>
+                <div className="ppt-popover-title">
+                    清空 PPT 链接
+                </div>
+            </div>
+        </div>;
+    }
+
     public render(): React.ReactNode {
         const {roomState, isReadOnly} = this.props;
         if (isReadOnly) {
@@ -70,15 +118,11 @@ class WhiteboardBottomLeft extends React.Component<WhiteboardBottomLeftProps, {}
             <div className="whiteboard-box-bottom-left">
                 <div className="whiteboard-box-mid">
                     {this.isHavePpt() &&
-                    <div onClick={() => {
-                        if (roomStore.boardPointerEvents === "auto") {
-                            roomStore.boardPointerEvents = "none";
-                        } else {
-                            roomStore.boardPointerEvents = "auto";
-                        }
-                    }} className="whiteboard-click-icon">
-                        {roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}
-                    </div>}
+                    <Popover title={"H5 课件操作"} placement="topLeft" content={this.renderPptPopover()} trigger="hover">
+                        <div onClick={this.handlePptClick} className="whiteboard-click-icon">
+                            {roomStore.boardPointerEvents === "auto" ? <img src={click_icon}/> : <img src={click_icon_black}/>}
+                        </div>
+                    </Popover>}
                     {this.renderFileIcon()}
                     <ScaleController
                         zoomScale={roomState.zoomScale}

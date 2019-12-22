@@ -77,7 +77,6 @@ export type NetlessRoomProps = {
     roomToken: string;
     userId: string;
     roomFacadeSetter: RoomFacadeSetter;
-    isScreenLock?: boolean;
     defaultClassMode?: ClassModeType,
     userName?: string;
     roomName?: string;
