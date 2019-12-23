@@ -1,22 +1,17 @@
 import * as React from "react";
-import {CNode, CNodeKind, PluginComponentProps} from "white-web-sdk";
+import {CNode, CNodeKind, Player, PluginComponentProps, Room} from "white-web-sdk";
 import BraftEditor, {EditorState} from "braft-editor";
-import iframe_close from "./image/iframe_close.svg";
-import iframe_min from "./image/iframe_min.svg";
-import iframe_max from "./image/iframe_max.svg";
-import fix_icon from "./image/fix_icon.svg";
-import editor_icon from "./image/editor_icon.svg";
-import uneditor_icon from "./image/uneditor_icon.svg";
 import "./index.less";
 import "braft-editor/dist/index.css";
-
+export type SelfUserInf = {
+    userId: number, identity: IdentityType,
+};
 export type WhiteEditorPluginProps = PluginComponentProps & {
     editorState: any;
 };
 
 export type WhiteEditorPluginStates = {
     selfEditorState: EditorState;
-    isClickDisable: boolean;
 };
 
 
@@ -24,7 +19,7 @@ export class WhiteEditorPlugin extends React.Component<WhiteEditorPluginProps, W
 
     public static readonly protocol: string = "white-editor-plugin";
     public static readonly backgroundProps: Partial<WhiteEditorPluginProps> = {editorState: "<p>Hello <b>World!</b></p>"};
-
+    private selfUserInf: SelfUserInf | null = null;
     public static willInterruptEvent(props: any, event: any): boolean {
         return true;
     }
@@ -37,9 +32,8 @@ export class WhiteEditorPlugin extends React.Component<WhiteEditorPluginProps, W
         };
     }
     public UNSAFE_componentWillReceiveProps(nextProps: WhiteEditorPluginProps): void {
-        const selfEditorStateData = this.state.selfEditorState.toRAW();
         if (nextProps.editorState !== this.props.editorState) {
-            if (nextProps.editorState !== selfEditorStateData) {
+            if (this.selfUserInf && this.selfUserInf.identity !== IdentityType.host) {
                 this.setState({selfEditorState: BraftEditor.createEditorState(nextProps.editorState)});
             }
         }
@@ -52,48 +46,85 @@ export class WhiteEditorPlugin extends React.Component<WhiteEditorPluginProps, W
 
     private handleChange = async (editorState: EditorState): Promise<void> => {
         await this.setState({selfEditorState: editorState});
-        this.props.setProps(this.props.uuid, {
+        this.props.operator.setProps(this.props.uuid, {
             editorState: editorState.toRAW(),
         });
     }
 
+    private setMyIdentityRoom = (room: Room): void => {
+        const observerId = room.observerId;
+        const roomMember = room.state.roomMembers.find(roomMember => observerId === roomMember.memberId);
+        if (roomMember && roomMember.payload) {
+            this.selfUserInf = {
+                userId: roomMember.payload.userId,
+                identity: roomMember.payload.identity,
+            };
+        }
+    }
+
+    private setMyIdentityPlay = (play: Player): void => {
+        const observerId = play.observerId;
+        const roomMember = play.state.roomMembers.find(roomMember => observerId === roomMember.memberId);
+        if (roomMember && roomMember.payload) {
+            this.selfUserInf = {
+                userId: roomMember.payload.userId,
+                identity: roomMember.payload.identity,
+            };
+        }
+    }
+
     public render(): React.ReactNode {
         const {width, height} = this.props;
-        const {selfEditorState, isClickDisable} = this.state;
+        const {selfEditorState} = this.state;
         return (
             <CNode kind={CNodeKind.HTML}>
-                <div style={{width: width, height: height}} className="editor-out-box">
-                    <div className="iframe-box" style={{width: width, height: height}}>
-                        <div className="iframe-box-nav">
-                            <div className="iframe-box-nav-left">
-                                <div className="iframe-box-nav-close">
-                                    <img style={{width: 7.2}} src={iframe_close}/>
+                <RoomConsumer>
+                    {(room: Room | undefined) => {
+                        if (room) {
+                            this.room = room;
+                            this.setMyIdentityRoom(room);
+                            return (
+                                <div className="plugin-box" style={{width: width, height: height}}>
+                                    <div className="plugin-box-nav">
+                                        Editor
+                                    </div>
+                                    <div className="plugin-box-body">
+                                        <BraftEditor
+                                            className="editor-box-active"
+                                            value={selfEditorState}
+                                            onChange={this.handleChange}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="iframe-box-nav-min">
-                                    <img src={iframe_min}/>
+                            );
+                        } else {
+                            return null;
+                        }
+                    }}
+                </RoomConsumer>
+                <PlayerConsumer>
+                    {(play: Player | undefined) => {
+                        if (play) {
+                            this.play = play;
+                            this.setMyIdentityPlay(play);
+                            return (
+                                <div className="plugin-box" style={{width: width, height: height}}>
+                                    <div className="plugin-box-nav">
+                                        Editor
+                                    </div>
+                                    <div className="plugin-box-body">
+                                        <BraftEditor
+                                            className="editor-box-active"
+                                            value={this.props.selfEditorState}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="iframe-box-nav-max">
-                                    <img  style={{width: 6}} src={iframe_max}/>
-                                </div>
-                            </div>
-                            <div className="iframe-box-nav-right">
-                                <div className="iframe-box-nav-right-btn">
-                                    <img src={fix_icon}/>
-                                </div>
-                                <div onClick={() => this.setState({isClickDisable: !this.state.isClickDisable})} className="iframe-box-nav-right-btn">
-                                    {isClickDisable ? <img src={editor_icon}/> : <img src={uneditor_icon}/>}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="iframe-box-body">
-                            <BraftEditor
-                                className="editor-box-active"
-                                value={selfEditorState}
-                                onChange={this.handleChange}
-                            />
-                        </div>
-                    </div>
-                </div>
+                            );
+                        } else {
+                            return null;
+                        }
+                    }}
+                </PlayerConsumer>
             </CNode>
         );
     }

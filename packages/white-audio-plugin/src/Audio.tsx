@@ -129,8 +129,7 @@ class Audio extends React.Component<VideoProps, VideoStates> {
                 height: this.props.height ? this.props.height : "100%",
             }}>
                 {this.renderMuteBox()}
-                <video playsInline
-                       className="white-plugin-audio"
+                <audio className="white-plugin-audio"
                        src={this.props.audioURL}
                        ref={this.player}
                        muted={this.state.muted}

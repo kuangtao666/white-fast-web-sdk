@@ -43,6 +43,7 @@ import WebPpt from "./WebPpt";
 import {roomStore} from "../models/RoomStore";
 import {observer} from "mobx-react";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
+import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {
     ClassModeType,
     IdentityType,
@@ -114,14 +115,14 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen, plugins} = this.props;
+        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});

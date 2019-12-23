@@ -154,12 +154,12 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
                                         <span>
-                                            Video Player
+                                            Audio Player
                                         </span>
                                     </div>
-                                    <div className="plugin-box-body">
+                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-box-body">
                                         <Audio
-                                            audioURL={this.props.audioURL}
+                                            audioURL={this.props.audioUrl}
                                             isClickEnable={this.state.isClickEnable}
                                             play={this.state.play}
                                             identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
@@ -185,10 +185,10 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
                                         <span>
-                                              Video Player
+                                              Audio Player
                                         </span>
                                     </div>
-                                    <div className="plugin-box-body">
+                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-box-body">
                                         <Audio
                                             audioURL={this.props.audioURL}
                                             isClickEnable={false}
