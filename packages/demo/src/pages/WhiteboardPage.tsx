@@ -3,8 +3,6 @@ import {RouteComponentProps} from "react-router";
 import AgoraRTC from "agora-rtc-sdk";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
-import WhiteAudioPlugin from "@netless/white-audio-plugin";
-import WhiteVideoPlugin from "@netless/white-video-plugin";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
 import {IdentityType} from "./IndexPage";
 export type WhiteboardPageProps = RouteComponentProps<{
@@ -102,7 +100,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 language: "Chinese",
                 toolBarPosition: "left",
                 isManagerOpen: true,
-                plugins: [WhiteVideoPlugin, WhiteAudioPlugin],
                 // ossConfigObj: {
                 //     accessKeyId: "LTAIMCKvqa9EeK4c",
                 //     accessKeySecret: "0twckwYwJudmSOf2GEECozJlvBepQp",
