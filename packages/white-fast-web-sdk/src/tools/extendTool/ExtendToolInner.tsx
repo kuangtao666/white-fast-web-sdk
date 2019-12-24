@@ -64,16 +64,6 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
             this.setState({activeKey: evt});
         }
     }
-    private insertPlugin = (protocal: string, width: number, height: number): void => {
-        this.props.room.insertPlugin({
-            protocal: protocal,
-            centerX: 0,
-            centerY: 0,
-            width: width,
-            height: height,
-        });
-    }
-
     private uploadVideo = async (event: any): Promise<void> => {
         try {
             const uploadManager = new UploadManager(this.props.client, this.props.room);
@@ -164,13 +154,6 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                                         roomStore.isInputH5Visible = true;
                                     }} className="extend-inner-icon">
                                         <img src={web_plugin}/>
-                                    </div>
-                                </Tooltip>
-                            </div>
-                            <div className="extend-icon-box">
-                                <Tooltip placement="bottom" title={isEnglish ? "Editor" : "文本编辑器"}>
-                                    <div onClick={() => this.insertPlugin("white-editor-plugin", 720, 600)} className="extend-inner-icon">
-                                        <img src={editor_plugin}/>
                                     </div>
                                 </Tooltip>
                             </div>
