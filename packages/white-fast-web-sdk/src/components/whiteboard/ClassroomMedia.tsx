@@ -1,8 +1,8 @@
 import * as React from "react";
 import "./ClassroomMedia.less";
-import {Room, ViewMode} from "white-react-sdk";
+import {Room, ViewMode} from "white-web-sdk";
 import {Button, Radio, Tooltip, notification, Icon, message} from "antd";
-import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import * as set_video from "../../assets/image/set_video.svg";
 import * as hangUp from "../../assets/image/hangUp.svg";
 import * as menu_in from "../../assets/image/menu_in.svg";
@@ -11,19 +11,16 @@ import * as microphone_open from "../../assets/image/microphone_open.svg";
 import * as microphone_close from "../../assets/image/microphone_close.svg";
 import * as camera_open from "../../assets/image/camera_open.svg";
 import * as camera_close from "../../assets/image/camera_close.svg";
-import {LanguageEnum, RtcType} from "../../pages/NetlessRoom";
 import ClassroomMediaManager from "./ClassroomMediaManager";
 import Identicon from "../../tools/identicon/Identicon";
+import {ClassModeType, IdentityType, LanguageEnum, RtcType} from "../../pages/NetlessRoomTypes";
+import {roomStore} from "../../models/RoomStore";
+import {observer} from "mobx-react";
 
 export type NetlessStream = {
     state: {isAudioOpen: boolean, isVideoOpen: boolean, isInStage: boolean, identity?: IdentityType},
 } & any;
 
-export enum IdentityType {
-    host = "host",
-    guest = "guest",
-    listener = "listener",
-}
 
 export type ClassroomMediaStates = {
     isRtcStart: boolean;
@@ -40,26 +37,21 @@ export type ClassroomMediaStates = {
 export type ClassroomMediaProps = {
     userId: number;
     channelId: string;
-    isRecording: boolean;
     room: Room;
     isAllMemberAudioClose: boolean,
     classMode: ClassModeType;
     handleManagerState: () => void;
     applyForRtc: boolean;
     isVideoEnable: boolean;
-    startRtcCallback: (startRtc: (recordFunc?: () => void) => void) => void;
-    stopRtcCallback: (stopRtc: () => void) => void;
-    getMediaCellReleaseFunc: (func: () => void) => void;
-    getMediaStageCellReleaseFunc: (func: () => void) => void;
     isAllowHandUp: boolean;
     identity?: IdentityType;
     rtc?: RtcType;
     language?: LanguageEnum;
-    stopRecord?: () => void;
     userAvatarUrl?: string;
 };
 
-export default class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
+@observer
+class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMediaStates> {
 
     private agoraClient: any;
 
@@ -79,7 +71,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
     public componentDidMount(): void {
-        const {userId, startRtcCallback, stopRtcCallback, identity, rtc} = this.props;
+        const {userId, identity} = this.props;
         if (identity !== IdentityType.host && this.props.isVideoEnable) {
             const key = `${Date.now()}`;
             const btn = (
@@ -114,8 +106,8 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 });
             }
         }
-        startRtcCallback(this.startRtc);
-        stopRtcCallback(this.stopRtc);
+        roomStore.startRtc = this.startRtc;
+        roomStore.stopRtc = this.stopRtc;
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
@@ -575,12 +567,12 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                            <div className="manager-box-btn">
                                <Tooltip placement={"right"} title={isEnglish ? "Close video call" : "关闭视频"}>
                                    <div className="manager-box-btn-hang" onClick={() => {
-                                       if (this.props.isRecording && this.props.identity === IdentityType.host) {
+                                       if (roomStore.isRecording && this.props.identity === IdentityType.host) {
                                            const key = `rtc-close`;
                                            const btn = (
                                                <Button type="primary" onClick={() => {
-                                                   if (this.props.stopRecord) {
-                                                       this.props.stopRecord();
+                                                   if (roomStore.stopRecord) {
+                                                       roomStore.stopRecord();
                                                    }
                                                    this.stopRtc();
                                                    notification.close(key);
@@ -635,8 +627,6 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                        </div>
                    </div>}
                    <ClassroomMediaManager
-                       getMediaCellReleaseFunc={this.props.getMediaCellReleaseFunc}
-                       getMediaStageCellReleaseFunc={this.props.getMediaStageCellReleaseFunc}
                        rtcClient={this.agoraClient}
                        isLocalStreamPublish={this.state.isLocalStreamPublish}
                        setMemberToStageById={this.setMemberToStageById}
@@ -659,7 +649,13 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 }});
         }
     }
-    private startRtc = (recordFunc?: () => void): void => {
+
+    private startRecord = (): void => {
+        if (roomStore.startRecord) {
+            roomStore.startRecord();
+        }
+    }
+    private startRtc = (): void => {
         const {rtc, classMode, userId, channelId, identity} = this.props;
         if (rtc) {
             const AgoraRTC = rtc.rtcObj;
@@ -685,23 +681,19 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                     console.log("User " + uid + " join channel successfully");
                     // 创建本地流对象
                     if (identity === IdentityType.host) {
-                        this.createLocalStream(AgoraRTC, userId, recordFunc);
+                        this.createLocalStream(AgoraRTC, userId);
                     } else if (identity === IdentityType.guest) {
                         if (classMode === ClassModeType.discuss) {
-                            this.createLocalStream(AgoraRTC, userId, recordFunc);
+                            this.createLocalStream(AgoraRTC, userId);
                         } else {
                             this.setMediaState(true);
                             this.setState({isRtcStart: true, isRtcLoading: false});
-                            if (recordFunc) {
-                                recordFunc();
-                            }
+                            this.startRecord();
                         }
                     } else {
                         this.setMediaState(true);
                         this.setState({isRtcStart: true, isRtcLoading: false});
-                        if (recordFunc) {
-                            recordFunc();
-                        }
+                        this.startRecord();
                     }
                     // 添加监听
                 }, (err: any) => {
@@ -769,7 +761,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
         }
     }
 
-    private createLocalStream = (rtcObj: any, userId: number, recordFunc?: () => void): void => {
+    private createLocalStream = (rtcObj: any, userId: number): void => {
         // 创建本地流对象
         const localStream = rtcObj.createStream({
             streamID: userId,
@@ -787,9 +779,7 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
                 isCameraOpen: true,
                 isMicrophoneOpen: true,
                 localStream: localStream});
-            if (recordFunc) {
-                recordFunc();
-            }
+            this.startRecord();
         }, (err: any) => {
             console.log("getUserMedia failed", err);
         });
@@ -906,3 +896,5 @@ export default class ClassroomMedia extends React.Component<ClassroomMediaProps,
     }
 
 }
+
+export default ClassroomMedia;

@@ -1,12 +1,11 @@
 import * as React from "react";
-import {Badge, Icon} from "antd";
-import {WhiteWebSdk, PlayerWhiteboard, PlayerPhase, Player} from "white-react-sdk";
-import * as chat_white from "../assets/image/chat_white.svg";
 import SeekSlider from "@netless/react-seek-slider";
+import {Badge, Icon, message} from "antd";
+import {WhiteWebSdk, PlayerPhase, Player} from "white-web-sdk";
+import * as chat_white from "../assets/image/chat_white.svg";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
 import {displayWatch} from "../tools/WatchDisplayer";
-import {message} from "antd";
 import {UserCursor} from "../components/whiteboard/UserCursor";
 import {MessageType} from "../components/whiteboard/WhiteboardBottomRight";
 import WhiteboardTopLeft from "../components/whiteboard/WhiteboardTopLeft";
@@ -16,12 +15,12 @@ import PlayerManager from "../components/whiteboard/PlayerManager";
 import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
-import {LanguageEnum} from "./NetlessRoom";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
 import {observer} from "mobx-react";
 import {replayStore} from "../models/ReplayStore";
+import {LanguageEnum} from "./NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum LayoutType {
     Suspension = "Suspension",
@@ -397,10 +396,11 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                             </div>}
                         </div>
                         {player &&
-                        <PlayerWhiteboard
+                        <div
                             style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}
                             className="player-box"
-                            player={player}/>}
+                            ref={ref => player.bindHtmlElement(ref)}
+                            />}
                     </div>
                 </div>
                 {this.state.layoutType === LayoutType.Side &&

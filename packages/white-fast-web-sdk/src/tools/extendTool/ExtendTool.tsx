@@ -4,15 +4,26 @@ import "./ExtendTool.less";
 import {ExtendToolIcon} from "./ExtendToolIcon";
 import ExtendToolInner from "./ExtendToolInner";
 import {RoomContextConsumer} from "../../pages/RoomContext";
-import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
-import {PluginComponentClass} from "white-react-sdk";
+import {PluginComponentClass} from "white-web-sdk";
+import * as OSS from "ali-oss";
+import {PPTProgressListener} from "../upload/UploadManager";
+import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
 
 export type ExtendToolStates = {
     toolBoxColor: string;
 };
 
 export type ExtendToolProps = {
+    oss: {
+        accessKeyId: string,
+        accessKeySecret: string,
+        region: string,
+        bucket: string,
+        folder: string,
+        prefix: string,
+    },
+    onProgress: PPTProgressListener,
     toolBarPosition?: ToolBarPositionEnum;
     language?: LanguageEnum;
     userId: string;
@@ -20,11 +31,18 @@ export type ExtendToolProps = {
 };
 
 export default class ExtendTool extends React.Component<ExtendToolProps, ExtendToolStates> {
+    private readonly client: any;
     public constructor(props: ExtendToolProps) {
         super(props);
         this.state = {
             toolBoxColor: "#A2A7AD",
         };
+        this.client = new OSS({
+            accessKeyId: this.props.oss.accessKeyId,
+            accessKeySecret: this.props.oss.accessKeySecret,
+            region: this.props.oss.region,
+            bucket: this.props.oss.bucket,
+        });
     }
     private handlePlacement = (): TooltipPlacement => {
         const {toolBarPosition} = this.props;
@@ -49,7 +67,7 @@ export default class ExtendTool extends React.Component<ExtendToolProps, ExtendT
         const {toolBarPosition} = this.props;
         return (
             <RoomContextConsumer key={"add"} children={context => (
-                <Popover trigger="click" placement={this.handlePlacement()} content={<ExtendToolInner userId={this.props.userId} language={this.props.language} room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
+                <Popover trigger="click" placement={this.handlePlacement()} content={<ExtendToolInner onProgress={this.props.onProgress} client={this.client} userId={this.props.userId} language={this.props.language} room={context.room} whiteboardLayerDownRef={context.whiteboardLayerDownRef}/>}>
                     <div
                         onMouseEnter={() => this.setState({toolBoxColor: "#141414"})}
                         onMouseLeave={() => this.setState({toolBoxColor: "#A2A7AD"})}

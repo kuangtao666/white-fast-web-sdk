@@ -11,9 +11,12 @@ import {
     ToolBoxText,
 } from "./ToolIconComponent";
 import "./ToolBox.less";
-import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoom";
 import {TooltipPlacement} from "antd/lib/tooltip";
 import {isMobile} from "react-device-detect";
+import {LanguageEnum, ToolBarPositionEnum} from "../../pages/NetlessRoomTypes";
+import {DisplayProperty} from "csstype";
+import {roomStore} from "../../models/RoomStore";
+import {Room} from "white-web-sdk";
 
 type ApplianceDescription = {
     readonly iconView: React.ComponentClass<IconProps>;
@@ -35,6 +38,7 @@ export type MemberState = {
 };
 export type ToolBoxProps = {
     memberState: Readonly<MemberState>;
+    room: Room;
     setMemberState: (modifyState: Partial<MemberState>) => void;
     isReadOnly?: boolean;
     toolBarPosition?: ToolBarPositionEnum;
@@ -150,8 +154,28 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
         }
     }
 
+    private isHavePpt = (): boolean => {
+        const {room} = this.props;
+        const isHave = !!(room.state.globalState && room.state.globalState.h5PptUrl);
+        if (isHave) {
+            roomStore.isScreenZoomLock = true;
+        }
+        return isHave;
+    }
+    private detectToolboxState = (): DisplayProperty => {
+        const {isReadOnly} = this.props;
+        if (!this.isHavePpt()) {
+            return "flex";
+        }
+        if (isReadOnly || roomStore.boardPointerEvents === "none") {
+            return "none";
+        } else {
+            return "flex";
+        }
+    }
+
     public render(): React.ReactNode {
-        const {toolBarPosition, isReadOnly} = this.props;
+        const {toolBarPosition} = this.props;
         const nodes: React.ReactNode[] = [];
         for (const applianceName in ToolBox.descriptions) {
             const description = ToolBox.descriptions[applianceName];
@@ -168,7 +192,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             case ToolBarPositionEnum.top: {
                 return (
                     <div style={{
-                        display: isReadOnly ? "none" : "flex",
+                        display: this.detectToolboxState(),
                     }} className="whiteboard-tool-box">
                         <div className="tool-mid-box">
                             {this.addCustomerComponent(nodes)}
@@ -178,7 +202,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             case ToolBarPositionEnum.bottom: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-bottom">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-bottom">
                         <div className="tool-mid-box">
                                 {this.addCustomerComponent(nodes)}
                         </div>
@@ -187,7 +211,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             case ToolBarPositionEnum.left: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-left">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-left">
                         <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>
@@ -196,7 +220,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             case ToolBarPositionEnum.right: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-right">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-right">
                         <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>
@@ -205,7 +229,7 @@ export default class ToolBox extends React.Component<ToolBoxProps, ToolBoxStates
             }
             default: {
                 return (
-                    <div style={{display: isReadOnly ? "none" : "flex"}} className="whiteboard-tool-box-left">
+                    <div style={{display: this.detectToolboxState()}} className="whiteboard-tool-box-left">
                         <div className="tool-mid-box-left">
                             {this.addCustomerComponent(nodes)}
                         </div>

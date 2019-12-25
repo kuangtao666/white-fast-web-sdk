@@ -5,7 +5,7 @@ import NetlessRoom from "../pages/NetlessRoom";
 import {
     Room,
     Player,
-} from "white-react-sdk";
+} from "white-web-sdk";
 
 export interface RoomFacadeObject {
     release(): void;

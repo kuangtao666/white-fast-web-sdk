@@ -1,4 +1,4 @@
-import {Room, Scene} from "white-react-sdk";
+import {Room, Scene} from "white-web-sdk";
 export class WebCourseController {
 
     private readonly setGlobalState: (netlessState: any) => void;

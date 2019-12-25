@@ -1,5 +1,5 @@
 import * as React from "react";
-import {CNode, CNodeKind, PluginComponentProps} from "white-react-sdk";
+import {CNode, CNodeKind, PluginComponentProps} from "white-web-sdk";
 import {Input, message} from "antd";
 import "../PluginStyle.less";
 import "./WhiteWebCoursePlugin.less";

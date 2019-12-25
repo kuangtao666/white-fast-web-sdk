@@ -1,8 +1,8 @@
 import * as React from "react";
 import {Button, Input, Popover} from "antd";
 import * as down from "../../assets/image/down.svg";
-import {IdentityType} from "./WhiteboardTopRight";
 import "./WhiteboardTopLeft.less";
+import {IdentityType} from "../../pages/NetlessRoomTypes";
 export type WhiteboardTopLeftProps = {
     logoUrl?: string;
     clickLogoCallback?: () => void;

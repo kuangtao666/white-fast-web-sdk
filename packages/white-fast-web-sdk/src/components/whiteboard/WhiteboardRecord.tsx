@@ -2,15 +2,16 @@ import * as React from "react";
 import {message, Modal} from "antd";
 import "./WhiteboardRecord.less";
 import {displayWatch} from "../../tools/WatchDisplayer";
-import {RecordDataType, RtcType} from "../../pages/NetlessRoom";
 import {RecordOperator} from "./RecordOperator";
 import {OSSConfigObjType} from "../../appToken";
 import {HostUserType} from "../../pages/RoomManager";
-import {Room} from "white-react-sdk";
+import {Room} from "white-web-sdk";
 import video_record from "../../assets/image/video_record.svg";
 import whiteboard_record from "../../assets/image/whiteboard_record.svg";
 import player_green from "../../assets/image/player_green.svg";
-import {IdentityType} from "./ClassroomMedia";
+import {RecordDataType, RtcType} from "../../pages/NetlessRoomTypes";
+import {roomStore} from "../../models/RoomStore";
+import {observer} from "mobx-react";
 
 export type WhiteboardRecordState = {
     isRecord: boolean;
@@ -29,14 +30,11 @@ export type WhiteboardRecordProps = {
     rtc?: RtcType;
     recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
-    startRtc?: (recordFunc?: () => void) => void;
-    stopRecordCallback?: (recordFunc: () => void) => void;
     replayCallback?: () => void;
-    setRecordingState: (state: boolean) => void;
-    recordTime: (time: number) => void;
 };
 
-export default class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
+@observer
+class WhiteboardRecord extends React.Component<WhiteboardRecordProps, WhiteboardRecordState> {
     private recordOperator: RecordOperator;
     private interval: any;
     public constructor(props: WhiteboardRecordProps) {
@@ -51,26 +49,13 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
     }
 
     public componentDidMount(): void {
-        if (this.props.stopRecordCallback) {
-            this.props.stopRecordCallback(this.stopRecord);
-        }
-    }
-
-    public componentWillReceiveProps(nextProps: WhiteboardRecordProps): void {
-        const {rtc} = this.props;
-        if (nextProps.startRtc !== this.props.startRtc) {
-            if (rtc && rtc.defaultStart === true) {
-                if (nextProps.startRtc) {
-                    nextProps.startRtc(this.startRecord);
-                }
-            }
-        }
+        roomStore.stopRecord = this.stopRecord;
+        roomStore.startRecord = this.startRecord;
     }
     private tick = (): void => {
         this.setState(({
             secondsElapsed: this.state.secondsElapsed + 1,
         }));
-        this.props.recordTime(this.state.secondsElapsed);
     }
 
 
@@ -187,7 +172,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     if (resp.serverResponse.fileList) {
                         const res = await this.recordOperator.stop();
                         message.info("结束录制");
-                        this.props.setRecordingState(false);
+                        roomStore.isRecording = false;
                         this.setRecordState(false);
                         const time =  new Date();
                         const timeStamp = time.getTime();
@@ -202,7 +187,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     }
                 } else {
                     message.info("结束录制");
-                    this.props.setRecordingState(false);
+                    roomStore.isRecording = false;
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     this.setState({isRecord: false, isRecordOver: true});
@@ -259,7 +244,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                     await this.recordOperator.start();
                     message.success("开始录制");
                     this.setRecordState(true);
-                    this.props.setRecordingState(true);
+                    roomStore.isRecording = true;
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     if (this.props.recordDataCallback) {
@@ -273,7 +258,7 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 }
             } else {
                 message.success("开始录制");
-                this.props.setRecordingState(true);
+                roomStore.isRecording = true;
                 this.setRecordState(true);
                 const time =  new Date();
                 const timeStamp = time.getTime();
@@ -379,8 +364,8 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
                 >
                     <div className="record-select-box">
                         <div onClick={() => {
-                            if (this.props.startRtc) {
-                                this.props.startRtc(this.startRecord);
+                            if (roomStore.startRtc) {
+                                roomStore.startRtc();
                                 this.setState({isRecordModalVisible: false});
                             }
                         }} className="record-select-cell">
@@ -408,3 +393,5 @@ export default class WhiteboardRecord extends React.Component<WhiteboardRecordPr
         );
     }
 }
+
+export default WhiteboardRecord;

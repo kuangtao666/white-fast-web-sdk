@@ -1,16 +1,15 @@
 import * as React from "react";
 import {Tabs, Tooltip} from "antd";
-import {ViewMode} from "white-react-sdk";
-import {Player} from "white-react-sdk";
-import {LanguageEnum} from "../../pages/NetlessRoom";
+import {ViewMode, Player} from "white-web-sdk";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
-import {GuestUserType, HostUserType, ClassModeType} from "../../pages/RoomManager";
+import {GuestUserType, HostUserType} from "../../pages/RoomManager";
 import user_empty from "../../assets/image/user_empty.svg";
 import menu_in from "../../assets/image/menu_in.svg";
 import teacher from "../../assets/image/teacher.svg";
 import "./PlayerManager.less";
 import Identicon from "../../tools/identicon/Identicon";
+import {ClassModeType, LanguageEnum} from "../../pages/NetlessRoomTypes";
 const { TabPane } = Tabs;
 
 export type PlayerManagerProps = {

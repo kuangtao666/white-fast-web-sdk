@@ -1,5 +1,5 @@
 import * as React from "react";
-import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-react-sdk";
+import {ViewMode, Room, RoomState, Scene, DeviceType} from "white-web-sdk";
 import {Badge, Button, message, Modal, Input, Radio} from "antd";
 import Clipboard from "react-clipboard.js";
 import QRCode from "qrcode.react";
@@ -8,10 +8,10 @@ import stop_icon from "../../assets/image/stop_icon.svg";
 import replay_video_cover_en from "../../assets/image/replay_video_cover_en.svg";
 import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
-import {LanguageEnum} from "../../pages/NetlessRoom";
-import {ClassModeType, GuestUserType} from "../../pages/RoomManager";
+import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 import Identicon from "../../tools/identicon/Identicon";
+import {IdentityType, LanguageEnum} from "../../pages/NetlessRoomTypes";
 
 export type WhiteboardTopRightProps = {
     userId: string;
@@ -47,12 +47,6 @@ export type WhiteboardTopRightStates = {
     shareUrl: ShareUrlType;
 };
 
-export enum IdentityType {
-    host = "host",
-    guest = "guest",
-    listener = "listener",
-}
-
 export default class WhiteboardTopRight extends React.Component<WhiteboardTopRightProps, WhiteboardTopRightStates> {
 
     public constructor(props: WhiteboardTopRightProps) {
@@ -83,7 +77,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         } else {
             return false;
         }
-    }
+    };
 
     private handleUrl = (url: string): string => {
         if (this.props.isManagerOpen === null) {
@@ -114,10 +108,10 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 return classUrl;
             }
         }
-    }
+    };
     private handleInvite = (): void => {
         this.setState({isInviteVisible: true});
-    }
+    };
     public componentDidMount(): void {
         const {identity} = this.props;
         if (identity === IdentityType.host) {
@@ -129,7 +123,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
 
     private handleClose = (): void => {
         this.setState({isCloseTipsVisible: true});
-    }
+    };
 
     private handleRenderStop = (): React.ReactNode => {
         return (
@@ -137,7 +131,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <img src={stop_icon}/>
             </div>
         );
-    }
+    };
     private handleUserAvatar = (): React.ReactNode => {
         const  {userAvatarUrl, userId} = this.props;
         if (userAvatarUrl) {
@@ -159,11 +153,11 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 </div>
             );
         }
-    }
+    };
 
     private handleShareUrl = (evt: any): void => {
         this.setState({shareUrl: evt.target.value});
-    }
+    };
 
     private handleSwitchDisable = (shareUrl: ShareUrlType): boolean => {
         const  {identity} = this.props;
@@ -178,7 +172,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 return true;
             }
         }
-    }
+    };
 
     private renderSideMenu = (): React.ReactNode => {
         const  {isManagerOpen} = this.props;
@@ -202,7 +196,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         } else {
             return null;
         }
-    }
+    };
 
     private renderExit = (): React.ReactNode => {
         const isEnglish = this.props.language === LanguageEnum.English;
@@ -230,7 +224,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 </div>
             );
         }
-    }
+    };
     public render(): React.ReactNode {
         const  {isManagerOpen} = this.props;
         const isEnglish = this.props.language === LanguageEnum.English;

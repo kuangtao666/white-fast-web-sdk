@@ -5,7 +5,11 @@ import {RouteComponentProps} from "react-router";
 import netless_black from "../assets/image/netless_black.svg";
 import {Link} from "@netless/i18n-react-router";
 import {FormComponentProps} from "antd/lib/form";
-import {IdentityType} from "./WhiteboardCreatorPage";
+export enum IdentityType {
+    host = "host",
+    guest = "guest",
+    listener = "listener",
+}
 
 const { TabPane } = Tabs;
 

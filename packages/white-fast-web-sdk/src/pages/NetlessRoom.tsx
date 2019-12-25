@@ -6,7 +6,6 @@ import {Icon, message} from "antd";
 import Dropzone from "react-dropzone";
 import {
     WhiteWebSdk,
-    RoomWhiteboard,
     Room,
     RoomState,
     RoomPhase,
@@ -15,10 +14,10 @@ import {
     ViewMode,
     DeviceType,
     PluginComponentClass,
-} from "white-react-sdk";
+} from "white-web-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
-import WhiteboardTopRight, {IdentityType} from "../components/whiteboard/WhiteboardTopRight";
+import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
 import WhiteboardBottomLeft from "../components/whiteboard/WhiteboardBottomLeft";
 import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRight";
 import MenuBox from "../components/menu/MenuBox";
@@ -33,122 +32,29 @@ import WhiteboardFile from "../components/whiteboard/WhiteboardFile";
 import {PPTDataType, PPTType} from "../components/menu/PPTDatas";
 import LoadingPage from "../components/LoadingPage";
 import {isMobile} from "react-device-detect";
-import {GuestUserType, HostUserType, ClassModeType, RoomManager} from "./RoomManager";
+import {GuestUserType, HostUserType, RoomManager} from "./RoomManager";
 import WhiteboardManager from "../components/whiteboard/WhiteboardManager";
 import ExtendTool from "../tools/extendTool/ExtendTool";
 import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
-import {RoomFacadeObject, RoomFacadeSetter} from "../facade/Facade";
+import {RoomFacadeObject} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
-import WhiteAudioPlugin from "../plugins/audio_plugin/WhiteAudioPlugin";
 import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
 import {roomStore} from "../models/RoomStore";
 import {observer} from "mobx-react";
+import {
+    ClassModeType,
+    IdentityType,
+    MenuInnerType,
+    NetlessRoomProps,
+    PagePreviewPositionEnum,
+} from "./NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
-
-export enum MenuInnerType {
-    AnnexBox = "AnnexBox",
-    PPTBox = "PPTBox",
-}
-
-export enum LanguageEnum {
-    Chinese = "Chinese",
-    English = "English",
-}
-
-export enum UploadDocumentEnum {
-    image = "image",
-    static_conversion = "static_conversion",
-    dynamic_conversion = "dynamic_conversion",
-}
-
-export enum RtcEnum {
-    agora = "agora",
-    zego = "zego",
-    qiniu = "qiniu",
-}
-
-export type UploadToolBoxType = {
-    enable: boolean,
-    type: UploadDocumentEnum,
-    icon?: string,
-    title?: string,
-    script?: string,
-};
-
-export type RtcType = {
-    type: RtcEnum,
-    rtcObj: any,
-    appId: string,
-    defaultStart?: boolean,
-    channel?: string, // 不写默认是 uuid,
-    authConfig?: {
-        token: string,
-    }
-    recordConfig?: {
-        recordUid?: string,
-        recordToken?: string,
-        customerId: string,
-        customerCertificate: string,
-    },
-};
-export type RecordDataType = {startTime?: number, endTime?: number, mediaUrl?: string};
-export type RealTimeProps = {
-    uuid: string;
-    roomToken: string;
-    userId: string;
-    roomFacadeSetter: RoomFacadeSetter;
-    isScreenLock?: boolean;
-    defaultClassMode?: ClassModeType,
-    userName?: string;
-    roomName?: string;
-    userAvatarUrl?: string;
-    isReadOnly?: boolean;
-    uploadToolBox?: UploadToolBoxType[],
-    toolBarPosition?: ToolBarPositionEnum;
-    pagePreviewPosition?: PagePreviewPositionEnum;
-    boardBackgroundColor?: string;
-    defaultColorArray?: string[];
-    identity?: IdentityType;
-    colorArrayStateCallback?: (colorArray: string[]) => void;
-    roomRenameCallback?: (name: string) => void;
-    documentArray?: PPTDataType[];
-    logoUrl?: string;
-    loadingSvgUrl?: string;
-    language?: LanguageEnum;
-    clickLogoCallback?: () => void;
-    deviceType?: DeviceType;
-    rtc?: RtcType;
-    roomCallback?: (room: Room) => void;
-    exitRoomCallback?: () => void;
-    replayCallback?: () => void;
-    recordDataCallback?: (data: RecordDataType) => void;
-    documentArrayCallback?: (data: PPTDataType[]) => void;
-    isManagerOpen?: boolean | null;
-    elementId: string;
-    ossConfigObj?: OSSConfigObjType;
-    ossUploadCallback?: (res: any) => void;
-    enableRecord?: boolean;
-};
-
-export enum ToolBarPositionEnum {
-    top = "top",
-    bottom = "bottom",
-    left = "left",
-    right = "right",
-}
-
-export enum PagePreviewPositionEnum {
-    left = "left",
-    right = "right",
-}
-
-export type RealTimeStates = {
+export type NetlessRoomStates = {
     phase: RoomPhase;
     connectedFail: boolean;
-    didSlaveConnected: boolean;
     menuInnerState: MenuInnerType;
     isMenuVisible: boolean;
     roomToken: string | null;
@@ -169,27 +75,19 @@ export type RealTimeStates = {
     classMode: ClassModeType;
     ossConfigObj: OSSConfigObjType;
     documentArray: PPTDataType[];
-    startRtc?: (recordFunc?: () => void) => void;
-    stopRtc?: () => void;
-    stopRecord?: (stopRecordFunc?: () => void) => void;
-    isRecording: boolean;
-    secondsElapsed?: number;
-    releaseMedia?: () => void;
-    releaseMediaStage?: () => void;
 };
 
 @observer
-class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> implements RoomFacadeObject {
+class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> implements RoomFacadeObject {
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
     private readonly cursor: UserCursor;
     private menuChild: React.Component;
-    public constructor(props: RealTimeProps) {
+    public constructor(props: NetlessRoomProps) {
         super(props);
         this.state = {
             phase: RoomPhase.Connecting,
             connectedFail: false,
-            didSlaveConnected: false,
             menuInnerState: MenuInnerType.PPTBox,
             isMenuVisible: false,
             roomToken: null,
@@ -204,7 +102,6 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
             classMode: this.props.defaultClassMode !== undefined ? this.props.defaultClassMode : ClassModeType.discuss,
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
-            isRecording: false,
         };
         this.cursor = new UserCursor();
     }
@@ -218,14 +115,14 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
     }
 
     private startJoinRoom = async (): Promise<void> => {
-        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen, isScreenLock} = this.props;
+        const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin, WhiteAudioPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -241,7 +138,6 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
                     }},
                 {
                     onPhaseChanged: phase => {
-                        console.log(phase);
                         if (!this.didLeavePage) {
                             this.setState({phase});
                         }
@@ -370,23 +266,14 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         }
     }
     public componentWillMount (): void {
+        if (this.props.identity) {
+            roomStore.identity = this.props.identity;
+        }
         this.props.roomFacadeSetter(this);
         window.addEventListener("beforeunload", this.beforeunload);
     }
     private beforeunload = (): void => {
         this.stopAll();
-    }
-
-    private recordTime = (time: number): void => {
-        this.setState({secondsElapsed: time});
-    }
-
-    private getMediaCellReleaseFunc = (func: () => void): void => {
-        this.setState({releaseMedia: func});
-    }
-
-    private getMediaStageCellReleaseFunc = (func: () => void): void => {
-        this.setState({releaseMediaStage: func});
     }
 
     private stopAll = (): void => {
@@ -399,7 +286,6 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
             room.setGlobalState({hostInfo: {
                     ...room.state.globalState.hostInfo,
                     isVideoEnable: false,
-                    secondsElapsed: this.state.secondsElapsed,
                 }});
         }
         this.didLeavePage = true;
@@ -410,14 +296,11 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         if (this.roomManager) {
             this.roomManager.stop();
         }
-        if (this.state.stopRtc) {
-            this.state.stopRtc();
+        if (roomStore.stopRtc) {
+            roomStore.stopRtc();
         }
-        if (this.state.releaseMedia) {
-            this.state.releaseMedia();
-        }
-        if (this.state.releaseMediaStage) {
-            this.state.releaseMediaStage();
+        if (roomStore.releaseMedia) {
+            roomStore.releaseMedia();
         }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("beforeunload", this.beforeunload);
@@ -626,11 +509,7 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
             return (
                 <WhiteboardRecord
                     ossConfigObj={this.state.ossConfigObj}
-                    recordTime={this.recordTime}
-                    startRtc={this.state.startRtc}
                     replayCallback={this.props.replayCallback}
-                    stopRecordCallback={this.stopRecordCallback}
-                    setRecordingState={this.setRecordingState}
                     room={this.state.room!}
                     recordDataCallback={this.props.recordDataCallback}
                     uuid={this.props.uuid} rtc={this.props.rtc}
@@ -670,7 +549,9 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         if (!isMobile) {
             return (
                 <ExtendTool
+                    oss={this.state.ossConfigObj}
                     userId={this.props.userId}
+                    onProgress={this.progress}
                     language={this.props.language}
                     toolBarPosition={this.props.toolBarPosition}/>
             );
@@ -683,23 +564,54 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         this.setState({documentArray: state});
     }
 
-    private startRtcCallback = (func: (recordFunc?: () => void) => void): void => {
-        this.setState({startRtc: func});
+    private getCameraState = (room: Room): ViewMode => {
+        const {userId} = this.props;
+        if (this.props.identity === IdentityType.host) {
+            const userSelf: HostUserType = room.state.globalState.hostInfo;
+            if (userSelf) {
+                return userSelf.cameraState;
+            } else {
+                return ViewMode.Freedom;
+            }
+        } else if (this.props.identity === IdentityType.guest) {
+            const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+            if (userSelf) {
+                return userSelf.cameraState;
+            } else {
+                return ViewMode.Freedom;
+            }
+        } else {
+            return ViewMode.Follower;
+        }
     }
 
-    private stopRtcCallback = (func: () => void): void => {
-        this.setState({stopRtc: func});
+    private getDisableCameraTransformState = (room: Room): boolean => {
+        const {userId} = this.props;
+        if (this.props.identity === IdentityType.host) {
+            const userSelf: HostUserType = room.state.globalState.hostInfo;
+            if (userSelf) {
+                return userSelf.disableCameraTransform;
+            } else {
+                return true;
+            }
+        } else if (this.props.identity === IdentityType.guest) {
+            const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+            if (userSelf) {
+                return userSelf.disableCameraTransform;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
     }
 
-    private stopRecordCallback = (func: () => void): void => {
-        this.setState({stopRecord: func});
-    }
-    private setRecordingState = (state: boolean): void => {
-        this.setState({isRecording: state});
+    private handleScreenLock = (room: Room): void => {
+        room.disableCameraTransform = roomStore.isScreenZoomLock;
     }
     public render(): React.ReactNode {
         const {phase, connectedFail, room, roomState} = this.state;
-        const {language, loadingSvgUrl, userId, isScreenLock} = this.props;
+        const {language, loadingSvgUrl} = this.props;
         const isReadOnly = this.detectIsReadOnly();
         if (connectedFail || phase === RoomPhase.Disconnected) {
             return <PageError/>;
@@ -713,38 +625,14 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         } else if (!roomState) {
             return <LoadingPage language={language} phase={phase} loadingSvgUrl={loadingSvgUrl}/>;
         } else {
-            let cameraState;
-            let disableCameraTransform;
-            if (this.props.identity === IdentityType.host) {
-                const userSelf: HostUserType = room.state.globalState.hostInfo;
-                if (userSelf) {
-                    cameraState = userSelf.cameraState;
-                    disableCameraTransform = userSelf.disableCameraTransform;
-                }
-            } else if (this.props.identity === IdentityType.guest) {
-                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
-                if (userSelf) {
-                    cameraState = userSelf.cameraState;
-                    disableCameraTransform = userSelf.disableCameraTransform;
-                }
-            } else {
-                cameraState = ViewMode.Follower;
-                disableCameraTransform = true;
-            }
-            if (isScreenLock !== undefined && isScreenLock) {
-                room.disableCameraTransform = isScreenLock;
-            }
+            const cameraState = this.getCameraState(room);
+            const disableCameraTransform = this.getDisableCameraTransformState(room);
+            this.handleScreenLock(room);
             return (
                 <RoomContextProvider value={{
                     onColorArrayChange: this.props.colorArrayStateCallback,
-                    startRtcCallback: this.startRtcCallback,
-                    stopRtcCallback: this.stopRtcCallback,
                     whiteboardLayerDownRef: this.state.whiteboardLayerDownRef!,
                     room: room,
-                    stopRecord: this.state.stopRecord,
-                    isRecording: this.state.isRecording,
-                    getMediaCellReleaseFunc: this.getMediaCellReleaseFunc,
-                    getMediaStageCellReleaseFunc: this.getMediaStageCellReleaseFunc,
                 }}>
                     <div className="realtime-box">
                         <MenuBox
@@ -816,6 +704,7 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
                                 room={room}/>
                             {this.renderRecordComponent()}
                             <ToolBox
+                                room={room}
                                 isReadOnly={isReadOnly}
                                 language={this.props.language}
                                 toolBarPosition={this.props.toolBarPosition}
@@ -870,9 +759,9 @@ class NetlessRoom extends React.Component<RealTimeProps, RealTimeStates> impleme
         }
     }
     private renderWhiteboard(): React.ReactNode {
-        if (this.state.room) {
-            return <RoomWhiteboard room={this.state.room}
-                                   style={{width: "100%", height: "100%"}}/>;
+        const {room} = this.state;
+        if (room) {
+            return <div ref={ref => room.bindHtmlElement(ref)} style={{width: "100%", height: "100%"}}/>;
         } else {
             return null;
         }

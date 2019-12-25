@@ -129,7 +129,9 @@ class Video extends React.Component<VideoProps, VideoStates> {
                 height: this.props.height ? this.props.height : "100%",
             }}>
                 {this.renderMuteBox()}
-                <video className="white-plugin-video" src={this.props.videoURL}
+                <video playsInline
+                       className="white-plugin-video"
+                       src={this.props.videoURL}
                        ref={this.player}
                        muted={this.state.muted}
                        style={{
