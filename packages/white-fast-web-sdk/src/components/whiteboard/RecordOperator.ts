@@ -1,7 +1,5 @@
 import Fetcher from "@netless/fetch-middleware";
 
-const fetcher = new Fetcher(5000, "https://apiagoraio.herewhite.com");
-
 export class RecordOperator {
 
     private readonly agoraAppId: string;
@@ -11,26 +9,44 @@ export class RecordOperator {
     private readonly mode: string;
     private readonly recordingConfig: any;
     private readonly storageConfig: any;
-
     private recordId?: string;
     public resourceId?: string;
     private readonly uid: string;
     private readonly token: string | undefined = undefined;
-
-    public constructor(agoraAppId: string, customerId: string, customerCertificate: string, channelName: string, recordingConfig: any, storageConfig: any, mode: string, token: string | undefined, uid: string) {
-        this.agoraAppId = agoraAppId;
-        this.customerId = customerId;
-        this.customerCertificate = customerCertificate;
-        this.channelName = channelName;
+    private fetcher: Fetcher;
+    public constructor(
+        rtcBaseConfig: {
+            agoraAppId: string,
+            customerId: string,
+            customerCertificate: string,
+            channelName: string,
+            mode: string,
+            token: string | undefined,
+            uid: string,
+        },
+        fetchConfig: {
+            apiOrigin: string,
+            fetchTimeout?: number,
+        },
+        recordingConfig: any,
+        storageConfig: any,
+        ) {
+        this.agoraAppId = rtcBaseConfig.agoraAppId;
+        this.customerId = rtcBaseConfig.customerId;
+        this.customerCertificate = rtcBaseConfig.customerCertificate;
+        this.channelName = rtcBaseConfig.channelName;
         this.recordingConfig = recordingConfig;
         this.storageConfig = storageConfig;
-        this.mode = mode;
-        this.uid = uid;
-        this.token = token;
+        this.mode = rtcBaseConfig.mode;
+        this.uid = rtcBaseConfig.uid;
+        this.token = rtcBaseConfig.token;
+        this.fetcher = new Fetcher(
+            fetchConfig.fetchTimeout ? fetchConfig.fetchTimeout : 2000,
+            fetchConfig.apiOrigin);
     }
 
     public async acquire(): Promise<void> {
-        const json = await fetcher.post<any>({
+        const json = await this.fetcher.post<any>({
             path: `v1/apps/${this.agoraAppId}/cloud_recording/acquire`,
             headers: {
                 Authorization: this.basicAuthorization(this.customerId, this.customerCertificate),
@@ -59,7 +75,7 @@ export class RecordOperator {
         if (this.resourceId === undefined) {
             throw new Error("call 'acquire' method acquire resource");
         }
-        const json = await fetcher.post<any>({
+        const json = await this.fetcher.post<any>({
             path: `v1/apps/${this.agoraAppId}/cloud_recording/resourceid/${this.resourceId}/mode/${this.mode}/start`,
             headers: {
                 Authorization: this.basicAuthorization(this.customerId, this.customerCertificate),
@@ -67,7 +83,11 @@ export class RecordOperator {
             body: {
                 cname: this.channelName,
                 uid: this.uid,
-                clientRequest: {token: this.token, recordingConfig: this.recordingConfig, storageConfig: this.storageConfig },
+                clientRequest: {
+                    token: this.token,
+                    recordingConfig: this.recordingConfig,
+                    storageConfig: this.storageConfig,
+                },
             },
         });
         const res = json as any;
@@ -87,7 +107,7 @@ export class RecordOperator {
             throw new Error("call 'start' method start record");
         }
         try {
-            const json = await fetcher.post<any>({
+            const json = await this.fetcher.post<any>({
                 path: `v1/apps/${this.agoraAppId}/cloud_recording/resourceid/${this.resourceId}/sid/${this.recordId}/mode/${this.mode}/stop`,
                 headers: {
                     Authorization: this.basicAuthorization(this.customerId, this.customerCertificate),
@@ -113,7 +133,7 @@ export class RecordOperator {
         if (this.recordId === undefined) {
             throw new Error("call 'start' method start record");
         }
-        const json = await fetcher.get<any>({
+        const json = await this.fetcher.get<any>({
             path: `v1/apps/${this.agoraAppId}/cloud_recording/resourceid/${this.resourceId}/sid/${this.recordId}/mode/${this.mode}/query`,
             headers: {
                 Authorization: this.basicAuthorization(this.customerId, this.customerCertificate),

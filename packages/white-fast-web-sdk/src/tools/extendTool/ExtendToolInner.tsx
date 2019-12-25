@@ -84,7 +84,6 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                     height: 270,
                     props: {
                         videoUrl: url,
-                        identity: roomStore.identity,
                     },
                 });
             }
@@ -112,7 +111,6 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                     height: 86,
                     props: {
                         audioUrl: url,
-                        identity: roomStore.identity,
                     },
                 });
             }

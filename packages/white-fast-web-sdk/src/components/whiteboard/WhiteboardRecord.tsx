@@ -216,7 +216,20 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                     if (rtc.channel) {
                         channel = rtc.channel;
                     }
-                    this.recordOperator = new RecordOperator(rtc.appId, rtc.recordConfig.customerId, rtc.recordConfig.customerCertificate, channel,
+                    this.recordOperator = new RecordOperator(
+                        {
+                            agoraAppId: rtc.appId,
+                            customerId: rtc.recordConfig.customerId,
+                            customerCertificate: rtc.recordConfig.customerCertificate,
+                            channelName: channel,
+                            mode: "mix",
+                            token: rtc.recordConfig.recordToken ? rtc.recordConfig.recordToken : undefined,
+                            uid: rtc.recordConfig.recordUid ? rtc.recordConfig.recordUid : `${Math.floor(Math.random() * 100000)}`,
+                        },
+                        {
+                            apiOrigin: "https://apiagoraio.herewhite.com",
+                            fetchTimeout: 3000,
+                        },
                         {
                             audioProfile: 1,
                             transcodingConfig: {
@@ -234,8 +247,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                             bucket: this.props.ossConfigObj.bucket,
                             accessKey: this.props.ossConfigObj.accessKeyId,
                             secretKey: this.props.ossConfigObj.accessKeySecret,
-                        }, "mix", rtc.recordConfig.recordToken ? rtc.recordConfig.recordToken : undefined,
-                        rtc.recordConfig.recordUid ? rtc.recordConfig.recordUid : `${Math.floor(Math.random() * 100000)}`);
+                        },
+                    );
                     await this.recordOperator.acquire();
                 }
             }
@@ -314,7 +327,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
         if (isMediaRun || this.state.isRecordWhiteboardOnly) {
             if (this.state.isRecord) {
                 return (
-                    <div onClick={() => this.stopRecord()} className="record-out-box">
+                    <div onClick={() => this.stopRecord()}
+                         className="record-out-box">
                         <div className="record-box">
                             <div className="record-box-inner-rect"/>
                         </div>
@@ -325,7 +339,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                 );
             } else {
                 return (
-                    <div onClick={() => this.startRecord()} className="record-out-box">
+                    <div onClick={() => this.startRecord()}
+                         className="record-out-box">
                         <div className="record-box">
                             <div className="record-box-inner"/>
                         </div>
@@ -337,7 +352,9 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
             }
         } else {
             return (
-                <div onClick={() => this.setState({isRecordModalVisible: true})} className="record-out-box">
+                <div onClick={() =>
+                    this.setState({isRecordModalVisible: true})}
+                     className="record-out-box">
                     <div className="record-box">
                         {this.state.isRecord ?
                             <div className="record-box-inner-rect"/> :
@@ -378,7 +395,9 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                         </div>
                         <div onClick={async() => {
                             await this.startRecord();
-                            this.setState({isRecordModalVisible: false, isRecordWhiteboardOnly: true});
+                            this.setState({
+                                isRecordModalVisible: false,
+                                isRecordWhiteboardOnly: true});
                         }} className="record-select-cell">
                             <div className="record-select-cell-icon">
                                 <img style={{width: 85}} src={whiteboard_record}/>
