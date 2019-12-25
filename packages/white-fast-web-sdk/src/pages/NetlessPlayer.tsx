@@ -1,7 +1,7 @@
 import * as React from "react";
 import SeekSlider from "@netless/react-seek-slider";
 import {Badge, Icon, message} from "antd";
-import {WhiteWebSdk, PlayerPhase, Player} from "white-web-sdk";
+import {WhiteWebSdk, PlayerPhase, Player, PlayerWhiteboard} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
