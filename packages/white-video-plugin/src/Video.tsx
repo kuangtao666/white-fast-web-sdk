@@ -60,7 +60,6 @@ class Video extends React.Component<VideoProps, VideoStates> {
             }
         }
     }
-
     public componentDidMount(): void {
         if (this.player.current) {
             this.player.current.currentTime = this.props.currentTime;
@@ -76,8 +75,9 @@ class Video extends React.Component<VideoProps, VideoStates> {
             });
             this.player.current.addEventListener("seeked", (event: any) => {
                 if (this.player.current) {
-                    if (this.props.seek !== this.player.current.currentTime) {
-                        this.props.onSeeked(this.player.current.currentTime);
+                    const currentTime = Math.round(this.player.current.currentTime);
+                    if (this.props.seek !== currentTime) {
+                        this.props.onSeeked(currentTime);
                     }
                 }
             });
@@ -87,7 +87,8 @@ class Video extends React.Component<VideoProps, VideoStates> {
 
     private timeUpdate = (): void => {
         if (this.player.current && this.props.onTimeUpdate) {
-            this.props.onTimeUpdate(this.player.current.currentTime);
+            const currentTime = Math.round(this.player.current.currentTime);
+            this.props.onTimeUpdate(currentTime);
         }
     }
 

@@ -16,7 +16,8 @@ import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
-import {observer} from "mobx-react";
+import WhiteVideoPlugin from "@netless/white-video-plugin";
+import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {replayStore} from "../models/ReplayStore";
 import {LanguageEnum} from "./NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
@@ -60,7 +61,6 @@ export type PlayerPageStates = {
     layoutType: LayoutType;
 };
 
-@observer
 class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> implements PlayerFacadeObject {
     private scheduleTime: number = 0;
     private readonly cursor: any;
@@ -116,7 +116,7 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             this.setState({isManagerOpen: true});
         }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk();
+            const whiteWebSdk = new WhiteWebSdk({plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,

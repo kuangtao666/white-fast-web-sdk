@@ -190,7 +190,7 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
                                     </div>
                                     <div className="plugin-box-body">
                                         <Video
-                                            videoURL={this.props.url}
+                                            videoURL={this.props.videoUrl}
                                             isClickEnable={false}
                                             play={this.props.play}
                                             currentTime={this.props.currentTime}

@@ -77,7 +77,8 @@ class Audio extends React.Component<VideoProps, VideoStates> {
             this.player.current.addEventListener("seeked", (event: any) => {
                 if (this.player.current) {
                     if (this.props.seek !== this.player.current.currentTime) {
-                        this.props.onSeeked(this.player.current.currentTime);
+                        const currentTime = Math.round(this.player.current.currentTime);
+                        this.props.onSeeked(currentTime);
                     }
                 }
             });
@@ -87,7 +88,8 @@ class Audio extends React.Component<VideoProps, VideoStates> {
 
     private timeUpdate = (): void => {
         if (this.player.current && this.props.onTimeUpdate) {
-            this.props.onTimeUpdate(this.player.current.currentTime);
+            const currentTime = Math.round(this.player.current.currentTime);
+            this.props.onTimeUpdate(currentTime);
         }
     }
 
