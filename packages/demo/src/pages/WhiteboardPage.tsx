@@ -79,6 +79,8 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                     this.props.history.push("/");
                 },
                 recordDataCallback: (data: RecordDataType) => {
+                    console.log(778899);
+                    console.log(data);
                     this.setState({recordData: data});
                 },
                 replayCallback: () => {
@@ -89,7 +91,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 rtc: {
                     type: "agora",
                     rtcObj: AgoraRTC,
-                    // defaultStart: true,
+                    defaultStart: true,
                     appId: "8595fd46955f427db44b4e9ba90f015d",
                     recordConfig: {
                         customerId: "b4e2bc22a89549b2a84969b844258fe3",

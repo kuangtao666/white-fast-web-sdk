@@ -61,6 +61,7 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
 
     public componentDidMount(): void {
         this.setState({seek: this.props.currentTime});
+        this.setState({play: this.props.play});
         this.handleSeekData(this.props.currentTime);
         this.handlePlayState(false);
         if (this.selfUserInf && this.selfUserInf.identity !== IdentityType.host) {
