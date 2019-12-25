@@ -394,11 +394,10 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                             </div>}
                         </div>
                         {player &&
-                        <div
+                        <PlayerWhiteboard
                             style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}
                             className="player-box"
-                            ref={ref => player.bindHtmlElement(ref)}
-                            />}
+                            player={player}/>}
                     </div>
                 </div>
                 {this.state.layoutType === LayoutType.Side &&
