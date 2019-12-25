@@ -303,6 +303,9 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         if (roomStore.releaseMedia) {
             roomStore.releaseMedia();
         }
+        if (roomStore.stopRecord) {
+            roomStore.stopRecord();
+        }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("beforeunload", this.beforeunload);
     }
@@ -311,6 +314,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     }
     public async componentDidMount(): Promise<void> {
         window.addEventListener("resize", this.onWindowResize);
+        roomStore.recordDataCallback = this.props.recordDataCallback;
         if (this.props.deviceType) {
             this.setState({deviceType: this.props.deviceType});
         } else {
@@ -512,7 +516,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                     ossConfigObj={this.state.ossConfigObj}
                     replayCallback={this.props.replayCallback}
                     room={this.state.room!}
-                    recordDataCallback={this.props.recordDataCallback}
                     uuid={this.props.uuid} rtc={this.props.rtc}
                     channelName={this.props.uuid}/>
             );

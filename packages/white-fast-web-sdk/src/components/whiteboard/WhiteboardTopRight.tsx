@@ -12,6 +12,8 @@ import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 import Identicon from "../../tools/identicon/Identicon";
 import {IdentityType, LanguageEnum} from "../../pages/NetlessRoomTypes";
+import {roomStore} from "../../models/RoomStore";
+const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 export type WhiteboardTopRightProps = {
     userId: string;
@@ -77,7 +79,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         } else {
             return false;
         }
-    };
+    }
 
     private handleUrl = (url: string): string => {
         if (this.props.isManagerOpen === null) {
@@ -108,10 +110,10 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 return classUrl;
             }
         }
-    };
+    }
     private handleInvite = (): void => {
         this.setState({isInviteVisible: true});
-    };
+    }
     public componentDidMount(): void {
         const {identity} = this.props;
         if (identity === IdentityType.host) {
@@ -123,7 +125,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
 
     private handleClose = (): void => {
         this.setState({isCloseTipsVisible: true});
-    };
+    }
 
     private handleRenderStop = (): React.ReactNode => {
         return (
@@ -131,7 +133,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 <img src={stop_icon}/>
             </div>
         );
-    };
+    }
     private handleUserAvatar = (): React.ReactNode => {
         const  {userAvatarUrl, userId} = this.props;
         if (userAvatarUrl) {
@@ -153,11 +155,11 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 </div>
             );
         }
-    };
+    }
 
     private handleShareUrl = (evt: any): void => {
         this.setState({shareUrl: evt.target.value});
-    };
+    }
 
     private handleSwitchDisable = (shareUrl: ShareUrlType): boolean => {
         const  {identity} = this.props;
@@ -172,7 +174,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 return true;
             }
         }
-    };
+    }
 
     private renderSideMenu = (): React.ReactNode => {
         const  {isManagerOpen} = this.props;
@@ -196,13 +198,13 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
         } else {
             return null;
         }
-    };
+    }
 
     private renderExit = (): React.ReactNode => {
         const isEnglish = this.props.language === LanguageEnum.English;
         if (this.props.identity === IdentityType.host) {
             return (
-                <div onClick={() => {
+                <div onClick={async () => {
                     if (this.props.replayCallback) {
                         this.props.replayCallback();
                         this.setState({isCloseTipsVisible: false});
@@ -224,7 +226,7 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                 </div>
             );
         }
-    };
+    }
     public render(): React.ReactNode {
         const  {isManagerOpen} = this.props;
         const isEnglish = this.props.language === LanguageEnum.English;
@@ -290,10 +292,21 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                         <div className="whiteboard-share-text-box">
                             {this.renderExit()}
                             <Button
-                                    onClick={() => {
-                                        if (this.props.exitRoomCallback) {
-                                            this.props.exitRoomCallback();
-                                            this.setState({isCloseTipsVisible: false});
+                                    onClick={async () => {
+                                        if (roomStore.isRecording) {
+                                            if (roomStore.startRecord) {
+                                                roomStore.startRecord();
+                                            }
+                                            await timeout(500);
+                                            if (this.props.exitRoomCallback) {
+                                                this.props.exitRoomCallback();
+                                                this.setState({isCloseTipsVisible: false});
+                                            }
+                                        } else {
+                                            if (this.props.exitRoomCallback) {
+                                                this.props.exitRoomCallback();
+                                                this.setState({isCloseTipsVisible: false});
+                                            }
                                         }
                                     }}
                                     style={{marginTop: 16, width: 240}}

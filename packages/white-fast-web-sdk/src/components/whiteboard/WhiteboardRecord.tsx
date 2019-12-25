@@ -28,7 +28,6 @@ export type WhiteboardRecordProps = {
     uuid: string;
     ossConfigObj: OSSConfigObjType;
     rtc?: RtcType;
-    recordDataCallback?: (data: RecordDataType) => void;
     room: Room;
     replayCallback?: () => void;
 };
@@ -176,9 +175,9 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                         this.setRecordState(false);
                         const time =  new Date();
                         const timeStamp = time.getTime();
-                        this.setState({isRecord: false});
-                        if (this.props.recordDataCallback) {
-                            this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime, mediaUrl: res.serverResponse.fileList});
+                        this.setState({isRecord: false, isRecordOver: true});
+                        if (roomStore.endRecordDataCallback) {
+                            roomStore.endRecordDataCallback(timeStamp, res.serverResponse.fileList);
                             this.setState({mediaUrl: res.serverResponse.fileList});
                         }
                         this.stopClock();
@@ -191,8 +190,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                     const time =  new Date();
                     const timeStamp = time.getTime();
                     this.setState({isRecord: false, isRecordOver: true});
-                    if (this.props.recordDataCallback) {
-                        this.props.recordDataCallback({endTime: timeStamp, startTime: this.state.startTime});
+                    if (roomStore.endRecordDataCallback) {
+                        roomStore.endRecordDataCallback(timeStamp);
                     }
                     this.stopClock();
                 }
@@ -260,8 +259,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                     roomStore.isRecording = true;
                     const time =  new Date();
                     const timeStamp = time.getTime();
-                    if (this.props.recordDataCallback) {
-                        this.props.recordDataCallback({startTime: timeStamp});
+                    if (roomStore.startRecordDataCallback(timeStamp)) {
+                        roomStore.startRecordDataCallback(timeStamp);
                     }
                     this.setState({isRecord: true, startTime: timeStamp});
                     this.startClock();
@@ -275,8 +274,8 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                 this.setRecordState(true);
                 const time =  new Date();
                 const timeStamp = time.getTime();
-                if (this.props.recordDataCallback) {
-                    this.props.recordDataCallback({startTime: timeStamp});
+                if (roomStore.startRecordDataCallback) {
+                    roomStore.startRecordDataCallback(timeStamp);
                 }
                 this.setState({isRecord: true, startTime: timeStamp});
                 this.startClock();
