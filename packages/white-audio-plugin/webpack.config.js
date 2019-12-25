@@ -13,7 +13,9 @@ module.exports = {
         libraryTarget: "umd",
         path: path.resolve(__dirname, 'dist'),
     },
-
+    externals: {
+      'white-web-sdk': 'white-web-sdk'
+    },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.json']
     },

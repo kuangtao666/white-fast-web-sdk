@@ -1,7 +1,7 @@
 import * as React from "react";
 import SeekSlider from "@netless/react-seek-slider";
 import {Badge, Icon, message} from "antd";
-import {WhiteWebSdk, PlayerPhase, Player} from "white-web-sdk";
+import {WhiteWebSdk, PlayerPhase, Player, PlayerWhiteboard} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
@@ -16,9 +16,8 @@ import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
-import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WhiteVideoPlugin from "@netless/white-video-plugin";
-import {observer} from "mobx-react";
+import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {replayStore} from "../models/ReplayStore";
 import {LanguageEnum} from "./NetlessRoomTypes";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
@@ -62,7 +61,6 @@ export type PlayerPageStates = {
     layoutType: LayoutType;
 };
 
-@observer
 class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> implements PlayerFacadeObject {
     private scheduleTime: number = 0;
     private readonly cursor: any;
@@ -118,7 +116,7 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             this.setState({isManagerOpen: true});
         }
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk({ plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
+            const whiteWebSdk = new WhiteWebSdk({plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,
@@ -396,11 +394,10 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                             </div>}
                         </div>
                         {player &&
-                        <div
+                        <PlayerWhiteboard
                             style={{backgroundColor: boardBackgroundColor ? boardBackgroundColor : "#F2F2F2"}}
                             className="player-box"
-                            ref={ref => player.bindHtmlElement(ref)}
-                            />}
+                            player={player}/>}
                     </div>
                 </div>
                 {this.state.layoutType === LayoutType.Side &&

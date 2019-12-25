@@ -14,7 +14,8 @@ import {
     ViewMode,
     DeviceType,
     PluginComponentClass,
-} from "white-web-sdk";
+    RoomWhiteboard,
+} from "white-react-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
 import WhiteboardTopRight from "../components/whiteboard/WhiteboardTopRight";
@@ -39,11 +40,11 @@ import WhiteboardRecord from "../components/whiteboard/WhiteboardRecord";
 import "./NetlessRoom.less";
 import {RoomFacadeObject} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
-import WhiteVideoPlugin from "@netless/white-video-plugin";
-import WhiteWebCoursePlugin from "../plugins/web-course-plugin/WhiteWebCoursePlugin";
 import WebPpt from "./WebPpt";
 import {roomStore} from "../models/RoomStore";
 import {observer} from "mobx-react";
+import WhiteVideoPlugin from "@netless/white-video-plugin";
+import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {
     ClassModeType,
     IdentityType,
@@ -122,7 +123,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteWebCoursePlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
@@ -729,7 +730,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div style={{pointerEvents: roomStore.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
-                                {this.renderWhiteboard()}
+                                {this.renderWhiteboard(room)}
                             </div>
                             <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
                         </Dropzone>
@@ -758,13 +759,8 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             );
         }
     }
-    private renderWhiteboard(): React.ReactNode {
-        const {room} = this.state;
-        if (room) {
-            return <div ref={ref => room.bindHtmlElement(ref)} style={{width: "100%", height: "100%"}}/>;
-        } else {
-            return null;
-        }
+    private renderWhiteboard(room: Room): React.ReactNode {
+        return <RoomWhiteboard room={room} style={{width: "100%", height: "100%"}}/>;
     }
 }
 

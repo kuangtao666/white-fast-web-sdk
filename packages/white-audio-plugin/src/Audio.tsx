@@ -3,7 +3,7 @@ import "./index.less";
 import * as mute_icon from "./image/mute_icon.svg";
 
 export type VideoProps = {
-    readonly videoURL: string;
+    readonly audioURL: string;
     readonly play: boolean;
     readonly seek: number;
     readonly width?: number;
@@ -26,7 +26,7 @@ export type VideoStates = {
     muted: boolean;
 };
 
-class Video extends React.Component<VideoProps, VideoStates> {
+class Audio extends React.Component<VideoProps, VideoStates> {
     private readonly player: React.RefObject<HTMLVideoElement>;
     public constructor(props: VideoProps) {
         super(props);
@@ -60,6 +60,7 @@ class Video extends React.Component<VideoProps, VideoStates> {
             }
         }
     }
+
     public componentDidMount(): void {
         if (this.player.current) {
             this.player.current.currentTime = this.props.currentTime;
@@ -75,8 +76,8 @@ class Video extends React.Component<VideoProps, VideoStates> {
             });
             this.player.current.addEventListener("seeked", (event: any) => {
                 if (this.player.current) {
-                    const currentTime = Math.round(this.player.current.currentTime);
-                    if (this.props.seek !== currentTime) {
+                    if (this.props.seek !== this.player.current.currentTime) {
+                        const currentTime = Math.round(this.player.current.currentTime);
                         this.props.onSeeked(currentTime);
                     }
                 }
@@ -125,14 +126,13 @@ class Video extends React.Component<VideoProps, VideoStates> {
     }
     public render(): React.ReactNode {
         return (
-            <div className="white-plugin-video-box" style={{
+            <div className="white-plugin-audio-box" style={{
                 width: this.props.width ? this.props.width : "100%",
                 height: this.props.height ? this.props.height : "100%",
             }}>
                 {this.renderMuteBox()}
-                <video playsInline
-                       className="white-plugin-video"
-                       src={this.props.videoURL}
+                <audio className="white-plugin-audio"
+                       src={this.props.audioURL}
                        ref={this.player}
                        muted={this.state.muted}
                        style={{
@@ -151,4 +151,4 @@ class Video extends React.Component<VideoProps, VideoStates> {
     }
 }
 
-export default Video;
+export default Audio;

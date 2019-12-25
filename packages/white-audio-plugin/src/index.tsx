@@ -1,7 +1,7 @@
 import * as React from "react";
 import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-web-sdk";
 import "./PluginStyle.less";
-import Video from "./Video";
+import Audio from "./Audio";
 export enum VideoStateEnum {
     play = "play",
     pause = "pause",
@@ -36,7 +36,7 @@ export type SelfUserInf = {
 
 class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginStates> {
 
-    public static readonly protocol: string = "video";
+    public static readonly protocol: string = "audio";
     private room: Room | undefined = undefined;
     private play: Player | undefined = undefined;
     public static readonly backgroundProps: Partial<WhiteVideoPluginProps> = {play: false, seek: 0, currentTime: 0,
@@ -154,12 +154,12 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
                                         <span>
-                                            Video Player
+                                            Audio Player
                                         </span>
                                     </div>
-                                    <div className="plugin-box-body">
-                                        <Video
-                                            videoURL={this.props.videoUrl}
+                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-box-body">
+                                        <Audio
+                                            audioURL={this.props.audioUrl}
                                             isClickEnable={this.state.isClickEnable}
                                             play={this.state.play}
                                             identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
@@ -185,12 +185,12 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
                                 <div className="plugin-box" style={{width: width, height: height}}>
                                     <div className="plugin-box-nav">
                                         <span>
-                                              Video Player
+                                              Audio Player
                                         </span>
                                     </div>
-                                    <div className="plugin-box-body">
-                                        <Video
-                                            videoURL={this.props.videoUrl}
+                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-box-body">
+                                        <Audio
+                                            audioURL={this.props.audioURL}
                                             isClickEnable={false}
                                             play={this.props.play}
                                             currentTime={this.props.currentTime}
