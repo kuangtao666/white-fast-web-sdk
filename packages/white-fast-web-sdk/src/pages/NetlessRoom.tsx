@@ -127,16 +127,17 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
+            const userPayload = identity === IdentityType.host ? {
+                userId: userId,
+                name: userName,
+                avatar: userAvatarUrl,
+                identity: identity,
+            } : undefined;
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: {
-                        userId: userId,
-                        name: userName,
-                        avatar: userAvatarUrl,
-                        identity: identity,
-                    }},
+                    userPayload: userPayload},
                 {
                     onPhaseChanged: phase => {
                         if (!this.didLeavePage) {
