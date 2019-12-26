@@ -30,7 +30,7 @@ export class RoomStore {
 
     private startTime?: number;
 
-    public startRecordDataCallback = (startTime: number): void => {
+    public startRecordDataCallback (startTime: number): void {
         if (this.recordDataCallback) {
             this.recordDataCallback({startTime: startTime});
             this.startTime = startTime;

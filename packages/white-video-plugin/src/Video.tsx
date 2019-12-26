@@ -131,6 +131,7 @@ class Video extends React.Component<VideoProps, VideoStates> {
             }}>
                 {this.renderMuteBox()}
                 <video playsInline
+                       webkit-playsinline
                        className="white-plugin-video"
                        src={this.props.videoURL}
                        ref={this.player}

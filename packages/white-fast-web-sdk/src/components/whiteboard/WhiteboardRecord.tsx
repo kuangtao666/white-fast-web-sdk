@@ -259,9 +259,7 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                     roomStore.isRecording = true;
                     const time =  new Date();
                     const timeStamp = time.getTime();
-                    if (roomStore.startRecordDataCallback(timeStamp)) {
-                        roomStore.startRecordDataCallback(timeStamp);
-                    }
+                    roomStore.startRecordDataCallback(timeStamp);
                     this.setState({isRecord: true, startTime: timeStamp});
                     this.startClock();
                 } catch (err) {
@@ -274,9 +272,7 @@ class WhiteboardRecord extends React.Component<WhiteboardRecordProps, Whiteboard
                 this.setRecordState(true);
                 const time =  new Date();
                 const timeStamp = time.getTime();
-                if (roomStore.startRecordDataCallback) {
-                    roomStore.startRecordDataCallback(timeStamp);
-                }
+                roomStore.startRecordDataCallback(timeStamp);
                 this.setState({isRecord: true, startTime: timeStamp});
                 this.startClock();
             }
