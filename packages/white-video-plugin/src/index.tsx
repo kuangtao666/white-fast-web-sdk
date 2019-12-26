@@ -70,7 +70,7 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
         };
     }
 
-    public componentDidMount(): void {
+    public async componentDidMount(): Promise<void> {
         this.setState({seek: this.props.currentTime});
         this.setState({play: this.props.play});
         this.handleSeekData(this.props.currentTime);
