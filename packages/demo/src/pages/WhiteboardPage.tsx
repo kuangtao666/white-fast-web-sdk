@@ -79,8 +79,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                     this.props.history.push("/");
                 },
                 recordDataCallback: (data: RecordDataType) => {
-                    console.log(778899);
-                    console.log(data);
                     this.setState({recordData: data});
                 },
                 replayCallback: () => {
@@ -101,7 +99,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 identity: identityType,
                 language: "Chinese",
                 toolBarPosition: "left",
-                isManagerOpen: true,
+                isManagerOpen: null,
                 // ossConfigObj: {
                 //     accessKeyId: "LTAIMCKvqa9EeK4c",
                 //     accessKeySecret: "0twckwYwJudmSOf2GEECozJlvBepQp",

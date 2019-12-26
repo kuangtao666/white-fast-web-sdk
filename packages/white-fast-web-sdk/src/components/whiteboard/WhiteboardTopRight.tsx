@@ -294,18 +294,18 @@ export default class WhiteboardTopRight extends React.Component<WhiteboardTopRig
                             <Button
                                     onClick={async () => {
                                         if (roomStore.isRecording) {
-                                            if (roomStore.startRecord) {
-                                                roomStore.startRecord();
+                                            if (roomStore.stopRecord) {
+                                                roomStore.stopRecord();
                                             }
+                                            this.setState({isCloseTipsVisible: false});
                                             await timeout(500);
                                             if (this.props.exitRoomCallback) {
                                                 this.props.exitRoomCallback();
-                                                this.setState({isCloseTipsVisible: false});
                                             }
                                         } else {
+                                            this.setState({isCloseTipsVisible: false});
                                             if (this.props.exitRoomCallback) {
                                                 this.props.exitRoomCallback();
-                                                this.setState({isCloseTipsVisible: false});
                                             }
                                         }
                                     }}

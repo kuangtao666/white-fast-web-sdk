@@ -303,9 +303,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         if (roomStore.releaseMedia) {
             roomStore.releaseMedia();
         }
-        if (roomStore.stopRecord) {
-            roomStore.stopRecord();
-        }
         window.removeEventListener("resize", this.onWindowResize);
         window.removeEventListener("beforeunload", this.beforeunload);
     }
@@ -570,43 +567,51 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
 
     private getCameraState = (room: Room): ViewMode => {
         const {userId} = this.props;
-        if (this.props.identity === IdentityType.host) {
-            const userSelf: HostUserType = room.state.globalState.hostInfo;
-            if (userSelf) {
-                return userSelf.cameraState;
-            } else {
-                return ViewMode.Freedom;
-            }
-        } else if (this.props.identity === IdentityType.guest) {
-            const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
-            if (userSelf) {
-                return userSelf.cameraState;
-            } else {
-                return ViewMode.Freedom;
-            }
+        if (this.props.isManagerOpen === null) {
+            return ViewMode.Freedom;
         } else {
-            return ViewMode.Follower;
+            if (this.props.identity === IdentityType.host) {
+                const userSelf: HostUserType = room.state.globalState.hostInfo;
+                if (userSelf) {
+                    return userSelf.cameraState;
+                } else {
+                    return ViewMode.Freedom;
+                }
+            } else if (this.props.identity === IdentityType.guest) {
+                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+                if (userSelf) {
+                    return userSelf.cameraState;
+                } else {
+                    return ViewMode.Freedom;
+                }
+            } else {
+                return ViewMode.Follower;
+            }
         }
     }
 
     private getDisableCameraTransformState = (room: Room): boolean => {
         const {userId} = this.props;
-        if (this.props.identity === IdentityType.host) {
-            const userSelf: HostUserType = room.state.globalState.hostInfo;
-            if (userSelf) {
-                return userSelf.disableCameraTransform;
-            } else {
-                return true;
-            }
-        } else if (this.props.identity === IdentityType.guest) {
-            const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
-            if (userSelf) {
-                return userSelf.disableCameraTransform;
-            } else {
-                return true;
-            }
+        if (this.props.isManagerOpen === null) {
+            return false;
         } else {
-            return true;
+            if (this.props.identity === IdentityType.host) {
+                const userSelf: HostUserType = room.state.globalState.hostInfo;
+                if (userSelf) {
+                    return userSelf.disableCameraTransform;
+                } else {
+                    return true;
+                }
+            } else if (this.props.identity === IdentityType.guest) {
+                const userSelf: GuestUserType = room.state.globalState.guestUsers.find((user: GuestUserType) => user.userId === userId);
+                if (userSelf) {
+                    return userSelf.disableCameraTransform;
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
         }
     }
 
@@ -733,7 +738,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                                 ]} customerComponentPosition={CustomerComponentPositionType.end}
                                 memberState={room.state.memberState}/>
                             <div style={{pointerEvents: roomStore.boardPointerEvents}} className="whiteboard-tool-layer-down" ref={this.setWhiteboardLayerDownRef}>
-                                {this.renderWhiteboard(room)}
+                                <RoomWhiteboard room={room} style={{width: "100%", height: "100%"}}/>
                             </div>
                             <WebPpt identity={this.props.identity} ppt={room.state.globalState.ppt} room={room}/>
                         </Dropzone>
@@ -761,9 +766,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                 </RoomContextProvider>
             );
         }
-    }
-    private renderWhiteboard(room: Room): React.ReactNode {
-        return <RoomWhiteboard room={room} style={{width: "100%", height: "100%"}}/>;
     }
 }
 
