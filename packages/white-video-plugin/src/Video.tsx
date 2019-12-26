@@ -51,9 +51,10 @@ class Video extends React.Component<VideoProps, VideoStates> {
                     try {
                         await this.player.current.play();
                     } catch (err) {
-                        console.log(err);
-                        this.setState({selfMute: true});
-                        await this.player.current.play();
+                        if (`${err.name}` === "NotAllowedError") {
+                            this.setState({selfMute: true});
+                            await this.player.current.play();
+                        }
                     }
                 }
             } else {
@@ -80,16 +81,12 @@ class Video extends React.Component<VideoProps, VideoStates> {
         if (this.player.current) {
             this.player.current.currentTime = this.props.currentTime;
             this.player.current.addEventListener("play", (event: any) => {
-                if (!this.props.play) {
-                    this.props.onPlayed(true);
-                }
+                this.props.onPlayed(true);
             });
             this.player.current.addEventListener("pause", (event: any) => {
-                if (this.props.play) {
-                    this.props.onPlayed(false);
-                    if (this.player.current) {
-                        this.player.current.currentTime = this.props.currentTime;
-                    }
+                this.props.onPlayed(false);
+                if (this.player.current) {
+                    this.player.current.currentTime = this.props.currentTime;
                 }
             });
             this.player.current.addEventListener("seeked", (event: any) => {

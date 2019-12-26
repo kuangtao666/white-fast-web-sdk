@@ -112,7 +112,6 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
                 this.props.operator.setProps(this.props.uuid, {play: play});
-                this.setState({play: play});
             }
         }
     }
