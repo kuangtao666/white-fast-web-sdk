@@ -1,5 +1,6 @@
 import {observable} from "mobx";
-import {IdentityType} from "../pages/NetlessRoomTypes";
+import {IdentityType, RecordDataType} from "../pages/NetlessRoomTypes";
+import {number} from "prop-types";
 
 export class RoomStore {
     @observable
@@ -24,5 +25,25 @@ export class RoomStore {
     public isScreenZoomLock: boolean = false;
     @observable
     public isInputH5Visible: boolean = false;
+    @observable
+    public recordDataCallback?: (data: RecordDataType) => void;
+
+    private startTime?: number;
+
+    public startRecordDataCallback (startTime: number): void {
+        if (this.recordDataCallback) {
+            this.recordDataCallback({startTime: startTime});
+            this.startTime = startTime;
+        }
+    }
+
+    public endRecordDataCallback = (endTime: number, mediaUrl?: string): void => {
+        if (this.recordDataCallback) {
+            this.recordDataCallback({
+                startTime: this.startTime,
+                endTime: endTime,
+                mediaUrl: mediaUrl});
+        }
+    }
 }
 export const roomStore = new RoomStore();

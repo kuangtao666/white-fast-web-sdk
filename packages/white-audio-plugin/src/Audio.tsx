@@ -6,10 +6,14 @@ export type VideoProps = {
     readonly audioURL: string;
     readonly play: boolean;
     readonly seek: number;
+    readonly mute: boolean;
+    readonly volume: number;
     readonly width?: number;
     readonly height?: number;
     readonly onPlayed: (play: boolean) => void;
     readonly onSeeked: (seek: number) => void;
+    readonly onMuted: (mute: boolean) => void;
+    readonly onVolumeChange: (volume: number) => void;
     isClickEnable: boolean;
     currentTime: number;
     identity?: IdentityType;
@@ -24,6 +28,8 @@ export enum IdentityType {
 export type VideoStates = {
     isMediaPlayAllow: boolean;
     muted: boolean;
+    selfMute: boolean;
+    volume: number;
 };
 
 class Audio extends React.Component<VideoProps, VideoStates> {
@@ -33,7 +39,9 @@ class Audio extends React.Component<VideoProps, VideoStates> {
         this.player = React.createRef();
         this.state = {
             isMediaPlayAllow: true,
-            muted: false,
+            selfMute: false,
+            muted: props.mute,
+            volume: 1,
         };
     }
     public async componentWillReceiveProps(nextProps: Readonly<VideoProps>): Promise<void> {
@@ -43,9 +51,10 @@ class Audio extends React.Component<VideoProps, VideoStates> {
                     try {
                         await this.player.current.play();
                     } catch (err) {
-                        console.log(err);
-                        this.setState({muted: true});
-                        await this.player.current.play();
+                        if (`${err.name}` === "NotAllowedError") {
+                            this.setState({selfMute: true});
+                            await this.player.current.play();
+                        }
                     }
                 }
             } else {
@@ -59,19 +68,26 @@ class Audio extends React.Component<VideoProps, VideoStates> {
                 this.player.current.currentTime = nextProps.seek;
             }
         }
+        if (this.props.mute !== nextProps.mute) {
+            this.setState({muted: nextProps.mute});
+        }
+        if (this.props.volume !== nextProps.volume) {
+            if (this.player.current) {
+                this.player.current.volume = nextProps.volume;
+            }
+        }
     }
 
     public componentDidMount(): void {
         if (this.player.current) {
             this.player.current.currentTime = this.props.currentTime;
             this.player.current.addEventListener("play", (event: any) => {
-                if (!this.props.play) {
-                    this.props.onPlayed(true);
-                }
+                this.props.onPlayed(true);
             });
             this.player.current.addEventListener("pause", (event: any) => {
-                if (this.props.play) {
-                    this.props.onPlayed(false);
+                this.props.onPlayed(false);
+                if (this.player.current) {
+                    this.player.current.currentTime = this.props.currentTime;
                 }
             });
             this.player.current.addEventListener("seeked", (event: any) => {
@@ -81,6 +97,10 @@ class Audio extends React.Component<VideoProps, VideoStates> {
                         this.props.onSeeked(currentTime);
                     }
                 }
+            });
+            this.player.current.addEventListener("volumechange", (event: any) => {
+                this.props.onVolumeChange(event.target.volume);
+                this.props.onMuted(event.target.muted);
             });
         }
 
@@ -95,11 +115,11 @@ class Audio extends React.Component<VideoProps, VideoStates> {
 
     private renderMuteBox = (): React.ReactNode => {
         if (this.props.identity !== IdentityType.host) {
-            if (this.state.muted) {
+            if (this.state.selfMute) {
                 return (
                     <div className="media-mute-box">
                         <div onClick={() => {
-                            this.setState({muted: false});
+                            this.setState({selfMute: false});
                         }} style={{pointerEvents: "auto"}} className="media-mute-box-inner">
                             <img src={mute_icon}/>
                             <span>unmute</span>
@@ -134,7 +154,7 @@ class Audio extends React.Component<VideoProps, VideoStates> {
                 <audio className="white-plugin-audio"
                        src={this.props.audioURL}
                        ref={this.player}
-                       muted={this.state.muted}
+                       muted={this.state.muted ? this.state.muted : this.state.selfMute}
                        style={{
                            width: "100%",
                            height: "100%",

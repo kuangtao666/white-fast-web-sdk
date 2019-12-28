@@ -71,7 +71,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     public componentDidMount(): void {
-        const {userId, identity} = this.props;
+        const {userId, identity, rtc} = this.props;
         if (identity !== IdentityType.host && this.props.isVideoEnable) {
             const key = `${Date.now()}`;
             const btn = (
@@ -108,6 +108,9 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         }
         roomStore.startRtc = this.startRtc;
         roomStore.stopRtc = this.stopRtc;
+        if (rtc && rtc.defaultStart) {
+            this.startRtc ();
+        }
     }
 
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
