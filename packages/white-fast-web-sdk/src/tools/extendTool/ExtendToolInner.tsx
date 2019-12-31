@@ -3,11 +3,9 @@ import uuidv4 from "uuid/v4";
 import "./ExtendToolInner.less";
 import {
     Room,
-    PluginComponentClass,
 } from "white-web-sdk";
 import {Button, Input, Modal, Tabs, Tooltip, Upload} from "antd";
 import web_plugin from "../../assets/image/web_plugin.svg";
-import editor_plugin from "../../assets/image/editor_plugin.svg";
 import video_plugin from "../../assets/image/video_plugin.svg";
 import audio_plugin from "../../assets/image/audio_plugin.svg";
 import {PPTProgressListener, UploadManager} from "../upload/UploadManager";
@@ -22,7 +20,6 @@ export type ExtendToolInnerProps = {
     onProgress: PPTProgressListener,
     language?: LanguageEnum;
     userId: string;
-    plugins?: PluginComponentClass | ReadonlyArray<PluginComponentClass>;
 };
 
 export type ExtendToolInnerStates = {
@@ -76,16 +73,16 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                 url = res.replace("http", "https");
             }
             if (url) {
-                this.props.room.insertPlugin({
-                    protocal: "video",
-                    centerX: 0,
-                    centerY: 0,
-                    width: 480,
-                    height: 270,
-                    props: {
-                        videoUrl: url,
-                    },
-                });
+                // this.props.room.insertPlugin({
+                //     protocal: "video",
+                //     centerX: 0,
+                //     centerY: 0,
+                //     width: 480,
+                //     height: 270,
+                //     props: {
+                //         videoUrl: url,
+                //     },
+                // });
             }
         } catch (err) {
             console.log(err);
@@ -103,16 +100,16 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                 url = res.replace("http", "https");
             }
             if (url) {
-                this.props.room.insertPlugin({
-                    protocal: "audio",
-                    centerX: 0,
-                    centerY: 0,
-                    width: 480,
-                    height: 86,
-                    props: {
-                        audioUrl: url,
-                    },
-                });
+                // this.props.room.insertPlugin({
+                //     protocal: "audio",
+                //     centerX: 0,
+                //     centerY: 0,
+                //     width: 480,
+                //     height: 86,
+                //     props: {
+                //         audioUrl: url,
+                //     },
+                // });
             }
         } catch (err) {
             console.log(err);

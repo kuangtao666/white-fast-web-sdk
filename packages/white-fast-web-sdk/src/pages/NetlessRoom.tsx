@@ -13,7 +13,6 @@ import {
     MemberState,
     ViewMode,
     DeviceType,
-    PluginComponentClass,
     RoomWhiteboard,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
@@ -43,8 +42,6 @@ import * as default_cover from "../assets/image/default_cover.svg";
 import WebPpt from "./WebPpt";
 import {roomStore} from "../models/RoomStore";
 import {observer} from "mobx-react";
-import WhiteVideoPlugin from "@netless/white-video-plugin";
-import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {
     ClassModeType,
     IdentityType,
@@ -123,7 +120,7 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " "});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
