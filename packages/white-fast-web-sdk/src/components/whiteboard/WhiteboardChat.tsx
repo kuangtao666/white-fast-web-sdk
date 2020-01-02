@@ -1,6 +1,6 @@
 import * as React from "react";
 import "./WhiteboardChat.less";
-import {
+const {
     ThemeProvider,
     MessageGroup,
     Message,
@@ -10,7 +10,7 @@ import {
     Row,
     TextInput,
     SendButton,
-} from "@livechat/ui-kit";
+} = require("@livechat/ui-kit");
 import {Room, Player} from "white-web-sdk";
 import {MessageType} from "./WhiteboardBottomRight";
 import * as empty from "../../assets/image/empty.svg";

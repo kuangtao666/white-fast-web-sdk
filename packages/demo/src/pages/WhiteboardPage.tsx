@@ -1,6 +1,7 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
-import AgoraRTC from "agora-rtc-sdk";
+// import AgoraRTC from "agora-rtc-sdk";
+import { ZegoClient } from "webrtc-zego";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
 import WhiteFastSDK from "@netless/white-fast-web-sdk";
@@ -63,7 +64,8 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
         const {userId, uuid, identityType} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
         if (roomToken) {
-           this.netlessRoom = WhiteFastSDK.Room("whiteboard", {
+            console.log({roomToken, uuid, userId, identityType});
+            this.netlessRoom = WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
                 roomToken: roomToken,
                 userId: userId,
@@ -87,9 +89,12 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 roomCallback: (room: any) => {
                 },
                 rtc: {
-                    type: "agora",
-                    rtcObj: AgoraRTC,
-                    appId: "8595fd46955f427db44b4e9ba90f015d",
+                    type: "zego",
+                    rtcObj: ZegoClient,
+                    appId: 1082937486,
+                    authConfig: {
+                        token: [0x60, 0x25, 0xbf, 0x4c, 0xe1, 0x10, 0x42, 0xda, 0x3a, 0xa0, 0xf6, 0xab, 0xf8, 0x14, 0x9e, 0xcc, 0x48, 0x8a, 0x34, 0x08, 0x45, 0xac, 0x60, 0x77, 0x25, 0x1c, 0x00, 0x63, 0x4b, 0xc6, 0xd6, 0x9a],
+                    },
                     recordConfig: {
                         customerId: "b4e2bc22a89549b2a84969b844258fe3",
                         customerCertificate: "594daac9c32b491795f8cbd27a7d5265",
@@ -99,58 +104,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 language: "Chinese",
                 toolBarPosition: "left",
                 isManagerOpen: true,
-                // ossConfigObj: {
-                //     accessKeyId: "LTAIMCKvqa9EeK4c",
-                //     accessKeySecret: "0twckwYwJudmSOf2GEECozJlvBepQp",
-                //     region: "oss-cn-hangzhou",
-                //     bucket: "fast-sdk-test",
-                //     folder: "media",
-                //     prefix: "https://fast-sdk-test.oss-cn-hangzhou.aliyuncs.com",
-                // },
-               //  uploadToolBox: [
-               //      {
-               //          enable: true,
-               //          type: "image",
-               //          icon: "",
-               //          title: "",
-               //          script: "",
-               //      },
-               //      {
-               //          enable: true,
-               //          type: "static_conversion",
-               //          icon: "",
-               //          title: "",
-               //          script: "",
-               //      },
-               //      {
-               //          enable: true,
-               //          type: "dynamic_conversion",
-               //          icon: "",
-               //          title: "",
-               //          script: "",
-               //      },
-               //  ],
-               // ossConfigObj: {
-               //     accessKeyId: "LTAIwHZFXsXh9yaG",
-               //     accessKeySecret: "9FE19EMIG3pWzVElJn1iolz66XxPkO",
-               //     bucket: "netless-agora-whiteboard",
-               //     region: "oss-cn-hangzhou",
-               //     folder: "ppt",
-               //     prefix: "https://netless-agora-whiteboard.oss-cn-hangzhou.aliyuncs.com/",
-               // },
-               // enableRecord: false,
-               //  pagePreviewPosition: "right",
-               //  boardBackgroundColor: "#F2F2F2",
-               //  isReadOnly: false,
-               //  defaultColorArray: [
-               //      "#E77345",
-               //      "#005BF6",
-               //      "#F5AD46",
-               //      "#68AB5D",
-               //      "#9E51B6",
-               //      "#1E2023",
-               //  ],
-               //  isScreenLock: true,
                 documentArray: [
                     {
                         active: false,

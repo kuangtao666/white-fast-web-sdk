@@ -4,9 +4,10 @@ import {NetlessStream} from "./ClassroomMedia";
 import * as microphone_open from "../../assets/image/microphone_open.svg";
 import * as microphone_close from "../../assets/image/microphone_close.svg";
 import Identicon from "../../tools/identicon/Identicon";
-import {ClassModeType} from "../../pages/NetlessRoomTypes";
+import {ClassModeType, RtcEnum} from "../../pages/NetlessRoomTypes";
 import {roomStore} from "../../models/RoomStore";
 export type ClassroomManagerCellProps = {
+    rtcType: RtcEnum;
     stream: NetlessStream;
     userId: number;
     rtcClient: any;
@@ -21,11 +22,10 @@ export type ClassroomManagerCellProps = {
 };
 
 export default class ClassroomMediaCell extends React.Component<ClassroomManagerCellProps, {}> {
-
-
     public constructor(props: ClassroomManagerCellProps) {
         super(props);
     }
+    public videoEl: HTMLVideoElement;
 
     public async componentDidMount(): Promise<void> {
         const {stream} = this.props;
@@ -34,9 +34,17 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     }
 
     private startStream = (stream: NetlessStream): void => {
-        const streamId = stream.getId();
-        this.publishLocalStream(stream);
-        stream.play(`netless-${streamId}`);
+        switch (this.props.rtcType) {
+            case "agora": {
+                const streamId = stream.getId();
+                this.publishLocalStream(stream);
+                stream.play(`netless-${streamId}`);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
     private release = (): void => {
@@ -45,12 +53,20 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
     }
 
     public componentWillUnmount(): void {
-       this.release();
+        this.release();
     }
 
     private stopStream = (stream: NetlessStream): void => {
-        if (stream.isPlaying()) {
-            stream.stop();
+        switch (this.props.rtcType) {
+            case "agora": {
+                if (stream.isPlaying()) {
+                    stream.stop();
+                }
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
 
@@ -135,9 +151,28 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
             </div>;
         }
     }
+
+    private zegoSDKDetect = () => this.props.rtcType === "zego";
+    private agoraSDKDetect = () => this.props.rtcType === "agora";
+
     public render(): React.ReactNode {
-        const {stream} = this.props;
-        const streamId =  stream.getId();
+        const {stream, rtcType, isLocalStreamPublish} = this.props;
+        const isZegoSDK = this.zegoSDKDetect();
+        const isAgoraSDK = this.agoraSDKDetect();
+
+        const zegoVideoNode = <video
+            ref={(videoEl: HTMLVideoElement) => this.videoEl = videoEl}
+            autoPlay
+            playsInline
+            onClick={() => this.handleClickVideo(streamId)}
+            className="rtc-media-cell-box"
+            muted={isLocalStreamPublish}
+        />;
+        const streamId = {
+            "zego": stream.streamId,
+            "agora": stream.getId(),
+        }[rtcType] || "";
+
         if (stream.state.isInStage) {
             return (
                 <div className="rtc-media-stage-out-box" style={this.renderStageStyle()}>
@@ -146,8 +181,8 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
                             {stream.state.isAudioOpen ? <img src={microphone_open}/> : <img src={microphone_close}/>}
                         </div>
                         {!stream.state.isVideoOpen && this.renderStageAvatar()}
-                        <div id={`netless-${streamId}`} className="rtc-media-stage-box">
-                        </div>
+                        {isAgoraSDK && <div id={`netless-${streamId}`} className="rtc-media-stage-box" />}
+                        {isZegoSDK && zegoVideoNode}
                     </div>
                 </div>
             );
@@ -159,8 +194,8 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
                             {stream.state.isAudioOpen ? <img src={microphone_open}/> : <img src={microphone_close}/>}
                         </div>
                         {!stream.state.isVideoOpen && this.renderAvatar()}
-                        <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} className="rtc-media-cell-box">
-                        </div>
+                        {isAgoraSDK && <div id={`netless-${streamId}`} onClick={() => this.handleClickVideo(streamId)} className="rtc-media-cell-box" />}
+                        {isZegoSDK && zegoVideoNode}
                     </div>
                 </div>
             );

@@ -2,9 +2,10 @@ import * as React from "react";
 import {NetlessStream} from "./ClassroomMedia";
 import ClassroomMediaCell from "./ClassroomMediaCell";
 import "./ClassroomMediaManager.less";
-import {ClassModeType, IdentityType} from "../../pages/NetlessRoomTypes";
+import {ClassModeType, IdentityType, RtcEnum} from "../../pages/NetlessRoomTypes";
 
 export type ClassroomMediaManagerProps = {
+    rtcType: RtcEnum;
     streams: NetlessStream[];
     userId: number;
     classMode: ClassModeType;
@@ -29,12 +30,21 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
             mediaLayerDownRef: null,
         };
     }
+
+    public getVideoEls(): HTMLVideoElement[] {
+        return this.mediaCells.map(mediaCell => mediaCell.videoEl);
+    }
+
+    public mediaCells: ClassroomMediaCell[] = [];
+    public videoEls: HTMLVideoElement[] = [];
     private renderMediaCell = (streams: NetlessStream[]): React.ReactNode => {
         const {mediaLayerDownRef} = this.state;
+        this.mediaCells = [];
         if (mediaLayerDownRef) {
             return streams.map((stream: NetlessStream, index: number) => {
                 return <ClassroomMediaCell setLocalStreamState={this.props.setLocalStreamState}
                                            key={`${stream.getId()}`}
+                                           rtcType={this.props.rtcType}
                                            streamIndex={index}
                                            mediaLayerDownRef={mediaLayerDownRef}
                                            classMode={this.props.classMode}
@@ -43,7 +53,8 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
                                            userId={this.props.userId}
                                            setMemberToStageById={this.props.setMemberToStageById}
                                            rtcClient={this.props.rtcClient}
-                                           stream={stream}/>;
+                                           stream={stream}
+                                           ref={(mediaCell: ClassroomMediaCell) => this.mediaCells[index] = mediaCell} />;
             });
         } else {
             return null;
