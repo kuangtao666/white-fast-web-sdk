@@ -1,19 +1,14 @@
 import * as React from "react";
-import { CNode, CNodeKind, PluginComponentProps, RoomConsumer, Room, PlayerConsumer, Player} from "white-web-sdk";
+import { CNode, RoomConsumer, Room, PlayerConsumer, Player, PluginProps} from "white-web-sdk";
 import "./PluginStyle.less";
 import Video from "./Video";
-export enum VideoStateEnum {
-    play = "play",
-    pause = "pause",
-}
-
 export enum IdentityType {
     host = "host",
     guest = "guest",
     listener = "listener",
 }
 
-export type WhiteVideoPluginProps = PluginComponentProps & {
+export type WhiteVideoPluginProps = PluginProps<{
     play: boolean;
     seek: number;
     volume: number,
@@ -21,7 +16,8 @@ export type WhiteVideoPluginProps = PluginComponentProps & {
     currentTime: number;
     loadingPercent: number;
     isUpload: boolean;
-};
+}>;
+
 
 export type WhiteVideoPluginStates = {
     isClickEnable: boolean;
@@ -108,33 +104,37 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
     }
 
     private handleSeekData = (seek: number): void => {
+        const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                this.props.operator.setProps(this.props.uuid, {seek: seek});
+                plugin.attributes = {seek: seek};
             }
         }
     }
 
     private handleMuteState = (mute: boolean): void => {
+        const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                this.props.operator.setProps(this.props.uuid, {mute: mute});
+                plugin.attributes = {mute: mute};
             }
         }
     }
 
     private handleVolumeChange = (volume: number): void => {
+        const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                this.props.operator.setProps(this.props.uuid, {volume: volume});
+                plugin.attributes = {volume: volume};
             }
         }
     }
 
     private handlePlayState = (play: boolean): void => {
+        const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                this.props.operator.setProps(this.props.uuid, {play: play});
+                plugin.attributes = {play: play};
             }
         }
     }
@@ -160,9 +160,10 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
     }
 
     private onTimeUpdate = (time: number): void => {
+        const {plugin} = this.props;
         if (this.selfUserInf) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                this.props.operator.setProps(this.props.uuid, {currentTime: time});
+                plugin.attributes = {currentTime: time};
             }
         }
     }
@@ -170,7 +171,7 @@ class Index extends React.Component<WhiteVideoPluginProps, WhiteVideoPluginState
     public render(): React.ReactNode {
         const {width, height} = this.props;
         return (
-            <CNode kind={CNodeKind.HTML}>
+            <CNode>
                 <RoomConsumer>
                     {(room: Room | undefined) => {
                         if (room) {

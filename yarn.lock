@@ -16343,7 +16343,7 @@ white-react-sdk@^2.5.1:
     react "~16.8.0"
     white-web-sdk "2.5.1"
 
-white-web-sdk@2.5.1, white-web-sdk@^2.3.18:
+white-web-sdk@2.5.1, white-web-sdk@^2.5.1:
   version "2.5.1"
   resolved "https://registry.npmjs.org/white-web-sdk/-/white-web-sdk-2.5.1.tgz#e1713cf64a8f0b00fdc311e9e6ffd3d378999637"
   integrity sha512-1XekSYsnB3a4HXcWZLMJ5v0Hrd9ZhMMqcWWebuMjj7nmm5quFSpzEBH6lYnO4ZENF/aVGsxdCyQV3kyxjvs4lQ==

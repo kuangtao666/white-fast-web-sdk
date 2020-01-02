@@ -152,30 +152,30 @@ class ExtendToolInner extends React.Component<ExtendToolInnerProps, ExtendToolIn
                                     </div>
                                 </Tooltip>
                             </div>
-                            <div className="extend-icon-box">
-                                <Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传视频"}>
-                                    <Upload
-                                        accept={"video/mp4"}
-                                        showUploadList={false}
-                                        customRequest={this.uploadVideo}>
-                                        <div className="extend-inner-icon">
-                                            <img style={{width: 26}} src={video_plugin}/>
-                                        </div>
-                                    </Upload>
-                                </Tooltip>
-                            </div>
-                            <div className="extend-icon-box">
-                                <Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传音频"}>
-                                    <Upload
-                                        accept={"audio/mp3"}
-                                        showUploadList={false}
-                                        customRequest={this.uploadAudio}>
-                                        <div className="extend-inner-icon">
-                                            <img style={{width: 26}} src={audio_plugin}/>
-                                        </div>
-                                    </Upload>
-                                </Tooltip>
-                            </div>
+                            {/*<div className="extend-icon-box">*/}
+                                {/*<Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传视频"}>*/}
+                                    {/*<Upload*/}
+                                        {/*accept={"video/mp4"}*/}
+                                        {/*showUploadList={false}*/}
+                                        {/*customRequest={this.uploadVideo}>*/}
+                                        {/*<div className="extend-inner-icon">*/}
+                                            {/*<img style={{width: 26}} src={video_plugin}/>*/}
+                                        {/*</div>*/}
+                                    {/*</Upload>*/}
+                                {/*</Tooltip>*/}
+                            {/*</div>*/}
+                            {/*<div className="extend-icon-box">*/}
+                                {/*<Tooltip placement="bottom" title={isEnglish ? "Upload video" : "上传音频"}>*/}
+                                    {/*<Upload*/}
+                                        {/*accept={"audio/mp3"}*/}
+                                        {/*showUploadList={false}*/}
+                                        {/*customRequest={this.uploadAudio}>*/}
+                                        {/*<div className="extend-inner-icon">*/}
+                                            {/*<img style={{width: 26}} src={audio_plugin}/>*/}
+                                        {/*</div>*/}
+                                    {/*</Upload>*/}
+                                {/*</Tooltip>*/}
+                            {/*</div>*/}
                         </div>
                     </TabPane>
                     <TabPane tab={isEnglish ? "Graph" : "常用图形"} key="2">

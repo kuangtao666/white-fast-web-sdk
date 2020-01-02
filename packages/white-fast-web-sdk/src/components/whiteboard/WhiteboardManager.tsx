@@ -72,6 +72,7 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         }
     }
 
+
     private renderHost = (): React.ReactNode => {
         const {room, userId} = this.props;
         const hostInfo: HostUserType = room.state.globalState.hostInfo;
