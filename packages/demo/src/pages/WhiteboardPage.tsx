@@ -1,6 +1,6 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
-// import AgoraRTC from "agora-rtc-sdk";
+import AgoraRTC from "agora-rtc-sdk";
 import { ZegoClient } from "webrtc-zego";
 import "./WhiteboardPage.less";
 import {netlessWhiteboardApi} from "../apiMiddleware";
@@ -11,6 +11,22 @@ export type WhiteboardPageProps = RouteComponentProps<{
     userId: string;
     identityType: IdentityType;
 }>;
+
+const zegoRtcConfig = {
+    type: "zego",
+    rtcObj: ZegoClient,
+    appId: 1082937486,
+    authConfig: {
+        token: [0x60, 0x25, 0xbf, 0x4c, 0xe1, 0x10, 0x42, 0xda, 0x3a, 0xa0, 0xf6, 0xab, 0xf8, 0x14, 0x9e, 0xcc, 0x48, 0x8a, 0x34, 0x08, 0x45, 0xac, 0x60, 0x77, 0x25, 0x1c, 0x00, 0x63, 0x4b, 0xc6, 0xd6, 0x9a],
+    },
+};
+
+const agoraRtcConfig = {
+    type: "agora",
+    rtcObj: AgoraRTC,
+    appId: "8595fd46955f427db44b4e9ba90f015d",
+};
+const rtcConfig = agoraRtcConfig;
 
 export type WhiteboardPageState = {
     recordData: RecordDataType | null;
@@ -64,7 +80,6 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
         const {userId, uuid, identityType} = this.props.match.params;
         const roomToken = await this.getRoomToken(uuid);
         if (roomToken) {
-            console.log({roomToken, uuid, userId, identityType});
             this.netlessRoom = WhiteFastSDK.Room("whiteboard", {
                 uuid: uuid,
                 roomToken: roomToken,
@@ -89,12 +104,7 @@ export default class WhiteboardPage extends React.Component<WhiteboardPageProps,
                 roomCallback: (room: any) => {
                 },
                 rtc: {
-                    type: "zego",
-                    rtcObj: ZegoClient,
-                    appId: 1082937486,
-                    authConfig: {
-                        token: [0x60, 0x25, 0xbf, 0x4c, 0xe1, 0x10, 0x42, 0xda, 0x3a, 0xa0, 0xf6, 0xab, 0xf8, 0x14, 0x9e, 0xcc, 0x48, 0x8a, 0x34, 0x08, 0x45, 0xac, 0x60, 0x77, 0x25, 0x1c, 0x00, 0x63, 0x4b, 0xc6, 0xd6, 0x9a],
-                    },
+                    ...rtcConfig,
                     recordConfig: {
                         customerId: "b4e2bc22a89549b2a84969b844258fe3",
                         customerCertificate: "594daac9c32b491795f8cbd27a7d5265",

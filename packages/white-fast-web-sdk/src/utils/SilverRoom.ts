@@ -104,10 +104,8 @@ export function getEasySDK(ZegoClient: any): any {
         this._cacheSDKConfig.loginToken = await getLoginToken() as string;
       }
 
-      console.error(this._cacheSDKConfig.loginToken);
       return new Promise((resolve, reject) => {
         this.login(decodeURIComponent(para.roomId), 2, this._cacheSDKConfig.loginToken, (streamList: any) => {
-          this.publish(this._cacheSDKConfig.publishStreamId);
           this._cacheSDKConfig.streamList = streamList;
           resolve(streamList);
           if (this.handleStreamsUpdate) {
@@ -160,7 +158,13 @@ export function getEasySDK(ZegoClient: any): any {
           videoQuality: 2,
           horizontal: true,
           ...mediaStreamConstraints,
-        }, res, rej);
+        }, () => {
+          res();
+          if (success) { success(); }
+        }, () => {
+          rej();
+          if (error) { error(); }
+        });
       });
     }
 

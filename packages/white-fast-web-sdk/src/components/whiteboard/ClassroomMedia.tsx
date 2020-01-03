@@ -754,7 +754,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                     }
                     const { zegoClient } = this;
                     await zegoClient.initSDK({ appId, signKey: token as number[] });
-                    const streams = await zegoClient.join({ roomId: channelId, userId: userId.toString() });
+                    const streams = await zegoClient.join({ roomId: channelId.toString(), userId: userId.toString() });
                     this.setMediaState(true);
                     this.addZegoListeners();
                     this.setState({ isRtcStart: true, isRtcLoading: false, streams: streams ? streams.map((t: any) => this.convertZegoStream(t)) : [] }, () => {
@@ -884,7 +884,8 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                     const els = this.classroomMediaManager.getVideoEls();
                     if (els && els[0]) {
                         await zegoClient.startPreview(els[0]);
-                        const res = zegoClient.startPublishingStream(uuid.v4(), els[0]);
+                        const res = await zegoClient.publish();
+                        console.log("publish--------------------------");
                     }
                     this.playZegoRemoteStreams();
                 });
