@@ -32,7 +32,9 @@ export default class ClassroomMediaManager extends React.Component<ClassroomMedi
     }
 
     public getVideoEls(): HTMLVideoElement[] {
-        return this.mediaCells.map(mediaCell => mediaCell.videoEl);
+        return this.mediaCells.map(mediaCell => {
+            return mediaCell ? mediaCell.videoEl : (null as any);
+        });
     }
 
     public mediaCells: ClassroomMediaCell[] = [];

@@ -165,6 +165,7 @@ export default class ClassroomMediaCell extends React.Component<ClassroomManager
             autoPlay
             playsInline
             onClick={() => this.handleClickVideo(streamId)}
+            style={{ objectFit: "cover", background: "#000" }}
             className="rtc-media-cell-box"
             muted={isLocalStreamPublish}
         />;

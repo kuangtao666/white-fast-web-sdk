@@ -117,6 +117,11 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         }
     }
 
+    public componentWillUnmount(): void {
+        if (this.zegoClient) {
+            this.zegoClient.unInitSDK();
+        }
+    }
     public UNSAFE_componentWillReceiveProps(nextProps: ClassroomMediaProps): void {
         if (this.props.isVideoEnable !== nextProps.isVideoEnable) {
             if (nextProps.isVideoEnable) {
@@ -467,10 +472,13 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     private switchCamera = (): void => {
         const { rtc } = this.props;
         if (rtc && rtc.type === "zego") {
-            let { isCameraOpen } = this.state;
-            isCameraOpen = !isCameraOpen;
-            this.zegoClient.enableMicrophone(1, isCameraOpen);
-            this.setState({isCameraOpen});
+            const els = this.classroomMediaManager.getVideoEls();
+            if (els && els[0]) {
+                let { isCameraOpen } = this.state;
+                isCameraOpen = !isCameraOpen;
+                this.zegoClient.enableCamera(els[0], isCameraOpen);
+                this.setState({isCameraOpen});
+            }
             return;
         }
 
@@ -501,11 +509,13 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     private switchMicrophone = (): void => {
         const { rtc } = this.props;
         if (rtc && rtc.type === "zego") {
-            let {isMicrophoneOpen} = this.state;
-            isMicrophoneOpen = !isMicrophoneOpen;
-            this.zegoOptions.enableMic = isMicrophoneOpen;
-            this.zegoClient.enableMicrophone(1, isMicrophoneOpen);
-            this.setState({isMicrophoneOpen});
+            const els = this.classroomMediaManager.getVideoEls();
+            if (els && els[0]) {
+                let { isMicrophoneOpen } = this.state;
+                isMicrophoneOpen = !isMicrophoneOpen;
+                this.zegoClient.enableMicrophone(els[0], isMicrophoneOpen);
+                this.setState({isMicrophoneOpen});
+            }
             return;
         }
 
@@ -683,7 +693,7 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
             roomStore.startRecord();
         }
     }
-    private startRtc = async (): void => {
+    private startRtc = async () => {
         const {rtc, classMode, userId, channelId, identity} = this.props;
         if (rtc) {
             let token: string | number[] = "";
@@ -737,11 +747,14 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
                     });
                 }
                 case "zego": {
-                    const ZegoClient = getEasySDK(rtcObj);
-                    const zegoClient = new ZegoClient();
-                    this.zegoClient = zegoClient;
+                    if (!this.zegoClient) {
+                        const ZegoClient = getEasySDK(rtcObj);
+                        const zegoClient = new ZegoClient();
+                        this.zegoClient = zegoClient;
+                    }
+                    const { zegoClient } = this;
                     await zegoClient.initSDK({ appId, signKey: token as number[] });
-                    const streams = await zegoClient.join({ roomId: "testRoomId", userId: uuid.v4() });
+                    const streams = await zegoClient.join({ roomId: channelId, userId: userId.toString() });
                     this.setMediaState(true);
                     this.addZegoListeners();
                     this.setState({ isRtcStart: true, isRtcLoading: false, streams: streams ? streams.map((t: any) => this.convertZegoStream(t)) : [] }, () => {
@@ -759,30 +772,45 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private stopRtc = (): void => {
-        // TODO: stopRtc
-        if (this.agoraClient) {
-            const {localStream} = this.state;
-            this.unpublishStream();
-            this.agoraClient.leave(() => {
-                this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
-                this.setMediaState(false);
-                if (localStream) {
-                    if (localStream.isPlaying()) {
-                        localStream.stop();
-                    }
-                    localStream.close();
+        const { rtc } = this.props;
+        if (!rtc) { return; }
+        switch (rtc.type) {
+            case "agora": {
+                if (this.agoraClient) {
+                    const {localStream} = this.state;
+                    this.unpublishStream();
+                    this.agoraClient.leave(() => {
+                        this.setState({streams: [], isRtcStart: false, isMaskAppear: false});
+                        this.setMediaState(false);
+                        if (localStream) {
+                            if (localStream.isPlaying()) {
+                                localStream.stop();
+                            }
+                            localStream.close();
+                        }
+                        console.log("client leaves channel success");
+                    }, (err: any) => {
+                        console.log("channel leave failed");
+                        console.error(err);
+                    });
+                    this.agoraClient = undefined;
                 }
-                console.log("client leaves channel success");
-            }, (err: any) => {
-                console.log("channel leave failed");
-                console.error(err);
-            });
-            this.agoraClient = undefined;
+                break;
+            }
+            case "zego": {
+                if (this.zegoClient) {
+                    this.zegoClient.unInitSDK();
+                    this.setState({streams: [], isRtcStart: false, isMaskAppear: false, localStream: null});
+                }
+                break;
+            }
+            default: {
+                break;
+            }
         }
     }
 
     private unpublishStream = (isLocalStop?: boolean): void => {
-        // TODO: unpublishStream
         const {localStream} = this.state;
         if (localStream) {
             if (this.state.isLocalStreamPublish) {
@@ -802,7 +830,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private publishStream = (): void => {
-        // TODO: publishStream
         const {localStream} = this.state;
         if (localStream) {
             if (!this.state.isLocalStreamPublish) {
@@ -887,7 +914,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private addStream = (stream: any): void => {
-        // TODO: addStream
         if (stream) {
             if (!stream.getId) {
                 const id = uuid.v4();
@@ -910,7 +936,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private setMemberToStageById = (userId: number): void => {
-        // TODO: Unknown
         const originalStreamArray = this.state.streams;
         const newStreams: NetlessStream[] = originalStreamArray.map(originalStream => {
             originalStream.isInStage = originalStream.getId() === userId;
@@ -920,7 +945,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private removeStream = (stream: any): void => {
-        // TODO: removeStream
         if (stream) {
             const originalStreamArray = this.state.streams;
             const newStream = originalStreamArray.filter(originalStream => {
@@ -931,7 +955,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private setVideoState = (uid: number, state: boolean): void => {
-        // TODO: zego stream camera state.
         const streams = this.state.streams.map(data => {
             if (data.getId() === uid) {
                 data.state.isVideoOpen = state;
@@ -941,7 +964,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         this.setState({streams: streams});
     }
     private setAudioState = (uid: number, state: boolean): void => {
-        // TODO: zego stream mic state.
         const streams = this.state.streams.map(data => {
             if (data.getId() === uid) {
                 data.state.isAudioOpen = state;
@@ -968,11 +990,12 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
         zegoClient.playStreams(streams.slice(1).map((stream, index) => ({ streamId: stream.stream_id, viewEl: els[index + 1] })));
     }
     private addZegoListeners = () => {
-        const { zegoClient, state: { streams, localStream } } = this;
+        const { zegoClient } = this;
         zegoClient.handleStreamsUpdate = (streamList: any[]) => {
-            if (streamList && streamList.length > 0) {
-                const newStreams = [...(localStream ? streams[0] : []), ...streamList.map(t => this.convertZegoStream(t))];
-                console.warn(newStreams);
+            const { state: { streams, localStream } } = this;
+            if (streamList) {
+                const newStreams = [...(localStream ? [streams[0]] : []), ...streamList.map(t => this.convertZegoStream(t))];
+                console.log(newStreams);
                 this.setState({
                     streams: newStreams,
                 }, () => {
@@ -983,7 +1006,6 @@ class ClassroomMedia extends React.Component<ClassroomMediaProps, ClassroomMedia
     }
 
     private addRtcListeners = (rtcClient: any): void => {
-        // TODO:
         // 监听
         rtcClient.on("stream-published", () => {
             console.log("Publish local stream successfully");
