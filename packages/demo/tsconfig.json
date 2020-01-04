@@ -26,6 +26,10 @@
       "*" : ["node_modules/white-web-sdk/types/*"]
     }
   },
+  "files": [
+    "./src/custom.d.ts",
+    "../white-fast-web-sdk/src/custom.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist",

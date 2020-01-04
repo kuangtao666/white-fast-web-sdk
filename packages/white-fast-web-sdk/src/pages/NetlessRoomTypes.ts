@@ -45,7 +45,7 @@ export type RtcType = {
     defaultStart?: boolean,
     channel?: string, // 不写默认是 uuid,
     authConfig?: {
-        token: string,
+        token: string | number[],
     }
     recordConfig?: {
         recordUid?: string,
