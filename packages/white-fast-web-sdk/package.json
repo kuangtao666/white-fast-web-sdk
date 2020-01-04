@@ -1,6 +1,6 @@
 {
   "name": "@netless/white-fast-web-sdk",
-  "version": "1.1.43",
+  "version": "1.1.46",
   "main": "dist/bundle.js",
   "types": "dist/facade/index.d.ts",
   "author": "netless",
@@ -51,8 +51,7 @@
     "react-dropzone": "4.2.10",
     "react-tiny-virtual-list": "^2.2.0",
     "uuid": "^3.3.2",
-    "white-react-sdk": "^2.3.18",
-    "white-web-sdk": "^2.3.18"
+    "white-react-sdk": "2.3.18"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
