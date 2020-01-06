@@ -2,7 +2,7 @@ import * as React from "react";
 import "./index.less";
 import * as mute_icon from "./image/mute_icon.svg";
 
-export type VideoProps = {
+export type AudioProps = {
     readonly audioURL: string;
     readonly play: boolean;
     readonly seek: number;
@@ -32,9 +32,9 @@ export type VideoStates = {
     volume: number;
 };
 
-class Audio extends React.Component<VideoProps, VideoStates> {
+export default class WhiteAudio extends React.Component<AudioProps, VideoStates> {
     private readonly player: React.RefObject<HTMLVideoElement>;
-    public constructor(props: VideoProps) {
+    public constructor(props: AudioProps) {
         super(props);
         this.player = React.createRef();
         this.state = {
@@ -44,7 +44,7 @@ class Audio extends React.Component<VideoProps, VideoStates> {
             volume: 1,
         };
     }
-    public async componentWillReceiveProps(nextProps: Readonly<VideoProps>): Promise<void> {
+    public async componentWillReceiveProps(nextProps: Readonly<AudioProps>): Promise<void> {
         if (this.props.play !== nextProps.play) {
             if (nextProps.play) {
                 if (this.player.current) {
@@ -170,5 +170,3 @@ class Audio extends React.Component<VideoProps, VideoStates> {
         );
     }
 }
-
-export default Audio;

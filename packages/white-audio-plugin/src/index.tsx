@@ -1,7 +1,7 @@
 import * as React from "react";
-import {CNode, RoomConsumer, Room, PlayerConsumer, Player, PluginProps} from "white-web-sdk";
+import {CNode, RoomConsumer, Room, PlayerConsumer, Player, PluginProps, Plugin} from "white-web-sdk";
 import "./PluginStyle.less";
-import Audio from "./Audio";
+import WhiteAudio from "./WhiteAudio";
 
 export enum IdentityType {
     host = "host",
@@ -9,13 +9,13 @@ export enum IdentityType {
     listener = "listener",
 }
 
-export type WhiteAudioPluginProps = PluginProps<{
+export type WhiteAudioPluginProps = {
     play: boolean;
     seek: number;
     currentTime: number;
     loadingPercent: number;
     isUpload: boolean;
-}>;
+};
 
 export type WhiteAudioPluginStates = {
     isClickEnable: boolean;
@@ -32,19 +32,11 @@ export type SelfUserInf = {
     identity: IdentityType,
 };
 
-class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginStates> {
+class WhiteAudioPlugin extends React.Component<PluginProps<{}, WhiteAudioPluginProps>, WhiteAudioPluginStates> {
 
-    public static readonly protocol: string = "audio";
     private room: Room | undefined = undefined;
     private play: Player | undefined = undefined;
-    public static readonly backgroundProps: Partial<WhiteAudioPluginProps> = {play: false, seek: 0, currentTime: 0,
-        loadingPercent: 0,
-        isUpload: false};
     private selfUserInf: SelfUserInf | null = null;
-
-    public static willInterruptEvent(props: any, event: any): boolean {
-        return true;
-    }
     public constructor(props: WhiteAudioPluginProps) {
         super(props);
         this.state = {
@@ -60,9 +52,9 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
     }
 
     public componentDidMount(): void {
-        this.setState({seek: this.props.currentTime});
-        this.setState({play: this.props.play});
-        this.handleSeekData(this.props.currentTime);
+        this.setState({seek: this.props.plugin.attributes.currentTime});
+        this.setState({play: this.props.plugin.attributes.play});
+        this.handleSeekData(this.props.plugin.attributes.currentTime);
         this.handlePlayState(false);
         if (this.selfUserInf && this.selfUserInf.identity !== IdentityType.host) {
             this.setState({isClickEnable: false});
@@ -72,26 +64,26 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
     private isHost = (): boolean => {
         return !!(this.selfUserInf && this.selfUserInf.identity === IdentityType.host);
     }
-    public UNSAFE_componentWillReceiveProps(nextProps: WhiteAudioPluginProps): void {
+    public UNSAFE_componentWillReceiveProps(nextProps: PluginProps<{}, WhiteAudioPluginProps>): void {
         if (!this.isHost()) {
-            if (this.props.play !== nextProps.play) {
-                this.setState({play: nextProps.play});
+            if (this.props.plugin.attributes.play !== nextProps.plugin.attributes.play) {
+                this.setState({play: nextProps.plugin.attributes.play});
             }
-            if (this.props.seek !== nextProps.seek) {
-                this.setState({seek: nextProps.seek});
+            if (this.props.plugin.attributes.seek !== nextProps.plugin.attributes.seek) {
+                this.setState({seek: nextProps.plugin.attributes.seek});
             }
 
-            if (this.props.loadingPercent !== nextProps.loadingPercent) {
-                this.setState({loadingPercent: nextProps.loadingPercent});
+            if (this.props.plugin.attributes.loadingPercent !== nextProps.plugin.attributes.loadingPercent) {
+                this.setState({loadingPercent: nextProps.plugin.attributes.loadingPercent});
             }
-            if (this.props.isUpload !== nextProps.isUpload) {
-                this.setState({isUpload: nextProps.isUpload});
+            if (this.props.plugin.attributes.isUpload !== nextProps.plugin.attributes.isUpload) {
+                this.setState({isUpload: nextProps.plugin.attributes.isUpload});
             }
-            if (this.props.mute !== nextProps.mute) {
-                this.setState({mute: nextProps.mute});
+            if (this.props.plugin.attributes.mute !== nextProps.plugin.attributes.mute) {
+                this.setState({mute: nextProps.plugin.attributes.mute});
             }
-            if (this.props.volume !== nextProps.volume) {
-                this.setState({volume: nextProps.volume});
+            if (this.props.plugin.attributes.volume !== nextProps.plugin.attributes.volume) {
+                this.setState({volume: nextProps.plugin.attributes.volume});
             }
         }
     }
@@ -100,7 +92,7 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
         const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                plugin.attributes = {seek: seek};
+                plugin.putAttributes({seek: seek});
             }
         }
     }
@@ -109,7 +101,7 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
         const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                plugin.attributes = {play: play};
+                plugin.putAttributes({play: play});
             }
         }
     }
@@ -117,7 +109,7 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
         const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                plugin.attributes = {mute: mute};
+                plugin.putAttributes({mute: mute});
             }
         }
     }
@@ -126,7 +118,7 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
         const {plugin} = this.props;
         if (this.selfUserInf && this.room) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                plugin.attributes = {volume: volume};
+                plugin.putAttributes({volume: volume});
             }
         }
     }
@@ -155,39 +147,38 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
         const {plugin} = this.props;
         if (this.selfUserInf) {
             if (this.selfUserInf.identity === IdentityType.host) {
-                plugin.attributes = {currentTime: time};
+                plugin.putAttributes({currentTime: time});
             }
         }
     }
 
     public render(): React.ReactNode {
-        const {width, height} = this.props;
         return (
-            <CNode>
+            <CNode context={this.props.cnode}>
                 <RoomConsumer>
                     {(room: Room | undefined) => {
                         if (room) {
                             this.room = room;
                             this.setMyIdentityRoom(room);
                             return (
-                                <div className="plugin-box" style={{width: width, height: height}}>
-                                    <div className="plugin-box-nav">
+                                <div className="plugin-audio-box" style={{width: this.props.size.width, height: this.props.size.height}}>
+                                    <div className="plugin-audio-box-nav">
                                         <span>
                                             Audio Player
                                         </span>
                                     </div>
-                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-box-body">
-                                        <Audio
+                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-audio-box-body">
+                                        <WhiteAudio
                                             volume={this.state.volume}
                                             mute={this.state.mute}
                                             onVolumeChange={this.handleVolumeChange}
                                             onMuted={this.handleMuteState}
-                                            audioURL={this.props.audioUrl}
+                                            audioURL={this.props.plugin.attributes.pluginAudioUrl}
                                             isClickEnable={this.state.isClickEnable}
                                             play={this.state.play}
                                             identity={this.selfUserInf ? this.selfUserInf.identity : undefined}
                                             onTimeUpdate={this.onTimeUpdate}
-                                            currentTime={this.props.currentTime}
+                                            currentTime={this.props.plugin.attributes.currentTime}
                                             seek={this.state.seek}
                                             onPlayed={this.handlePlayState}
                                             onSeeked={this.handleSeekData}/>
@@ -205,23 +196,23 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
                             this.play = play;
                             this.setMyIdentityPlay(play);
                             return (
-                                <div className="plugin-box" style={{width: width, height: height}}>
-                                    <div className="plugin-box-nav">
+                                <div className="plugin-audio-box" style={{width: this.props.size.width, height: this.props.size.height}}>
+                                    <div className="plugin-audio-box-nav">
                                         <span>
                                               Audio Player
                                         </span>
                                     </div>
-                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-box-body">
-                                        <Audio
+                                    <div style={{backgroundColor: "#F1F3F4"}} className="plugin-audio-box-body">
+                                        <WhiteAudio
                                             onVolumeChange={this.handleVolumeChange}
                                             onMuted={this.handleMuteState}
-                                            audioURL={this.props.audioURL}
-                                            volume={this.props.volume}
-                                            mute={this.props.mute}
+                                            audioURL={this.props.plugin.attributes.pluginAudioUrl}
+                                            volume={this.props.plugin.attributes.volume}
+                                            mute={this.props.plugin.attributes.mute}
                                             isClickEnable={false}
-                                            play={this.props.play}
-                                            currentTime={this.props.currentTime}
-                                            seek={this.props.seek}
+                                            play={this.props.plugin.attributes.play}
+                                            currentTime={this.props.plugin.attributes.currentTime}
+                                            seek={this.props.plugin.attributes.seek}
                                             onPlayed={this.handlePlayState}
                                             onSeeked={this.handleSeekData}/>
                                     </div>
@@ -237,4 +228,14 @@ class Index extends React.Component<WhiteAudioPluginProps, WhiteAudioPluginState
     }
 }
 
-export default Index;
+export const audioPlugin: Plugin<{}, WhiteAudioPluginProps> = Object.freeze({
+    kind: "audio",
+    render: WhiteAudioPlugin,
+    defaultAttributes: {
+        play: false,
+        seek: 0,
+        currentTime: 0,
+        loadingPercent: 0,
+        isUpload: false,
+    },
+});

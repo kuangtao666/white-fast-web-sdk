@@ -61,6 +61,9 @@ export default class ReplayPage extends React.Component<ReplayPageProps, Whitebo
                 clickLogoCallback: () => {
                     this.props.history.push("/");
                 },
+                playerCallback: (player: any) => {
+                    console.log("player", player);
+                },
                 beginTimestamp: startTime && parseInt(startTime),
                 duration: this.getDuration(),
                 layoutType: "Side",

@@ -35,6 +35,7 @@ export type PlayerPageProps = {
     mediaUrl?: string,
     logoUrl?: string;
     clickLogoCallback?: () => void;
+    playerCallback?: (player: Player) => void;
     roomName?: string;
     language?: LanguageEnum;
     isManagerOpen?: boolean;
@@ -154,6 +155,9 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             this.setState({
                 player: player,
             });
+            if (this.props.playerCallback) {
+                this.props.playerCallback(player);
+            }
             player.addMagixEventListener("message",  event => {
                 this.setState({messages: [...this.state.messages, event.payload]});
             });
