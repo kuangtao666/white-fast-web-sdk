@@ -18,12 +18,12 @@
   "dependencies": {
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
-    "white-web-sdk": "^2.5.1"
+    "white-web-sdk": "^2.5.3"
   },
   "peerDependencies": {
     "react": "^16.8.0",
     "react-dom": "^16.8.0",
-    "white-web-sdk": "^2.5.1"
+    "white-web-sdk": "^2.5.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
