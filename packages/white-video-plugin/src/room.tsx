@@ -257,6 +257,28 @@ export default class WhiteVideoPluginRoom extends React.Component<WhiteVideoPlug
         }
     }
 
+    private renderDeleteBtn = (): React.ReactNode => {
+        const { plugin } = this.props;
+        if (plugin.context) {
+            if (plugin.context.identity === IdentityType.host) {
+                return (
+                    <div
+                        style={{ pointerEvents: "auto" }}
+                        className="plugin-audio-box-delete"
+                        onClick={() => {
+                            plugin.remove();
+                        }}
+                    >
+                        <img src={delete_icon} />
+                    </div>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        } 
+    }
     public render(): React.ReactNode {
         const { size, plugin } = this.props;
         return (
@@ -268,15 +290,7 @@ export default class WhiteVideoPluginRoom extends React.Component<WhiteVideoPlug
                             Video Player
                         </span>
                     </div>
-                    <div
-                        style={{ pointerEvents: "auto" }}
-                        className="plugin-video-box-delete"
-                        onClick={() => {
-                            plugin.remove();
-                        }}
-                    >
-                        <img src={delete_icon} />
-                    </div>
+                    {this.renderDeleteBtn()}
                 </div>
                 <div className="plugin-video-box-body">
                     {this.renderMuteBox()}

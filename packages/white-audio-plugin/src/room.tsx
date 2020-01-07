@@ -257,6 +257,29 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
         }
     }
 
+    private renderDeleteBtn = (): React.ReactNode => {
+        const { plugin } = this.props;
+        if (plugin.context) {
+            if (plugin.context.identity === IdentityType.host) {
+                return (
+                    <div
+                        style={{ pointerEvents: "auto" }}
+                        className="plugin-audio-box-delete"
+                        onClick={() => {
+                            plugin.remove();
+                        }}
+                    >
+                        <img src={delete_icon} />
+                    </div>
+                );
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        } 
+    }
+
     public render(): React.ReactNode {
         const { size, plugin } = this.props;
         return (
@@ -268,21 +291,12 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
                             Audio Player
                         </span>
                     </div>
-                    <div
-                        style={{ pointerEvents: "auto" }}
-                        className="plugin-audio-box-delete"
-                        onClick={() => {
-                            plugin.remove();
-                        }}
-                    >
-                        <img src={delete_icon} />
-                    </div>
+                    {this.renderDeleteBtn()}
                 </div>
                 <div className="plugin-audio-box-body">
                     {this.renderMuteBox()}
                     <div className="white-plugin-audio-box">
-                        <audio webkit-playsinline="true"
-                            playsinline
+                        <audio
                             className="white-plugin-aduio"
                             src={plugin.attributes.pluginAudioUrl}
                             ref={this.player}
