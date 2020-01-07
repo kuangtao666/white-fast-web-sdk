@@ -13,6 +13,10 @@ declare module "agora-rtc-sdk" {
     export default AgoraRTC;
 }
 
+declare module "webrtc-zego" {
+    export const ZegoClient: any;
+}
+
 
 declare module "*.jpg" {
     const content: string;
