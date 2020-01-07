@@ -282,6 +282,7 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
                     {this.renderMuteBox()}
                     <div className="white-plugin-audio-box">
                         <audio webkit-playsinline="true"
+                            playsinline
                             className="white-plugin-aduio"
                             src={plugin.attributes.pluginAudioUrl}
                             ref={this.player}

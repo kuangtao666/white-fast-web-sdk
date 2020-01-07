@@ -143,6 +143,7 @@ export default class WhiteAudioPluginReplay extends React.Component<WhiteAudioPl
                 <div className="plugin-audio-box-body">
                     <div className="white-plugin-audio-box">
                         <audio webkit-playsinline="true"
+                            playsinline
                             className="white-plugin-audio"
                             src={plugin.attributes.pluginAudioUrl}
                             ref={this.player}

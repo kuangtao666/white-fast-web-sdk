@@ -143,6 +143,7 @@ export default class WhiteVideoPluginReplay extends React.Component<WhiteVideoPl
                 <div className="plugin-video-box-body">
                     <div className="white-plugin-video-box">
                         <video webkit-playsinline="true"
+                            playsInline
                             className="white-plugin-video"
                             src={plugin.attributes.pluginVideoUrl}
                             ref={this.player}

@@ -282,6 +282,7 @@ export default class WhiteVideoPluginRoom extends React.Component<WhiteVideoPlug
                     {this.renderMuteBox()}
                     <div className="white-plugin-video-box">
                         <video webkit-playsinline="true"
+                            playsInline
                             className="white-plugin-video"
                             src={plugin.attributes.pluginVideoUrl}
                             ref={this.player}
