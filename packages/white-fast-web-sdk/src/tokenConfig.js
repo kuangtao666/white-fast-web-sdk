@@ -1,4 +1,4 @@
-{
+module.exports = {
   "ossConfigObj": {
     "accessKeyId": "LTAIwHZFXsXh9yaG",
     "accessKeySecret": "9FE19EMIG3pWzVElJn1iolz66XxPkO",

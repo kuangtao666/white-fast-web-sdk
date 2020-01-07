@@ -31,7 +31,8 @@
     "antd": "^3.24.3",
     "react": "~16.8.0",
     "react-dom": "~16.8.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "webrtc-zego": "^1.2.2"
   },
   "devDependencies": {
     "@types/ali-oss": "^6.0.3",
