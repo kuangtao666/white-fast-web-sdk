@@ -21,7 +21,6 @@ export type WhiteAudioPluginProps = PluginProps<{
 
 
 export type WhiteAudioPluginStates = {
-    isClickEnable: boolean;
     play: boolean;
     mute: boolean;
     selfMute: boolean;
@@ -50,7 +49,6 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
         this.reactionVolumeDisposer = this.startVolumeReaction();
         this.reactionMuteDisposer = this.startMuteTimeReaction();
         this.state = {
-            isClickEnable: true,
             play: false,
             seek: 0,
             selfMute: false,
@@ -64,10 +62,6 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
         const { plugin } = this.props;
         this.handleSeekData(plugin.attributes.currentTime);
         this.handlePlayState(false);
-        if (this.selfUserInf && this.selfUserInf.identity !== IdentityType.host) {
-            this.setState({ isClickEnable: false });
-        }
-
         if (this.player.current) {
             this.player.current.currentTime = plugin.attributes.currentTime;
             this.player.current.addEventListener("play", (event: any) => {
@@ -102,7 +96,7 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
 
     private setMyIdentityRoom = (): void => {
         const {plugin} = this.props;
-        if (plugin.context && plugin.context.identity) {
+        if (plugin.context) {
             this.selfUserInf = {
                 identity: this.props.plugin.context.identity,
             };
@@ -232,11 +226,12 @@ export default class WhiteAudioPluginRoom extends React.Component<WhiteAudioPlug
 
     private detectAudioClickEnable = (): any => {
         const { plugin } = this.props;
-        if (plugin.context.identity !== IdentityType.host) {
-            return "none";
-        }
-        if (this.state.isClickEnable) {
-            return "auto";
+        if (plugin.context) {
+            if (plugin.context.identity !== IdentityType.host) {
+                return "none";
+            } else {
+                return "auto";
+            }
         } else {
             return "none";
         }

@@ -1,4 +1,4 @@
 export type PluginContext = {
-    identity: string | undefined,
+    identity: string,
 };
 
