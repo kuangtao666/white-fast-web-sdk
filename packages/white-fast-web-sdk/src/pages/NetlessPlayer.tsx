@@ -130,9 +130,6 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                 }, {
                     onPhaseChanged: phase => {
                         this.setState({phase: phase});
-                        if (phase === PlayerPhase.Ended) {
-                            replayStore.seekToScheduleTime(0);
-                        }
                     },
                     onLoadFirstFrame: () => {
                         this.setState({isFirstScreenReady: true});
@@ -247,7 +244,6 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             }
             case PlayerPhase.Ended: {
                 player.seekToScheduleTime(0);
-                replayStore.seekToScheduleTime(0);
                 break;
             }
         }

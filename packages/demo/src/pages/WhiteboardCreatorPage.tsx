@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Redirect} from "@netless/i18n-react-router";
+import {Redirect} from "react-router";
 import {netlessWhiteboardApi, RoomType} from "../apiMiddleware";
 import {message} from "antd";
 import {RouteComponentProps} from "react-router";
