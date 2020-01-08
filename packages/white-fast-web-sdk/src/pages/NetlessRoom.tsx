@@ -118,14 +118,14 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     private startJoinRoom = async (): Promise<void> => {
         const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
-        const plugins = createPlugins({"video": videoPlugin, "audio": audioPlugin});
-                plugins.setPluginContext("video", {identity: identity ? identity : IdentityType.guest});
-                plugins.setPluginContext("audio", {identity: identity ? identity : IdentityType.guest});
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
+                const plugins = createPlugins({"video": videoPlugin, "audio": audioPlugin});
+                plugins.setPluginContext("video", {identity: identity ? identity : IdentityType.guest});
+                plugins.setPluginContext("audio", {identity: identity ? identity : IdentityType.guest});
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ",
                     plugins: plugins});
             }
@@ -163,8 +163,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                         });
                     },
                 });
-            plugins.setPluginContext("video", {identity: identity ? identity : IdentityType.guest});
-            plugins.setPluginContext("audio", {identity: identity ? identity : IdentityType.guest});
             room.moveCamera({
                 centerX: 0,
                 centerY: 0,
