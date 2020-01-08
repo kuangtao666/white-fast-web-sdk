@@ -5,9 +5,7 @@
     "lerna": "^3.16.5"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "global": "^4.4.0",
-    "webrtc-zego": "^1.2.2"
+    "global": "^4.4.0"
   },
   "scripts": {
     "dev": "lerna run --parallel dev",

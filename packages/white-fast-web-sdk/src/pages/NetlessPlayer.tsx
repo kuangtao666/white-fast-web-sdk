@@ -1,7 +1,7 @@
 import * as React from "react";
 import SeekSlider from "@netless/react-seek-slider";
 import {Badge, Icon, message} from "antd";
-import {WhiteWebSdk, PlayerPhase, Player, PlayerWhiteboard} from "white-react-sdk";
+import {WhiteWebSdk, PlayerPhase, Player, PlayerWhiteboard, createPlugins} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
@@ -16,10 +16,10 @@ import PlayerTopRight from "../components/whiteboard/PlayerTopRight";
 import Draggable from "react-draggable";
 import "./NetlessPlayer.less";
 import {PlayerFacadeObject, PlayerFacadeSetter} from "../facade/Facade";
-import WhiteVideoPlugin from "@netless/white-video-plugin";
-import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {replayStore} from "../models/ReplayStore";
 import {LanguageEnum} from "./NetlessRoomTypes";
+import {videoPlugin} from "@netless/white-video-plugin";
+import {audioPlugin} from "@netless/white-audio-plugin";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));
 export enum LayoutType {
     Suspension = "Suspension",
@@ -37,6 +37,7 @@ export type PlayerPageProps = {
     mediaUrl?: string,
     logoUrl?: string;
     clickLogoCallback?: () => void;
+    playerCallback?: (player: Player) => void;
     roomName?: string;
     language?: LanguageEnum;
     isManagerOpen?: boolean;
@@ -115,8 +116,9 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
         if (mediaUrl && this.props.isManagerOpen === undefined) {
             this.setState({isManagerOpen: true});
         }
+        const plugins = createPlugins({"video": videoPlugin, "audio": audioPlugin});
         if (uuid && roomToken) {
-            const whiteWebSdk = new WhiteWebSdk({plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
+            const whiteWebSdk = new WhiteWebSdk({plugins: plugins});
             const player = await whiteWebSdk.replayRoom(
                 {
                     beginTimestamp: beginTimestamp,
@@ -128,9 +130,6 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                 }, {
                     onPhaseChanged: phase => {
                         this.setState({phase: phase});
-                        if (phase === PlayerPhase.Ended) {
-                            replayStore.seekToScheduleTime(0);
-                        }
                     },
                     onLoadFirstFrame: () => {
                         this.setState({isFirstScreenReady: true});
@@ -156,6 +155,9 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             this.setState({
                 player: player,
             });
+            if (this.props.playerCallback) {
+                this.props.playerCallback(player);
+            }
             player.addMagixEventListener("message",  event => {
                 this.setState({messages: [...this.state.messages, event.payload]});
             });
@@ -242,7 +244,6 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             }
             case PlayerPhase.Ended: {
                 player.seekToScheduleTime(0);
-                replayStore.seekToScheduleTime(0);
                 break;
             }
         }

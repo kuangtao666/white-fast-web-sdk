@@ -13,8 +13,8 @@ import {
     MemberState,
     ViewMode,
     DeviceType,
-    PluginComponentClass,
     RoomWhiteboard,
+    createPlugins,
 } from "white-react-sdk";
 import "white-web-sdk/style/index.css";
 import PageError from "../components/PageError";
@@ -42,9 +42,9 @@ import {RoomFacadeObject} from "../facade/Facade";
 import * as default_cover from "../assets/image/default_cover.svg";
 import WebPpt from "./WebPpt";
 import {roomStore} from "../models/RoomStore";
+import {videoPlugin} from "@netless/white-video-plugin";
+import {audioPlugin} from "@netless/white-audio-plugin";
 import {observer} from "mobx-react";
-import WhiteVideoPlugin from "@netless/white-video-plugin";
-import WhiteAudioPlugin from "@netless/white-audio-plugin";
 import {
     ClassModeType,
     IdentityType,
@@ -118,26 +118,29 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
     private startJoinRoom = async (): Promise<void> => {
         const {uuid, roomToken, userId, userName, userAvatarUrl, identity, isManagerOpen} = this.props;
         const {classMode} = this.state;
+        const plugins = createPlugins({"video": videoPlugin, "audio": audioPlugin});
+                plugins.setPluginContext("video", {identity: identity ? identity : IdentityType.guest});
+                plugins.setPluginContext("audio", {identity: identity ? identity : IdentityType.guest});
         if (roomToken && uuid) {
             let whiteWebSdk;
             if (isMobile) {
                 whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface});
             } else {
-                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ", plugins: [WhiteVideoPlugin, WhiteAudioPlugin]});
+                whiteWebSdk = new WhiteWebSdk({ deviceType: DeviceType.Surface, handToolKey: " ",
+                    plugins: plugins});
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
-            const userPayload = identity === IdentityType.host ? {
-                userId: userId,
-                name: userName,
-                avatar: userAvatarUrl,
-                identity: identity,
-            } : undefined;
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
                     cursorAdapter: this.cursor,
-                    userPayload: userPayload},
+                    userPayload: {
+                        userId: userId,
+                        name: userName,
+                        avatar: userAvatarUrl,
+                        identity: identity,
+                    }},
                 {
                     onPhaseChanged: phase => {
                         if (!this.didLeavePage) {
@@ -160,6 +163,8 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                         });
                     },
                 });
+            plugins.setPluginContext("video", {identity: identity ? identity : IdentityType.guest});
+            plugins.setPluginContext("audio", {identity: identity ? identity : IdentityType.guest});
             room.moveCamera({
                 centerX: 0,
                 centerY: 0,
@@ -171,9 +176,9 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             if (isManagerOpen !== null) {
                 this.roomManager = new RoomManager(userId, room, userAvatarUrl, identity, userName, classMode);
                 await this.roomManager.start();
-            }
-            if (identity === IdentityType.host) {
-                this.initDocumentState(room);
+                if (identity === IdentityType.host) {
+                    this.initDocumentState(room);
+                }
             }
             this.setState({room: room, roomState: room.state, roomToken: roomToken});
         } else {

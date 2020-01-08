@@ -33,7 +33,6 @@
     "scripts"
   ],
   "include": [
-    "./src/**/*",
-    "../white-fast-web-sdk/**/*"
+    "./src/**/*"
   ]
 }
