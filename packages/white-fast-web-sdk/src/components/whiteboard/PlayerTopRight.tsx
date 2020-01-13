@@ -5,7 +5,7 @@ import menu_out from "../../assets/image/menu_out.svg";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
 import {LayoutType} from "../../pages/NetlessPlayer";
-import Identicon from "../../tools/identicon/Identicon";
+import Identicon from "@netless/identicon";
 import {LanguageEnum} from "../../pages/NetlessRoomTypes";
 
 export type PlayerTopRightProps = {

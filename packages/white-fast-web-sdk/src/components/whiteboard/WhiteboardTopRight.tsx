@@ -10,7 +10,7 @@ import replay_video_cover from "../../assets/image/replay_video_cover.svg";
 import * as add from "../../assets/image/add.svg";
 import {GuestUserType} from "../../pages/RoomManager";
 import "./WhiteboardTopRight.less";
-import Identicon from "../../tools/identicon/Identicon";
+import Identicon from "@netless/identicon";
 import {IdentityType, LanguageEnum} from "../../pages/NetlessRoomTypes";
 import {roomStore} from "../../models/RoomStore";
 const timeout = (ms: any) => new Promise(res => setTimeout(res, ms));

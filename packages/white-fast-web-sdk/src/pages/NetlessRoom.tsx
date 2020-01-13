@@ -24,7 +24,7 @@ import WhiteboardBottomRight from "../components/whiteboard/WhiteboardBottomRigh
 import MenuBox from "../components/menu/MenuBox";
 import MenuAnnexBox from "../components/menu/MenuAnnexBox";
 import {ossConfigObj, OSSConfigObjType} from "../appToken";
-import {UserCursor} from "../components/whiteboard/UserCursor";
+import {UserCursor} from "@netless/cursor-adapter";
 import ToolBox, {CustomerComponentPositionType} from "../tools/toolBox/index";
 import UploadBtn from "../tools/upload/UploadBtn";
 import {RoomContextProvider} from "./RoomContext";
@@ -82,7 +82,6 @@ export type NetlessRoomStates = {
 class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> implements RoomFacadeObject {
     private didLeavePage: boolean = false;
     private roomManager: RoomManager;
-    private readonly cursor: UserCursor;
     private menuChild: React.Component;
     public constructor(props: NetlessRoomProps) {
         super(props);
@@ -104,7 +103,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             ossConfigObj: this.props.ossConfigObj !== undefined ? this.props.ossConfigObj : ossConfigObj,
             documentArray: this.props.documentArray !== undefined ? this.handleDocs(this.props.documentArray) : [],
         };
-        this.cursor = new UserCursor();
     }
 
     private handleManagerOpenState = (): boolean | null => {
@@ -131,10 +129,11 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
             }
             const pptConverter = whiteWebSdk.pptConverter(roomToken);
             this.setState({pptConverter: pptConverter});
+            const cursor = new UserCursor();
             const room = await whiteWebSdk.joinRoom({
                     uuid: uuid,
                     roomToken: roomToken,
-                    cursorAdapter: this.cursor,
+                    cursorAdapter: cursor,
                     userPayload: {
                         userId: userId,
                         name: userName,
@@ -156,13 +155,14 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                     },
                     onRoomStateChanged: modifyState => {
                         if (modifyState.roomMembers) {
-                            this.cursor.setColorAndAppliance(modifyState.roomMembers);
+                            cursor.setColorAndAppliance(modifyState.roomMembers);
                         }
                         this.setState({
                             roomState: {...this.state.roomState, ...modifyState} as RoomState,
                         });
                     },
                 });
+            cursor.setColorAndAppliance(room.state.roomMembers);
             room.moveCamera({
                 centerX: 0,
                 centerY: 0,
@@ -327,9 +327,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
         }
         await this.startJoinRoom();
         this.onWindowResize();
-        if (this.state.room && this.state.room.state.roomMembers) {
-            this.cursor.setColorAndAppliance(this.state.room.state.roomMembers);
-        }
     }
     public componentWillUnmount(): void {
         this.props.roomFacadeSetter(null);

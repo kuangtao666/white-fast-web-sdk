@@ -8,7 +8,7 @@ import user_empty from "../../assets/image/user_empty.svg";
 import menu_in from "../../assets/image/menu_in.svg";
 import teacher from "../../assets/image/teacher.svg";
 import "./PlayerManager.less";
-import Identicon from "../../tools/identicon/Identicon";
+import Identicon from "@netless/identicon";
 import {ClassModeType, LanguageEnum} from "../../pages/NetlessRoomTypes";
 const { TabPane } = Tabs;
 
