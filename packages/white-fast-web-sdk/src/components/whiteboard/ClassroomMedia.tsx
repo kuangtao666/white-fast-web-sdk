@@ -12,7 +12,7 @@ import * as microphone_close from "../../assets/image/microphone_close.svg";
 import * as camera_open from "../../assets/image/camera_open.svg";
 import * as camera_close from "../../assets/image/camera_close.svg";
 import ClassroomMediaManager from "./ClassroomMediaManager";
-import Identicon from "../../tools/identicon/Identicon";
+import Identicon from "@netless/identicon";
 import {ClassModeType, IdentityType, LanguageEnum, RtcType, RtcEnum} from "../../pages/NetlessRoomTypes";
 import {roomStore} from "../../models/RoomStore";
 import {observer} from "mobx-react";

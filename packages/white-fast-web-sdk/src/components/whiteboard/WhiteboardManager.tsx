@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Badge, Tabs, Icon} from "antd";
+import { reaction, IReactionDisposer } from "mobx";
 import "./WhiteboardManager.less";
 import {Room, ViewMode} from "white-web-sdk";
 import {GuestUserType, HostUserType} from "../../pages/RoomManager";
@@ -9,7 +10,7 @@ import raise_hands_active from "../../assets/image/raise_hands_active.svg";
 import WhiteboardChat from "./WhiteboardChat";
 import {MessageType} from "./WhiteboardBottomRight";
 import ClassroomMedia from "./ClassroomMedia";
-import Identicon from "../../tools/identicon/Identicon";
+import Identicon from "@netless/identicon";
 import {ClassModeType, IdentityType, LanguageEnum, RtcType} from "../../pages/NetlessRoomTypes";
 const { TabPane } = Tabs;
 
@@ -40,8 +41,12 @@ export type WhiteboardManagerStates = {
 
 
 export default class WhiteboardManager extends React.Component<WhiteboardManagerProps, WhiteboardManagerStates> {
+    private readonly reactionCameraDisposer: IReactionDisposer;
+    private readonly reactionChatStateDisposer: IReactionDisposer;
     public constructor(props: WhiteboardManagerProps) {
         super(props);
+        this.reactionCameraDisposer = this.startCameraReaction();
+        this.reactionChatStateDisposer = this.startChatStateReaction();
         this.state = {
             activeKey: "1",
             messages: [],
@@ -50,28 +55,39 @@ export default class WhiteboardManager extends React.Component<WhiteboardManager
         };
     }
 
+    private startCameraReaction(): IReactionDisposer {
+        const {cameraState, disableCameraTransform} = this.props;
+        return reaction(() => {
+            return {
+                cameraState,
+                disableCameraTransform,
+            };
+        }, state => {
+            if (state.cameraState !== undefined && state.disableCameraTransform !== undefined) {
+                this.props.room.setViewMode(state.cameraState);
+                this.props.room.disableCameraTransform = state.disableCameraTransform;
+            }
+        });
+    }
+
+    private startChatStateReaction(): IReactionDisposer {
+        const {isChatOpen} = this.props;
+        return reaction(() => {
+            return isChatOpen;
+        }, isChatOpen => {
+            if (isChatOpen) {
+                this.setState({activeKey: "1"});
+            } else {
+                this.setState({activeKey: "2"});
+            }
+        });
+    }
 
     public componentDidMount(): void {
         this.props.room.addMagixEventListener("message",  (event: any) => {
             this.setState({messages: [...this.state.messages, event.payload]});
         });
     }
-    public UNSAFE_componentWillReceiveProps(nextProps: WhiteboardManagerProps): void {
-        if (this.props.cameraState !== undefined && this.props.disableCameraTransform !== undefined && nextProps.cameraState !== undefined && nextProps.disableCameraTransform !== undefined) {
-           if (this.props.cameraState !== nextProps.cameraState) {
-               this.props.room.setViewMode(nextProps.cameraState);
-               this.props.room.disableCameraTransform = nextProps.disableCameraTransform;
-           }
-        }
-        if (this.props.isChatOpen !== nextProps.isChatOpen) {
-            if (nextProps.isChatOpen) {
-                this.setState({activeKey: "1"});
-            } else {
-                this.setState({activeKey: "2"});
-            }
-        }
-    }
-
 
     private renderHost = (): React.ReactNode => {
         const {room, userId} = this.props;

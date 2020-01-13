@@ -7,7 +7,7 @@ import * as eraser from "../../assets/image/eraser.svg";
 import * as ellipse from "../../assets/image/ellipse.svg";
 import * as rectangle from "../../assets/image/rectangle.svg";
 import "./UserCursor.less";
-import Identicon from "../../tools/identicon/Identicon";
+import Identicon from "@netless/identicon";
 export type CursorComponentProps = {
     roomMember: RoomMember;
 };

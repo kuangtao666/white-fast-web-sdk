@@ -8,8 +8,8 @@ import WhiteVideoPluginReplay from "./replay";
 export type WhiteVideoPluginProps = PluginProps<{
     play: boolean;
     seek: number;
-    volume: number,
-    mute: boolean,
+    volume: number;
+    mute: boolean;
     currentTime: number;
 }>;
 
