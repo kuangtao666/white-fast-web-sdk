@@ -1,7 +1,7 @@
 import * as React from "react";
 import SeekSlider from "@netless/react-seek-slider";
 import {Badge, Icon, message} from "antd";
-import {WhiteWebSdk, PlayerPhase, Player, PlayerWhiteboard, createPlugins} from "white-react-sdk";
+import {WhiteWebSdk, PlayerPhase, Player, PlayerWhiteboard, createPlugins, ObserverMode} from "white-react-sdk";
 import * as chat_white from "../assets/image/chat_white.svg";
 import * as player_stop from "../assets/image/player_stop.svg";
 import * as player_begin from "../assets/image/player_begin.svg";
@@ -133,6 +133,7 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                     },
                     onLoadFirstFrame: () => {
                         this.setState({isFirstScreenReady: true});
+                        // player.setObserverMode(ObserverMode.Directory);
                         if (player.state.roomMembers) {
                             this.cursor.setColorAndAppliance(player.state.roomMembers);
                         }
@@ -155,6 +156,12 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             this.setState({
                 player: player,
             });
+            player.moveCamera({
+                centerX: 0,
+                centerY: 0,
+                scale: 0.2,
+            });
+            alert(1);
             if (this.props.playerCallback) {
                 this.props.playerCallback(player);
             }
