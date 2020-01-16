@@ -133,7 +133,6 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
                     },
                     onLoadFirstFrame: () => {
                         this.setState({isFirstScreenReady: true});
-                        // player.setObserverMode(ObserverMode.Directory);
                         if (player.state.roomMembers) {
                             this.cursor.setColorAndAppliance(player.state.roomMembers);
                         }
@@ -156,12 +155,6 @@ class NetlessPlayer extends React.Component<PlayerPageProps, PlayerPageStates> i
             this.setState({
                 player: player,
             });
-            player.moveCamera({
-                centerX: 0,
-                centerY: 0,
-                scale: 0.2,
-            });
-            alert(1);
             if (this.props.playerCallback) {
                 this.props.playerCallback(player);
             }

@@ -163,10 +163,6 @@ class NetlessRoom extends React.Component<NetlessRoomProps, NetlessRoomStates> i
                     },
                 });
             cursor.setColorAndAppliance(room.state.roomMembers);
-            room.moveCamera({
-                centerX: 0,
-                centerY: 0,
-            });
             (window as any).room = room;
             if (this.props.roomCallback) {
                 this.props.roomCallback(room);
