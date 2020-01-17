@@ -2,8 +2,6 @@ import {Room, ViewMode} from "white-web-sdk";
 import {message} from "antd";
 import {ClassModeType, IdentityType} from "./NetlessRoomTypes";
 
-
-
 export type GuestUserType = {
     userId: string,
     identity: IdentityType,
